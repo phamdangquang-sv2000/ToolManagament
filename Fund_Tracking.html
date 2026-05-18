@@ -5,13 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>L2 Support · Quỹ Đóng Phạt</title>
 
-<!-- ───── CDN ───── -->
+<!-- Animated SVG Favicon -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237c5cff'/%3E%3Cstop offset='1' stop-color='%2322d3ee'/%3E%3C/linearGradient%3E%3ClinearGradient id='g2' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23f472b6'/%3E%3Cstop offset='1' stop-color='%237c5cff'/%3E%3C/linearGradient%3E%3Cstyle%3E%40keyframes pulse%7B0%25%2C100%25%7Bopacity%3A1%3Btransform%3Ascale(1)%7D50%25%7Bopacity%3A.85%3Btransform%3Ascale(.95)%7D%7D.ico%7Banimation%3Apulse 2s ease-in-out infinite%3Btransform-origin%3A16px 16px%7D%3C/style%3E%3C/defs%3E%3Ccircle class='ico' cx='16' cy='16' r='15' fill='url(%23g)'/%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='rgba(255,255,255,.25)' stroke-width='1'/%3E%3Ctext x='16' y='21' text-anchor='middle' font-size='15' font-family='sans-serif' fill='white' font-weight='900'%3E%E2%82%AB%3C/text%3E%3C/svg%3E">
+
+<!-- CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 
 <style>
-  /* ───── Design Tokens ───── */
   :root{
     --bg:#070912; --bg2:#0c1020; --surface:#121830; --surface2:#1a2342;
     --border:#222b4a; --border2:#2d3a63;
@@ -22,257 +24,156 @@
     --mono:'JetBrains Mono',monospace;
     --grad:linear-gradient(135deg,#7c5cff 0%,#22d3ee 100%);
     --grad-pink:linear-gradient(135deg,#f472b6 0%,#7c5cff 100%);
+    --grad-red:linear-gradient(135deg,#f87171 0%,#f472b6 100%);
+    --grad-green:linear-gradient(135deg,#34d399 0%,#22d3ee 100%);
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
-  body{
-    font-family:var(--font);
-    background:var(--bg);
-    color:var(--text);
-    min-height:100vh;
+  body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;
     background-image:
       radial-gradient(1200px 600px at 10% -10%,rgba(124,92,255,.18),transparent 60%),
       radial-gradient(900px 500px at 110% 10%,rgba(34,211,238,.12),transparent 60%),
       radial-gradient(700px 400px at 50% 120%,rgba(244,114,182,.10),transparent 60%);
-    background-attachment:fixed;
-  }
-  /* Animated gradient orbs */
+    background-attachment:fixed;}
+
   .orb{position:fixed;border-radius:50%;filter:blur(80px);opacity:.35;pointer-events:none;z-index:0;animation:float 14s ease-in-out infinite}
   .orb-1{width:380px;height:380px;background:#7c5cff;top:-80px;left:-100px}
   .orb-2{width:340px;height:340px;background:#22d3ee;top:30%;right:-120px;animation-delay:-5s}
   .orb-3{width:300px;height:300px;background:#f472b6;bottom:-80px;left:30%;animation-delay:-9s}
-  @keyframes float{
-    0%,100%{transform:translate(0,0) scale(1)}
-    50%{transform:translate(40px,-30px) scale(1.08)}
-  }
+  @keyframes float{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,-30px) scale(1.08)}}
 
-  /* Scrollbar */
   ::-webkit-scrollbar{width:10px;height:10px}
   ::-webkit-scrollbar-track{background:var(--bg2)}
   ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:8px}
   ::-webkit-scrollbar-thumb:hover{background:var(--primary)}
 
-  /* ───── Cards ───── */
-  .glass{
-    background:linear-gradient(180deg,rgba(26,35,66,.65),rgba(18,24,48,.55));
-    backdrop-filter:blur(14px);
-    border:1px solid var(--border);
-    border-radius:18px;
-    transition:transform .3s cubic-bezier(.34,1.4,.64,1),border-color .3s,box-shadow .3s;
-  }
+  /* Cards */
+  .glass{background:linear-gradient(180deg,rgba(26,35,66,.65),rgba(18,24,48,.55));backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:18px;transition:transform .3s cubic-bezier(.34,1.4,.64,1),border-color .3s,box-shadow .3s;}
   .glass:hover{border-color:var(--border2)}
-  .stat{
-    position:relative;overflow:hidden;
-    padding:22px 24px;
-  }
-  .stat::before{
-    content:'';position:absolute;inset:0;
-    background:radial-gradient(400px 200px at 0% 0%,rgba(124,92,255,.15),transparent 60%);
-    opacity:.8;pointer-events:none;
-  }
-  .stat::after{
-    content:'';position:absolute;top:0;left:0;right:0;height:2px;
-    background:var(--grad);opacity:.7;
-  }
+  .stat{position:relative;overflow:hidden;padding:22px 24px;}
+  .stat::before{content:'';position:absolute;inset:0;background:radial-gradient(400px 200px at 0% 0%,rgba(124,92,255,.15),transparent 60%);opacity:.8;pointer-events:none;}
+  .stat::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--stat-top, var(--grad));opacity:.7;}
   .stat:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(0,0,0,.4),0 0 24px var(--primary-glow)}
+  .stat-thu::after{background:var(--grad);}
+  .stat-chi::after{background:var(--grad-red);}
+  .stat-conlai::after{background:var(--grad-green);}
+  .stat-count::after{background:var(--grad-pink);}
 
-  /* ───── Buttons ───── */
-  .btn{
-    display:inline-flex;align-items:center;gap:8px;
-    padding:10px 18px;border-radius:12px;
-    font-weight:700;font-size:13.5px;cursor:pointer;
-    border:1px solid transparent;
-    transition:transform .18s cubic-bezier(.34,1.4,.64,1),box-shadow .18s,background .18s,color .18s;
-    user-select:none;white-space:nowrap;
-  }
+  /* Buttons */
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:12px;font-weight:700;font-size:13.5px;cursor:pointer;border:1px solid transparent;transition:transform .18s cubic-bezier(.34,1.4,.64,1),box-shadow .18s,background .18s,color .18s;user-select:none;white-space:nowrap;}
   .btn:active{transform:translateY(1px) scale(.98)}
-  .btn-primary{
-    background:var(--grad);color:#fff;
-    box-shadow:0 6px 20px var(--primary-glow),0 1px 0 rgba(255,255,255,.18) inset;
-    position:relative;overflow:hidden;
-  }
-  .btn-primary::after{
-    content:'';position:absolute;inset:0;
-    background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.25) 50%,transparent 70%);
-    transform:translateX(-100%);transition:transform .6s;
-  }
+  .btn-primary{background:var(--grad);color:#fff;box-shadow:0 6px 20px var(--primary-glow),0 1px 0 rgba(255,255,255,.18) inset;position:relative;overflow:hidden;}
+  .btn-primary::after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.25) 50%,transparent 70%);transform:translateX(-100%);transition:transform .6s;}
   .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 28px var(--primary-glow),0 0 0 1px rgba(255,255,255,.1) inset}
   .btn-primary:hover::after{transform:translateX(100%)}
-  .btn-ghost{
-    background:rgba(255,255,255,.04);color:var(--text);border-color:var(--border);
-    position:relative;overflow:hidden;
-  }
-  .btn-ghost::after{
-    content:'';position:absolute;inset:0;
-    background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.12) 50%,transparent 70%);
-    transform:translateX(-120%);transition:transform .55s ease;pointer-events:none;
-  }
-  .btn-ghost:hover{
-    background:rgba(255,255,255,.09);border-color:var(--border2);
-    box-shadow:0 0 16px rgba(124,92,255,.18),0 4px 12px rgba(0,0,0,.2);
-    transform:translateY(-2px);
-  }
+
+  .btn-expense{background:linear-gradient(135deg,rgba(248,113,113,.2),rgba(244,114,182,.15));color:#fca5a5;border:1px solid rgba(248,113,113,.4);position:relative;overflow:hidden;box-shadow:0 4px 16px rgba(248,113,113,.15);}
+  .btn-expense::after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.15) 50%,transparent 70%);transform:translateX(-100%);transition:transform .6s;}
+  .btn-expense:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(248,113,113,.3);background:linear-gradient(135deg,rgba(248,113,113,.3),rgba(244,114,182,.25));color:#fff;}
+  .btn-expense:hover::after{transform:translateX(100%)}
+
+  .btn-ghost{background:rgba(255,255,255,.04);color:var(--text);border-color:var(--border);position:relative;overflow:hidden;}
+  .btn-ghost::after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.12) 50%,transparent 70%);transform:translateX(-120%);transition:transform .55s ease;pointer-events:none;}
+  .btn-ghost:hover{background:rgba(255,255,255,.09);border-color:var(--border2);box-shadow:0 0 16px rgba(124,92,255,.18),0 4px 12px rgba(0,0,0,.2);transform:translateY(-2px);}
   .btn-ghost:hover::after{transform:translateX(120%)}
 
-  /* Role buttons */
-  .btn-role-employee{
-    background:rgba(124,92,255,.12);color:#a78bfa;
-    border:1px solid rgba(124,92,255,.45);
-    box-shadow:0 0 16px rgba(124,92,255,.15);
-    position:relative;overflow:hidden;
-  }
-  .btn-role-employee::after{
-    content:'';position:absolute;inset:0;
-    background:linear-gradient(120deg,transparent 30%,rgba(167,139,250,.2) 50%,transparent 70%);
-    transform:translateX(-120%);transition:transform .55s ease;pointer-events:none;
-  }
-  .btn-role-employee:hover{
-    background:rgba(124,92,255,.25);border-color:#7c5cff;
-    box-shadow:0 0 28px rgba(124,92,255,.35),0 4px 14px rgba(0,0,0,.25);
-    transform:translateY(-2px);
-  }
+  .btn-role-employee{background:rgba(124,92,255,.12);color:#a78bfa;border:1px solid rgba(124,92,255,.45);box-shadow:0 0 16px rgba(124,92,255,.15);position:relative;overflow:hidden;}
+  .btn-role-employee::after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent 30%,rgba(167,139,250,.2) 50%,transparent 70%);transform:translateX(-120%);transition:transform .55s ease;pointer-events:none;}
+  .btn-role-employee:hover{background:rgba(124,92,255,.25);border-color:#7c5cff;box-shadow:0 0 28px rgba(124,92,255,.35),0 4px 14px rgba(0,0,0,.25);transform:translateY(-2px);}
   .btn-role-employee:hover::after{transform:translateX(120%)}
 
-  .btn-role-admin{
-    background:rgba(248,113,113,.1);color:#fca5a5;
-    border:1px solid rgba(248,113,113,.3);
-    position:relative;overflow:hidden;
-  }
-  .btn-role-admin::after{
-    content:'';position:absolute;inset:0;
-    background:linear-gradient(120deg,transparent 30%,rgba(252,165,165,.15) 50%,transparent 70%);
-    transform:translateX(-120%);transition:transform .55s ease;pointer-events:none;
-  }
-  .btn-role-admin:hover{
-    background:rgba(248,113,113,.2);border-color:#f87171;color:#fff;
-    box-shadow:0 0 20px rgba(248,113,113,.25),0 4px 12px rgba(0,0,0,.25);
-    transform:translateY(-2px);
-  }
+  .btn-role-admin{background:rgba(248,113,113,.1);color:#fca5a5;border:1px solid rgba(248,113,113,.3);position:relative;overflow:hidden;}
+  .btn-role-admin::after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent 30%,rgba(252,165,165,.15) 50%,transparent 70%);transform:translateX(-120%);transition:transform .55s ease;pointer-events:none;}
+  .btn-role-admin:hover{background:rgba(248,113,113,.2);border-color:#f87171;color:#fff;box-shadow:0 0 20px rgba(248,113,113,.25),0 4px 12px rgba(0,0,0,.25);transform:translateY(-2px);}
   .btn-role-admin:hover::after{transform:translateX(120%)}
 
-  /* Refresh spinning */
-  #btnRefresh .icon-refresh{transition:transform .6s ease}
-  #btnRefresh.spinning .icon-refresh{animation:refreshSpin .7s linear infinite}
-  @keyframes refreshSpin{to{transform:rotate(360deg)}}
   .btn-danger{background:rgba(248,113,113,.1);color:#fca5a5;border-color:rgba(248,113,113,.25)}
   .btn-danger:hover{background:rgba(248,113,113,.2);color:#fff;border-color:#f87171}
   .btn-sm{padding:6px 12px;font-size:12px;border-radius:9px}
 
-  /* ───── Inputs ───── */
-  .field{
-    width:100%;padding:11px 14px;
-    background:rgba(8,11,22,.6);
-    border:1px solid var(--border);
-    border-radius:11px;color:var(--text);
-    font-family:var(--font);font-size:13.5px;
-    transition:border-color .18s,box-shadow .18s,background .18s;
-  }
+  #btnRefresh .icon-refresh{transition:transform .6s ease}
+  #btnRefresh.spinning .icon-refresh{animation:refreshSpin .7s linear infinite}
+  @keyframes refreshSpin{to{transform:rotate(360deg)}}
+
+  /* Inputs */
+  .field{width:100%;padding:11px 14px;background:rgba(8,11,22,.6);border:1px solid var(--border);border-radius:11px;color:var(--text);font-family:var(--font);font-size:13.5px;transition:border-color .18s,box-shadow .18s,background .18s;}
   .field:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(124,92,255,.15)}
   .field::placeholder{color:var(--text3)}
   label.lbl{display:block;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono);margin-bottom:6px;font-weight:700}
 
-  /* ───── Badges ───── */
+  /* Badges */
   .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:7px;font-size:11px;font-weight:700;font-family:var(--mono);letter-spacing:.03em}
   .badge-paid{background:linear-gradient(135deg,rgba(52,211,153,.18),rgba(52,211,153,.08));color:#6ee7b7;border:1px solid rgba(52,211,153,.3)}
   .badge-pending{background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(251,191,36,.08));color:#fcd34d;border:1px solid rgba(251,191,36,.3)}
   .badge-bank{background:rgba(34,211,238,.12);color:#7dd3fc;border:1px solid rgba(34,211,238,.25)}
   .badge-cash{background:rgba(244,114,182,.12);color:#f9a8d4;border:1px solid rgba(244,114,182,.25)}
+  .badge-thu{background:rgba(52,211,153,.12);color:#6ee7b7;border:1px solid rgba(52,211,153,.28)}
+  .badge-chi{background:rgba(248,113,113,.12);color:#fca5a5;border:1px solid rgba(248,113,113,.28)}
 
-  /* ───── Table ───── */
+  /* Table */
   table.tbl{width:100%;border-collapse:collapse;font-size:13px}
-  .tbl th{
-    background:rgba(8,11,22,.55);text-align:left;
-    padding:11px 14px;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;
-    color:var(--text3);font-family:var(--mono);font-weight:700;
-    border-bottom:1px solid var(--border);
-    position:sticky;top:0;backdrop-filter:blur(8px);
-  }
+  .tbl th{background:rgba(8,11,22,.55);text-align:left;padding:11px 14px;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-family:var(--mono);font-weight:700;border-bottom:1px solid var(--border);position:sticky;top:0;backdrop-filter:blur(8px);}
   .tbl td{padding:13px 14px;border-bottom:1px solid rgba(34,43,74,.5);vertical-align:middle}
   .tbl tbody tr{transition:background-color .15s}
   .tbl tbody tr:hover td{background-color:rgba(124,92,255,.06)}
   .tbl tbody tr:last-child td{border-bottom:none}
+  .tbl tr.row-chi td:first-child{border-left:2px solid rgba(248,113,113,.45)}
 
-  /* Avatar */
   .avatar{width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.3)}
 
   /* Modal */
   .modal-backdrop{position:fixed;inset:0;background:rgba(4,6,14,.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:100;padding:20px;animation:fadeIn .2s}
   .modal-backdrop.open{display:flex}
-  .modal{
-    background:linear-gradient(180deg,#1a2342,#121830);
-    border:1px solid var(--border2);border-radius:20px;
-    max-width:560px;width:100%;
-    box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 40px var(--primary-glow);
-    animation:popIn .3s cubic-bezier(.34,1.4,.64,1);
-  }
+  .modal{background:linear-gradient(180deg,#1a2342,#121830);border:1px solid var(--border2);border-radius:20px;max-width:560px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 40px var(--primary-glow);animation:popIn .3s cubic-bezier(.34,1.4,.64,1);}
   @keyframes fadeIn{from{opacity:0}to{opacity:1}}
   @keyframes popIn{from{opacity:0;transform:scale(.9) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
 
-  /* Row animation */
   .row-in{animation:rowIn .35s cubic-bezier(.34,1.4,.64,1) both}
   @keyframes rowIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 
-  /* Spinner */
   .spinner{width:18px;height:18px;border:2px solid var(--border2);border-top-color:var(--primary);border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
   @keyframes spin{to{transform:rotate(360deg)}}
 
   /* Toast */
-  .toast{
-    position:fixed;bottom:24px;right:24px;
-    background:linear-gradient(180deg,#1a2342,#121830);
-    border:1px solid var(--border2);border-radius:14px;
-    padding:14px 18px;display:flex;align-items:center;gap:10px;
-    font-size:13.5px;font-weight:600;
-    box-shadow:0 14px 40px rgba(0,0,0,.5),0 0 24px var(--primary-glow);
-    z-index:200;animation:toastIn .3s cubic-bezier(.34,1.4,.64,1);
-  }
+  .toast{position:fixed;bottom:24px;right:24px;background:linear-gradient(180deg,#1a2342,#121830);border:1px solid var(--border2);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:600;box-shadow:0 14px 40px rgba(0,0,0,.5),0 0 24px var(--primary-glow);z-index:200;animation:toastIn .3s cubic-bezier(.34,1.4,.64,1);}
   @keyframes toastIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
   .toast-success{border-color:rgba(52,211,153,.4)}
   .toast-error{border-color:rgba(248,113,113,.4)}
 
-  /* Gradient text */
   .gtext{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
   .gtext-pink{background:var(--grad-pink);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .gtext-red{background:var(--grad-red);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .gtext-green{background:var(--grad-green);-webkit-background-clip:text;background-clip:text;color:transparent}
 
-  /* Brand */
-  .brand-logo{
-    width:42px;height:42px;border-radius:12px;
-    background:var(--grad);
-    display:inline-flex;align-items:center;justify-content:center;
-    font-weight:800;color:#fff;font-size:18px;
-    box-shadow:0 6px 20px var(--primary-glow);
-    position:relative;overflow:hidden;
-  }
-  .brand-logo::after{
-    content:'';position:absolute;inset:0;
-    background:linear-gradient(135deg,rgba(255,255,255,.3),transparent 50%);
-  }
+  .brand-logo{width:42px;height:42px;border-radius:12px;background:var(--grad);display:inline-flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:18px;box-shadow:0 6px 20px var(--primary-glow);position:relative;overflow:hidden;}
+  .brand-logo::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.3),transparent 50%);}
 
-  /* Filter chip */
-  .chip{
-    padding:7px 14px;border-radius:999px;font-size:12.5px;font-weight:600;
-    background:rgba(255,255,255,.04);color:var(--text2);
-    border:1px solid var(--border);cursor:pointer;
-    transition:all .18s;white-space:nowrap;
-  }
+  .chip{padding:7px 14px;border-radius:999px;font-size:12.5px;font-weight:600;background:rgba(255,255,255,.04);color:var(--text2);border:1px solid var(--border);cursor:pointer;transition:all .18s;white-space:nowrap;}
   .chip:hover{color:var(--text);border-color:var(--border2)}
   .chip.active{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 4px 14px var(--primary-glow)}
+  .chip.active-chi{background:var(--grad-red)!important;color:#fff!important;border-color:transparent!important;box-shadow:0 4px 14px rgba(248,113,113,.35)!important}
 
-  /* Empty state */
   .empty{padding:60px 20px;text-align:center;color:var(--text2)}
-
-  /* Setup banner */
-  .setup{
-    background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(248,113,113,.08));
-    border:1px solid rgba(251,191,36,.3);
-    border-radius:14px;padding:16px 20px;font-size:13px;color:#fcd34d;
-    margin-bottom:20px;
-  }
-  .setup code{background:rgba(0,0,0,.4);padding:2px 7px;border-radius:5px;font-family:var(--mono);font-size:12px;color:#fff}
-
-  /* Sort icon */
   .sortable{cursor:pointer;user-select:none}
   .sortable:hover{color:var(--text2)}
+
+  /* Pagination */
+  .page-btn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;font-size:12px;font-weight:700;font-family:var(--mono);cursor:pointer;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text2);transition:all .15s;}
+  .page-btn:hover{background:rgba(255,255,255,.09);border-color:var(--border2);color:var(--text);}
+  .page-btn.active{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 4px 14px var(--primary-glow);}
+  .page-btn:disabled{opacity:.3;cursor:not-allowed;pointer-events:none;}
+
+  /* Type toggle in modal */
+  .type-toggle{display:flex;gap:6px;margin-bottom:16px}
+  .type-btn{flex:1;padding:10px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text2);transition:all .18s;text-align:center;}
+  .type-btn.active-thu{background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.4);color:#6ee7b7;}
+  .type-btn.active-chi{background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.4);color:#fca5a5;}
+
+  /* Date filter selects */
+  .filter-select{padding:7px 12px;border-radius:999px;font-size:12.5px;font-weight:600;background:rgba(255,255,255,.04);color:var(--text2);border:1px solid var(--border);cursor:pointer;transition:all .18s;font-family:var(--font);appearance:none;-webkit-appearance:none;padding-right:28px;}
+  .filter-select:focus{outline:none;border-color:var(--primary);color:var(--text);}
+  .filter-select-wrap{position:relative}
+  .filter-select-wrap::after{content:'▾';position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--text3);pointer-events:none;}
 </style>
 </head>
 <body>
@@ -283,7 +184,7 @@
 
 <div class="relative z-10 max-w-7xl mx-auto px-5 md:px-8 py-8">
 
-  <!-- ───── Header ───── -->
+  <!-- Header -->
   <header class="flex items-center justify-between mb-8 flex-wrap gap-4">
     <div class="flex items-center gap-3">
       <div class="brand-logo">L2</div>
@@ -291,62 +192,92 @@
         <h1 class="text-xl md:text-2xl font-extrabold tracking-tight">
           Quỹ <span class="gtext">L2 Support</span>
         </h1>
-        <div class="text-xs text-[color:var(--text3)] font-mono mt-0.5">Lịch sử đóng · LATE FUND TRACKER</div>
+        <div class="text-xs text-[color:var(--text3)] font-mono mt-0.5">Thu · Chi · Còn lại · FUND TRACKER</div>
       </div>
     </div>
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 flex-wrap">
       <button class="btn btn-ghost" onclick="loadData(true)" id="btnRefresh">
         <svg class="icon-refresh" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
         <span id="btnRefreshText">Làm mới</span>
       </button>
-      <button class="btn btn-primary admin-only" onclick="openModal()" style="display:none">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Thêm
+      <button class="btn btn-primary admin-only" onclick="openAddModal('thu')" style="display:none">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Thu vào
       </button>
-      <!-- Role toggle button — updates dynamically via applyRole() -->
-      <button id="btnRoleToggle" class="btn btn-role-employee" onclick="handleRoleToggle()" style="display:none" title="Đổi vai trò">
+      <button class="btn btn-expense admin-only" onclick="openAddModal('chi')" style="display:none">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Chi ra
+      </button>
+      <button id="btnRoleToggle" class="btn btn-role-employee" onclick="handleRoleToggle()" style="display:none">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         <span id="btnRoleLabel">Đăng nhập Admin</span>
       </button>
     </div>
   </header>
 
-  <!-- ───── Stats ───── -->
+  <!-- Stats: Tổng Thu | Đã Chi | Còn Lại | Giao dịch -->
   <section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-7">
-    <div class="glass stat">
-      <div class="text-[11px] font-mono uppercase tracking-wider text-[color:var(--text3)] font-bold mb-2">Tổng quỹ</div>
+    <div class="glass stat stat-thu">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-[color:var(--text3)] font-bold mb-2">Tổng Quỹ</div>
       <div class="text-2xl md:text-3xl font-extrabold gtext" id="statTotal">0₫</div>
-      <div class="text-xs text-[color:var(--text2)] mt-1" id="statTotalSub">Tất cả thời gian</div>
+      <div class="text-xs text-[color:var(--text2)] mt-1" id="statTotalSub">Tổng thu vào</div>
     </div>
-    <div class="glass stat">
-      <div class="text-[11px] font-mono uppercase tracking-wider text-[color:var(--text3)] font-bold mb-2">Tháng này</div>
-      <div class="text-2xl md:text-3xl font-extrabold text-[color:var(--success)]" id="statMonth">0₫</div>
-      <div class="text-xs text-[color:var(--text2)] mt-1" id="statMonthSub">0 giao dịch</div>
+    <div class="glass stat stat-chi">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-[color:var(--text3)] font-bold mb-2">Đã Chi</div>
+      <div class="text-2xl md:text-3xl font-extrabold gtext-red" id="statChi">0₫</div>
+      <div class="text-xs text-[color:var(--text2)] mt-1" id="statChiSub">Tổng chi ra</div>
     </div>
-    <div class="glass stat">
-      <div class="text-[11px] font-mono uppercase tracking-wider text-[color:var(--text3)] font-bold mb-2">Số giao dịch</div>
+    <div class="glass stat stat-conlai">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-[color:var(--text3)] font-bold mb-2">Còn Lại</div>
+      <div class="text-2xl md:text-3xl font-extrabold gtext-green" id="statConlai">0₫</div>
+      <div class="text-xs text-[color:var(--text2)] mt-1">Quỹ hiện tại</div>
+    </div>
+    <div class="glass stat stat-count">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-[color:var(--text3)] font-bold mb-2">Giao dịch</div>
       <div class="text-2xl md:text-3xl font-extrabold gtext-pink" id="statCount">0</div>
       <div class="text-xs text-[color:var(--text2)] mt-1" id="statCountSub">Đã ghi nhận</div>
     </div>
-    <div class="glass stat">
-      <div class="text-[11px] font-mono uppercase tracking-wider text-[color:var(--text3)] font-bold mb-2">Thành viên</div>
-      <div class="text-2xl md:text-3xl font-extrabold text-[color:var(--primary-2)]" id="statMembers">0</div>
-      <div class="text-xs text-[color:var(--text2)] mt-1" id="statMembersSub">Đã từng đóng</div>
-    </div>
   </section>
 
-  <!-- ───── Filters ───── -->
-  <section class="glass p-5 mb-5">
+  <!-- Filters -->
+  <section class="glass p-4 mb-5">
     <div class="flex flex-wrap items-center gap-3">
-      <div class="relative flex-1 min-w-[220px]">
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--text3)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input id="searchInput" class="field pl-9" placeholder="Tìm theo tên..." oninput="render()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" readonly onfocus="this.removeAttribute('readonly')" name="search_fund_x">
+      <!-- Search -->
+      <div class="relative flex-1 min-w-[200px]">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--text3)]" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="searchInput" class="field pl-9" placeholder="Tìm theo tên..." oninput="currentPage=1;render()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" readonly onfocus="this.removeAttribute('readonly')" name="search_fund_x">
       </div>
+      <!-- Month filter -->
+      <div class="filter-select-wrap">
+        <select id="monthFilter" class="filter-select" onchange="currentPage=1;render()">
+          <option value="">Tất cả tháng</option>
+          <option value="01">Tháng 1</option><option value="02">Tháng 2</option>
+          <option value="03">Tháng 3</option><option value="04">Tháng 4</option>
+          <option value="05">Tháng 5</option><option value="06">Tháng 6</option>
+          <option value="07">Tháng 7</option><option value="08">Tháng 8</option>
+          <option value="09">Tháng 9</option><option value="10">Tháng 10</option>
+          <option value="11">Tháng 11</option><option value="12">Tháng 12</option>
+        </select>
+      </div>
+      <!-- Year filter -->
+      <div class="filter-select-wrap">
+        <select id="yearFilter" class="filter-select" onchange="currentPage=1;render()">
+          <option value="">Tất cả năm</option>
+        </select>
+      </div>
+      <!-- Type chips -->
+      <div class="flex gap-2 flex-wrap" id="typeChips">
+        <button class="chip active" data-filter="txtype" data-value="all">Tất cả</button>
+        <button class="chip" data-filter="txtype" data-value="thu">Thu vào</button>
+        <button class="chip" data-filter="txtype" data-value="chi">Chi ra</button>
+      </div>
+      <!-- Method chips -->
       <div class="flex gap-2 flex-wrap" id="methodChips">
-        <button class="chip active" data-filter="method" data-value="all">Tất cả</button>
+        <button class="chip active" data-filter="method" data-value="all">Mọi phương thức</button>
         <button class="chip" data-filter="method" data-value="chuyển khoản">Chuyển khoản</button>
         <button class="chip" data-filter="method" data-value="tiền mặt">Tiền mặt</button>
       </div>
+      <!-- Status chips -->
       <div class="flex gap-2 flex-wrap" id="statusChips">
         <button class="chip active" data-filter="status" data-value="all">Mọi trạng thái</button>
         <button class="chip" data-filter="status" data-value="đã đóng">Đã đóng</button>
@@ -355,7 +286,7 @@
     </div>
   </section>
 
-  <!-- ───── Table ───── -->
+  <!-- Table -->
   <section class="glass overflow-hidden">
     <div class="flex items-center justify-between px-5 py-4 border-b border-[color:var(--border)]">
       <div class="flex items-center gap-2">
@@ -363,14 +294,16 @@
         <h2 class="font-bold text-[15px]">Danh sách giao dịch</h2>
         <span class="text-xs text-[color:var(--text3)] font-mono" id="rowCount"></span>
       </div>
+      <span class="text-xs text-[color:var(--text3)] font-mono" id="pageLabel"></span>
     </div>
     <div class="overflow-x-auto">
       <table class="tbl" id="tbl">
         <thead>
           <tr>
-            <th class="sortable" onclick="setSort('late_date')">Ngày trễ</th>
+            <th>Loại</th>
+            <th class="sortable" onclick="setSort('late_date')">Ngày</th>
             <th class="sortable" onclick="setSort('paid_date')">Ngày đóng</th>
-            <th>Họ tên</th>
+            <th>Tên / Khoản</th>
             <th>Phương thức</th>
             <th class="text-right sortable" onclick="setSort('amount')">Số tiền</th>
             <th>Trạng thái</th>
@@ -385,40 +318,62 @@
     <div id="emptyState" class="empty" style="display:none">
       <div class="text-5xl mb-3">💸</div>
       <div class="font-bold text-lg mb-1">Chưa có giao dịch nào</div>
-      <div class="text-sm text-[color:var(--text3)] mb-4">Bấm "Thêm" để bắt đầu ghi nhận</div>
+      <div class="text-sm text-[color:var(--text3)] mb-4">Bấm "Thu vào" hoặc "Chi ra" để bắt đầu</div>
+    </div>
+    <!-- Pagination -->
+    <div id="paginationBar" class="flex items-center justify-between px-5 py-3 border-t border-[color:var(--border)]" style="display:none!important">
+      <button class="btn btn-ghost btn-sm" id="btnPrev" onclick="goPage(-1)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Trước
+      </button>
+      <div class="flex items-center gap-1" id="pageNumbers"></div>
+      <button class="btn btn-ghost btn-sm" id="btnNext" onclick="goPage(1)">
+        Sau
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
     </div>
   </section>
 
   <footer class="text-center text-xs text-[color:var(--text3)] mt-8 font-mono">
-    L2 Support · Late Fund Tracker
+    L2 Support · Fund Tracker · Thu · Chi · Còn Lại
   </footer>
 </div>
 
-<!-- ───── Modal ───── -->
+<!-- Modal: Add / Edit Transaction -->
 <div class="modal-backdrop" id="modal">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="flex items-center justify-between px-6 py-4 border-b border-[color:var(--border)]">
-      <h3 class="font-bold text-lg" id="modalTitle">Thêm khoản phạt</h3>
+      <h3 class="font-bold text-lg" id="modalTitle">Thêm giao dịch</h3>
       <button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button>
     </div>
     <div class="p-6">
+      <!-- Type toggle -->
+      <div class="type-toggle" id="typeToggle">
+        <button type="button" class="type-btn active-thu" id="tbThu" onclick="setModalType('thu')">
+          ↑ Thu vào
+        </button>
+        <button type="button" class="type-btn" id="tbChi" onclick="setModalType('chi')">
+          ↓ Chi ra
+        </button>
+      </div>
       <form id="form" onsubmit="onSubmit(event)" class="grid grid-cols-2 gap-4">
         <input type="hidden" id="f_id">
+        <input type="hidden" id="f_txtype" value="thu">
         <div class="col-span-2">
-          <label class="lbl">Họ và tên *</label>
+          <label class="lbl" id="lblName">Họ và tên *</label>
           <input id="f_name" class="field" required placeholder="Nguyễn Văn A">
         </div>
-        <div>
-          <label class="lbl">Ngày đi trễ *</label>
-          <input type="date" id="f_late" class="field" required>
+        <div id="wrapLate">
+          <label class="lbl" id="lblLate">Ngày đi trễ *</label>
+          <input type="date" id="f_late" class="field">
         </div>
-        <div>
+        <div id="wrapPaid">
           <label class="lbl">Ngày đóng</label>
           <input type="date" id="f_paid" class="field">
         </div>
-        <div>
+        <div id="wrapMethod">
           <label class="lbl">Phương thức *</label>
-          <select id="f_method" class="field" required>
+          <select id="f_method" class="field">
             <option value="chuyển khoản">Chuyển khoản</option>
             <option value="tiền mặt">Tiền mặt</option>
           </select>
@@ -427,7 +382,7 @@
           <label class="lbl">Số tiền (₫) *</label>
           <input type="number" id="f_amount" class="field" required value="50000" min="0" step="1000">
         </div>
-        <div class="col-span-2">
+        <div class="col-span-2" id="wrapStatus">
           <label class="lbl">Trạng thái</label>
           <select id="f_status" class="field">
             <option value="đã đóng">Đã đóng</option>
@@ -436,7 +391,7 @@
         </div>
         <div class="col-span-2">
           <label class="lbl">Ghi chú</label>
-          <input id="f_note" class="field" placeholder="VD: Cut off, new, ...">
+          <input id="f_note" class="field" placeholder="VD: Cut off, mua đồ ăn, ...">
         </div>
         <div class="col-span-2 flex justify-end gap-2 mt-2">
           <button type="button" class="btn btn-ghost" onclick="closeModal()">Hủy</button>
@@ -449,7 +404,7 @@
   </div>
 </div>
 
-<!-- ───── Login / Role Gate ───── -->
+<!-- Modal: Login / Role Gate -->
 <div class="modal-backdrop" id="loginModal">
   <div class="modal" style="max-width:440px" onclick="event.stopPropagation()">
     <div class="px-6 py-5 border-b border-[color:var(--border)] text-center">
@@ -480,31 +435,27 @@
 </div>
 
 <script>
-// ════════════════════════════════════════════════════════════════════
-// 🔧 SUPABASE CONFIG — Sửa 2 giá trị này
-// ════════════════════════════════════════════════════════════════════
 const SUPABASE_URL = 'https://edsowiramriosgwfuewg.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkc293aXJhbXJpb3Nnd2Z1ZXdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNDMzMDgsImV4cCI6MjA5MzgxOTMwOH0.aocvFLnJrl5LFPdxDf9zbhvT6HT7NpCEMFtiUr_M3gM';
-// ════════════════════════════════════════════════════════════════════
 
 const isConfigured = SUPABASE_URL.startsWith('https://') && SUPABASE_ANON_KEY.length > 20;
 const sb = isConfigured ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-if (!isConfigured) document.getElementById('setupBanner').style.display = 'block';
 
-// ───── State ─────
+// ── State ──
 let rows = [];
-let filters = { method:'all', status:'all' };
+let filters = { method:'all', status:'all', txtype:'all' };
 let sort = { key:'late_date', dir:'desc' };
+let currentPage = 1;
+const PAGE_SIZE = 9;
+let currentRole = null;
+let modalTxType = 'thu';
 
-// ───── Role / Auth (Supabase Auth) ─────
-let currentRole = null; // 'admin' | 'employee' | null
-
+// ── Role / Auth ──
 function toggleAdminForm(show){
   document.getElementById('adminLoginForm').style.display = show ? 'block' : 'none';
   document.getElementById('roleChoice').style.display    = show ? 'none'  : 'block';
   document.getElementById('loginErr').style.display = 'none';
 }
-
 async function submitAdminLogin(){
   if(!sb){ showLoginErr('Chưa cấu hình Supabase'); return; }
   const email = document.getElementById('loginEmail').value.trim();
@@ -515,296 +466,354 @@ async function submitAdminLogin(){
   const { data, error } = await sb.auth.signInWithPassword({ email, password });
   btn.disabled = false; btn.innerHTML = '🔐 Đăng nhập Admin';
   if(error){ showLoginErr('❌ ' + error.message); return; }
-  // Check has admin role
-  const { data: isAdminRpc, error: rpcErr } = await sb.rpc('has_role', {
-    _user_id: data.user.id, _role: 'admin'
-  });
-  if(rpcErr || !isAdminRpc){
-    await sb.auth.signOut();
-    showLoginErr('❌ Tài khoản này không có quyền Admin');
-    return;
-  }
+  const { data: isAdminRpc, error: rpcErr } = await sb.rpc('has_role', { _user_id: data.user.id, _role: 'admin' });
+  if(rpcErr || !isAdminRpc){ await sb.auth.signOut(); showLoginErr('❌ Tài khoản này không có quyền Admin'); return; }
   currentRole = 'admin';
   try{ localStorage.setItem('l2_role','admin'); }catch(_){}
-  closeLoginModal();
-  applyRole();
-  loadData();
+  closeLoginModal(); applyRole(); loadData();
 }
-
 function loginAsEmployee(){
   currentRole = 'employee';
   try{ localStorage.setItem('l2_role','employee'); }catch(_){}
-  closeLoginModal();
-  applyRole();
+  closeLoginModal(); applyRole();
 }
-
-function showLoginErr(msg){
-  const e = document.getElementById('loginErr');
-  e.textContent = msg; e.style.display = 'block';
-}
-function closeLoginModal(){
-  document.getElementById('loginModal').classList.remove('open');
-  document.getElementById('loginErr').style.display = 'none';
-}
-function openLoginModal(){
-  toggleAdminForm(false);
-  document.getElementById('loginModal').classList.add('open');
-}
-
+function showLoginErr(msg){ const e=document.getElementById('loginErr'); e.textContent=msg; e.style.display='block'; }
+function closeLoginModal(){ document.getElementById('loginModal').classList.remove('open'); document.getElementById('loginErr').style.display='none'; }
+function openLoginModal(){ toggleAdminForm(false); document.getElementById('loginModal').classList.add('open'); }
 async function logout(){
   try{ localStorage.removeItem('l2_role'); }catch(_){}
   if(sb) await sb.auth.signOut();
-  currentRole = null;
-  openLoginModal();
+  currentRole = null; openLoginModal();
 }
 function isAdmin(){ return currentRole === 'admin'; }
 function applyRole(){
   const btn = document.getElementById('btnRoleToggle');
-  const label = document.getElementById('btnRoleLabel');
   btn.style.display = 'inline-flex';
-
   if(isAdmin()){
-    // Admin mode: show "Đăng xuất" button with danger style
     btn.className = 'btn btn-role-admin';
     btn.title = 'Đang đăng nhập với vai trò ADMIN — Bấm để đăng xuất';
-    btn.innerHTML = `
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      <span style="font-family:var(--mono);font-size:11px;letter-spacing:.04em;line-height:1">
-        <span style="display:block;font-size:9px;opacity:.7;margin-bottom:1px;text-transform:uppercase">Admin · Đăng xuất</span>
-        Đổi sang Employee
-      </span>`;
+    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span style="font-family:var(--mono);font-size:11px;letter-spacing:.04em;line-height:1"><span style="display:block;font-size:9px;opacity:.7;margin-bottom:1px;text-transform:uppercase">Admin · Đăng xuất</span>Đổi sang Employee</span>`;
   } else {
-    // Employee mode: show "Đăng nhập Admin" button with purple style
     btn.className = 'btn btn-role-employee';
     btn.title = 'Đang xem ở chế độ Employee — Bấm để đăng nhập Admin';
-    btn.innerHTML = `
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      <span style="font-family:var(--mono);font-size:11px;letter-spacing:.04em;line-height:1">
-        <span style="display:block;font-size:9px;opacity:.7;margin-bottom:1px;text-transform:uppercase">Employee · Nâng quyền</span>
-        Đăng nhập Admin
-      </span>`;
+    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span style="font-family:var(--mono);font-size:11px;letter-spacing:.04em;line-height:1"><span style="display:block;font-size:9px;opacity:.7;margin-bottom:1px;text-transform:uppercase">Employee · Nâng quyền</span>Đăng nhập Admin</span>`;
   }
-
-  document.querySelectorAll('.admin-only').forEach(el=>{
-    el.style.display = isAdmin() ? '' : 'none';
-  });
+  document.querySelectorAll('.admin-only').forEach(el=>{ el.style.display = isAdmin() ? '' : 'none'; });
   render();
 }
+function handleRoleToggle(){ if(isAdmin()) logout(); else openLoginModal(); }
 
-function handleRoleToggle(){
-  if(isAdmin()){
-    logout();
-  } else {
-    openLoginModal();
-  }
-}
-
-// ───── Helpers ─────
+// ── Helpers ──
 const fmtMoney = n => (Number(n)||0).toLocaleString('vi-VN') + '₫';
 const fmtDate = d => { if(!d) return '—'; const [y,m,day]=d.split('-'); return `${day}/${m}/${y}`; };
 const colorFromName = (s='?') => {
   let h=0; for(let i=0;i<s.length;i++) h=s.charCodeAt(i)+((h<<5)-h);
-  const hue = Math.abs(h)%360;
+  const hue=Math.abs(h)%360;
   return `linear-gradient(135deg,hsl(${hue},70%,55%),hsl(${(hue+40)%360},75%,50%))`;
 };
 const initials = (s='?') => s.trim().split(/\s+/).slice(-2).map(w=>w[0]?.toUpperCase()).join('');
+const isChi = r => r.payment_method === 'chi ra';
+const dateOf = r => r.late_date || r.paid_date || '';
 
-// ───── Toast ─────
+// ── Toast ──
 function toast(msg, type='success'){
-  const el = document.createElement('div');
-  el.className = `toast toast-${type}`;
-  el.innerHTML = (type==='success'?'✅ ':'⚠️ ') + msg;
+  const el=document.createElement('div');
+  el.className=`toast toast-${type}`;
+  el.innerHTML=(type==='success'?'✅ ':'⚠️ ')+msg;
   document.body.appendChild(el);
   setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .3s'},2500);
   setTimeout(()=>el.remove(),2800);
 }
 
-// ───── Load ─────
+// ── Load ──
 async function loadData(showSpin=false){
   if(!sb){ render(); return; }
-  const btn = document.getElementById('btnRefresh');
-  const btnText = document.getElementById('btnRefreshText');
-  if(showSpin){
-    btn.classList.add('spinning','pointer-events-none');
-    btn.style.opacity = '.7';
-    btnText.textContent = 'Đang tải...';
-  }
+  const btn=document.getElementById('btnRefresh');
+  const btnText=document.getElementById('btnRefreshText');
+  if(showSpin){ btn.classList.add('spinning','pointer-events-none'); btn.style.opacity='.7'; btnText.textContent='Đang tải...'; }
   document.getElementById('loadingState').style.display = rows.length?'none':'block';
   const { data, error } = await sb.from('fines').select('*').order('late_date',{ascending:false});
   document.getElementById('loadingState').style.display='none';
-  btn.classList.remove('spinning','pointer-events-none');
-  btn.style.opacity = '';
-  btnText.textContent = 'Làm mới';
+  btn.classList.remove('spinning','pointer-events-none'); btn.style.opacity=''; btnText.textContent='Làm mới';
   if(error){ toast('Lỗi tải dữ liệu: '+error.message,'error'); return; }
   rows = data || [];
+  buildYearFilter();
   render();
-  if(showSpin){ toast('✨ Dữ liệu đã được cập nhật','success'); }
+  if(showSpin) toast('✨ Dữ liệu đã được cập nhật','success');
 }
 
-// ───── Filters ─────
-document.querySelectorAll('#methodChips .chip, #statusChips .chip').forEach(c=>{
+function buildYearFilter(){
+  const years = [...new Set(rows.map(r=>dateOf(r).slice(0,4)).filter(y=>y&&y.length===4))].sort((a,b)=>b-a);
+  const sel = document.getElementById('yearFilter');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Tất cả năm</option>' + years.map(y=>`<option value="${y}"${y===cur?' selected':''}>${y}</option>`).join('');
+}
+
+// ── Filters ──
+document.querySelectorAll('#typeChips .chip, #methodChips .chip, #statusChips .chip').forEach(c=>{
   c.addEventListener('click', ()=>{
     const group = c.dataset.filter;
     filters[group] = c.dataset.value;
-    document.querySelectorAll(`.chip[data-filter="${group}"]`).forEach(x=>x.classList.toggle('active', x===c));
-    render();
+    document.querySelectorAll(`.chip[data-filter="${group}"]`).forEach(x=>{
+      x.classList.remove('active','active-chi');
+      if(x===c){
+        if(group==='txtype' && c.dataset.value==='chi') x.classList.add('active-chi');
+        else x.classList.add('active');
+      }
+    });
+    currentPage=1; render();
   });
 });
 
 function setSort(key){
-  if(sort.key===key) sort.dir = sort.dir==='asc'?'desc':'asc';
+  if(sort.key===key) sort.dir=sort.dir==='asc'?'desc':'asc';
   else { sort.key=key; sort.dir='desc'; }
   render();
 }
+function goPage(dir){
+  currentPage=Math.max(1,currentPage+dir); render();
+}
 
-// ───── Render ─────
+// ── Render ──
 function render(){
-  const q = document.getElementById('searchInput').value.trim().toLowerCase();
-  let list = rows.filter(r=>{
-    if(filters.method!=='all' && r.payment_method!==filters.method) return false;
-    if(filters.status!=='all' && r.status!==filters.status) return false;
+  const q=document.getElementById('searchInput').value.trim().toLowerCase();
+  const selMonth=document.getElementById('monthFilter').value;
+  const selYear=document.getElementById('yearFilter').value;
+
+  let list=rows.filter(r=>{
+    const chi=isChi(r);
+    if(filters.txtype==='thu' && chi) return false;
+    if(filters.txtype==='chi' && !chi) return false;
+    if(!chi){
+      if(filters.method!=='all' && r.payment_method!==filters.method) return false;
+      if(filters.status!=='all' && r.status!==filters.status) return false;
+    }
     if(q && !(r.full_name||'').toLowerCase().includes(q)) return false;
+    const d=dateOf(r);
+    if(selMonth && !d.includes('-'+selMonth+'-') && !d.startsWith(selYear+'-'+selMonth)) {
+      const dm=d.slice(5,7);
+      if(dm!==selMonth) return false;
+    }
+    if(selYear && !d.startsWith(selYear)) return false;
     return true;
   });
+
   list.sort((a,b)=>{
     const va=a[sort.key], vb=b[sort.key];
     if(va==null) return 1; if(vb==null) return -1;
-    const cmp = va<vb?-1:va>vb?1:0;
+    const cmp=va<vb?-1:va>vb?1:0;
     return sort.dir==='asc'?cmp:-cmp;
   });
 
-  // Stats
-  const total = rows.reduce((s,r)=>s+(Number(r.amount)||0),0);
-  const now = new Date(); const ym = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  const monthRows = rows.filter(r=>(r.paid_date||r.late_date||'').startsWith(ym));
-  const monthTotal = monthRows.reduce((s,r)=>s+(Number(r.amount)||0),0);
-  const members = new Set(rows.map(r=>r.full_name).filter(Boolean));
-  document.getElementById('statTotal').textContent = fmtMoney(total);
-  document.getElementById('statMonth').textContent = fmtMoney(monthTotal);
-  document.getElementById('statMonthSub').textContent = monthRows.length+' giao dịch';
-  document.getElementById('statCount').textContent = rows.length;
-  document.getElementById('statMembers').textContent = members.size;
-  document.getElementById('statMembersSub').textContent = 'Đã từng đóng phạt';
+  // Stats (always from full rows, no filter)
+  const thuRows=rows.filter(r=>!isChi(r));
+  const chiRows=rows.filter(r=>isChi(r));
+  const totalThu=thuRows.reduce((s,r)=>s+(Number(r.amount)||0),0);
+  const totalChi=chiRows.reduce((s,r)=>s+(Number(r.amount)||0),0);
+  const conLai=totalThu-totalChi;
+  document.getElementById('statTotal').textContent=fmtMoney(totalThu);
+  document.getElementById('statTotalSub').textContent=`${thuRows.length} giao dịch thu`;
+  document.getElementById('statChi').textContent=fmtMoney(totalChi);
+  document.getElementById('statChiSub').textContent=`${chiRows.length} khoản chi`;
+  document.getElementById('statConlai').textContent=fmtMoney(conLai);
+  document.getElementById('statCount').textContent=rows.length;
+  document.getElementById('statCountSub').textContent='Tất cả giao dịch';
 
-  document.getElementById('rowCount').textContent = `· ${list.length}/${rows.length}`;
-  const tbody = document.getElementById('tbody');
-  const empty = document.getElementById('emptyState');
-  if(!list.length){
-    tbody.innerHTML=''; empty.style.display='block';
-    return;
-  }
+  const totalFiltered=list.length;
+  const totalPages=Math.max(1,Math.ceil(totalFiltered/PAGE_SIZE));
+  currentPage=Math.min(currentPage,totalPages);
+  const pageList=list.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
+
+  document.getElementById('rowCount').textContent=`· ${totalFiltered}/${rows.length}`;
+  document.getElementById('pageLabel').textContent=totalPages>1?`Trang ${currentPage}/${totalPages}`:'';
+
+  const tbody=document.getElementById('tbody');
+  const empty=document.getElementById('emptyState');
+  const pgBar=document.getElementById('paginationBar');
+
+  if(!totalFiltered){ tbody.innerHTML=''; empty.style.display='block'; pgBar.style.display='none'; return; }
   empty.style.display='none';
 
-  tbody.innerHTML = list.map(r=>{
-    const name = r.full_name||'?';
-    const methodCls = r.payment_method==='tiền mặt'?'badge-cash':'badge-bank';
-    const statusCls = r.status==='đã đóng'?'badge-paid':'badge-pending';
-    const statusIcon = r.status==='đã đóng'?'✓':'•';
-    return `<tr class="row-in">
+  tbody.innerHTML=pageList.map(r=>{
+    const name=r.full_name||'?';
+    const chi=isChi(r);
+    const methodCls=chi?'badge-chi': (r.payment_method==='tiền mặt'?'badge-cash':'badge-bank');
+    const statusCls=chi?'badge-chi': (r.status==='đã đóng'?'badge-paid':'badge-pending');
+    const statusIcon=chi?'↓': (r.status==='đã đóng'?'✓':'•');
+    const statusText=chi?'chi ra':escapeHtml(r.status||'');
+    const methodText=chi?'—':escapeHtml(r.payment_method||'');
+    const rowCls=chi?'row-in row-chi':'row-in';
+    const amountCls=chi?'gtext-red':'font-bold font-mono';
+    const amountSign=chi?'− ':'+ ';
+    return `<tr class="${rowCls}">
+      <td>${chi
+        ? `<span class="badge badge-chi">↓ Chi</span>`
+        : `<span class="badge badge-thu">↑ Thu</span>`
+      }</td>
       <td class="font-mono text-[12px] text-[color:var(--text2)] whitespace-nowrap">${fmtDate(r.late_date)}</td>
-      <td class="font-mono text-[12px] text-[color:var(--text2)] whitespace-nowrap">${fmtDate(r.paid_date)}</td>
+      <td class="font-mono text-[12px] text-[color:var(--text2)] whitespace-nowrap">${chi?'—':fmtDate(r.paid_date)}</td>
       <td>
         <div class="flex items-center gap-2.5">
           <div class="avatar" style="background:${colorFromName(name)}">${escapeHtml(initials(name))}</div>
           <div class="font-semibold">${escapeHtml(name)}</div>
         </div>
       </td>
-      <td><span class="badge ${methodCls}">${escapeHtml(r.payment_method||'')}</span></td>
-      <td class="text-right font-bold font-mono">${fmtMoney(r.amount)}</td>
-      <td><span class="badge ${statusCls}">${statusIcon} ${escapeHtml(r.status||'')}</span></td>
-      <td class="text-[12px] text-[color:var(--text2)] max-w-[180px] truncate" title="${escapeHtml(r.note||'')}">${escapeHtml(r.note||'—')}</td>
+      <td>${chi?`<span class="text-[color:var(--text3)] text-xs">—</span>`:`<span class="badge ${methodCls}">${methodText}</span>`}</td>
+      <td class="text-right ${amountCls}" style="${chi?'background:var(--grad-red);-webkit-background-clip:text;background-clip:text;color:transparent':''}">${amountSign}${fmtMoney(r.amount)}</td>
+      <td><span class="badge ${statusCls}">${statusIcon} ${statusText}</span></td>
+      <td class="text-[12px] text-[color:var(--text2)] max-w-[160px] truncate" title="${escapeHtml(r.note||'')}">${escapeHtml(r.note||'—')}</td>
       <td class="text-right whitespace-nowrap">
-        ${isAdmin() ? `<button class="btn btn-ghost btn-sm" onclick='openModal(${JSON.stringify(r).replace(/'/g,"&#39;")})'>Sửa</button>
-        <button class="btn btn-danger btn-sm" onclick="del('${r.id}')">Xóa</button>` : `<span class="text-[color:var(--text3)] text-xs">—</span>`}
+        ${isAdmin()?`<button class="btn btn-ghost btn-sm" onclick='openEditModal(${JSON.stringify(r).replace(/'/g,"&#39;")})'>Sửa</button>
+        <button class="btn btn-danger btn-sm" onclick="del('${r.id}')">Xóa</button>`:`<span class="text-[color:var(--text3)] text-xs">—</span>`}
       </td>
     </tr>`;
   }).join('');
+
+  // Pagination bar
+  if(totalPages>1){
+    pgBar.style.cssText='display:flex!important;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--border)';
+    document.getElementById('btnPrev').disabled = currentPage<=1;
+    document.getElementById('btnNext').disabled = currentPage>=totalPages;
+    const nums=document.getElementById('pageNumbers');
+    let pages=[];
+    for(let i=1;i<=totalPages;i++){
+      if(i===1||i===totalPages||Math.abs(i-currentPage)<=1) pages.push(i);
+      else if(pages[pages.length-1]!=='…') pages.push('…');
+    }
+    nums.innerHTML=pages.map(p=>p==='…'
+      ?`<span class="text-[color:var(--text3)] px-1 font-mono text-xs">…</span>`
+      :`<button class="page-btn ${p===currentPage?'active':''}" onclick="currentPage=${p};render()">${p}</button>`
+    ).join('');
+  } else {
+    pgBar.style.display='none';
+  }
 }
 
-function escapeHtml(s){ return String(s??'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function escapeHtml(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-// ───── Modal ─────
-function openModal(row){
-  if(!isAdmin()){ toast('Bạn không có quyền chỉnh sửa','error'); return; }
-  const f = id => document.getElementById(id);
-  if(row){
-    f('modalTitle').textContent='Sửa giao dịch';
-    f('f_id').value = row.id;
-    f('f_name').value = row.full_name||'';
-    f('f_late').value = row.late_date||'';
-    f('f_paid').value = row.paid_date||'';
-    f('f_method').value = row.payment_method||'chuyển khoản';
-    f('f_amount').value = row.amount||50000;
-    f('f_status').value = row.status||'đã đóng';
-    f('f_note').value = row.note||'';
+// ── Modal Type Toggle ──
+function setModalType(type){
+  modalTxType=type;
+  document.getElementById('f_txtype').value=type;
+  const tbThu=document.getElementById('tbThu');
+  const tbChi=document.getElementById('tbChi');
+  const wrapLate=document.getElementById('wrapLate');
+  const wrapPaid=document.getElementById('wrapPaid');
+  const wrapMethod=document.getElementById('wrapMethod');
+  const wrapStatus=document.getElementById('wrapStatus');
+  const fLate=document.getElementById('f_late');
+  const fMethod=document.getElementById('f_method');
+  if(type==='thu'){
+    tbThu.className='type-btn active-thu'; tbChi.className='type-btn';
+    document.getElementById('lblName').textContent='Họ và tên *';
+    document.getElementById('lblLate').textContent='Ngày đi trễ *';
+    wrapLate.style.display=''; wrapPaid.style.display=''; wrapMethod.style.display=''; wrapStatus.style.display='';
+    fLate.required=true; fMethod.required=true;
+    document.getElementById('btnSubmit').style.background='var(--grad)';
   } else {
-    f('modalTitle').textContent='Thêm khoản phạt';
-    document.getElementById('form').reset();
-    f('f_id').value=''; f('f_amount').value=50000;
-    f('f_late').value = new Date().toISOString().slice(0,10);
+    tbThu.className='type-btn'; tbChi.className='type-btn active-chi';
+    document.getElementById('lblName').textContent='Tên khoản chi *';
+    document.getElementById('lblLate').textContent='Ngày chi *';
+    wrapLate.style.display=''; wrapPaid.style.display='none'; wrapMethod.style.display='none'; wrapStatus.style.display='none';
+    fLate.required=true; fMethod.required=false;
+    document.getElementById('btnSubmit').style.background='linear-gradient(135deg,#f87171,#f472b6)';
   }
+}
+
+// ── Modal Open/Close ──
+function openAddModal(type='thu'){
+  if(!isAdmin()){ toast('Bạn không có quyền chỉnh sửa','error'); return; }
+  document.getElementById('modalTitle').textContent='Thêm giao dịch';
+  document.getElementById('form').reset();
+  document.getElementById('f_id').value='';
+  document.getElementById('f_amount').value=50000;
+  document.getElementById('f_late').value=new Date().toISOString().slice(0,10);
+  document.getElementById('typeToggle').style.display='flex';
+  setModalType(type);
   document.getElementById('modal').classList.add('open');
 }
+
+function openEditModal(row){
+  if(!isAdmin()){ toast('Bạn không có quyền chỉnh sửa','error'); return; }
+  const chi=row.payment_method==='chi ra';
+  document.getElementById('modalTitle').textContent=chi?'Sửa khoản chi':'Sửa khoản thu';
+  document.getElementById('typeToggle').style.display='none';
+  document.getElementById('f_id').value=row.id;
+  document.getElementById('f_name').value=row.full_name||'';
+  document.getElementById('f_late').value=row.late_date||'';
+  document.getElementById('f_paid').value=row.paid_date||'';
+  document.getElementById('f_method').value=row.payment_method||'chuyển khoản';
+  document.getElementById('f_amount').value=row.amount||50000;
+  document.getElementById('f_status').value=row.status||'đã đóng';
+  document.getElementById('f_note').value=row.note||'';
+  setModalType(chi?'chi':'thu');
+  document.getElementById('modal').classList.add('open');
+}
+
 function closeModal(){ document.getElementById('modal').classList.remove('open'); }
 document.getElementById('modal').addEventListener('click', closeModal);
 
+// ── Submit ──
 async function onSubmit(e){
   e.preventDefault();
   if(!isAdmin()){ toast('Bạn không có quyền chỉnh sửa','error'); return; }
   if(!sb){ toast('Chưa cấu hình Supabase','error'); return; }
-  const payload = {
+  const type=document.getElementById('f_txtype').value;
+  const chi=type==='chi';
+  const payload=chi ? {
     full_name: document.getElementById('f_name').value.trim(),
     late_date: document.getElementById('f_late').value || null,
-    paid_date: document.getElementById('f_paid').value || null,
+    paid_date: null,
+    payment_method: 'chi ra',
+    amount: Number(document.getElementById('f_amount').value)||0,
+    status: 'chi ra',
+    note: document.getElementById('f_note').value.trim()||null,
+  } : {
+    full_name: document.getElementById('f_name').value.trim(),
+    late_date: document.getElementById('f_late').value||null,
+    paid_date: document.getElementById('f_paid').value||null,
     payment_method: document.getElementById('f_method').value,
     amount: Number(document.getElementById('f_amount').value)||0,
     status: document.getElementById('f_status').value,
-    note: document.getElementById('f_note').value.trim() || null,
+    note: document.getElementById('f_note').value.trim()||null,
   };
-  const id = document.getElementById('f_id').value;
-  const btn = document.getElementById('btnSubmit');
-  const btnText = document.getElementById('btnSubmitText');
+  const id=document.getElementById('f_id').value;
+  const btn=document.getElementById('btnSubmit');
+  const btnText=document.getElementById('btnSubmitText');
   btn.disabled=true; btnText.innerHTML='<span class="spinner"></span>';
   let err;
-  if(id){ ({ error: err } = await sb.from('fines').update(payload).eq('id',id)); }
-  else { ({ error: err } = await sb.from('fines').insert(payload)); }
-  btn.disabled=false; btnText.textContent='Lưu';
+  if(id){ ({error:err}=await sb.from('fines').update(payload).eq('id',id)); }
+  else { ({error:err}=await sb.from('fines').insert(payload)); }
+  btn.disabled=false; btn.style.background=''; btnText.textContent='Lưu';
   if(err){ toast('Lỗi: '+err.message,'error'); return; }
-  toast(id?'Đã cập nhật':'Đã thêm khoản phạt');
-  closeModal();
-  loadData();
+  toast(id?(chi?'Đã cập nhật khoản chi':'Đã cập nhật'):(chi?'Đã ghi khoản chi':'Đã thêm khoản thu'));
+  closeModal(); loadData();
 }
 
+// ── Delete ──
 async function del(id){
   if(!isAdmin()){ toast('Bạn không có quyền xóa','error'); return; }
   if(!confirm('Xóa giao dịch này?')) return;
   if(!sb){ toast('Chưa cấu hình Supabase','error'); return; }
-  const { error } = await sb.from('fines').delete().eq('id',id);
+  const {error}=await sb.from('fines').delete().eq('id',id);
   if(error){ toast('Lỗi: '+error.message,'error'); return; }
-  toast('Đã xóa');
-  loadData();
+  toast('Đã xóa'); loadData();
 }
 
-// ───── Init ─────
+// ── Init ──
 (async function init(){
-  let saved = null;
-  try{ saved = localStorage.getItem('l2_role'); }catch(_){}
-
-  // Verify admin session với Supabase
-  if(saved === 'admin' && sb){
-    const { data: { user } } = await sb.auth.getUser();
+  let saved=null;
+  try{ saved=localStorage.getItem('l2_role'); }catch(_){}
+  if(saved==='admin' && sb){
+    const {data:{user}}=await sb.auth.getUser();
     if(user){
-      const { data: ok } = await sb.rpc('has_role', { _user_id: user.id, _role: 'admin' });
-      if(ok){ currentRole = 'admin'; applyRole(); loadData(); return; }
+      const {data:ok}=await sb.rpc('has_role',{_user_id:user.id,_role:'admin'});
+      if(ok){ currentRole='admin'; applyRole(); loadData(); return; }
     }
     try{ localStorage.removeItem('l2_role'); }catch(_){}
   }
-
-  if(saved === 'employee'){
-    currentRole = 'employee'; applyRole();
-  } else {
-    openLoginModal();
-  }
+  if(saved==='employee'){ currentRole='employee'; applyRole(); }
+  else { openLoginModal(); }
   loadData();
 })();
 </script>
