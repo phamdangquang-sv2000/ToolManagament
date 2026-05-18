@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>L2 Support · Quỹ Đóng Phạt</title>
 
-<!-- Animated SVG Favicon -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237c5cff'/%3E%3Cstop offset='1' stop-color='%2322d3ee'/%3E%3C/linearGradient%3E%3ClinearGradient id='g2' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23f472b6'/%3E%3Cstop offset='1' stop-color='%237c5cff'/%3E%3C/linearGradient%3E%3Cstyle%3E%40keyframes pulse%7B0%25%2C100%25%7Bopacity%3A1%3Btransform%3Ascale(1)%7D50%25%7Bopacity%3A.85%3Btransform%3Ascale(.95)%7D%7D.ico%7Banimation%3Apulse 2s ease-in-out infinite%3Btransform-origin%3A16px 16px%7D%3C/style%3E%3C/defs%3E%3Ccircle class='ico' cx='16' cy='16' r='15' fill='url(%23g)'/%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='rgba(255,255,255,.25)' stroke-width='1'/%3E%3Ctext x='16' y='21' text-anchor='middle' font-size='15' font-family='sans-serif' fill='white' font-weight='900'%3E%E2%82%AB%3C/text%3E%3C/svg%3E">
+<!-- Animated Wallet Favicon -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237c5cff'/%3E%3Cstop offset='1' stop-color='%2322d3ee'/%3E%3C/linearGradient%3E%3ClinearGradient id='cg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23fbbf24'/%3E%3Cstop offset='1' stop-color='%23f59e0b'/%3E%3C/linearGradient%3E%3Cstyle%3E%40keyframes wob%7B0%25%2C100%25%7Btransform%3Arotate(-6deg)%7D50%25%7Btransform%3Arotate(6deg)%7D%7D%40keyframes coin%7B0%25%2C100%25%7Btransform%3AtranslateY(0)%7D50%25%7Btransform%3AtranslateY(-3px)%7D%7D.wg%7Banimation%3Awob 2.4s ease-in-out infinite%3Btransform-origin%3A16px 17px%7D.cg%7Banimation%3Acoin 1.2s ease-in-out infinite%7D%3C/style%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='15.5' fill='url(%23bg)'/%3E%3Cg class='wg'%3E%3Crect x='5' y='11' width='22' height='14' rx='3' fill='white' opacity='.92'/%3E%3Crect x='5' y='8' width='16' height='7' rx='2.5' fill='white' opacity='.65'/%3E%3Crect x='19' y='14' width='8' height='8' rx='2' fill='url(%23bg)' opacity='.9'/%3E%3Ccircle class='cg' cx='23' cy='18' r='2' fill='url(%23cg)'/%3E%3C/g%3E%3C/svg%3E">
 
 <!-- CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
@@ -145,13 +145,89 @@
   .gtext-red{background:var(--grad-red);-webkit-background-clip:text;background-clip:text;color:transparent}
   .gtext-green{background:var(--grad-green);-webkit-background-clip:text;background-clip:text;color:transparent}
 
-  .brand-logo{width:42px;height:42px;border-radius:12px;background:var(--grad);display:inline-flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:18px;box-shadow:0 6px 20px var(--primary-glow);position:relative;overflow:hidden;}
-  .brand-logo::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.3),transparent 50%);}
+  /* Brand Logo */
+  .brand-logo{
+    width:42px;height:42px;border-radius:12px;
+    background:var(--grad);
+    display:inline-flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 20px var(--primary-glow),0 0 0 1px rgba(255,255,255,.15) inset;
+    position:relative;overflow:hidden;
+    animation:logoGlow 3s ease-in-out infinite;
+  }
+  @keyframes logoGlow{
+    0%,100%{box-shadow:0 6px 20px var(--primary-glow),0 0 0 1px rgba(255,255,255,.15) inset}
+    50%{box-shadow:0 8px 32px rgba(124,92,255,.65),0 0 18px rgba(34,211,238,.35),0 0 0 1px rgba(255,255,255,.2) inset}
+  }
+  /* Shimmer sweep */
+  .brand-logo::before{
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(110deg,transparent 20%,rgba(255,255,255,.35) 50%,transparent 80%);
+    transform:translateX(-100%);
+    animation:logoShimmer 2.8s ease-in-out infinite;
+  }
+  @keyframes logoShimmer{
+    0%,40%{transform:translateX(-100%)}
+    60%,100%{transform:translateX(120%)}
+  }
+  /* Wallet SVG inner animations */
+  @keyframes walletWiggle{
+    0%,100%{transform:rotate(0deg) scale(1)}
+    15%{transform:rotate(-10deg) scale(1.05)}
+    30%{transform:rotate(7deg) scale(1.02)}
+    45%{transform:rotate(-4deg) scale(1.01)}
+    60%{transform:rotate(2deg)}
+    75%{transform:rotate(-1deg)}
+  }
+  @keyframes coinBounce{
+    0%,100%{transform:translateY(0);opacity:.9}
+    40%{transform:translateY(-5px);opacity:1}
+    70%{transform:translateY(-2px)}
+  }
+  .wallet-icon{animation:walletWiggle 3s ease-in-out infinite;transform-origin:50% 50%}
+  .wallet-coin{animation:coinBounce 1.5s ease-in-out infinite}
 
   .chip{padding:7px 14px;border-radius:999px;font-size:12.5px;font-weight:600;background:rgba(255,255,255,.04);color:var(--text2);border:1px solid var(--border);cursor:pointer;transition:all .18s;white-space:nowrap;}
   .chip:hover{color:var(--text);border-color:var(--border2)}
   .chip.active{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 4px 14px var(--primary-glow)}
-  .chip.active-chi{background:var(--grad-red)!important;color:#fff!important;border-color:transparent!important;box-shadow:0 4px 14px rgba(248,113,113,.35)!important}
+
+  /* Filter Dropdowns */
+  .fdd-wrap{position:relative}
+  .fdd-trigger{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:7px 13px 7px 14px;border-radius:999px;
+    font-size:12.5px;font-weight:600;
+    background:rgba(255,255,255,.04);color:var(--text2);
+    border:1px solid var(--border);cursor:pointer;
+    transition:all .18s;white-space:nowrap;font-family:var(--font);
+  }
+  .fdd-trigger:hover{color:var(--text);border-color:var(--border2);background:rgba(255,255,255,.08)}
+  .fdd-trigger.fdd-active{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 4px 14px var(--primary-glow)}
+  .fdd-chevron{transition:transform .2s;opacity:.6}
+  .fdd-wrap.open .fdd-chevron{transform:rotate(180deg)}
+  .fdd-menu{
+    position:absolute;top:calc(100% + 7px);left:0;
+    background:linear-gradient(180deg,#1e2b52,#141e3a);
+    border:1px solid var(--border2);border-radius:13px;
+    overflow:hidden;z-index:60;min-width:175px;
+    box-shadow:0 16px 40px rgba(0,0,0,.6),0 0 20px var(--primary-glow);
+    opacity:0;transform:translateY(-6px) scale(.97);
+    pointer-events:none;transition:opacity .16s,transform .16s;
+  }
+  .fdd-wrap.open .fdd-menu{opacity:1;transform:translateY(0) scale(1);pointer-events:all}
+  .fdd-item{
+    display:flex;align-items:center;gap:8px;
+    width:100%;padding:10px 14px;
+    background:transparent;border:none;cursor:pointer;
+    text-align:left;color:var(--text2);font-family:var(--font);
+    font-size:12.5px;font-weight:600;
+    border-bottom:1px solid rgba(34,43,74,.4);
+    transition:background .12s,color .12s;
+  }
+  .fdd-item:last-child{border-bottom:none}
+  .fdd-item:hover{background:rgba(124,92,255,.12);color:var(--text)}
+  .fdd-item.active{color:var(--primary-2)}
+  .fdd-check{opacity:0;font-size:11px;color:var(--success)}
+  .fdd-item.active .fdd-check{opacity:1}
 
   .empty{padding:60px 20px;text-align:center;color:var(--text2)}
   .sortable{cursor:pointer;user-select:none}
@@ -168,6 +244,60 @@
   .type-btn{flex:1;padding:10px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text2);transition:all .18s;text-align:center;}
   .type-btn.active-thu{background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.4);color:#6ee7b7;}
   .type-btn.active-chi{background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.4);color:#fca5a5;}
+
+  /* Split Add Button */
+  .add-split-btn{
+    display:flex;align-items:stretch;
+    background:var(--grad);border-radius:12px;
+    box-shadow:0 6px 20px var(--primary-glow),0 1px 0 rgba(255,255,255,.18) inset;
+    overflow:hidden;position:relative;
+  }
+  .add-split-main{
+    display:inline-flex;align-items:center;gap:7px;
+    padding:10px 16px;font-weight:700;font-size:13.5px;
+    color:#fff;background:transparent;border:none;cursor:pointer;
+    border-right:1px solid rgba(255,255,255,.2);
+    transition:background .15s;
+  }
+  .add-split-main:hover{background:rgba(255,255,255,.12)}
+  .add-split-arrow{
+    display:inline-flex;align-items:center;justify-content:center;
+    padding:10px 11px;color:#fff;background:transparent;border:none;cursor:pointer;
+    transition:background .15s;
+  }
+  .add-split-arrow:hover{background:rgba(255,255,255,.12)}
+  /* Dropdown menu */
+  .add-split-menu{
+    position:absolute;top:calc(100% + 8px);right:0;
+    background:linear-gradient(180deg,#1e2b52,#141e3a);
+    border:1px solid var(--border2);border-radius:14px;
+    overflow:hidden;z-index:50;
+    min-width:200px;
+    box-shadow:0 16px 48px rgba(0,0,0,.55),0 0 24px var(--primary-glow);
+    opacity:0;transform:translateY(-8px) scale(.97);
+    pointer-events:none;transition:opacity .18s,transform .18s;
+  }
+  .add-split-menu.open{opacity:1;transform:translateY(0) scale(1);pointer-events:all}
+  .add-split-menu button{
+    display:flex;align-items:center;gap:10px;
+    width:100%;padding:12px 16px;
+    background:transparent;border:none;cursor:pointer;
+    text-align:left;color:var(--text);font-family:var(--font);
+    transition:background .12s;
+    border-bottom:1px solid rgba(34,43,74,.5);
+  }
+  .add-split-menu button:last-child{border-bottom:none}
+  .add-split-menu button:hover{background:rgba(124,92,255,.12)}
+  .add-split-menu button svg{flex-shrink:0;color:var(--text2)}
+  .add-split-menu button:hover svg{color:var(--primary-2)}
+  .add-split-menu button span{font-weight:700;font-size:13px;flex:1}
+  .add-split-menu button small{display:block;font-size:10.5px;color:var(--text3);margin-top:1px;font-family:var(--mono)}
+  .add-split-menu button:first-child:hover{background:rgba(52,211,153,.1)}
+  .add-split-menu button:last-child:hover{background:rgba(248,113,113,.1)}
+  .add-split-menu button:first-child svg{color:#6ee7b7}
+  .add-split-menu button:last-child svg{color:#fca5a5}
+  .add-split-menu button:first-child span{color:#6ee7b7}
+  .add-split-menu button:last-child span{color:#fca5a5}
 
   /* Date filter selects */
   .filter-select{padding:7px 12px;border-radius:999px;font-size:12.5px;font-weight:600;background:rgba(255,255,255,.04);color:var(--text2);border:1px solid var(--border);cursor:pointer;transition:all .18s;font-family:var(--font);appearance:none;-webkit-appearance:none;padding-right:28px;}
@@ -187,7 +317,14 @@
   <!-- Header -->
   <header class="flex items-center justify-between mb-8 flex-wrap gap-4">
     <div class="flex items-center gap-3">
-      <div class="brand-logo">L2</div>
+      <div class="brand-logo">
+        <svg class="wallet-icon" width="26" height="22" viewBox="0 0 26 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="5" width="26" height="17" rx="3" fill="white" opacity=".9"/>
+          <rect x="0" y="1" width="19" height="8" rx="2.5" fill="white" opacity=".65"/>
+          <rect x="18" y="9" width="8" height="8" rx="2" fill="rgba(124,92,255,.5)"/>
+          <circle class="wallet-coin" cx="22" cy="13" r="2.2" fill="#fbbf24"/>
+        </svg>
+      </div>
       <div>
         <h1 class="text-xl md:text-2xl font-extrabold tracking-tight">
           Quỹ <span class="gtext">L2 Support</span>
@@ -200,14 +337,30 @@
         <svg class="icon-refresh" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
         <span id="btnRefreshText">Làm mới</span>
       </button>
-      <button class="btn btn-primary admin-only" onclick="openAddModal('thu')" style="display:none">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Thu vào
-      </button>
-      <button class="btn btn-expense admin-only" onclick="openAddModal('chi')" style="display:none">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Chi ra
-      </button>
+      <!-- Split add button -->
+      <div class="admin-only add-split-wrap" style="display:none;position:relative">
+        <div class="add-split-btn">
+          <button class="add-split-main" onclick="openAddModal('thu')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Thêm
+          </button>
+          <button class="add-split-arrow" onclick="toggleAddMenu(event)" title="Chọn loại giao dịch">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+        <div class="add-split-menu" id="addMenu">
+          <button onclick="openAddModal('thu');closeAddMenu()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Thu vào</span>
+            <small>Ghi nhận khoản phạt</small>
+          </button>
+          <button onclick="openAddModal('chi');closeAddMenu()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 5 12 12 19"/></svg>
+            <span>Chi ra</span>
+            <small>Ghi nhận khoản chi</small>
+          </button>
+        </div>
+      </div>
       <button id="btnRoleToggle" class="btn btn-role-employee" onclick="handleRoleToggle()" style="display:none">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         <span id="btnRoleLabel">Đăng nhập Admin</span>
@@ -240,48 +393,107 @@
   </section>
 
   <!-- Filters -->
-  <section class="glass p-4 mb-5">
+  <section class="glass p-4 mb-5" style="position:relative;z-index:20;overflow:visible">
     <div class="flex flex-wrap items-center gap-3">
       <!-- Search -->
       <div class="relative flex-1 min-w-[200px]">
         <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--text3)]" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input id="searchInput" class="field pl-9" placeholder="Tìm theo tên..." oninput="currentPage=1;render()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" readonly onfocus="this.removeAttribute('readonly')" name="search_fund_x">
       </div>
-      <!-- Month filter -->
-      <div class="filter-select-wrap">
-        <select id="monthFilter" class="filter-select" onchange="currentPage=1;render()">
-          <option value="">Tất cả tháng</option>
-          <option value="01">Tháng 1</option><option value="02">Tháng 2</option>
-          <option value="03">Tháng 3</option><option value="04">Tháng 4</option>
-          <option value="05">Tháng 5</option><option value="06">Tháng 6</option>
-          <option value="07">Tháng 7</option><option value="08">Tháng 8</option>
-          <option value="09">Tháng 9</option><option value="10">Tháng 10</option>
-          <option value="11">Tháng 11</option><option value="12">Tháng 12</option>
-        </select>
+      <!-- Month dropdown -->
+      <div class="fdd-wrap" id="fddMonth">
+        <button class="fdd-trigger" onclick="toggleFdd('fddMonth',event)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span id="fddMonthLabel">Tất cả tháng</span>
+          <svg class="fdd-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="fdd-menu" style="max-height:260px;overflow-y:auto">
+          <button class="fdd-item active" data-value="" onclick="setFdd('fddMonth','month','','Tất cả tháng',this)"><span class="fdd-check">✓</span> Tất cả tháng</button>
+          <button class="fdd-item" data-value="01" onclick="setFdd('fddMonth','month','01','Tháng 1',this)"><span class="fdd-check">✓</span> Tháng 1</button>
+          <button class="fdd-item" data-value="02" onclick="setFdd('fddMonth','month','02','Tháng 2',this)"><span class="fdd-check">✓</span> Tháng 2</button>
+          <button class="fdd-item" data-value="03" onclick="setFdd('fddMonth','month','03','Tháng 3',this)"><span class="fdd-check">✓</span> Tháng 3</button>
+          <button class="fdd-item" data-value="04" onclick="setFdd('fddMonth','month','04','Tháng 4',this)"><span class="fdd-check">✓</span> Tháng 4</button>
+          <button class="fdd-item" data-value="05" onclick="setFdd('fddMonth','month','05','Tháng 5',this)"><span class="fdd-check">✓</span> Tháng 5</button>
+          <button class="fdd-item" data-value="06" onclick="setFdd('fddMonth','month','06','Tháng 6',this)"><span class="fdd-check">✓</span> Tháng 6</button>
+          <button class="fdd-item" data-value="07" onclick="setFdd('fddMonth','month','07','Tháng 7',this)"><span class="fdd-check">✓</span> Tháng 7</button>
+          <button class="fdd-item" data-value="08" onclick="setFdd('fddMonth','month','08','Tháng 8',this)"><span class="fdd-check">✓</span> Tháng 8</button>
+          <button class="fdd-item" data-value="09" onclick="setFdd('fddMonth','month','09','Tháng 9',this)"><span class="fdd-check">✓</span> Tháng 9</button>
+          <button class="fdd-item" data-value="10" onclick="setFdd('fddMonth','month','10','Tháng 10',this)"><span class="fdd-check">✓</span> Tháng 10</button>
+          <button class="fdd-item" data-value="11" onclick="setFdd('fddMonth','month','11','Tháng 11',this)"><span class="fdd-check">✓</span> Tháng 11</button>
+          <button class="fdd-item" data-value="12" onclick="setFdd('fddMonth','month','12','Tháng 12',this)"><span class="fdd-check">✓</span> Tháng 12</button>
+        </div>
       </div>
-      <!-- Year filter -->
-      <div class="filter-select-wrap">
-        <select id="yearFilter" class="filter-select" onchange="currentPage=1;render()">
-          <option value="">Tất cả năm</option>
-        </select>
+      <!-- Year dropdown -->
+      <div class="fdd-wrap" id="fddYear">
+        <button class="fdd-trigger" onclick="toggleFdd('fddYear',event)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span id="fddYearLabel">Tất cả năm</span>
+          <svg class="fdd-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="fdd-menu" id="fddYearMenu">
+          <button class="fdd-item active" data-value="" onclick="setFdd('fddYear','year','','Tất cả năm',this)"><span class="fdd-check">✓</span> Tất cả năm</button>
+        </div>
       </div>
-      <!-- Type chips -->
-      <div class="flex gap-2 flex-wrap" id="typeChips">
-        <button class="chip active" data-filter="txtype" data-value="all">Tất cả</button>
-        <button class="chip" data-filter="txtype" data-value="thu">Thu vào</button>
-        <button class="chip" data-filter="txtype" data-value="chi">Chi ra</button>
+      <!-- Type dropdown -->
+      <div class="fdd-wrap" id="fddTxtype">
+        <button class="fdd-trigger" onclick="toggleFdd('fddTxtype',event)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 7 13 17 8 12 1 19"/><polyline points="17 7 23 7 23 13"/></svg>
+          <span id="fddTxtypeLabel">Tất cả</span>
+          <svg class="fdd-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="fdd-menu">
+          <button class="fdd-item active" data-value="all" onclick="setFdd('fddTxtype','txtype','all','Tất cả',this)">
+            <span class="fdd-check">✓</span> Tất cả
+          </button>
+          <button class="fdd-item" data-value="thu" onclick="setFdd('fddTxtype','txtype','thu','↑ Thu vào',this)">
+            <span class="fdd-check">✓</span>
+            <span style="color:#6ee7b7">↑</span> Thu vào
+          </button>
+          <button class="fdd-item" data-value="chi" onclick="setFdd('fddTxtype','txtype','chi','↓ Chi ra',this)">
+            <span class="fdd-check">✓</span>
+            <span style="color:#fca5a5">↓</span> Chi ra
+          </button>
+        </div>
       </div>
-      <!-- Method chips -->
-      <div class="flex gap-2 flex-wrap" id="methodChips">
-        <button class="chip active" data-filter="method" data-value="all">Mọi phương thức</button>
-        <button class="chip" data-filter="method" data-value="chuyển khoản">Chuyển khoản</button>
-        <button class="chip" data-filter="method" data-value="tiền mặt">Tiền mặt</button>
+      <!-- Method dropdown -->
+      <div class="fdd-wrap" id="fddMethod">
+        <button class="fdd-trigger" onclick="toggleFdd('fddMethod',event)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          <span id="fddMethodLabel">Mọi phương thức</span>
+          <svg class="fdd-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="fdd-menu">
+          <button class="fdd-item active" data-value="all" onclick="setFdd('fddMethod','method','all','Mọi phương thức',this)">
+            <span class="fdd-check">✓</span> Mọi phương thức
+          </button>
+          <button class="fdd-item" data-value="chuyển khoản" onclick="setFdd('fddMethod','method','chuyển khoản','Chuyển khoản',this)">
+            <span class="fdd-check">✓</span> Chuyển khoản
+          </button>
+          <button class="fdd-item" data-value="tiền mặt" onclick="setFdd('fddMethod','method','tiền mặt','Tiền mặt',this)">
+            <span class="fdd-check">✓</span> Tiền mặt
+          </button>
+        </div>
       </div>
-      <!-- Status chips -->
-      <div class="flex gap-2 flex-wrap" id="statusChips">
-        <button class="chip active" data-filter="status" data-value="all">Mọi trạng thái</button>
-        <button class="chip" data-filter="status" data-value="đã đóng">Đã đóng</button>
-        <button class="chip" data-filter="status" data-value="chưa đóng">Chưa đóng</button>
+      <!-- Status dropdown -->
+      <div class="fdd-wrap" id="fddStatus">
+        <button class="fdd-trigger" onclick="toggleFdd('fddStatus',event)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span id="fddStatusLabel">Mọi trạng thái</span>
+          <svg class="fdd-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="fdd-menu">
+          <button class="fdd-item active" data-value="all" onclick="setFdd('fddStatus','status','all','Mọi trạng thái',this)">
+            <span class="fdd-check">✓</span> Mọi trạng thái
+          </button>
+          <button class="fdd-item" data-value="đã đóng" onclick="setFdd('fddStatus','status','đã đóng','Đã đóng',this)">
+            <span class="fdd-check">✓</span>
+            <span style="color:#6ee7b7">✓</span> Đã đóng
+          </button>
+          <button class="fdd-item" data-value="chưa đóng" onclick="setFdd('fddStatus','status','chưa đóng','Chưa đóng',this)">
+            <span class="fdd-check">✓</span>
+            <span style="color:#fcd34d">•</span> Chưa đóng
+          </button>
+        </div>
       </div>
     </div>
   </section>
@@ -408,7 +620,14 @@
 <div class="modal-backdrop" id="loginModal">
   <div class="modal" style="max-width:440px" onclick="event.stopPropagation()">
     <div class="px-6 py-5 border-b border-[color:var(--border)] text-center">
-      <div class="brand-logo mx-auto mb-3" style="width:56px;height:56px;font-size:22px;border-radius:16px">L2</div>
+      <div class="brand-logo mx-auto mb-3" style="width:56px;height:56px;border-radius:16px">
+        <svg class="wallet-icon" width="32" height="27" viewBox="0 0 26 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="5" width="26" height="17" rx="3" fill="white" opacity=".9"/>
+          <rect x="0" y="1" width="19" height="8" rx="2.5" fill="white" opacity=".65"/>
+          <rect x="18" y="9" width="8" height="8" rx="2" fill="rgba(124,92,255,.5)"/>
+          <circle class="wallet-coin" cx="22" cy="13" r="2.2" fill="#fbbf24"/>
+        </svg>
+      </div>
       <h3 class="font-bold text-lg">Chào mừng đến Quỹ <span class="gtext">L2 Support</span></h3>
       <div class="text-xs text-[color:var(--text3)] font-mono mt-1">Đăng nhập Admin hoặc xem ở chế độ Employee</div>
     </div>
@@ -443,7 +662,7 @@ const sb = isConfigured ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 // ── State ──
 let rows = [];
-let filters = { method:'all', status:'all', txtype:'all' };
+let filters = { method:'all', status:'all', txtype:'all', month:'', year:'' };
 let sort = { key:'late_date', dir:'desc' };
 let currentPage = 1;
 const PAGE_SIZE = 9;
@@ -503,6 +722,11 @@ function applyRole(){
 }
 function handleRoleToggle(){ if(isAdmin()) logout(); else openLoginModal(); }
 
+// ── Add Menu ──
+function toggleAddMenu(e){ e.stopPropagation(); document.getElementById('addMenu').classList.toggle('open'); }
+function closeAddMenu(){ document.getElementById('addMenu').classList.remove('open'); }
+document.addEventListener('click', ()=>closeAddMenu());
+
 // ── Helpers ──
 const fmtMoney = n => (Number(n)||0).toLocaleString('vi-VN') + '₫';
 const fmtDate = d => { if(!d) return '—'; const [y,m,day]=d.split('-'); return `${day}/${m}/${y}`; };
@@ -544,26 +768,24 @@ async function loadData(showSpin=false){
 
 function buildYearFilter(){
   const years = [...new Set(rows.map(r=>dateOf(r).slice(0,4)).filter(y=>y&&y.length===4))].sort((a,b)=>b-a);
-  const sel = document.getElementById('yearFilter');
-  const cur = sel.value;
-  sel.innerHTML = '<option value="">Tất cả năm</option>' + years.map(y=>`<option value="${y}"${y===cur?' selected':''}>${y}</option>`).join('');
+  const menu = document.getElementById('fddYearMenu');
+  const curYear = filters.year||'';
+  menu.innerHTML = `<button class="fdd-item${curYear===''?' active':''}" data-value="" onclick="setFdd('fddYear','year','','Tất cả năm',this)"><span class="fdd-check">✓</span> Tất cả năm</button>`
+    + years.map(y=>`<button class="fdd-item${y===curYear?' active':''}" data-value="${y}" onclick="setFdd('fddYear','year','${y}','${y}',this)"><span class="fdd-check">✓</span> ${y}</button>`).join('');
 }
 
-// ── Filters ──
-document.querySelectorAll('#typeChips .chip, #methodChips .chip, #statusChips .chip').forEach(c=>{
-  c.addEventListener('click', ()=>{
-    const group = c.dataset.filter;
-    filters[group] = c.dataset.value;
-    document.querySelectorAll(`.chip[data-filter="${group}"]`).forEach(x=>{
-      x.classList.remove('active','active-chi');
-      if(x===c){
-        if(group==='txtype' && c.dataset.value==='chi') x.classList.add('active-chi');
-        else x.classList.add('active');
-      }
-    });
-    currentPage=1; render();
-  });
-});
+// ── Filter Dropdowns ──
+function toggleFdd(id, e){ e.stopPropagation(); const el=document.getElementById(id); const isOpen=el.classList.contains('open'); document.querySelectorAll('.fdd-wrap.open').forEach(w=>w.classList.remove('open')); if(!isOpen) el.classList.add('open'); }
+function setFdd(wrapId, filterKey, value, label, btn){
+  filters[filterKey]=value;
+  document.getElementById(wrapId+'Label').textContent=label;
+  const wrap=document.getElementById(wrapId);
+  wrap.querySelectorAll('.fdd-item').forEach(b=>b.classList.toggle('active', b===btn));
+  wrap.querySelector('.fdd-trigger').classList.toggle('fdd-active', value!=='all' && value!=='');
+  wrap.classList.remove('open');
+  currentPage=1; render();
+}
+document.addEventListener('click', ()=>document.querySelectorAll('.fdd-wrap.open').forEach(w=>w.classList.remove('open')));
 
 function setSort(key){
   if(sort.key===key) sort.dir=sort.dir==='asc'?'desc':'asc';
@@ -577,8 +799,8 @@ function goPage(dir){
 // ── Render ──
 function render(){
   const q=document.getElementById('searchInput').value.trim().toLowerCase();
-  const selMonth=document.getElementById('monthFilter').value;
-  const selYear=document.getElementById('yearFilter').value;
+  const selMonth=filters.month||'';
+  const selYear=filters.year||'';
 
   let list=rows.filter(r=>{
     const chi=isChi(r);
