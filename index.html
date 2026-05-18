@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
   :root {
+    /* Deep Navy × Glassmorphism × Champagne Gold */
     --bg:          #0c1322;
     --bg-mesh:     #0f1a2e;
     --surface:     rgba(255,255,255,.08);
@@ -41,6 +42,7 @@
     overflow: hidden;
   }
 
+  /* Animated mesh background */
   body::before {
     content: '';
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
@@ -57,6 +59,7 @@
     100% { opacity: .9; transform: scale(1.02) rotate(-.3deg); }
   }
 
+  /* Fine grid overlay for depth */
   body::after {
     content: '';
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
@@ -105,6 +108,7 @@
     50%       { box-shadow: 0 0 28px rgba(245,210,120,.7), 0 2px 8px rgba(0,0,0,.4); }
   }
 
+  /* Sheen sweep on the logo icon */
   .logo-icon::before {
     content: '';
     position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
@@ -117,6 +121,7 @@
     100% { left: 130%; }
   }
 
+  /* SVG bolt inside */
   .logo-icon svg {
     width: 15px; height: 15px; position: relative; z-index: 1;
     filter: drop-shadow(0 1px 2px rgba(0,0,0,.35));
@@ -137,6 +142,7 @@
 
   .tab-sep { width: 1px; height: 18px; background: var(--border); margin: 0 6px; flex-shrink: 0; }
 
+  /* ── Active app chip on topbar ── */
   #active-chip {
     display: none; align-items: center; gap: 6px;
     padding: 0 10px; height: var(--topbar-h);
@@ -154,6 +160,7 @@
 
   .chip-sep { width: 1px; height: 18px; background: var(--border); margin: 0 4px; flex-shrink: 0; }
 
+  /* ── Apps dropdown button ── */
   #apps-btn {
     display: flex; align-items: center; gap: 6px;
     padding: 0 12px; height: var(--topbar-h);
@@ -179,6 +186,7 @@
   }
   #apps-btn.open .apps-btn-arrow { transform: rotate(180deg); }
 
+  /* ── Dropdown panel ── */
   #apps-dropdown {
     position: fixed; top: calc(var(--topbar-h) + 6px); left: 0; right: 0;
     display: flex; justify-content: center;
@@ -250,15 +258,9 @@
   .di-icon {
     width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,.35); overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,.35);
   }
   .di-icon svg { width: 16px; height: 16px; }
-  .di-icon img { width: 20px; height: 20px; object-fit: contain; border-radius: 4px; }
-
-  .di-initials {
-    font-size: 11px; font-weight: 800; letter-spacing: -.02em;
-    line-height: 1; text-transform: uppercase;
-  }
 
   .di-info { flex: 1; min-width: 0; }
   .di-name {
@@ -291,6 +293,7 @@
   body.admin-mode .df-add-btn { display: flex; }
   .df-add-btn:hover { background: rgba(232,187,80,.16); }
 
+  /* hide old tabs */
   #tabs { display: none; }
 
   .badge {
@@ -342,14 +345,11 @@
   .pane iframe { width: 100%; height: 100%; border: none; display: block; }
 
   /* ══════════════ HOME ══════════════ */
-  /* FIX: removed justify-content:center which caused title to be cut off
-     when content overflows — flex centering + overflow-y means the top is
-     unreachable. Use margin:auto on the inner wrapper instead. */
   #home {
     position: absolute; inset: 0;
     display: flex; flex-direction: column;
-    align-items: center;
-    padding: 32px 28px 48px; overflow-y: auto;
+    align-items: center; justify-content: center;
+    padding: 40px 28px 48px; overflow-y: auto;
     background: transparent;
   }
 
@@ -357,10 +357,6 @@
     position: relative; z-index: 2;
     display: flex; flex-direction: column; align-items: center;
     width: 100%; max-width: 1060px;
-    /* margin:auto centers vertically when there's extra space,
-       but never hides content above viewport edge */
-    margin: auto;
-    padding: 8px 0;
   }
 
   .home-eyebrow {
@@ -421,10 +417,12 @@
     border-radius: 20px; padding: 28px 24px 22px;
     overflow: hidden; text-align: left;
     transform-style: preserve-3d;
+    /* Glass surface */
     background: rgba(255,255,255,.07);
     border: 1px solid rgba(255,255,255,.14);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
+    /* Strong visible shadow for depth */
     box-shadow:
       0 4px 0 rgba(0,0,0,.5),
       0 8px 0 rgba(0,0,0,.3),
@@ -439,6 +437,7 @@
       background .25s ease;
   }
 
+  /* Shimmer sweep */
   .card::before {
     content: '';
     position: absolute; top: 0; left: -120%; width: 65%; height: 100%;
@@ -447,6 +446,7 @@
     transition: left .55s ease; pointer-events: none; z-index: 3;
   }
 
+  /* Top glass reflection line */
   .card::after {
     content: '';
     position: absolute; top: 0; left: 20px; right: 20px; height: 1px;
@@ -475,6 +475,7 @@
     transition: transform .1s, box-shadow .1s;
   }
 
+  /* Colored top stripe */
   .card-stripe {
     position: absolute; top: 0; left: 0; right: 0; height: 3px;
     background: linear-gradient(90deg, var(--card-accent, var(--accent)), var(--card-accent2, var(--accent2)));
@@ -492,6 +493,7 @@
     overflow: hidden;
   }
 
+  /* Sheen sweep on card icons */
   .card-icon::after {
     content: '';
     position: absolute; inset: 0;
@@ -514,23 +516,6 @@
     transform: translateZ(22px) translateY(-2px) scale(1.08);
     box-shadow: 0 8px 24px rgba(0,0,0,.5), 0 0 20px var(--card-glow, rgba(232,187,80,.3));
   }
-
-  /* Favicon image inside card icon */
-  .card-icon img {
-    width: 28px; height: 28px; object-fit: contain; border-radius: 5px;
-    position: relative; z-index: 1;
-    transition: transform .35s cubic-bezier(.17,.67,.35,1.4);
-  }
-  .card:hover .card-icon img { transform: scale(1.15) translateY(-1px); }
-
-  /* Initials fallback inside card icon */
-  .card-initials {
-    font-size: 15px; font-weight: 900; letter-spacing: -.03em;
-    text-transform: uppercase; line-height: 1;
-    position: relative; z-index: 1;
-    transition: transform .35s cubic-bezier(.17,.67,.35,1.4);
-  }
-  .card:hover .card-initials { transform: scale(1.15) translateY(-1px); }
 
   .card-title {
     font-size: 15px; font-weight: 800; color: var(--text);
@@ -558,6 +543,7 @@
     box-shadow: 0 4px 16px var(--card-glow, rgba(232,187,80,.4));
   }
 
+  /* Admin buttons */
   .card-admin-bar { display: none; position: absolute; top: 12px; right: 12px; gap: 6px; z-index: 10; }
   body.admin-mode .card-admin-bar { display: flex; }
   .card-admin-btn {
@@ -570,6 +556,7 @@
   .card-delete-btn { background: rgba(252,129,129,.12); color: var(--red); }
   .card-delete-btn:hover { background: rgba(252,129,129,.25); transform: scale(1.1); }
 
+  /* Add card */
   .card-add {
     display: none; background: rgba(255,255,255,.03);
     border: 1px dashed rgba(255,255,255,.15); border-radius: 20px;
@@ -600,18 +587,16 @@
   }
   .spin-ring {
     width: 36px; height: 36px; border-radius: 50%;
-    border: 3px solid rgba(232,187,80,.15);
-    border-top-color: var(--accent);
-    animation: spin .8s linear infinite;
+    border: 3px solid rgba(232,187,80,.15); border-top-color: var(--accent);
+    animation: spin .65s linear infinite;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .load-text { font-size: 13px; color: var(--text2); font-weight: 500; }
+  .load-text { font-size: 12px; color: var(--text2); font-family: var(--mono); letter-spacing: .08em; }
 
   /* ══════════════ MODALS ══════════════ */
   .modal-backdrop {
-    position: fixed; inset: 0; z-index: 500;
-    background: rgba(0,0,0,.6);
-    backdrop-filter: blur(12px);
+    position: fixed; inset: 0;
+    background: rgba(5,10,20,.65); backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px); z-index: 1000;
     display: flex; align-items: center; justify-content: center;
     opacity: 0; pointer-events: none; transition: opacity .22s;
@@ -660,6 +645,7 @@
   .modal-scroll::-webkit-scrollbar-track { background: transparent; }
   .modal-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 3px; }
 
+  /* Forms */
   .form-group { margin-bottom: 18px; }
   .form-label {
     display: block; font-size: 11px; font-weight: 700;
@@ -682,6 +668,27 @@
   .form-textarea { resize: vertical; min-height: 80px; line-height: 1.55; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
+  /* Swatches */
+  .color-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+  .swatch {
+    width: 30px; height: 30px; border-radius: 9px; cursor: pointer;
+    border: 2px solid transparent; transition: all .15s;
+    box-shadow: 0 3px 8px rgba(0,0,0,.5);
+  }
+  .swatch:hover { transform: scale(1.12); }
+  .swatch.selected { border-color: #fff; transform: scale(1.2); box-shadow: 0 0 0 3px rgba(255,255,255,.25), 0 4px 12px rgba(0,0,0,.5); }
+
+  /* Emoji */
+  .emoji-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .emoji-btn {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+    cursor: pointer; font-size: 17px; display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+  }
+  .emoji-btn:hover { background: rgba(255,255,255,.12); transform: scale(1.08); }
+  .emoji-btn.selected { background: rgba(232,187,80,.15); border-color: rgba(232,187,80,.4); box-shadow: 0 0 12px rgba(232,187,80,.15); }
+
   /* Source toggle */
   .source-toggle { display: flex; gap: 8px; margin-bottom: 12px; }
   .source-btn {
@@ -691,27 +698,6 @@
     cursor: pointer; transition: all .15s; font-family: var(--font);
   }
   .source-btn.active { background: rgba(232,187,80,.12); border-color: rgba(232,187,80,.3); color: var(--accent2); }
-
-  /* Logo preview in modal */
-  .logo-preview-row {
-    display: flex; align-items: center; gap: 12px;
-    padding: 12px 14px;
-    background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
-    border-radius: 12px; margin-bottom: 18px;
-  }
-  .logo-preview-box {
-    width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center; overflow: hidden;
-    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.1);
-  }
-  .logo-preview-box img { width: 28px; height: 28px; object-fit: contain; border-radius: 4px; }
-  .logo-preview-box .lp-initials {
-    font-size: 14px; font-weight: 900; letter-spacing: -.03em;
-    text-transform: uppercase; line-height: 1;
-  }
-  .logo-preview-info { flex: 1; }
-  .logo-preview-label { font-size: 11px; font-weight: 700; color: var(--text2); letter-spacing: .09em; text-transform: uppercase; font-family: var(--mono); }
-  .logo-preview-hint { font-size: 12px; color: var(--text3); margin-top: 3px; }
 
   /* Buttons */
   .modal-actions { display: flex; gap: 10px; margin-top: 28px; }
@@ -735,6 +721,7 @@
   .btn-danger { background: rgba(252,129,129,.1); color: var(--red); border: 1px solid rgba(252,129,129,.2); }
   .btn-danger:hover { background: rgba(252,129,129,.2); }
 
+  /* Login error */
   .login-error {
     background: rgba(252,129,129,.08); border: 1px solid rgba(252,129,129,.22);
     border-radius: 10px; padding: 10px 14px; font-size: 13px; color: var(--red);
@@ -747,6 +734,7 @@
   }
   .delete-confirm-name { color: var(--text); font-weight: 800; }
 
+  /* Tab close */
   .tab-close {
     display: none; width: 18px; height: 18px; border-radius: 5px;
     background: transparent; border: none; cursor: pointer;
@@ -756,6 +744,7 @@
   body.admin-mode .tab-close { display: flex; }
   .tab-close:hover { background: rgba(252,129,129,.2); color: var(--red); }
 
+  /* Responsive */
   @media (max-width: 600px) {
     .tab { padding: 0 10px; font-size: 12px; }
     .logo-text { display: none; }
@@ -764,6 +753,7 @@
     .cards { grid-template-columns: 1fr; }
   }
 
+  /* Entry animations */
   @keyframes cardIn {
     from { opacity: 0; transform: translateY(28px) scale(.95); }
     to   { opacity: 1; transform: translateY(0) scale(1); }
@@ -780,6 +770,7 @@
 </head>
 <body>
 
+<!-- ── Top bar (fixed, never blocks content) ── -->
 <div id="topbar">
   <button class="logo" onclick="showHome()">
     <div class="logo-icon">
@@ -794,12 +785,14 @@
 
   <div class="tab-sep"></div>
 
+  <!-- Active app chip -->
   <div id="active-chip">
     <span class="chip-dot" id="chip-dot"></span>
     <span id="chip-name"></span>
   </div>
   <div class="chip-sep" id="chip-sep" style="display:none"></div>
 
+  <!-- Apps dropdown trigger -->
   <button id="apps-btn" onclick="toggleDropdown()">
     <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
       <rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".7"/>
@@ -812,7 +805,7 @@
     <span class="apps-btn-arrow">▼</span>
   </button>
 
-  <div id="tabs" style="display:none"></div>
+  <div id="tabs" style="display:none"><!-- dynamic, kept for JS compat --></div>
 
   <div class="topbar-right">
     <div class="admin-indicator" id="adminIndicator">
@@ -823,6 +816,7 @@
   </div>
 </div>
 
+<!-- ── Apps Dropdown ── -->
 <div id="apps-dropdown">
   <div class="dropdown-inner">
     <div class="dropdown-header">
@@ -834,7 +828,7 @@
         Trang chủ
       </button>
     </div>
-    <div class="dropdown-grid" id="dropdown-grid"></div>
+    <div class="dropdown-grid" id="dropdown-grid"><!-- dynamic --></div>
     <div class="dropdown-footer">
       <span class="df-count" id="df-count">0 APPS</span>
       <button class="df-add-btn" onclick="openAdd();closeDropdown()">＋ Thêm app</button>
@@ -842,6 +836,7 @@
   </div>
 </div>
 
+<!-- ── Content (offset by topbar height via CSS) ── -->
 <div id="content">
   <div id="home" class="pane active">
     <div class="home-inner">
@@ -849,11 +844,11 @@
       <h1 class="home-title"><span class="grad">Internal L2 Tools Hub</span></h1>
       <p class="home-sub">Trung tâm ứng dụng nội bộ — chọn công cụ bên dưới để bắt đầu.</p>
 
-      <div class="cards" id="cardsGrid"></div>
-      <div class="home-footer" id="homeFooter"></div>
+      <div class="cards" id="cardsGrid"><!-- dynamic --></div>
+      <div class="home-footer" id="homeFooter"><!-- dynamic --></div>
     </div>
   </div>
-  <div id="appPanes"></div>
+  <div id="appPanes"><!-- dynamic --></div>
 </div>
 
 <!-- ══════ MODAL: Login ══════ -->
@@ -896,8 +891,7 @@
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Tên app *</label>
-          <input class="form-input" id="fName" placeholder="VD: HR Management"
-            oninput="updateLogoPreview()"/>
+          <input class="form-input" id="fName" placeholder="VD: HR Management"/>
         </div>
         <div class="form-group">
           <label class="form-label">Badge</label>
@@ -921,24 +915,22 @@
           <button class="source-btn active" id="srcFile" onclick="switchSource('file')">📄 File HTML</button>
           <button class="source-btn" id="srcUrl" onclick="switchSource('url')">🌐 URL / Link</button>
         </div>
-        <input class="form-input" id="fSrc" placeholder="VD: MyApp.html hoặc https://…"
-          oninput="updateLogoPreview()"/>
+        <input class="form-input" id="fSrc" placeholder="VD: MyApp.html hoặc https://…"/>
         <div style="font-size:11px;color:var(--text3);margin-top:6px;font-family:var(--mono)">
           File HTML phải nằm cùng thư mục với index.html này.
         </div>
       </div>
 
-      <!-- Auto logo preview — replaces manual icon/color pickers -->
-      <div class="logo-preview-row" id="logoPreviewRow">
-        <div class="logo-preview-box" id="logoPreviewBox">
-          <span class="lp-initials" id="logoPreviewInitials" style="color:#7e9abf">?</span>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Biểu tượng</label>
+          <div class="emoji-grid" id="emojiGrid"></div>
         </div>
-        <div class="logo-preview-info">
-          <div class="logo-preview-label">Logo tự động</div>
-          <div class="logo-preview-hint" id="logoPreviewHint">Nhập tên app hoặc URL để tự nhận diện logo</div>
+        <div class="form-group">
+          <label class="form-label">Màu sắc</label>
+          <div class="color-swatches" id="colorSwatches"></div>
         </div>
       </div>
-
     </div>
 
     <div class="modal-actions">
@@ -980,115 +972,24 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // CONFIG
 // ════════════════════════════════════════
 const ADMIN_PASSWORD_HASH = '8b85ce9a68ea550e7cd7417fc9c94fe9e53cb6e151bc094d0c3053bb2533e9e3';
+const STORAGE_KEY = 'itHub_apps_v2';
 
 const COLORS = [
-  { name:'blue',   hex:'#60a5fa', hex2:'#3b82f6', glow:'rgba(96,165,250,.08)',  shadow:'rgba(96,165,250,.2)',  iconBg:'rgba(59,130,246,.12)', iconShadow:'rgba(59,130,246,.25)' },
   { name:'amber',  hex:'#f59e0b', hex2:'#d97706', glow:'rgba(245,158,11,.08)',  shadow:'rgba(245,158,11,.2)',  iconBg:'rgba(245,158,11,.12)', iconShadow:'rgba(245,158,11,.25)' },
+  { name:'blue',   hex:'#60a5fa', hex2:'#3b82f6', glow:'rgba(96,165,250,.08)',  shadow:'rgba(96,165,250,.2)',  iconBg:'rgba(59,130,246,.12)', iconShadow:'rgba(59,130,246,.25)' },
   { name:'red',    hex:'#f87171', hex2:'#ef4444', glow:'rgba(248,113,113,.08)', shadow:'rgba(248,113,113,.2)', iconBg:'rgba(239,68,68,.12)',  iconShadow:'rgba(239,68,68,.25)' },
   { name:'green',  hex:'#34d399', hex2:'#10b981', glow:'rgba(52,211,153,.08)',  shadow:'rgba(52,211,153,.2)',  iconBg:'rgba(16,185,129,.12)', iconShadow:'rgba(16,185,129,.25)' },
   { name:'orange', hex:'#fb923c', hex2:'#f97316', glow:'rgba(251,146,60,.08)',  shadow:'rgba(251,146,60,.2)',  iconBg:'rgba(249,115,22,.12)', iconShadow:'rgba(249,115,22,.25)' },
   { name:'teal',   hex:'#2dd4bf', hex2:'#14b8a6', glow:'rgba(45,212,191,.08)', shadow:'rgba(45,212,191,.2)',  iconBg:'rgba(20,184,166,.12)', iconShadow:'rgba(20,184,166,.25)' },
   { name:'purple', hex:'#a78bfa', hex2:'#8b5cf6', glow:'rgba(167,139,250,.08)',shadow:'rgba(167,139,250,.2)', iconBg:'rgba(139,92,246,.12)', iconShadow:'rgba(139,92,246,.25)' },
-  { name:'pink',   hex:'#f472b6', hex2:'#ec4899', glow:'rgba(244,114,182,.08)',shadow:'rgba(244,114,182,.2)', iconBg:'rgba(236,72,153,.12)', iconShadow:'rgba(236,72,153,.25)' },
-  { name:'sky',    hex:'#38bdf8', hex2:'#0ea5e9', glow:'rgba(56,189,248,.08)', shadow:'rgba(56,189,248,.2)',  iconBg:'rgba(14,165,233,.12)', iconShadow:'rgba(14,165,233,.25)' },
-  { name:'lime',   hex:'#a3e635', hex2:'#84cc16', glow:'rgba(163,230,53,.08)', shadow:'rgba(163,230,53,.2)',  iconBg:'rgba(132,204,22,.12)', iconShadow:'rgba(132,204,22,.25)' },
 ];
 
-// Pick a color that keeps cards visually distinct:
-// prefer colors not yet used; if all used, pick least-used
-function pickNextColor(excludeId) {
-  const usedNames = apps
-    .filter(a => a.id !== excludeId)
-    .map(a => a.color);
-  const counts = {};
-  COLORS.forEach(c => { counts[c.name] = 0; });
-  usedNames.forEach(n => { if (counts[n] !== undefined) counts[n]++; });
-  // find min count
-  const minCount = Math.min(...Object.values(counts));
-  // pick first color with that min count (preserves a round-robin order)
-  const candidate = COLORS.find(c => counts[c.name] === minCount);
-  return candidate ? candidate.name : COLORS[0].name;
-}
-
-// ── Auto logo helpers ─────────────────────────────────────
-
-// Cache: src string -> resolved favicon URL (or null)
-const localFaviconCache = {};
-
-// For external URLs: use Google favicon service
-function faviconFromUrl(src) {
-  if (!src) return null;
-  const trimmed = src.trim();
-  if (!trimmed.startsWith('http')) return null;
-  try {
-    const url = new URL(trimmed);
-    return `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=64`;
-  } catch { return null; }
-}
-
-// For local HTML files: fetch the file and parse the <link rel="icon"> tag
-async function fetchLocalFavicon(src) {
-  if (!src || src.trim().startsWith('http')) return null;
-  const key = src.trim();
-  if (key in localFaviconCache) return localFaviconCache[key];
-
-  try {
-    const res = await fetch(key);
-    if (!res.ok) { localFaviconCache[key] = null; return null; }
-    const html = await res.text();
-
-    // Match any <link> tag that has rel containing "icon"
-    const linkRe = /<link([^>]+)>/gi;
-    let m;
-    while ((m = linkRe.exec(html)) !== null) {
-      const attrs = m[1];
-      if (!/rel=["'][^"']*icon[^"']*["']/i.test(attrs)) continue;
-      const hrefMatch = attrs.match(/href=["']([^"']+)["']/i);
-      if (!hrefMatch) continue;
-      let url = hrefMatch[1];
-      // data URIs are usable directly
-      if (url.startsWith('data:')) { localFaviconCache[key] = url; return url; }
-      // absolute URLs
-      if (url.startsWith('http')) { localFaviconCache[key] = url; return url; }
-      // relative path — resolve relative to the HTML file's directory
-      const dir = key.includes('/') ? key.substring(0, key.lastIndexOf('/') + 1) : '';
-      url = dir + url;
-      localFaviconCache[key] = url;
-      return url;
-    }
-  } catch {}
-  localFaviconCache[key] = null;
-  return null;
-}
-
-// Returns the best favicon to display for an app (cached result or null)
-function getAppFavicon(app) {
-  if (!app.src) return null;
-  if (app.src.trim().startsWith('http')) return faviconFromUrl(app.src);
-  // local file — return from cache (may be null if not yet loaded or not found)
-  return localFaviconCache[app.src.trim()] || null;
-}
-
-// Pre-fetch local favicons for all apps, then re-render
-async function prefetchLocalFavicons() {
-  const localApps = apps.filter(a => a.src && !a.src.trim().startsWith('http'));
-  if (!localApps.length) return;
-  await Promise.all(localApps.map(a => fetchLocalFavicon(a.src)));
-  render(); // re-render now that we have real favicons
-}
-
-// Returns 1-2 uppercase initials from a name
-function nameInitials(name) {
-  if (!name) return '?';
-  const words = name.trim().split(/\s+/);
-  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
-  return (words[0][0] + words[1][0]).toUpperCase();
-}
+const EMOJIS = ['👥','📊','🛡️','📁','📈','🔧','💼','🧩','🚀','📋','🔍','💡','🖥️','🗂️','📦','⚡','🎯','🔗'];
 
 const DEFAULT_APPS = [
-  { id:'app_0', name:'Quản Lý Nhân Sự',    badge:'HR',  desc:'Quản lý danh sách nhân sự, thiết bị laptop, tài khoản hệ thống của L2 Support Team.', tags:'HR · L2 Team', src:'HR_Management.html',    color:'blue'   },
-  { id:'app_1', name:'CAT Tracking',        badge:'KPI', desc:'Theo dõi KPI upload file hàng ngày, leaderboard, gamification và báo cáo hiệu suất.',  tags:'KPI · CAT',   src:'CAT_Tracking.html',     color:'amber'  },
-  { id:'app_2', name:'IT Incident Tracker', badge:'INC', desc:'Ghi nhận và theo dõi sự cố IT theo mức độ ưu tiên P1/P2, timeline và xuất báo cáo PowerPoint.', tags:'Incident · IT', src:'Incident_Tracking.html', color:'red' },
+  { id:'app_0', name:'Quản Lý Nhân Sự',    badge:'HR',  desc:'Quản lý danh sách nhân sự, thiết bị laptop, tài khoản hệ thống của L2 Support Team.', tags:'HR · L2 Team', src:'HR_Management.html',    emoji:'👥', color:'blue'   },
+  { id:'app_1', name:'CAT Tracking', badge:'KPI', desc:'Theo dõi KPI upload file hàng ngày, leaderboard, gamification và báo cáo hiệu suất.',  tags:'KPI · CAT',   src:'CAT_Tracking.html',     emoji:'📊', color:'amber' },
+  { id:'app_2', name:'IT Incident Tracker', badge:'INC', desc:'Ghi nhận và theo dõi sự cố IT theo mức độ ưu tiên P1/P2, timeline và xuất báo cáo PowerPoint.', tags:'Incident · IT', src:'Incident_Tracking.html', emoji:'🛡️', color:'red' },
 ];
 
 // ════════════════════════════════════════
@@ -1098,8 +999,11 @@ let apps = [];
 let isAdmin = false;
 let current = 'home';
 let editingId = null;
+let selectedColor = 'blue';
+let selectedEmoji = '📁';
 let srcMode = 'file';
 
+// Load all apps from Supabase, ordered by `position`
 async function loadApps() {
   try {
     const { data, error } = await sb
@@ -1108,6 +1012,7 @@ async function loadApps() {
       .order('position', { ascending: true });
     if (error) throw error;
     if (!data || data.length === 0) {
+      // First run: seed default apps into Supabase
       const seed = DEFAULT_APPS.map((a, i) => ({ ...a, position: i }));
       const { data: inserted, error: insErr } = await sb.from('apps').insert(seed).select();
       if (insErr) throw insErr;
@@ -1120,11 +1025,13 @@ async function loadApps() {
   }
 }
 
+// Upsert one app row to Supabase
 async function upsertApp(app) {
   const { error } = await sb.from('apps').upsert(app, { onConflict: 'id' });
   if (error) { console.error('[Supabase] upsert failed:', error); alert('Lưu lên Supabase thất bại: ' + error.message); }
 }
 
+// Delete one app row from Supabase
 async function removeApp(id) {
   const { error } = await sb.from('apps').delete().eq('id', id);
   if (error) { console.error('[Supabase] delete failed:', error); alert('Xóa trên Supabase thất bại: ' + error.message); }
@@ -1155,16 +1062,11 @@ function renderDropdown() {
     const item = document.createElement('div');
     item.className = 'dropdown-item' + (current === i ? ' active-item' : '');
     item.id = 'di-' + app.id;
-
-    const favicon = getAppFavicon(app);
-    const iconHtml = favicon
-      ? `<img src="${esc(favicon)}" alt="" onerror="this.style.display='none';this.nextSibling.style.display='flex'"/>
-         <span class="di-initials" style="display:none;color:${color.hex}">${esc(nameInitials(app.name))}</span>`
-      : `<span class="di-initials" style="color:${color.hex}">${esc(nameInitials(app.name))}</span>`;
-
     item.innerHTML = `
       <div class="di-icon" style="background:${color.iconBg};box-shadow:0 2px 8px ${color.iconShadow}">
-        ${iconHtml}
+        <span style="color:${color.hex};display:flex;align-items:center;justify-content:center;">
+          ${SVG_ICONS[app.emoji] || SVG_ICONS['📁']}
+        </span>
       </div>
       <div class="di-info">
         <div class="di-name">${esc(app.name)}</div>
@@ -1189,17 +1091,20 @@ let dropdownOpen = false;
 function toggleDropdown() {
   dropdownOpen ? closeDropdown() : openDropdown();
 }
+
 function openDropdown() {
   dropdownOpen = true;
   document.getElementById('apps-btn').classList.add('open');
   document.getElementById('apps-dropdown').classList.add('open');
 }
+
 function closeDropdown() {
   dropdownOpen = false;
   document.getElementById('apps-btn').classList.remove('open');
   document.getElementById('apps-dropdown').classList.remove('open');
 }
 
+// Close dropdown on outside click
 document.addEventListener('click', e => {
   if (dropdownOpen &&
       !e.target.closest('#apps-btn') &&
@@ -1244,31 +1149,13 @@ function renderCards() {
       --card-glow:${color.glow};
       --card-shadow:${color.shadow};
     `;
-
-    const favicon = getAppFavicon(app);
-    const initials = nameInitials(app.name);
-
-    let iconContent;
-    if (favicon) {
-      iconContent = `
-        <img src="${esc(favicon)}" alt=""
-          onerror="this.style.display='none';this.nextSibling.style.display='block'"
-          style="width:28px;height:28px;object-fit:contain;border-radius:5px;position:relative;z-index:1;transition:transform .35s cubic-bezier(.17,.67,.35,1.4)"/>
-        <span class="card-initials" style="display:none;color:${color.hex}">${esc(initials)}</span>
-      `;
-    } else {
-      iconContent = `<span class="card-initials" style="color:${color.hex}">${esc(initials)}</span>`;
-    }
-
     card.innerHTML = `
       <div class="card-stripe"></div>
       <div class="card-admin-bar">
         <button class="card-admin-btn card-edit-btn" onclick="event.stopPropagation();openEdit('${app.id}')" title="Sửa">✏️</button>
         <button class="card-admin-btn card-delete-btn" onclick="event.stopPropagation();confirmDelete('${app.id}')" title="Xóa">🗑️</button>
       </div>
-      <div class="card-icon" style="background:${color.iconBg};box-shadow:0 4px 12px ${color.iconShadow}, 0 2px 0 rgba(0,0,0,.06)">
-        ${iconContent}
-      </div>
+      <div class="card-icon" style="background:${color.iconBg};box-shadow:0 4px 12px ${color.iconShadow}, 0 2px 0 rgba(0,0,0,.06)">${getAppIcon(app.emoji || '📁', color.hex)}</div>
       <div class="card-title">${esc(app.name)}</div>
       <div class="card-desc">${esc(app.desc || '')}</div>
       <div class="card-footer">
@@ -1280,6 +1167,7 @@ function renderCards() {
     grid.appendChild(card);
   });
 
+  // Add card (admin only)
   const addCard = document.createElement('div');
   addCard.className = 'card card-add';
   addCard.onclick = openAdd;
@@ -1292,6 +1180,128 @@ function renderFooter() {
 }
 
 function getColor(name) { return COLORS.find(c => c.name === name) || COLORS[0]; }
+
+// ── SVG icon library ──────────────────────────────────────
+const SVG_ICONS = {
+  '👥': `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- person left -->
+    <circle cx="8.5" cy="7" r="2.8" fill="currentColor" opacity=".9"/>
+    <path d="M2.5 18c0-3.31 2.69-5.5 6-5.5s6 2.19 6 5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none" opacity=".9"/>
+    <!-- person right (offset) -->
+    <circle cx="15.5" cy="7" r="2.5" fill="currentColor" opacity=".6"/>
+    <path d="M11.5 18c0-2.8 1.8-4.8 4-5.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none" opacity=".6"/>
+  </svg>`,
+
+  '🛡️': `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 3L4 6.5V12c0 4.1 3.4 7.9 8 9 4.6-1.1 8-4.9 8-9V6.5L12 3Z"
+      fill="currentColor" opacity=".15" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M12 3L4 6.5V12c0 4.1 3.4 7.9 8 9"
+      fill="currentColor" opacity=".35" stroke="none"/>
+    <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`,
+
+  '📊': `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="3"  y="14" width="4" height="7" rx="1.5" fill="currentColor" opacity=".6"/>
+    <rect x="10" y="9"  width="4" height="12" rx="1.5" fill="currentColor" opacity=".85"/>
+    <rect x="17" y="4"  width="4" height="17" rx="1.5" fill="currentColor"/>
+  </svg>`,
+
+  '📁': `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M3 7a2 2 0 012-2h4.17a2 2 0 011.42.59L12 7h7a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7Z"
+      fill="currentColor" opacity=".2" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M3 10h18" stroke="currentColor" stroke-width="1.4" opacity=".6"/>
+  </svg>`,
+
+  '📈': `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <polyline points="3,17 8,11 13,14 21,5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <polyline points="16,5 21,5 21,10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`,
+
+  '🔧': `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76Z"
+      fill="currentColor" opacity=".2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`,
+
+  '💼': `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="2" y="9" width="20" height="13" rx="2" fill="currentColor" opacity=".2" stroke="currentColor" stroke-width="1.6"/>
+    <path d="M16 9V7a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+    <line x1="2" y1="15" x2="22" y2="15" stroke="currentColor" stroke-width="1.4" opacity=".5"/>
+  </svg>`,
+
+  '🧩': `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2H7a2 2 0 00-2 2v5c1.1 0 2 .9 2 2s-.9 2-2 2v5a2 2 0 002 2h5v-2c0-1.1.9-2 2-2s2 .9 2 2v2h5a2 2 0 002-2v-5c-1.1 0-2-.9-2-2s.9-2 2-2V4a2 2 0 00-2-2h-5v2c0 1.1-.9 2-2 2s-2-.9-2-2V2Z"
+      fill="currentColor" opacity=".2" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+  </svg>`,
+
+  '🚀': `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2C12 2 7 6 7 13h10C17 6 12 2 12 2Z" fill="currentColor" opacity=".2" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+    <rect x="9" y="13" width="6" height="4" rx="1" fill="currentColor" opacity=".4"/>
+    <path d="M9 17c-1 1-2 3-2 3h10s-1-2-2-3" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" fill="none" opacity=".6"/>
+    <circle cx="12" cy="10" r="1.5" fill="currentColor"/>
+  </svg>`,
+
+  '📋': `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="5" y="3" width="14" height="18" rx="2" fill="currentColor" opacity=".15" stroke="currentColor" stroke-width="1.6"/>
+    <path d="M9 3h6v3H9z" fill="currentColor" opacity=".5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+    <line x1="8" y1="11" x2="16" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".7"/>
+    <line x1="8" y1="15" x2="14" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".5"/>
+  </svg>`,
+
+  '🔍': `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="11" cy="11" r="6" fill="currentColor" opacity=".15" stroke="currentColor" stroke-width="1.8"/>
+    <line x1="16" y1="16" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </svg>`,
+
+  '💡': `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2a7 7 0 017 7c0 3-1.8 5.5-4.5 6.5V17H9.5v-1.5C6.8 14.5 5 12 5 9a7 7 0 017-7Z"
+      fill="currentColor" opacity=".2" stroke="currentColor" stroke-width="1.6"/>
+    <path d="M9.5 21h5M10.5 19h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+  </svg>`,
+
+  '🖥️': `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="2" y="3" width="20" height="14" rx="2" fill="currentColor" opacity=".2" stroke="currentColor" stroke-width="1.6"/>
+    <line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+  </svg>`,
+
+  '🗂️': `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M3 5a2 2 0 012-2h3.59a2 2 0 011.41.59L11 5h8a2 2 0 012 2v3H3V5Z"
+      fill="currentColor" opacity=".3" stroke="currentColor" stroke-width="1.5"/>
+    <rect x="3" y="8" width="18" height="12" rx="2" fill="currentColor" opacity=".15" stroke="currentColor" stroke-width="1.5"/>
+  </svg>`,
+
+  '📦': `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M21 10V6a1 1 0 00-.55-.89l-8-4a1 1 0 00-.9 0l-8 4A1 1 0 003 6v4l9 4.5L21 10Z"
+      fill="currentColor" opacity=".3" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M3 10l9 4.5M21 10l-9 4.5M12 14.5V22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>`,
+
+  '⚡': `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M13 2L4.5 13.5H11L10 22L19.5 10.5H13L13 2Z"
+      fill="currentColor" opacity=".85" stroke="currentColor" stroke-width=".8" stroke-linejoin="round"/>
+  </svg>`,
+
+  '🎯': `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="9" fill="currentColor" opacity=".1" stroke="currentColor" stroke-width="1.5"/>
+    <circle cx="12" cy="12" r="5.5" fill="currentColor" opacity=".2" stroke="currentColor" stroke-width="1.5"/>
+    <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+    <line x1="12" y1="2" x2="12" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".5"/>
+    <line x1="22" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".5"/>
+  </svg>`,
+
+  '🔗': `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+    <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+  </svg>`,
+};
+
+function getAppIcon(emoji, colorHex) {
+  const svg = SVG_ICONS[emoji] || SVG_ICONS['📁'];
+  // wrap in a colored span so currentColor works
+  return `<span style="color:${colorHex};display:flex;align-items:center;justify-content:center;">${svg}</span>`;
+}
 
 function esc(str) {
   return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -1388,7 +1398,7 @@ async function submitLogin() {
 // ADD / EDIT APP
 // ════════════════════════════════════════
 function openAdd() {
-  editingId = null; srcMode = 'file';
+  editingId = null; selectedColor = 'blue'; selectedEmoji = '📁'; srcMode = 'file';
   document.getElementById('modalIcon').textContent = '➕';
   document.getElementById('modalTitle').textContent = 'Thêm ứng dụng mới';
   document.getElementById('modalSubtitle').textContent = 'Điền thông tin để thêm app vào hub';
@@ -1398,8 +1408,7 @@ function openAdd() {
   document.getElementById('fDesc').value = '';
   document.getElementById('fTags').value = '';
   document.getElementById('fSrc').value = '';
-  switchSource('file');
-  updateLogoPreview();
+  buildEmojiGrid(); buildColorSwatches(); switchSource('file');
   openModal('appModal');
   setTimeout(() => document.getElementById('fName').focus(), 250);
 }
@@ -1407,7 +1416,7 @@ function openAdd() {
 function openEdit(id) {
   const app = apps.find(a => a.id === id);
   if (!app) return;
-  editingId = id;
+  editingId = id; selectedColor = app.color || 'blue'; selectedEmoji = app.emoji || '📁';
   srcMode = app.src && app.src.startsWith('http') ? 'url' : 'file';
   document.getElementById('modalIcon').textContent = '✏️';
   document.getElementById('modalTitle').textContent = 'Chỉnh sửa ứng dụng';
@@ -1418,8 +1427,7 @@ function openEdit(id) {
   document.getElementById('fDesc').value  = app.desc  || '';
   document.getElementById('fTags').value  = app.tags  || '';
   document.getElementById('fSrc').value   = app.src   || '';
-  switchSource(srcMode);
-  updateLogoPreview();
+  buildEmojiGrid(); buildColorSwatches(); switchSource(srcMode);
   openModal('appModal');
   setTimeout(() => document.getElementById('fName').focus(), 250);
 }
@@ -1437,17 +1445,13 @@ function saveApp() {
   if (editingId) {
     const idx = apps.findIndex(a => a.id === editingId);
     if (idx !== -1) {
-      // keep existing color unless we need to reassign
-      const color = apps[idx].color || pickNextColor(editingId);
-      apps[idx] = { ...apps[idx], name, badge, desc, tags, src, color };
+      apps[idx] = { ...apps[idx], name, badge, desc, tags, src, emoji: selectedEmoji, color: selectedColor };
       row = apps[idx];
       const pane = document.getElementById('pane-' + editingId);
       if (pane) { const f = pane.querySelector('iframe'); if (f) f.remove(); }
     }
   } else {
-    // auto-assign a color that doesn't repeat with existing cards
-    const color = pickNextColor(null);
-    row = { id: genId(), name, badge, desc, tags, src, color, position: apps.length };
+    row = { id: genId(), name, badge, desc, tags, src, emoji: selectedEmoji, color: selectedColor, position: apps.length };
     apps.push(row);
   }
 
@@ -1460,72 +1464,6 @@ function switchSource(mode) {
   document.getElementById('srcFile').classList.toggle('active', mode === 'file');
   document.getElementById('srcUrl').classList.toggle('active',  mode === 'url');
   document.getElementById('fSrc').placeholder = mode === 'file' ? 'VD: MyApp.html' : 'https://example.com/app';
-  updateLogoPreview();
-}
-
-// ════════════════════════════════════════
-// LOGO PREVIEW (in modal)
-// ════════════════════════════════════════
-async function updateLogoPreview() {
-  const src  = (document.getElementById('fSrc')  || {}).value || '';
-  const name = (document.getElementById('fName') || {}).value || '';
-  const box  = document.getElementById('logoPreviewBox');
-  const hint = document.getElementById('logoPreviewHint');
-  if (!box || !hint) return;
-
-  const initials = nameInitials(name);
-  const initialsHtml = (col) =>
-    `<span id="logoPreviewInitials" style="font-size:14px;font-weight:900;letter-spacing:-.03em;text-transform:uppercase;color:${col}">${esc(initials)}</span>`;
-
-  const srcTrimmed = src.trim();
-
-  if (srcTrimmed.startsWith('http')) {
-    // External URL: use Google favicon
-    const favicon = faviconFromUrl(srcTrimmed);
-    box.innerHTML = `
-      <img src="${esc(favicon)}" alt=""
-        style="width:28px;height:28px;object-fit:contain;border-radius:4px;"
-        onerror="this.style.display='none';this.insertAdjacentHTML('afterend','${initialsHtml('#7e9abf').replace(/'/g, "\\'")}')"/>
-    `;
-    try {
-      hint.textContent = `Favicon từ ${new URL(srcTrimmed).hostname}`;
-    } catch { hint.textContent = 'Favicon tự động từ URL'; }
-
-  } else if (srcTrimmed) {
-    // Local HTML file: check cache first, show initials while loading
-    const cached = localFaviconCache[srcTrimmed];
-    if (cached !== undefined) {
-      // Already know the result
-      if (cached) {
-        box.innerHTML = `<img src="${esc(cached)}" alt="" style="width:28px;height:28px;object-fit:contain;border-radius:4px;"/>`;
-        hint.textContent = 'Favicon từ file HTML';
-      } else {
-        box.innerHTML = initialsHtml('#7e9abf');
-        hint.textContent = name.trim() ? 'Chữ viết tắt từ tên app' : 'Không tìm thấy favicon trong file';
-      }
-    } else {
-      // Not cached yet — show initials, then fetch
-      box.innerHTML = initialsHtml('#7e9abf');
-      hint.textContent = 'Đang tìm favicon trong file…';
-      const favicon = await fetchLocalFavicon(srcTrimmed);
-      // Only update if user hasn't changed the src in the meantime
-      if ((document.getElementById('fSrc') || {}).value.trim() === srcTrimmed) {
-        if (favicon) {
-          box.innerHTML = `<img src="${esc(favicon)}" alt="" style="width:28px;height:28px;object-fit:contain;border-radius:4px;"/>`;
-          hint.textContent = 'Favicon từ file HTML';
-        } else {
-          hint.textContent = name.trim() ? 'Chữ viết tắt từ tên app' : 'Không tìm thấy favicon trong file';
-        }
-      }
-    }
-
-  } else if (name.trim()) {
-    box.innerHTML = initialsHtml('#7e9abf');
-    hint.textContent = 'Chữ viết tắt từ tên app';
-  } else {
-    box.innerHTML = `<span id="logoPreviewInitials" style="font-size:14px;font-weight:900;letter-spacing:-.03em;color:#3d5275">?</span>`;
-    hint.textContent = 'Nhập tên app hoặc URL để tự nhận diện logo';
-  }
 }
 
 // ════════════════════════════════════════
@@ -1548,6 +1486,42 @@ function deleteApp(id) {
   apps = apps.filter(a => a.id !== id);
   closeModal('deleteModal'); render();
   removeApp(id);
+}
+
+// ════════════════════════════════════════
+// EMOJI & COLOR PICKERS
+// ════════════════════════════════════════
+function buildEmojiGrid() {
+  const grid = document.getElementById('emojiGrid');
+  grid.innerHTML = '';
+  EMOJIS.forEach(em => {
+    const btn = document.createElement('button');
+    btn.className = 'emoji-btn' + (em === selectedEmoji ? ' selected' : '');
+    btn.textContent = em;
+    btn.onclick = () => {
+      selectedEmoji = em;
+      grid.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    };
+    grid.appendChild(btn);
+  });
+}
+
+function buildColorSwatches() {
+  const container = document.getElementById('colorSwatches');
+  container.innerHTML = '';
+  COLORS.forEach(c => {
+    const sw = document.createElement('div');
+    sw.className = 'swatch' + (c.name === selectedColor ? ' selected' : '');
+    sw.style.background = c.hex;
+    sw.title = c.name;
+    sw.onclick = () => {
+      selectedColor = c.name;
+      container.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
+      sw.classList.add('selected');
+    };
+    container.appendChild(sw);
+  });
 }
 
 // ════════════════════════════════════════
@@ -1575,8 +1549,7 @@ document.addEventListener('keydown', e => {
 // ════════════════════════════════════════
 (async () => {
   apps = await loadApps();
-  render(); // first render with initials
-  prefetchLocalFavicons(); // async: re-renders once local favicons are loaded
+  render();
   const _restored = loadSession();
   if (_restored !== 'home' && typeof _restored === 'number' && _restored < apps.length) {
     openApp(_restored);
