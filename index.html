@@ -141,32 +141,159 @@
 
   .tab-sep { width: 1px; height: 18px; background: var(--border); margin: 0 6px; flex-shrink: 0; }
 
-  #tabs {
-    display: flex; align-items: stretch; gap: 2px;
-    flex: 1; overflow-x: auto; scrollbar-width: none; height: 100%;
+  /* ── Active app chip on topbar ── */
+  #active-chip {
+    display: none; align-items: center; gap: 6px;
+    padding: 0 10px; height: var(--topbar-h);
+    color: var(--accent); font-size: 12px; font-weight: 700;
+    white-space: nowrap; position: relative; flex-shrink: 0;
   }
-  #tabs::-webkit-scrollbar { display: none; }
+  #active-chip.visible { display: flex; }
+  #active-chip::after {
+    content: '';
+    position: absolute; bottom: 0; left: 6px; right: 6px; height: 2px;
+    background: linear-gradient(90deg, var(--accent3), var(--accent2));
+    border-radius: 2px 2px 0 0;
+  }
+  #active-chip .chip-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 8px currentColor; }
 
-  .tab {
+  .chip-sep { width: 1px; height: 18px; background: var(--border); margin: 0 4px; flex-shrink: 0; }
+
+  /* ── Apps dropdown button ── */
+  #apps-btn {
     display: flex; align-items: center; gap: 6px;
     padding: 0 12px; height: var(--topbar-h);
     cursor: pointer; border: none; background: transparent;
     color: var(--text2); font-family: var(--font);
     font-size: 12px; font-weight: 600; white-space: nowrap;
     position: relative; transition: color .15s, background .15s;
+    flex-shrink: 0;
   }
-  .tab:hover { color: var(--text); background: rgba(255,255,255,.04); }
-  .tab.active { color: var(--accent); background: rgba(232,187,80,.06); }
-  .tab.active::after {
-    content: '';
-    position: absolute; bottom: 0; left: 10px; right: 10px;
-    height: 2px;
-    background: linear-gradient(90deg, var(--accent3), var(--accent2));
-    border-radius: 2px 2px 0 0;
+  #apps-btn:hover { color: var(--text); background: rgba(255,255,255,.04); }
+  #apps-btn.open  { color: var(--accent); background: rgba(232,187,80,.06); }
+
+  .apps-btn-count {
+    background: rgba(232,187,80,.15); color: var(--accent2);
+    border: 1px solid rgba(232,187,80,.25);
+    font-family: var(--mono); font-size: 9px; font-weight: 600;
+    padding: 1px 6px; border-radius: 20px; letter-spacing: .04em;
   }
 
-  .tab-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; transition: box-shadow .2s; }
-  .tab.active .tab-dot { box-shadow: 0 0 8px currentColor; }
+  .apps-btn-arrow {
+    font-size: 9px; opacity: .6;
+    transition: transform .2s; display: inline-block;
+  }
+  #apps-btn.open .apps-btn-arrow { transform: rotate(180deg); }
+
+  /* ── Dropdown panel ── */
+  #apps-dropdown {
+    position: fixed; top: calc(var(--topbar-h) + 6px); left: 0; right: 0;
+    display: flex; justify-content: center;
+    pointer-events: none; z-index: 300;
+  }
+
+  .dropdown-inner {
+    width: min(680px, 96vw);
+    background: rgba(11,18,34,.96);
+    border: 1px solid rgba(255,255,255,.13);
+    border-radius: 18px;
+    backdrop-filter: blur(32px) saturate(180%);
+    -webkit-backdrop-filter: blur(32px) saturate(180%);
+    box-shadow: 0 24px 60px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.05) inset,
+                0 -1px 0 rgba(232,187,80,.08) inset;
+    overflow: hidden;
+    opacity: 0; transform: translateY(-10px) scale(.97);
+    transition: opacity .2s ease, transform .2s cubic-bezier(.17,.67,.35,1.3);
+  }
+  #apps-dropdown.open { pointer-events: auto; }
+  #apps-dropdown.open .dropdown-inner { opacity: 1; transform: translateY(0) scale(1); }
+
+  .dropdown-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px 10px;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+  }
+  .dropdown-title {
+    font-family: var(--mono); font-size: 10px; font-weight: 600;
+    color: var(--text3); letter-spacing: .1em; text-transform: uppercase;
+  }
+  .dropdown-home-btn {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 600; color: var(--text2);
+    background: rgba(255,255,255,.06); border: 1px solid var(--border);
+    border-radius: 8px; padding: 4px 10px; cursor: pointer;
+    transition: all .15s; font-family: var(--font);
+  }
+  .dropdown-home-btn:hover { background: rgba(255,255,255,.1); color: var(--text); }
+
+  .dropdown-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 6px; padding: 10px;
+  }
+
+  .dropdown-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 11px; border-radius: 11px; cursor: pointer;
+    border: 1px solid transparent;
+    transition: background .15s, border-color .15s, transform .12s;
+    position: relative; overflow: hidden;
+  }
+  .dropdown-item:hover {
+    background: rgba(255,255,255,.07);
+    border-color: rgba(255,255,255,.1);
+    transform: translateY(-1px);
+  }
+  .dropdown-item.active-item {
+    background: rgba(232,187,80,.07);
+    border-color: rgba(232,187,80,.2);
+  }
+  .dropdown-item.active-item::before {
+    content: '';
+    position: absolute; left: 0; top: 20%; bottom: 20%;
+    width: 2px; border-radius: 2px;
+    background: linear-gradient(180deg, var(--accent3), var(--accent2));
+  }
+
+  .di-icon {
+    width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,.35);
+  }
+  .di-icon svg { width: 16px; height: 16px; }
+
+  .di-info { flex: 1; min-width: 0; }
+  .di-name {
+    font-size: 12px; font-weight: 700; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    letter-spacing: -.01em;
+  }
+  .dropdown-item.active-item .di-name { color: var(--accent); }
+  .di-badge {
+    display: inline-block; margin-top: 2px;
+    font-family: var(--mono); font-size: 8px; font-weight: 500;
+    padding: 1px 5px; border-radius: 4px;
+    background: rgba(232,187,80,.1); color: var(--accent2);
+    border: 1px solid rgba(232,187,80,.2); letter-spacing: .05em;
+  }
+
+  .dropdown-footer {
+    padding: 8px 16px 10px;
+    border-top: 1px solid rgba(255,255,255,.06);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .df-count { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: .07em; }
+  .df-add-btn {
+    display: none; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 600; color: var(--accent2);
+    background: rgba(232,187,80,.08); border: 1px solid rgba(232,187,80,.2);
+    border-radius: 8px; padding: 4px 10px; cursor: pointer;
+    transition: all .15s; font-family: var(--font);
+  }
+  body.admin-mode .df-add-btn { display: flex; }
+  .df-add-btn:hover { background: rgba(232,187,80,.16); }
+
+  /* hide old tabs */
+  #tabs { display: none; }
 
   .badge {
     font-family: var(--mono); font-size: 9px; font-weight: 500;
@@ -175,7 +302,7 @@
     border: 1px solid rgba(232,187,80,.2); letter-spacing: .05em;
   }
 
-  .topbar-right { display: flex; align-items: center; gap: 8px; margin-left: 12px; flex-shrink: 0; }
+  .topbar-right { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-shrink: 0; }
 
   .admin-indicator {
     display: none; align-items: center; gap: 6px;
@@ -656,7 +783,28 @@
   </button>
 
   <div class="tab-sep"></div>
-  <div id="tabs"><!-- dynamic --></div>
+
+  <!-- Active app chip -->
+  <div id="active-chip">
+    <span class="chip-dot" id="chip-dot"></span>
+    <span id="chip-name"></span>
+  </div>
+  <div class="chip-sep" id="chip-sep" style="display:none"></div>
+
+  <!-- Apps dropdown trigger -->
+  <button id="apps-btn" onclick="toggleDropdown()">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+      <rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".7"/>
+      <rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".7"/>
+      <rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".7"/>
+      <rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity=".7"/>
+    </svg>
+    Apps
+    <span class="apps-btn-count" id="apps-btn-count">0</span>
+    <span class="apps-btn-arrow">▼</span>
+  </button>
+
+  <div id="tabs" style="display:none"><!-- dynamic, kept for JS compat --></div>
 
   <div class="topbar-right">
     <div class="admin-indicator" id="adminIndicator">
@@ -664,6 +812,26 @@
       ADMIN
     </div>
     <button class="btn-icon" id="adminBtn" title="Admin panel" onclick="handleAdminBtn()">⚙️</button>
+  </div>
+</div>
+
+<!-- ── Apps Dropdown ── -->
+<div id="apps-dropdown">
+  <div class="dropdown-inner">
+    <div class="dropdown-header">
+      <span class="dropdown-title">Ứng dụng</span>
+      <button class="dropdown-home-btn" onclick="showHome();closeDropdown()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+          <path d="M3 12L12 3l9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Trang chủ
+      </button>
+    </div>
+    <div class="dropdown-grid" id="dropdown-grid"><!-- dynamic --></div>
+    <div class="dropdown-footer">
+      <span class="df-count" id="df-count">0 APPS</span>
+      <button class="df-add-btn" onclick="openAdd();closeDropdown()">＋ Thêm app</button>
+    </div>
   </div>
 </div>
 
@@ -811,7 +979,7 @@ const EMOJIS = ['👥','📊','🛡️','📁','📈','🔧','💼','🧩','🚀
 
 const DEFAULT_APPS = [
   { id:'app_0', name:'Quản Lý Nhân Sự',    badge:'HR',  desc:'Quản lý danh sách nhân sự, thiết bị laptop, tài khoản hệ thống của L2 Support Team.', tags:'HR · L2 Team', src:'HR_Management.html',    emoji:'👥', color:'blue'   },
-  { id:'app_1', name:'L2 Support Tracking', badge:'KPI', desc:'Theo dõi KPI upload file hàng ngày, leaderboard, gamification và báo cáo hiệu suất.',  tags:'KPI · CAT',   src:'CAT_Tracking.html',     emoji:'📊', color:'amber' },
+  { id:'app_1', name:'CAT Tracking', badge:'KPI', desc:'Theo dõi KPI upload file hàng ngày, leaderboard, gamification và báo cáo hiệu suất.',  tags:'KPI · CAT',   src:'CAT_Tracking.html',     emoji:'📊', color:'amber' },
   { id:'app_2', name:'IT Incident Tracker', badge:'INC', desc:'Ghi nhận và theo dõi sự cố IT theo mức độ ưu tiên P1/P2, timeline và xuất báo cáo PowerPoint.', tags:'Incident · IT', src:'Incident_Tracking.html', emoji:'🛡️', color:'red' },
 ];
 
@@ -839,25 +1007,89 @@ function genId() { return 'app_' + Date.now(); }
 // ════════════════════════════════════════
 // RENDER
 // ════════════════════════════════════════
-function render() { renderTabs(); renderCards(); renderFooter(); }
+function render() { renderDropdown(); renderCards(); renderFooter(); }
 
-function renderTabs() {
-  const container = document.getElementById('tabs');
-  container.innerHTML = '';
+function renderDropdown() {
+  const grid = document.getElementById('dropdown-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
   apps.forEach((app, i) => {
     const color = getColor(app.color);
-    const btn = document.createElement('button');
-    btn.className = 'tab' + (current === i ? ' active tab-new' : ' tab-new');
-    btn.id = 'tab-' + app.id;
-    btn.innerHTML = `
-      <span class="tab-dot" style="background:${color.hex};color:${color.hex}"></span>
-      ${esc(app.name)}
-      <span class="badge">${esc(app.badge || '')}</span>
-      <button class="tab-close" onclick="event.stopPropagation();confirmDelete('${app.id}')" title="Xóa">✕</button>
+    const item = document.createElement('div');
+    item.className = 'dropdown-item' + (current === i ? ' active-item' : '');
+    item.id = 'di-' + app.id;
+    item.innerHTML = `
+      <div class="di-icon" style="background:${color.iconBg};box-shadow:0 2px 8px ${color.iconShadow}">
+        <span style="color:${color.hex};display:flex;align-items:center;justify-content:center;">
+          ${SVG_ICONS[app.emoji] || SVG_ICONS['📁']}
+        </span>
+      </div>
+      <div class="di-info">
+        <div class="di-name">${esc(app.name)}</div>
+        ${app.badge ? `<span class="di-badge">${esc(app.badge)}</span>` : ''}
+      </div>
     `;
-    btn.onclick = () => openApp(i);
-    container.appendChild(btn);
+    item.onclick = () => { openApp(i); closeDropdown(); };
+    grid.appendChild(item);
   });
+
+  const countEl = document.getElementById('apps-btn-count');
+  if (countEl) countEl.textContent = apps.length;
+  const dfCount = document.getElementById('df-count');
+  if (dfCount) dfCount.textContent = `${apps.length} APP${apps.length !== 1 ? 'S' : ''}`;
+}
+
+// ════════════════════════════════════════
+// DROPDOWN TOGGLE
+// ════════════════════════════════════════
+let dropdownOpen = false;
+
+function toggleDropdown() {
+  dropdownOpen ? closeDropdown() : openDropdown();
+}
+
+function openDropdown() {
+  dropdownOpen = true;
+  document.getElementById('apps-btn').classList.add('open');
+  document.getElementById('apps-dropdown').classList.add('open');
+}
+
+function closeDropdown() {
+  dropdownOpen = false;
+  document.getElementById('apps-btn').classList.remove('open');
+  document.getElementById('apps-dropdown').classList.remove('open');
+}
+
+// Close dropdown on outside click
+document.addEventListener('click', e => {
+  if (dropdownOpen &&
+      !e.target.closest('#apps-btn') &&
+      !e.target.closest('#apps-dropdown')) {
+    closeDropdown();
+  }
+});
+
+// ════════════════════════════════════════
+// ACTIVE CHIP
+// ════════════════════════════════════════
+function updateChip(app) {
+  const chip    = document.getElementById('active-chip');
+  const chipDot = document.getElementById('chip-dot');
+  const chipName = document.getElementById('chip-name');
+  const chipSep = document.getElementById('chip-sep');
+  if (!app) {
+    chip.classList.remove('visible');
+    if (chipSep) chipSep.style.display = 'none';
+    return;
+  }
+  const color = getColor(app.color);
+  chipDot.style.background = color.hex;
+  chipDot.style.color = color.hex;
+  chipDot.style.boxShadow = `0 0 8px ${color.hex}`;
+  chipName.textContent = app.name;
+  chip.classList.add('visible');
+  if (chipSep) chipSep.style.display = '';
 }
 
 function renderCards() {
@@ -1038,8 +1270,10 @@ function esc(str) {
 function showHome() {
   document.getElementById('home').classList.add('active');
   document.querySelectorAll('#appPanes .pane').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('#tabs .tab').forEach(t => t.classList.remove('active'));
   current = 'home';
+  updateChip(null);
+  renderDropdown();
+  closeDropdown();
 }
 
 function openApp(idx) {
@@ -1048,7 +1282,6 @@ function openApp(idx) {
 
   document.getElementById('home').classList.remove('active');
   document.querySelectorAll('#appPanes .pane').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('#tabs .tab').forEach(t => t.classList.remove('active'));
 
   let pane = document.getElementById('pane-' + app.id);
   if (!pane) {
@@ -1060,9 +1293,6 @@ function openApp(idx) {
   }
 
   pane.classList.add('active');
-
-  const tabEl = document.getElementById('tab-' + app.id);
-  if (tabEl) tabEl.classList.add('active');
 
   if (!pane.querySelector('iframe')) {
     const frame = document.createElement('iframe');
@@ -1076,6 +1306,8 @@ function openApp(idx) {
   }
 
   current = idx;
+  updateChip(app);
+  renderDropdown();
 }
 
 // ════════════════════════════════════════
