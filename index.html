@@ -1005,6 +1005,14 @@ function loadApps() {
 function saveApps() { localStorage.setItem(STORAGE_KEY, JSON.stringify(apps)); }
 function genId() { return 'app_' + Date.now(); }
 
+const SESSION_KEY = 'itHub_current_v1';
+function saveSession(idx) {
+  try { localStorage.setItem(SESSION_KEY, JSON.stringify(idx)); } catch {}
+}
+function loadSession() {
+  try { const v = localStorage.getItem(SESSION_KEY); return v !== null ? JSON.parse(v) : 'home'; } catch { return 'home'; }
+}
+
 // ════════════════════════════════════════
 // RENDER
 // ════════════════════════════════════════
@@ -1272,6 +1280,7 @@ function showHome() {
   document.getElementById('home').classList.add('active');
   document.querySelectorAll('#appPanes .pane').forEach(p => p.classList.remove('active'));
   current = 'home';
+  saveSession('home');
   updateChip(null);
   renderDropdown();
   closeDropdown();
@@ -1307,6 +1316,7 @@ function openApp(idx) {
   }
 
   current = idx;
+  saveSession(idx);
   updateChip(app);
   renderDropdown();
 }
@@ -1499,6 +1509,10 @@ document.addEventListener('keydown', e => {
 // INIT
 // ════════════════════════════════════════
 render();
+const _restored = loadSession();
+if (_restored !== 'home' && typeof _restored === 'number' && _restored < apps.length) {
+  openApp(_restored);
+}
 </script>
 </body>
 </html>
