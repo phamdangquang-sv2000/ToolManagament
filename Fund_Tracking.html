@@ -489,7 +489,7 @@
             <th>Loại</th>
             <th class="sortable" onclick="setSort('late_date')">Ngày</th>
             <th class="sortable" onclick="setSort('paid_date')">Ngày đóng</th>
-            <th>Tên / Khoản</th>
+            <th>Họ Tên</th>
             <th>Phương thức</th>
             <th class="text-right sortable" onclick="setSort('amount')">Số tiền</th>
             <th>Trạng thái</th>
@@ -946,7 +946,7 @@ function setModalType(type){
     document.getElementById('btnSubmit').style.background='var(--grad)';
   } else {
     tbThu.className='type-btn'; tbChi.className='type-btn active-chi';
-    document.getElementById('lblName').textContent='Tên khoản chi *';
+    document.getElementById('lblName').textContent='Họ Tên *';
     document.getElementById('lblLate').textContent='Ngày chi *';
     wrapLate.style.display=''; wrapPaid.style.display='none'; wrapMethod.style.display=''; wrapStatus.style.display='none';
     fLate.required=true; fMethod.required=true;
