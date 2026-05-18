@@ -479,7 +479,7 @@
   /* Colored top stripe */
   .card-stripe {
     position: absolute; top: 0; left: 0; right: 0; height: 3px;
-    background: linear-gradient(90deg, var(--card-accent, var(--accent)), var(--card-accent2, var(--accent2)));
+    background: var(--card-stripe-bg, linear-gradient(90deg, var(--card-accent, var(--accent)), var(--card-accent2, var(--accent2))));
     border-radius: 20px 20px 0 0;
     box-shadow: 0 0 12px var(--card-glow, rgba(232,187,80,.5));
   }
@@ -668,6 +668,70 @@
   }
   .form-textarea { resize: vertical; min-height: 80px; line-height: 1.55; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* ══════════════ COLOR PICKER ══════════════ */
+  .color-picker-tabs {
+    display: flex; gap: 4px; margin-bottom: 10px;
+  }
+  .color-tab-btn {
+    flex: 1; padding: 5px 8px; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.05);
+    color: var(--text2); font-size: 11px; font-weight: 700;
+    cursor: pointer; transition: all .15s; font-family: var(--mono);
+    letter-spacing: .06em; text-transform: uppercase;
+  }
+  .color-tab-btn.active {
+    background: rgba(232,187,80,.12); border-color: rgba(232,187,80,.3); color: var(--accent2);
+  }
+  .color-search {
+    width: 100%; background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1); border-radius: 9px;
+    color: var(--text); font-family: var(--mono); font-size: 11px;
+    padding: 6px 10px; outline: none; transition: all .18s;
+    margin-bottom: 8px;
+  }
+  .color-search::placeholder { color: var(--text3); }
+  .color-search:focus {
+    border-color: rgba(232,187,80,.4);
+    box-shadow: 0 0 0 3px rgba(232,187,80,.08);
+    background: rgba(255,255,255,.09);
+  }
+  .color-search-apply {
+    display: none; align-items: center; gap: 6px;
+    padding: 6px 10px; border-radius: 9px; cursor: pointer;
+    border: 1px dashed rgba(232,187,80,.4);
+    background: rgba(232,187,80,.07); color: var(--accent2);
+    font-size: 11px; font-weight: 600; font-family: var(--mono);
+    margin-bottom: 8px; transition: all .15s; width: 100%;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .color-search-apply.visible { display: flex; }
+  .color-search-apply:hover { background: rgba(232,187,80,.15); }
+  .grad-preview-bar {
+    width: 18px; height: 18px; border-radius: 5px; flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,.15);
+  }
+
+  /* Gradient swatches */
+  .gradient-swatches { display: flex; gap: 6px; flex-wrap: wrap; }
+  .grad-swatch {
+    width: 52px; height: 28px; border-radius: 8px; cursor: pointer;
+    border: 2px solid transparent; transition: all .15s;
+    box-shadow: 0 3px 8px rgba(0,0,0,.45);
+    position: relative; overflow: hidden;
+  }
+  .grad-swatch:hover { transform: scale(1.1); }
+  .grad-swatch.selected {
+    border-color: #fff; transform: scale(1.15);
+    box-shadow: 0 0 0 3px rgba(255,255,255,.25), 0 4px 12px rgba(0,0,0,.5);
+  }
+  .grad-swatch-label {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 8px; font-weight: 700; color: rgba(255,255,255,.85);
+    font-family: var(--mono); letter-spacing: .03em;
+    text-shadow: 0 1px 3px rgba(0,0,0,.6);
+    pointer-events: none;
+  }
 
   /* Swatches */
   .color-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -1025,6 +1089,25 @@ const EMOJIS = [
   '🚀','⚡','💡','🎯','🧩','🔗','🔍','📦','📌','🗓️','⏰','🔄','📤','📥','🌟','🤖',
 ];
 
+const GRADIENTS = [
+  { name:'Aurora',      grad:'linear-gradient(90deg,#8A5CFF 0%,#4EA2FF 50%,#1AD1FF 100%)',         first:'#8A5CFF', last:'#1AD1FF' },
+  { name:'Sunset',      grad:'linear-gradient(90deg,#FF6B6B 0%,#FFB347 100%)',                     first:'#FF6B6B', last:'#FFB347' },
+  { name:'Neon',        grad:'linear-gradient(90deg,#F953C6 0%,#B91D73 100%)',                     first:'#F953C6', last:'#B91D73' },
+  { name:'Mint',        grad:'linear-gradient(90deg,#00C9FF 0%,#92FE9D 100%)',                     first:'#00C9FF', last:'#92FE9D' },
+  { name:'Fire',        grad:'linear-gradient(90deg,#f12711 0%,#f5af19 100%)',                     first:'#f12711', last:'#f5af19' },
+  { name:'Ocean',       grad:'linear-gradient(90deg,#0072FF 0%,#00C6FF 100%)',                     first:'#0072FF', last:'#00C6FF' },
+  { name:'Candy',       grad:'linear-gradient(90deg,#FF87D4 0%,#A78BFF 50%,#87CEFF 100%)',        first:'#FF87D4', last:'#87CEFF' },
+  { name:'Synthwave',   grad:'linear-gradient(90deg,#FF00CC 0%,#333399 100%)',                     first:'#FF00CC', last:'#333399' },
+  { name:'Violet',      grad:'linear-gradient(90deg,#4776E6 0%,#8E54E9 100%)',                     first:'#4776E6', last:'#8E54E9' },
+  { name:'Gold',        grad:'linear-gradient(90deg,#F2994A 0%,#F2C94C 100%)',                     first:'#F2994A', last:'#F2C94C' },
+  { name:'Tropical',    grad:'linear-gradient(90deg,#f7971e 0%,#ffd200 100%)',                     first:'#f7971e', last:'#ffd200' },
+  { name:'Emerald',     grad:'linear-gradient(90deg,#43C6AC 0%,#191654 100%)',                     first:'#43C6AC', last:'#191654' },
+  { name:'Rose',        grad:'linear-gradient(90deg,#e8a0bf 0%,#f4c2c2 50%,#c9a96e 100%)',        first:'#e8a0bf', last:'#c9a96e' },
+  { name:'Cyber',       grad:'linear-gradient(90deg,#00ffff 0%,#0080ff 100%)',                     first:'#00ffff', last:'#0080ff' },
+  { name:'Deep',        grad:'linear-gradient(90deg,#0B0B3B 0%,#6F2DBD 100%)',                    first:'#6F2DBD', last:'#8E54E9' },
+  { name:'Galaxy',      grad:'linear-gradient(90deg,#1a1a2e 0%,#16213e 40%,#533483 100%)',        first:'#533483', last:'#8E54E9' },
+];
+
 const DEFAULT_APPS = [
   { id:'app_0', name:'Quản Lý Nhân Sự',    badge:'HR',  desc:'Quản lý danh sách nhân sự, thiết bị laptop, tài khoản hệ thống của L2 Support Team.', tags:'HR · L2 Team', src:'HR_Management.html',    emoji:'👥', color:'blue'   },
   { id:'app_1', name:'CAT Tracking', badge:'KPI', desc:'Theo dõi KPI upload file hàng ngày, leaderboard, gamification và báo cáo hiệu suất.',  tags:'KPI · CAT',   src:'CAT_Tracking.html',     emoji:'📊', color:'amber' },
@@ -1167,7 +1250,7 @@ function updateChip(app) {
     return;
   }
   const color = getColor(app.color);
-  chipDot.style.background = color.hex;
+  chipDot.style.background = color.isGradient ? color.gradient : color.hex;
   chipDot.style.color = color.hex;
   chipDot.style.boxShadow = `0 0 8px ${color.hex}`;
   chipName.textContent = app.name;
@@ -1188,6 +1271,7 @@ function renderCards() {
       --card-accent2:${color.hex2};
       --card-glow:${color.glow};
       --card-shadow:${color.shadow};
+      ${color.isGradient ? `--card-stripe-bg:${color.gradient};` : ''}
     `;
     card.innerHTML = `
       <div class="card-stripe"></div>
@@ -1219,7 +1303,32 @@ function renderFooter() {
   document.getElementById('homeFooter').textContent = `${apps.length} APPS · GITHUB PAGES · IFRAME ISOLATED`;
 }
 
-function getColor(name) { return COLORS.find(c => c.name === name) || COLORS[0]; }
+function extractHexColors(grad) {
+  return (grad.match(/#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3}/g) || ['#888888']);
+}
+function hexToRgba(hex, alpha) {
+  let h = hex.replace('#','');
+  if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+  const r=parseInt(h.slice(0,2),16), g=parseInt(h.slice(2,4),16), b=parseInt(h.slice(4,6),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+function getColor(name) {
+  if (!name) return COLORS[0];
+  if (name.startsWith('grad:')) {
+    const grad = name.slice(5);
+    const hexes = extractHexColors(grad);
+    const first = hexes[0], last = hexes[hexes.length - 1];
+    return {
+      name, hex: first, hex2: last,
+      gradient: grad, isGradient: true,
+      glow: hexToRgba(first, 0.15),
+      shadow: hexToRgba(first, 0.3),
+      iconBg: hexToRgba(first, 0.18),
+      iconShadow: hexToRgba(first, 0.35),
+    };
+  }
+  return COLORS.find(c => c.name === name) || COLORS[0];
+}
 
 // ── SVG icon library ──────────────────────────────────────
 const SVG_ICONS = {
@@ -1551,20 +1660,192 @@ function buildEmojiGrid() {
   });
 }
 
+let colorPickerTab = 'solid';
+
 function buildColorSwatches() {
   const container = document.getElementById('colorSwatches');
   container.innerHTML = '';
-  COLORS.forEach(c => {
-    const sw = document.createElement('div');
-    sw.className = 'swatch' + (c.name === selectedColor ? ' selected' : '');
-    sw.style.background = c.hex;
-    sw.title = c.name;
-    sw.onclick = () => {
-      selectedColor = c.name;
-      container.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
-      sw.classList.add('selected');
-    };
-    container.appendChild(sw);
+
+  const isGrad = selectedColor && selectedColor.startsWith('grad:');
+  colorPickerTab = isGrad ? 'gradient' : 'solid';
+
+  const tabs = document.createElement('div');
+  tabs.className = 'color-picker-tabs';
+  tabs.innerHTML = `
+    <button class="color-tab-btn ${colorPickerTab==='solid'?'active':''}" id="ctab-solid" onclick="switchColorTab('solid')">Màu</button>
+    <button class="color-tab-btn ${colorPickerTab==='gradient'?'active':''}" id="ctab-gradient" onclick="switchColorTab('gradient')">Gradient</button>
+  `;
+  container.appendChild(tabs);
+
+  const panelWrap = document.createElement('div');
+  panelWrap.id = 'color-panel-wrap';
+  container.appendChild(panelWrap);
+
+  renderColorPanel(panelWrap);
+}
+
+function switchColorTab(tab) {
+  colorPickerTab = tab;
+  document.querySelectorAll('.color-tab-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('ctab-' + tab);
+  if (btn) btn.classList.add('active');
+  const wrap = document.getElementById('color-panel-wrap');
+  if (wrap) renderColorPanel(wrap);
+}
+
+function renderColorPanel(wrap) {
+  wrap.innerHTML = '';
+  if (colorPickerTab === 'solid') {
+    renderSolidPanel(wrap);
+  } else {
+    renderGradientPanel(wrap);
+  }
+}
+
+function renderSolidPanel(wrap) {
+  const search = document.createElement('input');
+  search.className = 'color-search';
+  search.placeholder = '#hex hoặc tên màu…';
+  search.spellcheck = false;
+  wrap.appendChild(search);
+
+  const applyBtn = document.createElement('button');
+  applyBtn.className = 'color-search-apply';
+  applyBtn.type = 'button';
+  wrap.appendChild(applyBtn);
+
+  const swatchWrap = document.createElement('div');
+  swatchWrap.className = 'color-swatches';
+  wrap.appendChild(swatchWrap);
+
+  function buildSwatches(list) {
+    swatchWrap.innerHTML = '';
+    list.forEach(c => {
+      const sw = document.createElement('div');
+      sw.className = 'swatch' + (c.name === selectedColor ? ' selected' : '');
+      sw.style.background = c.hex;
+      sw.title = c.name + ' ' + c.hex;
+      sw.onclick = () => {
+        selectedColor = c.name;
+        swatchWrap.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
+        sw.classList.add('selected');
+        applyBtn.classList.remove('visible');
+        search.value = '';
+      };
+      swatchWrap.appendChild(sw);
+    });
+  }
+
+  buildSwatches(COLORS);
+
+  search.addEventListener('input', () => {
+    const q = search.value.trim().toLowerCase();
+    if (!q) { buildSwatches(COLORS); applyBtn.classList.remove('visible'); return; }
+
+    const filtered = COLORS.filter(c =>
+      c.name.toLowerCase().includes(q) ||
+      c.hex.toLowerCase().includes(q) ||
+      c.hex2.toLowerCase().includes(q)
+    );
+    buildSwatches(filtered);
+
+    const hexMatch = /^#?([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/.test(q.startsWith('#') ? q : '#' + q);
+    if (hexMatch) {
+      const hex = q.startsWith('#') ? q : '#' + q;
+      const solid = `linear-gradient(135deg,${hex} 0%,${hex} 100%)`;
+      applyBtn.innerHTML = `<div class="grad-preview-bar" style="background:${solid}"></div>Dùng màu ${hex.toUpperCase()}`;
+      applyBtn.classList.add('visible');
+      applyBtn.onclick = () => {
+        selectedColor = 'grad:linear-gradient(135deg,' + hex + ' 0%,' + hex + ' 100%)';
+        applyBtn.classList.remove('visible');
+        search.value = '';
+      };
+    } else {
+      applyBtn.classList.remove('visible');
+    }
+  });
+}
+
+function renderGradientPanel(wrap) {
+  const search = document.createElement('input');
+  search.className = 'color-search';
+  search.placeholder = 'linear-gradient(90deg,#8A5CFF,#1AD1FF)…';
+  search.spellcheck = false;
+  if (selectedColor && selectedColor.startsWith('grad:')) {
+    search.value = selectedColor.slice(5);
+  }
+  wrap.appendChild(search);
+
+  const applyBtn = document.createElement('button');
+  applyBtn.className = 'color-search-apply';
+  applyBtn.type = 'button';
+  applyBtn.innerHTML = '<span>↵</span> Áp dụng gradient này';
+  wrap.appendChild(applyBtn);
+
+  const swatchWrap = document.createElement('div');
+  swatchWrap.className = 'gradient-swatches';
+  wrap.appendChild(swatchWrap);
+
+  function buildGradSwatches(list) {
+    swatchWrap.innerHTML = '';
+    list.forEach(g => {
+      const gradKey = 'grad:' + g.grad;
+      const sw = document.createElement('div');
+      sw.className = 'grad-swatch' + (selectedColor === gradKey ? ' selected' : '');
+      sw.style.background = g.grad;
+      sw.title = g.name;
+      sw.innerHTML = `<div class="grad-swatch-label">${g.name}</div>`;
+      sw.onclick = () => {
+        selectedColor = gradKey;
+        swatchWrap.querySelectorAll('.grad-swatch').forEach(s => s.classList.remove('selected'));
+        sw.classList.add('selected');
+        search.value = g.grad;
+        applyBtn.classList.remove('visible');
+      };
+      swatchWrap.appendChild(sw);
+    });
+  }
+
+  buildGradSwatches(GRADIENTS);
+
+  search.addEventListener('input', () => {
+    const q = search.value.trim();
+    if (!q) { applyBtn.classList.remove('visible'); return; }
+
+    const isGradCSS = q.startsWith('linear-gradient') || q.startsWith('radial-gradient');
+    const hexesInSearch = q.match(/#[0-9a-fA-F]{3,6}/g) || [];
+    if (isGradCSS && hexesInSearch.length >= 1) {
+      applyBtn.innerHTML = `<div class="grad-preview-bar" style="background:${q}"></div>Áp dụng gradient này`;
+      applyBtn.classList.add('visible');
+      applyBtn.onclick = () => {
+        selectedColor = 'grad:' + q;
+        swatchWrap.querySelectorAll('.grad-swatch').forEach(s => s.classList.remove('selected'));
+        applyBtn.classList.remove('visible');
+      };
+    } else if (hexesInSearch.length >= 2) {
+      const autoGrad = `linear-gradient(90deg,${hexesInSearch.join(',')})`;
+      applyBtn.innerHTML = `<div class="grad-preview-bar" style="background:${autoGrad}"></div>Tạo gradient từ ${hexesInSearch.join(' → ')}`;
+      applyBtn.classList.add('visible');
+      applyBtn.onclick = () => {
+        selectedColor = 'grad:' + autoGrad;
+        swatchWrap.querySelectorAll('.grad-swatch').forEach(s => s.classList.remove('selected'));
+        applyBtn.classList.remove('visible');
+      };
+    } else if (hexesInSearch.length === 1) {
+      const h = hexesInSearch[0];
+      const autoGrad = `linear-gradient(135deg,${h} 0%,${h}aa 100%)`;
+      applyBtn.innerHTML = `<div class="grad-preview-bar" style="background:${autoGrad}"></div>Gradient từ ${h}`;
+      applyBtn.classList.add('visible');
+      applyBtn.onclick = () => {
+        selectedColor = 'grad:' + autoGrad;
+        swatchWrap.querySelectorAll('.grad-swatch').forEach(s => s.classList.remove('selected'));
+        applyBtn.classList.remove('visible');
+      };
+    } else {
+      const filtered = GRADIENTS.filter(g => g.name.toLowerCase().includes(q.toLowerCase()));
+      buildGradSwatches(filtered.length ? filtered : GRADIENTS);
+      applyBtn.classList.remove('visible');
+    }
   });
 }
 
