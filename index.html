@@ -1011,8 +1011,12 @@ function pickNextColor(excludeId) {
 }
 
 // ── Auto logo helpers ─────────────────────────────────────
-// Returns a Google favicon URL when src is a real URL, otherwise null
-function faviconFromSrc(src) {
+
+// Cache: src string -> resolved favicon URL (or null)
+const localFaviconCache = {};
+
+// For external URLs: use Google favicon service
+function faviconFromUrl(src) {
   if (!src) return null;
   const trimmed = src.trim();
   if (!trimmed.startsWith('http')) return null;
@@ -1020,6 +1024,57 @@ function faviconFromSrc(src) {
     const url = new URL(trimmed);
     return `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=64`;
   } catch { return null; }
+}
+
+// For local HTML files: fetch the file and parse the <link rel="icon"> tag
+async function fetchLocalFavicon(src) {
+  if (!src || src.trim().startsWith('http')) return null;
+  const key = src.trim();
+  if (key in localFaviconCache) return localFaviconCache[key];
+
+  try {
+    const res = await fetch(key);
+    if (!res.ok) { localFaviconCache[key] = null; return null; }
+    const html = await res.text();
+
+    // Match any <link> tag that has rel containing "icon"
+    const linkRe = /<link([^>]+)>/gi;
+    let m;
+    while ((m = linkRe.exec(html)) !== null) {
+      const attrs = m[1];
+      if (!/rel=["'][^"']*icon[^"']*["']/i.test(attrs)) continue;
+      const hrefMatch = attrs.match(/href=["']([^"']+)["']/i);
+      if (!hrefMatch) continue;
+      let url = hrefMatch[1];
+      // data URIs are usable directly
+      if (url.startsWith('data:')) { localFaviconCache[key] = url; return url; }
+      // absolute URLs
+      if (url.startsWith('http')) { localFaviconCache[key] = url; return url; }
+      // relative path — resolve relative to the HTML file's directory
+      const dir = key.includes('/') ? key.substring(0, key.lastIndexOf('/') + 1) : '';
+      url = dir + url;
+      localFaviconCache[key] = url;
+      return url;
+    }
+  } catch {}
+  localFaviconCache[key] = null;
+  return null;
+}
+
+// Returns the best favicon to display for an app (cached result or null)
+function getAppFavicon(app) {
+  if (!app.src) return null;
+  if (app.src.trim().startsWith('http')) return faviconFromUrl(app.src);
+  // local file — return from cache (may be null if not yet loaded or not found)
+  return localFaviconCache[app.src.trim()] || null;
+}
+
+// Pre-fetch local favicons for all apps, then re-render
+async function prefetchLocalFavicons() {
+  const localApps = apps.filter(a => a.src && !a.src.trim().startsWith('http'));
+  if (!localApps.length) return;
+  await Promise.all(localApps.map(a => fetchLocalFavicon(a.src)));
+  render(); // re-render now that we have real favicons
 }
 
 // Returns 1-2 uppercase initials from a name
@@ -1101,7 +1156,7 @@ function renderDropdown() {
     item.className = 'dropdown-item' + (current === i ? ' active-item' : '');
     item.id = 'di-' + app.id;
 
-    const favicon = faviconFromSrc(app.src);
+    const favicon = getAppFavicon(app);
     const iconHtml = favicon
       ? `<img src="${esc(favicon)}" alt="" onerror="this.style.display='none';this.nextSibling.style.display='flex'"/>
          <span class="di-initials" style="display:none;color:${color.hex}">${esc(nameInitials(app.name))}</span>`
@@ -1190,7 +1245,7 @@ function renderCards() {
       --card-shadow:${color.shadow};
     `;
 
-    const favicon = faviconFromSrc(app.src);
+    const favicon = getAppFavicon(app);
     const initials = nameInitials(app.name);
 
     let iconContent;
@@ -1411,28 +1466,61 @@ function switchSource(mode) {
 // ════════════════════════════════════════
 // LOGO PREVIEW (in modal)
 // ════════════════════════════════════════
-function updateLogoPreview() {
+async function updateLogoPreview() {
   const src  = (document.getElementById('fSrc')  || {}).value || '';
   const name = (document.getElementById('fName') || {}).value || '';
   const box  = document.getElementById('logoPreviewBox');
   const hint = document.getElementById('logoPreviewHint');
   if (!box || !hint) return;
 
-  const favicon = faviconFromSrc(src);
-  if (favicon) {
+  const initials = nameInitials(name);
+  const initialsHtml = (col) =>
+    `<span id="logoPreviewInitials" style="font-size:14px;font-weight:900;letter-spacing:-.03em;text-transform:uppercase;color:${col}">${esc(initials)}</span>`;
+
+  const srcTrimmed = src.trim();
+
+  if (srcTrimmed.startsWith('http')) {
+    // External URL: use Google favicon
+    const favicon = faviconFromUrl(srcTrimmed);
     box.innerHTML = `
       <img src="${esc(favicon)}" alt=""
         style="width:28px;height:28px;object-fit:contain;border-radius:4px;"
-        onerror="this.style.display='none';document.getElementById('logoPreviewInitials').style.display='block'"/>
-      <span id="logoPreviewInitials" style="display:none;font-size:14px;font-weight:900;letter-spacing:-.03em;text-transform:uppercase;color:#7e9abf">${esc(nameInitials(name))}</span>
+        onerror="this.style.display='none';this.insertAdjacentHTML('afterend','${initialsHtml('#7e9abf').replace(/'/g, "\\'")}')"/>
     `;
     try {
-      const domain = new URL(src.trim()).hostname;
-      hint.textContent = `Favicon từ ${domain}`;
+      hint.textContent = `Favicon từ ${new URL(srcTrimmed).hostname}`;
     } catch { hint.textContent = 'Favicon tự động từ URL'; }
+
+  } else if (srcTrimmed) {
+    // Local HTML file: check cache first, show initials while loading
+    const cached = localFaviconCache[srcTrimmed];
+    if (cached !== undefined) {
+      // Already know the result
+      if (cached) {
+        box.innerHTML = `<img src="${esc(cached)}" alt="" style="width:28px;height:28px;object-fit:contain;border-radius:4px;"/>`;
+        hint.textContent = 'Favicon từ file HTML';
+      } else {
+        box.innerHTML = initialsHtml('#7e9abf');
+        hint.textContent = name.trim() ? 'Chữ viết tắt từ tên app' : 'Không tìm thấy favicon trong file';
+      }
+    } else {
+      // Not cached yet — show initials, then fetch
+      box.innerHTML = initialsHtml('#7e9abf');
+      hint.textContent = 'Đang tìm favicon trong file…';
+      const favicon = await fetchLocalFavicon(srcTrimmed);
+      // Only update if user hasn't changed the src in the meantime
+      if ((document.getElementById('fSrc') || {}).value.trim() === srcTrimmed) {
+        if (favicon) {
+          box.innerHTML = `<img src="${esc(favicon)}" alt="" style="width:28px;height:28px;object-fit:contain;border-radius:4px;"/>`;
+          hint.textContent = 'Favicon từ file HTML';
+        } else {
+          hint.textContent = name.trim() ? 'Chữ viết tắt từ tên app' : 'Không tìm thấy favicon trong file';
+        }
+      }
+    }
+
   } else if (name.trim()) {
-    const initials = nameInitials(name);
-    box.innerHTML = `<span id="logoPreviewInitials" style="font-size:14px;font-weight:900;letter-spacing:-.03em;text-transform:uppercase;color:#7e9abf">${esc(initials)}</span>`;
+    box.innerHTML = initialsHtml('#7e9abf');
     hint.textContent = 'Chữ viết tắt từ tên app';
   } else {
     box.innerHTML = `<span id="logoPreviewInitials" style="font-size:14px;font-weight:900;letter-spacing:-.03em;color:#3d5275">?</span>`;
@@ -1487,7 +1575,8 @@ document.addEventListener('keydown', e => {
 // ════════════════════════════════════════
 (async () => {
   apps = await loadApps();
-  render();
+  render(); // first render with initials
+  prefetchLocalFavicons(); // async: re-renders once local favicons are loaded
   const _restored = loadSession();
   if (_restored !== 'home' && typeof _restored === 'number' && _restored < apps.length) {
     openApp(_restored);
