@@ -1400,13 +1400,18 @@ function openApp(idx) {
 // ════════════════════════════════════════
 // ADMIN AUTH
 // ════════════════════════════════════════
+function setAdminUI(on) {
+  isAdmin = on;
+  document.body.classList.toggle('admin-mode', on);
+  document.getElementById('adminBtn').title = on ? 'Thoát Admin' : 'Admin panel';
+  document.getElementById('adminBtn').textContent = on ? '🔓' : '⚙️';
+  document.getElementById('adminIndicator').classList.toggle('show', on);
+}
+
 function handleAdminBtn() {
   if (isAdmin) {
-    isAdmin = false;
-    document.body.classList.remove('admin-mode');
-    document.getElementById('adminBtn').title = 'Admin panel';
-    document.getElementById('adminBtn').textContent = '⚙️';
-    document.getElementById('adminIndicator').classList.remove('show');
+    sessionStorage.removeItem('itHub_admin');
+    setAdminUI(false);
   } else {
     openModal('loginModal');
     setTimeout(() => document.getElementById('adminPassword').focus(), 250);
@@ -1422,11 +1427,8 @@ async function submitLogin() {
   const pw = document.getElementById('adminPassword').value;
   const hash = await sha256(pw);
   if (hash === ADMIN_PASSWORD_HASH) {
-    isAdmin = true;
-    document.body.classList.add('admin-mode');
-    document.getElementById('adminBtn').title = 'Thoát Admin';
-    document.getElementById('adminBtn').textContent = '🔓';
-    document.getElementById('adminIndicator').classList.add('show');
+    sessionStorage.setItem('itHub_admin', '1');
+    setAdminUI(true);
     closeModal('loginModal');
     document.getElementById('adminPassword').value = '';
     document.getElementById('loginError').style.display = 'none';
@@ -1590,6 +1592,11 @@ document.addEventListener('keydown', e => {
 // INIT
 // ════════════════════════════════════════
 (async () => {
+  // Restore admin session if it was active before refresh
+  if (sessionStorage.getItem('itHub_admin') === '1') {
+    setAdminUI(true);
+  }
+
   apps = await loadApps();
   render();
   const _restored = loadSession();
