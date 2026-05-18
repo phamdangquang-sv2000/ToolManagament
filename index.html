@@ -959,7 +959,15 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+// ════════════════════════════════════════
+// SUPABASE
+// ════════════════════════════════════════
+const SUPABASE_URL = 'https://edsowiramriosgwfuewg.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkc293aXJhbXJpb3Nnd2Z1ZXdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNDMzMDgsImV4cCI6MjA5MzgxOTMwOH0.aocvFLnJrl5LFPdxDf9zbhvT6HT7NpCEMFtiUr_M3gM';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 // ════════════════════════════════════════
 // CONFIG
 // ════════════════════════════════════════
@@ -987,7 +995,7 @@ const DEFAULT_APPS = [
 // ════════════════════════════════════════
 // STATE
 // ════════════════════════════════════════
-let apps = loadApps();
+let apps = [];
 let isAdmin = false;
 let current = 'home';
 let editingId = null;
@@ -995,14 +1003,40 @@ let selectedColor = 'blue';
 let selectedEmoji = '📁';
 let srcMode = 'file';
 
-function loadApps() {
+// Load all apps from Supabase, ordered by `position`
+async function loadApps() {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_APPS));
-  } catch { return JSON.parse(JSON.stringify(DEFAULT_APPS)); }
+    const { data, error } = await sb
+      .from('apps')
+      .select('*')
+      .order('position', { ascending: true });
+    if (error) throw error;
+    if (!data || data.length === 0) {
+      // First run: seed default apps into Supabase
+      const seed = DEFAULT_APPS.map((a, i) => ({ ...a, position: i }));
+      const { data: inserted, error: insErr } = await sb.from('apps').insert(seed).select();
+      if (insErr) throw insErr;
+      return inserted.sort((a, b) => a.position - b.position);
+    }
+    return data;
+  } catch (e) {
+    console.error('[Supabase] loadApps failed, fallback to defaults:', e);
+    return JSON.parse(JSON.stringify(DEFAULT_APPS));
+  }
 }
 
-function saveApps() { localStorage.setItem(STORAGE_KEY, JSON.stringify(apps)); }
+// Upsert one app row to Supabase
+async function upsertApp(app) {
+  const { error } = await sb.from('apps').upsert(app, { onConflict: 'id' });
+  if (error) { console.error('[Supabase] upsert failed:', error); alert('Lưu lên Supabase thất bại: ' + error.message); }
+}
+
+// Delete one app row from Supabase
+async function removeApp(id) {
+  const { error } = await sb.from('apps').delete().eq('id', id);
+  if (error) { console.error('[Supabase] delete failed:', error); alert('Xóa trên Supabase thất bại: ' + error.message); }
+}
+
 function genId() { return 'app_' + Date.now(); }
 
 const SESSION_KEY = 'itHub_current_v1';
@@ -1407,18 +1441,22 @@ function saveApp() {
   if (!name) { document.getElementById('fName').focus(); return; }
   if (!src)  { document.getElementById('fSrc').focus(); return; }
 
+  let row;
   if (editingId) {
     const idx = apps.findIndex(a => a.id === editingId);
     if (idx !== -1) {
       apps[idx] = { ...apps[idx], name, badge, desc, tags, src, emoji: selectedEmoji, color: selectedColor };
+      row = apps[idx];
       const pane = document.getElementById('pane-' + editingId);
       if (pane) { const f = pane.querySelector('iframe'); if (f) f.remove(); }
     }
   } else {
-    apps.push({ id: genId(), name, badge, desc, tags, src, emoji: selectedEmoji, color: selectedColor });
+    row = { id: genId(), name, badge, desc, tags, src, emoji: selectedEmoji, color: selectedColor, position: apps.length };
+    apps.push(row);
   }
 
-  saveApps(); closeModal('appModal'); render();
+  closeModal('appModal'); render();
+  if (row) upsertApp(row);
 }
 
 function switchSource(mode) {
@@ -1446,7 +1484,8 @@ function deleteApp(id) {
   const pane = document.getElementById('pane-' + id);
   if (pane) pane.remove();
   apps = apps.filter(a => a.id !== id);
-  saveApps(); closeModal('deleteModal'); render();
+  closeModal('deleteModal'); render();
+  removeApp(id);
 }
 
 // ════════════════════════════════════════
@@ -1508,11 +1547,14 @@ document.addEventListener('keydown', e => {
 // ════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════
-render();
-const _restored = loadSession();
-if (_restored !== 'home' && typeof _restored === 'number' && _restored < apps.length) {
-  openApp(_restored);
-}
+(async () => {
+  apps = await loadApps();
+  render();
+  const _restored = loadSession();
+  if (_restored !== 'home' && typeof _restored === 'number' && _restored < apps.length) {
+    openApp(_restored);
+  }
+})();
 </script>
 </body>
 </html>
