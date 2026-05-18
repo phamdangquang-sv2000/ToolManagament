@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Internal Tools Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;0,9..40,900;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:       #07090f;
+    --bg2:      #0d1018;
+    --surface:  #111620;
+    --border:   #1c2333;
+    --border2:  #222d42;
+    --accent:   #4f7cff;
+    --accent2:  #7c4fff;
+    --cyan:     #00d4b8;
+    --text:     #c8d4e8;
+    --text2:    #6b7fa3;
+    --text3:    #2d3d58;
+    --font:     'DM Sans', system-ui, sans-serif;
+    --mono:     'DM Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── Noise texture overlay ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: .6;
+  }
+
+  /* ── Top bar ── */
+  #topbar {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    height: 52px;
+    min-height: 52px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    position: relative;
+    z-index: 100;
+  }
+
+  #topbar::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+    opacity: .4;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: 28px;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .logo-icon {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    box-shadow: 0 0 16px rgba(79,124,255,.35);
+  }
+
+  .logo-text {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    color: var(--text);
+  }
+
+  .logo-text span {
+    color: var(--text2);
+    font-weight: 300;
+  }
+
+  /* ── Tabs ── */
+  #tabs {
+    display: flex;
+    align-items: stretch;
+    gap: 2px;
+    flex: 1;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  #tabs::-webkit-scrollbar { display: none; }
+
+  .tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 16px;
+    height: 52px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--text2);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    position: relative;
+    transition: color .18s, background .18s;
+    border-radius: 0;
+  }
+
+  .tab:hover {
+    color: var(--text);
+    background: rgba(255,255,255,.03);
+  }
+
+  .tab.active {
+    color: #fff;
+    background: rgba(79,124,255,.08);
+  }
+
+  .tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 8px; right: 8px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px 2px 0 0;
+  }
+
+  .tab-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: box-shadow .2s;
+  }
+
+  .tab.active .tab-dot {
+    box-shadow: 0 0 8px currentColor;
+  }
+
+  .dot-blue   { background: #4f7cff; color: #4f7cff; }
+  .dot-purple { background: #7c4fff; color: #7c4fff; }
+  .dot-red    { background: #e8373a; color: #e8373a; }
+
+  /* ── Home tab button ── */
+  .tab-home {
+    border-right: 1px solid var(--border);
+    padding: 0 18px;
+    gap: 6px;
+  }
+
+  /* ── Separator ── */
+  .tab-sep {
+    width: 1px;
+    background: var(--border);
+    margin: 12px 4px;
+    flex-shrink: 0;
+  }
+
+  /* ── Status badge ── */
+  .badge {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(79,124,255,.12);
+    color: var(--accent);
+    border: 1px solid rgba(79,124,255,.2);
+    letter-spacing: .04em;
+  }
+
+  /* ── Content area ── */
+  #content {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── iframe pane ── */
+  .pane {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .22s ease;
+  }
+
+  .pane.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .pane iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+
+  /* ── Home screen ── */
+  #home {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 40px 24px;
+    overflow-y: auto;
+  }
+
+  /* Glow blob bg */
+  #home::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(ellipse,rgba(79,124,255,.07) 0%,transparent 65%);
+    pointer-events: none;
+  }
+
+  .home-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+    position: relative;
+  }
+
+  .home-title {
+    font-size: clamp(36px, 6vw, 72px);
+    font-weight: 900;
+    letter-spacing: -.03em;
+    line-height: 1.05;
+    text-align: center;
+    position: relative;
+    margin-bottom: 14px;
+  }
+
+  .home-title .grad {
+    background: linear-gradient(120deg, #fff 0%, #aac2ff 40%, #b39dfc 70%, #fff 100%);
+    background-size: 220% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: titleShine 4s linear infinite;
+  }
+
+  @keyframes titleShine {
+    0%   { background-position: 200% center; }
+    100% { background-position: -80%  center; }
+  }
+
+  .home-sub {
+    font-size: 15px;
+    color: var(--text2);
+    text-align: center;
+    max-width: 420px;
+    line-height: 1.65;
+    margin-bottom: 52px;
+    position: relative;
+    font-weight: 300;
+  }
+
+  /* ── App cards ── */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    width: 100%;
+    max-width: 900px;
+    position: relative;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 24px 20px;
+    cursor: pointer;
+    transition: border-color .2s, transform .2s, box-shadow .2s;
+    position: relative;
+    overflow: hidden;
+    text-align: left;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--card-glow, rgba(79,124,255,.06)) 0%, transparent 60%);
+    pointer-events: none;
+    transition: opacity .2s;
+  }
+
+  .card:hover {
+    border-color: var(--card-accent, var(--border2));
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px var(--card-shadow, rgba(79,124,255,.12));
+  }
+
+  .card:hover::before { opacity: 1.4; }
+
+  .card:active { transform: translateY(-1px); }
+
+  .card-1 { --card-accent: #4f7cff; --card-glow: rgba(79,124,255,.08); --card-shadow: rgba(79,124,255,.14); }
+  .card-2 { --card-accent: #7c4fff; --card-glow: rgba(124,79,255,.08); --card-shadow: rgba(124,79,255,.14); }
+  .card-3 { --card-accent: #e8373a; --card-glow: rgba(232,55,58,.07); --card-shadow: rgba(232,55,58,.14); }
+
+  .card-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .icon-blue   { background: rgba(79,124,255,.15); box-shadow: 0 0 20px rgba(79,124,255,.2); }
+  .icon-purple { background: rgba(124,79,255,.15); box-shadow: 0 0 20px rgba(124,79,255,.2); }
+  .icon-red    { background: rgba(232,55,58,.15);  box-shadow: 0 0 20px rgba(232,55,58,.2);  }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+    letter-spacing: -.01em;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.6;
+    font-weight: 300;
+    margin-bottom: 18px;
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  .card-arrow {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text2);
+    font-size: 13px;
+    transition: background .18s, color .18s, transform .18s;
+  }
+
+  .card:hover .card-arrow {
+    background: var(--card-accent, var(--accent));
+    color: #fff;
+    transform: translateX(2px);
+  }
+
+  /* ── Footer ── */
+  .home-footer {
+    margin-top: 44px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: .06em;
+    text-align: center;
+    position: relative;
+  }
+
+  /* ── Loading skeleton inside pane ── */
+  .pane-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    background: var(--bg);
+    pointer-events: none;
+    transition: opacity .3s;
+  }
+
+  .spin {
+    width: 32px; height: 32px;
+    border: 2px solid var(--border2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .load-text {
+    font-size: 12px;
+    color: var(--text2);
+    font-family: var(--mono);
+    letter-spacing: .08em;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    .tab { padding: 0 12px; font-size: 12px; gap: 6px; }
+    .logo-text { display: none; }
+    .badge { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Top navigation bar ── -->
+<div id="topbar">
+  <a class="logo tab-home tab" onclick="showHome()" href="javascript:void(0)">
+    <div class="logo-icon">⚡</div>
+    <div class="logo-text">Internal <span>Tools Hub</span></div>
+  </a>
+
+  <div class="tab-sep"></div>
+
+  <div id="tabs">
+    <button class="tab" id="tab-0" onclick="openApp(0)">
+      <span class="tab-dot dot-blue"></span>
+      Quản Lý Nhân Sự
+      <span class="badge">HR</span>
+    </button>
+
+    <button class="tab" id="tab-1" onclick="openApp(1)">
+      <span class="tab-dot dot-purple"></span>
+      L2 Support Tracking
+      <span class="badge">KPI</span>
+    </button>
+
+    <button class="tab" id="tab-2" onclick="openApp(2)">
+      <span class="tab-dot dot-red"></span>
+      IT Incident Tracker
+      <span class="badge">INC</span>
+    </button>
+  </div>
+</div>
+
+<!-- ── Content ── -->
+<div id="content">
+
+  <!-- Home screen -->
+  <div id="home" class="pane active">
+    <div class="home-eyebrow">CAT Support Operations</div>
+    <h1 class="home-title"><span class="grad">Internal Tools Hub</span></h1>
+    <p class="home-sub">Trung tâm ứng dụng nội bộ — chọn công cụ bên dưới để bắt đầu.</p>
+
+    <div class="cards">
+
+      <div class="card card-1" onclick="openApp(0)">
+        <div class="card-icon icon-blue">👥</div>
+        <div class="card-title">Quản Lý Nhân Sự</div>
+        <div class="card-desc">Quản lý danh sách nhân sự, thiết bị laptop, tài khoản hệ thống của L2 Support Team.</div>
+        <div class="card-footer">
+          <span class="card-tag">HR · L2 Team</span>
+          <span class="card-arrow">→</span>
+        </div>
+      </div>
+
+      <div class="card card-2" onclick="openApp(1)">
+        <div class="card-icon icon-purple">📊</div>
+        <div class="card-title">L2 Support Tracking</div>
+        <div class="card-desc">Theo dõi KPI upload file hàng ngày, leaderboard, gamification và báo cáo hiệu suất.</div>
+        <div class="card-footer">
+          <span class="card-tag">KPI · CAT</span>
+          <span class="card-arrow">→</span>
+        </div>
+      </div>
+
+      <div class="card card-3" onclick="openApp(2)">
+        <div class="card-icon icon-red">🛡️</div>
+        <div class="card-title">IT Incident Tracker</div>
+        <div class="card-desc">Ghi nhận và theo dõi sự cố IT theo mức độ ưu tiên P1/P2, timeline và xuất báo cáo PowerPoint.</div>
+        <div class="card-footer">
+          <span class="card-tag">Incident · IT</span>
+          <span class="card-arrow">→</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="home-footer">3 APPS · GITHUB PAGES · IFRAME ISOLATED</div>
+  </div>
+
+  <!-- App panes (lazy-loaded) -->
+  <div class="pane" id="pane-0">
+    <div class="pane-loading" id="loading-0">
+      <div class="spin"></div>
+      <div class="load-text">Đang tải Quản Lý Nhân Sự…</div>
+    </div>
+    <!-- iframe injected on demand -->
+  </div>
+
+  <div class="pane" id="pane-1">
+    <div class="pane-loading" id="loading-1">
+      <div class="spin"></div>
+      <div class="load-text">Đang tải L2 Support Tracking…</div>
+    </div>
+  </div>
+
+  <div class="pane" id="pane-2">
+    <div class="pane-loading" id="loading-2">
+      <div class="spin"></div>
+      <div class="load-text">Đang tải IT Incident Tracker…</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const APPS = [
+    { file: 'Quản_Lý_Nhân_Sự___L2_Support_Team.html', tab: 'tab-0', pane: 'pane-0', loading: 'loading-0' },
+    { file: 'L2_Support_Tracking_-_CAT.html',           tab: 'tab-1', pane: 'pane-1', loading: 'loading-1' },
+    { file: 'IT_Incident_Tracker.html',                 tab: 'tab-2', pane: 'pane-2', loading: 'loading-2' },
+  ];
+
+  let current = 'home'; // 'home' | 0 | 1 | 2
+
+  function showHome() {
+    setActive('home');
+  }
+
+  function openApp(idx) {
+    setActive(idx);
+    const app = APPS[idx];
+    const pane = document.getElementById(app.pane);
+
+    // Lazy-load iframe on first open
+    if (!pane.querySelector('iframe')) {
+      const frame = document.createElement('iframe');
+      frame.src = app.file;
+      frame.setAttribute('allow', 'clipboard-read; clipboard-write');
+      frame.onload = () => {
+        const loading = document.getElementById(app.loading);
+        if (loading) {
+          loading.style.opacity = '0';
+          setTimeout(() => loading.remove(), 300);
+        }
+      };
+      pane.appendChild(frame);
+    }
+  }
+
+  function setActive(target) {
+    // Deactivate all
+    document.getElementById('home').classList.remove('active');
+    APPS.forEach((_, i) => {
+      document.getElementById(APPS[i].pane).classList.remove('active');
+      document.getElementById(APPS[i].tab).classList.remove('active');
+    });
+
+    if (target === 'home') {
+      document.getElementById('home').classList.add('active');
+    } else {
+      document.getElementById(APPS[target].pane).classList.add('active');
+      document.getElementById(APPS[target].tab).classList.add('active');
+    }
+
+    current = target;
+  }
+</script>
+</body>
+</html>
