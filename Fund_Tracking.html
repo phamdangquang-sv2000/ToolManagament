@@ -407,20 +407,8 @@
           <span id="fddMonthLabel">Tất cả tháng</span>
           <svg class="fdd-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
-        <div class="fdd-menu" style="max-height:260px;overflow-y:auto">
+        <div class="fdd-menu" style="max-height:260px;overflow-y:auto" id="fddMonthMenu">
           <button class="fdd-item active" data-value="" onclick="setFdd('fddMonth','month','','Tất cả tháng',this)"><span class="fdd-check">✓</span> Tất cả tháng</button>
-          <button class="fdd-item" data-value="01" onclick="setFdd('fddMonth','month','01','Tháng 1',this)"><span class="fdd-check">✓</span> Tháng 1</button>
-          <button class="fdd-item" data-value="02" onclick="setFdd('fddMonth','month','02','Tháng 2',this)"><span class="fdd-check">✓</span> Tháng 2</button>
-          <button class="fdd-item" data-value="03" onclick="setFdd('fddMonth','month','03','Tháng 3',this)"><span class="fdd-check">✓</span> Tháng 3</button>
-          <button class="fdd-item" data-value="04" onclick="setFdd('fddMonth','month','04','Tháng 4',this)"><span class="fdd-check">✓</span> Tháng 4</button>
-          <button class="fdd-item" data-value="05" onclick="setFdd('fddMonth','month','05','Tháng 5',this)"><span class="fdd-check">✓</span> Tháng 5</button>
-          <button class="fdd-item" data-value="06" onclick="setFdd('fddMonth','month','06','Tháng 6',this)"><span class="fdd-check">✓</span> Tháng 6</button>
-          <button class="fdd-item" data-value="07" onclick="setFdd('fddMonth','month','07','Tháng 7',this)"><span class="fdd-check">✓</span> Tháng 7</button>
-          <button class="fdd-item" data-value="08" onclick="setFdd('fddMonth','month','08','Tháng 8',this)"><span class="fdd-check">✓</span> Tháng 8</button>
-          <button class="fdd-item" data-value="09" onclick="setFdd('fddMonth','month','09','Tháng 9',this)"><span class="fdd-check">✓</span> Tháng 9</button>
-          <button class="fdd-item" data-value="10" onclick="setFdd('fddMonth','month','10','Tháng 10',this)"><span class="fdd-check">✓</span> Tháng 10</button>
-          <button class="fdd-item" data-value="11" onclick="setFdd('fddMonth','month','11','Tháng 11',this)"><span class="fdd-check">✓</span> Tháng 11</button>
-          <button class="fdd-item" data-value="12" onclick="setFdd('fddMonth','month','12','Tháng 12',this)"><span class="fdd-check">✓</span> Tháng 12</button>
         </div>
       </div>
       <!-- Year dropdown -->
@@ -462,15 +450,9 @@
           <span id="fddMethodLabel">Mọi phương thức</span>
           <svg class="fdd-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
-        <div class="fdd-menu">
+        <div class="fdd-menu" id="fddMethodMenu">
           <button class="fdd-item active" data-value="all" onclick="setFdd('fddMethod','method','all','Mọi phương thức',this)">
             <span class="fdd-check">✓</span> Mọi phương thức
-          </button>
-          <button class="fdd-item" data-value="chuyển khoản" onclick="setFdd('fddMethod','method','chuyển khoản','Chuyển khoản',this)">
-            <span class="fdd-check">✓</span> Chuyển khoản
-          </button>
-          <button class="fdd-item" data-value="tiền mặt" onclick="setFdd('fddMethod','method','tiền mặt','Tiền mặt',this)">
-            <span class="fdd-check">✓</span> Tiền mặt
           </button>
         </div>
       </div>
@@ -481,17 +463,9 @@
           <span id="fddStatusLabel">Mọi trạng thái</span>
           <svg class="fdd-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
-        <div class="fdd-menu">
+        <div class="fdd-menu" id="fddStatusMenu">
           <button class="fdd-item active" data-value="all" onclick="setFdd('fddStatus','status','all','Mọi trạng thái',this)">
             <span class="fdd-check">✓</span> Mọi trạng thái
-          </button>
-          <button class="fdd-item" data-value="đã đóng" onclick="setFdd('fddStatus','status','đã đóng','Đã đóng',this)">
-            <span class="fdd-check">✓</span>
-            <span style="color:#6ee7b7">✓</span> Đã đóng
-          </button>
-          <button class="fdd-item" data-value="chưa đóng" onclick="setFdd('fddStatus','status','chưa đóng','Chưa đóng',this)">
-            <span class="fdd-check">✓</span>
-            <span style="color:#fcd34d">•</span> Chưa đóng
           </button>
         </div>
       </div>
@@ -736,7 +710,7 @@ const colorFromName = (s='?') => {
   return `linear-gradient(135deg,hsl(${hue},70%,55%),hsl(${(hue+40)%360},75%,50%))`;
 };
 const initials = (s='?') => s.trim().split(/\s+/).slice(-2).map(w=>w[0]?.toUpperCase()).join('');
-const isChi = r => r.payment_method === 'chi ra';
+const isChi = r => r.payment_method === 'chi ra' || r.type === 'chi';
 const dateOf = r => r.late_date || r.paid_date || '';
 
 // ── Toast ──
@@ -762,6 +736,9 @@ async function loadData(showSpin=false){
   if(error){ toast('Lỗi tải dữ liệu: '+error.message,'error'); return; }
   rows = data || [];
   buildYearFilter();
+  buildMonthFilter();
+  buildMethodFilter();
+  buildStatusFilter();
   render();
   if(showSpin) toast('✨ Dữ liệu đã được cập nhật','success');
 }
@@ -772,6 +749,40 @@ function buildYearFilter(){
   const curYear = filters.year||'';
   menu.innerHTML = `<button class="fdd-item${curYear===''?' active':''}" data-value="" onclick="setFdd('fddYear','year','','Tất cả năm',this)"><span class="fdd-check">✓</span> Tất cả năm</button>`
     + years.map(y=>`<button class="fdd-item${y===curYear?' active':''}" data-value="${y}" onclick="setFdd('fddYear','year','${y}','${y}',this)"><span class="fdd-check">✓</span> ${y}</button>`).join('');
+}
+
+function buildMonthFilter(){
+  const MONTH_NAMES = ['','Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
+  const months = [...new Set(rows.map(r=>dateOf(r).slice(5,7)).filter(m=>m&&m.length===2))].sort();
+  const menu = document.getElementById('fddMonthMenu');
+  const cur = filters.month||'';
+  menu.innerHTML = `<button class="fdd-item${cur===''?' active':''}" data-value="" onclick="setFdd('fddMonth','month','','Tất cả tháng',this)"><span class="fdd-check">✓</span> Tất cả tháng</button>`
+    + months.map(m=>`<button class="fdd-item${m===cur?' active':''}" data-value="${m}" onclick="setFdd('fddMonth','month','${m}','${MONTH_NAMES[parseInt(m)]}',this)"><span class="fdd-check">✓</span> ${MONTH_NAMES[parseInt(m)]}</button>`).join('');
+}
+
+function buildMethodFilter(){
+  const methods = [...new Set(rows.filter(r=>!isChi(r)).map(r=>r.payment_method).filter(Boolean))].sort();
+  const menu = document.getElementById('fddMethodMenu');
+  const cur = filters.method||'all';
+  menu.innerHTML = `<button class="fdd-item${cur==='all'?' active':''}" data-value="all" onclick="setFdd('fddMethod','method','all','Mọi phương thức',this)"><span class="fdd-check">✓</span> Mọi phương thức</button>`
+    + methods.map(m=>{
+      const label = m==='chuyển khoản'?'Chuyển khoản': m==='tiền mặt'?'Tiền mặt': m.charAt(0).toUpperCase()+m.slice(1);
+      return `<button class="fdd-item${m===cur?' active':''}" data-value="${m}" onclick="setFdd('fddMethod','method','${m.replace(/'/g,"\\'")}','${label}',this)"><span class="fdd-check">✓</span> ${label}</button>`;
+    }).join('');
+}
+
+function buildStatusFilter(){
+  const statuses = [...new Set(rows.map(r=>r.status).filter(Boolean))].sort();
+  const menu = document.getElementById('fddStatusMenu');
+  const cur = filters.status||'all';
+  const statusLabel = s => {
+    if(s==='đã đóng') return '✓ Đã đóng';
+    if(s==='chưa đóng') return '• Chưa đóng';
+    if(s==='đã chi') return '✓ Đã chi';
+    return s.charAt(0).toUpperCase()+s.slice(1);
+  };
+  menu.innerHTML = `<button class="fdd-item${cur==='all'?' active':''}" data-value="all" onclick="setFdd('fddStatus','status','all','Mọi trạng thái',this)"><span class="fdd-check">✓</span> Mọi trạng thái</button>`
+    + statuses.map(s=>`<button class="fdd-item${s===cur?' active':''}" data-value="${s}" onclick="setFdd('fddStatus','status','${s.replace(/'/g,"\\'")}','${statusLabel(s)}',this)"><span class="fdd-check">✓</span> ${statusLabel(s)}</button>`).join('');
 }
 
 // ── Filter Dropdowns ──
@@ -806,9 +817,9 @@ function render(){
     const chi=isChi(r);
     if(filters.txtype==='thu' && chi) return false;
     if(filters.txtype==='chi' && !chi) return false;
+    if(filters.status!=='all' && r.status!==filters.status) return false;
     if(!chi){
       if(filters.method!=='all' && r.payment_method!==filters.method) return false;
-      if(filters.status!=='all' && r.status!==filters.status) return false;
     }
     if(q && !(r.full_name||'').toLowerCase().includes(q)) return false;
     const d=dateOf(r);
@@ -861,11 +872,12 @@ function render(){
     const chi=isChi(r);
     const methodCls=chi?'badge-chi': (r.payment_method==='tiền mặt'?'badge-cash':'badge-bank');
     const statusCls=chi?'badge-chi': (r.status==='đã đóng'?'badge-paid':'badge-pending');
-    const statusIcon=chi?'↓': (r.status==='đã đóng'?'✓':'•');
-    const statusText=chi?'chi ra':escapeHtml(r.status||'');
+    const statusIcon=chi?'✓': (r.status==='đã đóng'?'✓':'•');
+    const statusText=chi?'Đã chi':escapeHtml(r.status||'');
     const methodText=chi?'—':escapeHtml(r.payment_method||'');
     const rowCls=chi?'row-in row-chi':'row-in';
-    const amountCls=chi?'gtext-red':'font-bold font-mono';
+    const amountCls='font-bold font-mono';
+    const amountColor=chi?'color:#fca5a5':'color:#e6ebf5';
     const amountSign=chi?'− ':'+ ';
     return `<tr class="${rowCls}">
       <td>${chi
@@ -881,7 +893,7 @@ function render(){
         </div>
       </td>
       <td>${chi?`<span class="text-[color:var(--text3)] text-xs">—</span>`:`<span class="badge ${methodCls}">${methodText}</span>`}</td>
-      <td class="text-right ${amountCls}" style="${chi?'background:var(--grad-red);-webkit-background-clip:text;background-clip:text;color:transparent':''}">${amountSign}${fmtMoney(r.amount)}</td>
+      <td class="text-right ${amountCls}" style="${amountColor}">${amountSign}${fmtMoney(r.amount)}</td>
       <td><span class="badge ${statusCls}">${statusIcon} ${statusText}</span></td>
       <td class="text-[12px] text-[color:var(--text2)] max-w-[160px] truncate" title="${escapeHtml(r.note||'')}">${escapeHtml(r.note||'—')}</td>
       <td class="text-right whitespace-nowrap">
@@ -936,8 +948,8 @@ function setModalType(type){
     tbThu.className='type-btn'; tbChi.className='type-btn active-chi';
     document.getElementById('lblName').textContent='Tên khoản chi *';
     document.getElementById('lblLate').textContent='Ngày chi *';
-    wrapLate.style.display=''; wrapPaid.style.display='none'; wrapMethod.style.display='none'; wrapStatus.style.display='none';
-    fLate.required=true; fMethod.required=false;
+    wrapLate.style.display=''; wrapPaid.style.display='none'; wrapMethod.style.display=''; wrapStatus.style.display='none';
+    fLate.required=true; fMethod.required=true;
     document.getElementById('btnSubmit').style.background='linear-gradient(135deg,#f87171,#f472b6)';
   }
 }
@@ -957,7 +969,7 @@ function openAddModal(type='thu'){
 
 function openEditModal(row){
   if(!isAdmin()){ toast('Bạn không có quyền chỉnh sửa','error'); return; }
-  const chi=row.payment_method==='chi ra';
+  const chi=isChi(row);
   document.getElementById('modalTitle').textContent=chi?'Sửa khoản chi':'Sửa khoản thu';
   document.getElementById('typeToggle').style.display='none';
   document.getElementById('f_id').value=row.id;
@@ -986,9 +998,10 @@ async function onSubmit(e){
     full_name: document.getElementById('f_name').value.trim(),
     late_date: document.getElementById('f_late').value || null,
     paid_date: null,
-    payment_method: 'chi ra',
+    payment_method: document.getElementById('f_method').value,
     amount: Number(document.getElementById('f_amount').value)||0,
-    status: 'chi ra',
+    status: 'đã chi',
+    type: 'chi',
     note: document.getElementById('f_note').value.trim()||null,
   } : {
     full_name: document.getElementById('f_name').value.trim(),
@@ -997,6 +1010,7 @@ async function onSubmit(e){
     payment_method: document.getElementById('f_method').value,
     amount: Number(document.getElementById('f_amount').value)||0,
     status: document.getElementById('f_status').value,
+    type: 'thu',
     note: document.getElementById('f_note').value.trim()||null,
   };
   const id=document.getElementById('f_id').value;
