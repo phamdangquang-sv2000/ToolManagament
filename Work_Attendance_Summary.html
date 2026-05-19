@@ -11,6 +11,7 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%230d9488'/%3E%3Cstop offset='1' stop-color='%235eead4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='18' r='8' fill='white' opacity='.95'/%3E%3Cpath d='M14 50c0-7 8-12 18-12s18 5 18 12' stroke='white' stroke-width='4' stroke-linecap='round' fill='none' opacity='.95'/%3E%3Ccircle cx='48' cy='22' r='10' fill='%230d9488'/%3E%3Cpath d='M43 22l3.5 3.5L53 18' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -916,6 +917,35 @@ tr:hover td{background:rgba(13,148,136,.03)}
 
     <!-- LEAVES -->
     <div id="s-leaves" class="section">
+
+      <!-- ADMIN: SQL setup notice (shown when hr_leave_requests table missing) -->
+      <div id="admin-sql-setup" class="hidden" style="margin-bottom:1rem">
+        <div style="background:#fef3c7;border:1.5px solid #f59e0b;border-radius:.85rem;padding:1.25rem;box-shadow:0 4px 16px rgba(245,158,11,.12)">
+          <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem">
+            <span style="font-size:1.1rem">⚙️</span>
+            <span style="font-weight:800;font-size:.9rem;color:#92400e">Thiết lập bảng Đơn Xin Nghỉ Phép</span>
+          </div>
+          <p style="font-size:.78rem;color:#92400e;margin-bottom:.75rem;line-height:1.6">
+            Tính năng đăng ký nghỉ phép cần bảng <strong>hr_leave_requests</strong> trong Supabase. Vào <strong>Supabase → SQL Editor</strong> và chạy lệnh sau:
+          </p>
+          <div id="sql-setup-box" onclick="copySetupSQL()" style="cursor:pointer;background:#451a03;color:#fef3c7;border-radius:.6rem;padding:.85rem 1rem;font-family:monospace;font-size:.72rem;line-height:1.7;position:relative;user-select:all;border:1px solid rgba(255,255,255,.1)">
+            <span style="position:absolute;top:.5rem;right:.65rem;font-size:.65rem;background:rgba(255,255,255,.12);padding:.15rem .45rem;border-radius:.35rem;color:#fde68a;font-family:sans-serif">click để copy</span>
+CREATE TABLE hr_leave_requests (<br>
+&nbsp;&nbsp;id UUID DEFAULT gen_random_uuid() PRIMARY KEY,<br>
+&nbsp;&nbsp;employee_id UUID REFERENCES hr_employees(id) ON DELETE CASCADE,<br>
+&nbsp;&nbsp;employee_name TEXT,<br>
+&nbsp;&nbsp;leave_date DATE NOT NULL,<br>
+&nbsp;&nbsp;days_count NUMERIC NOT NULL DEFAULT 1,<br>
+&nbsp;&nbsp;session_type TEXT,<br>
+&nbsp;&nbsp;reason TEXT,<br>
+&nbsp;&nbsp;status TEXT DEFAULT 'pending',<br>
+&nbsp;&nbsp;created_at TIMESTAMPTZ DEFAULT NOW()<br>
+);
+          </div>
+          <p style="font-size:.7rem;color:#a16207;margin-top:.6rem">Sau khi tạo xong, tải lại trang này để kích hoạt tính năng.</p>
+        </div>
+      </div>
+
       <!-- ADMIN: Pending requests section -->
       <div id="admin-pending-section" class="hidden">
         <div class="pending-req-card">
@@ -1089,6 +1119,27 @@ tr:hover td{background:rgba(13,148,136,.03)}
           <span style="display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;background:#f3e8ff;color:#7e22ce;font-weight:700">xo/wo Nửa ngày</span>
           <span style="display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;background:#fee2e2;color:#991b1b;font-weight:700">om/oa Off buổi</span>
           <span id="btn-rules" class="hidden btn btn-secondary btn-sm" onclick="toggleRulesPanel()" style="font-size:.7rem;padding:.3rem .7rem;cursor:pointer">⚙️ Quy tắc</span>
+        </div>
+      </div>
+
+      <!-- Sort + Export row -->
+      <div class="flex flex-wrap items-center gap-3 mb-3">
+        <span style="font-size:.78rem;font-weight:600;color:var(--text-2)">Sắp xếp:</span>
+        <select id="sch-sort" class="input" style="max-width:180px;font-size:.78rem" onchange="onSchSortChange()">
+          <option value="name-asc">Tên A → Z</option>
+          <option value="name-desc">Tên Z → A</option>
+          <option value="wfh-desc">WFH nhiều nhất</option>
+          <option value="wfh-asc">WFH ít nhất</option>
+        </select>
+        <div class="flex items-center gap-2 ml-auto flex-wrap">
+          <span style="font-size:.75rem;font-weight:600;color:var(--text-2)">📸 Xuất ảnh từ ngày</span>
+          <input id="sch-from-day" type="number" min="1" max="31" value="1" class="input" style="width:62px;font-size:.8rem;text-align:center;padding:.3rem .5rem">
+          <span style="font-size:.75rem;color:var(--text-3)">đến ngày</span>
+          <input id="sch-to-day" type="number" min="1" max="31" value="31" class="input" style="width:62px;font-size:.8rem;text-align:center;padding:.3rem .5rem">
+          <button id="btn-export-img" onclick="exportScheduleImage()" class="btn btn-primary btn-sm" style="font-size:.75rem;gap:.3rem">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            Xuất ảnh PNG
+          </button>
         </div>
       </div>
 
@@ -1303,6 +1354,7 @@ const S = {
   scheduleData: {},
   scheduleRules: {},
   scheduleLoading: false,
+  scheduleSortOrder: 'name-asc',
 };
 
 // ============ DARK MODE ============
@@ -2744,11 +2796,153 @@ async function initCal() {
   S.scheduleData = schData;
   S.scheduleRules = rules;
 
+  // Auto-update to-day input to match days in selected month
+  const toInput = document.getElementById('sch-to-day');
+  if (toInput) toInput.value = new Date(y, m, 0).getDate();
+
   renderRulesPanel();
   renderSchedule(y, m);
 
   loading.style.display = 'none';
   wrap.style.display = 'block';
+}
+
+// ============ SORT HELPERS ============
+function getSortedScheduleEmployees(y, m) {
+  const base = S.employees.filter(e => e.is_active !== false);
+  const sort = S.scheduleSortOrder || 'name-asc';
+  return [...base].sort((a, b) => {
+    if (sort === 'name-asc')  return a.name.localeCompare(b.name, 'vi');
+    if (sort === 'name-desc') return b.name.localeCompare(a.name, 'vi');
+    const wa = countWfhInMonth(a.id, y, m), wb = countWfhInMonth(b.id, y, m);
+    if (sort === 'wfh-desc') return wb - wa || a.name.localeCompare(b.name, 'vi');
+    if (sort === 'wfh-asc')  return wa - wb || a.name.localeCompare(b.name, 'vi');
+    return 0;
+  });
+}
+
+function onSchSortChange() {
+  S.scheduleSortOrder = document.getElementById('sch-sort').value;
+  const m = parseInt(document.getElementById('sch-month').value);
+  const y = parseInt(document.getElementById('sch-year').value);
+  renderSchedule(y, m);
+}
+
+// ============ EXPORT IMAGE ============
+async function exportScheduleImage() {
+  const m = parseInt(document.getElementById('sch-month').value);
+  const y = parseInt(document.getElementById('sch-year').value);
+  const daysInMonth = new Date(y, m, 0).getDate();
+  const fromDay = Math.max(1, parseInt(document.getElementById('sch-from-day').value) || 1);
+  const toDay   = Math.min(daysInMonth, parseInt(document.getElementById('sch-to-day').value) || daysInMonth);
+
+  if (fromDay > toDay) { toast('Ngày bắt đầu phải ≤ ngày kết thúc!', 'warn'); return; }
+  if (typeof html2canvas === 'undefined') { toast('Thư viện xuất ảnh chưa tải xong, thử lại!', 'warn'); return; }
+
+  const btn = document.getElementById('btn-export-img');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner" style="border-color:rgba(255,255,255,.3);border-top-color:#fff;width:12px;height:12px;border-width:2px"></span> Đang xuất...'; }
+
+  try {
+    const exportEl = buildExportTable(y, m, fromDay, toDay);
+    exportEl.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;opacity:1';
+    document.body.appendChild(exportEl);
+    await new Promise(r => setTimeout(r, 120));
+
+    const canvas = await html2canvas(exportEl, {
+      scale: 3,
+      backgroundColor: '#ffffff',
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
+    });
+    document.body.removeChild(exportEl);
+
+    const mn = ['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'][m-1];
+    const link = document.createElement('a');
+    link.download = `LichLam_${mn}_${y}_Ngay${fromDay}-${toDay}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    toast('Đã xuất ảnh thành công!', 'success');
+  } catch(e) {
+    toast('Lỗi xuất ảnh: ' + e.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Xuất ảnh PNG'; }
+  }
+}
+
+function buildExportTable(year, month, fromDay, toDay) {
+  const employees = getSortedScheduleEmployees(year, month);
+  const today = new Date();
+  const maxWfh = parseInt(S.scheduleRules.max_wfh_per_month?.value || '1');
+  const DOW_SHORT = ['CN','T2','T3','T4','T5','T6','T7'];
+  const MONTH_VN = ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
+
+  const days = [];
+  for (let d = fromDay; d <= toDay; d++) {
+    const dow = new Date(year, month-1, d).getDay();
+    const isWeekend = dow === 0 || dow === 6;
+    const isToday = today.getFullYear()===year && today.getMonth()===month-1 && today.getDate()===d;
+    days.push({ d, dow, isWeekend, isToday });
+  }
+
+  // Build table HTML with fully inline styles for correct rendering
+  let html = `<div style="font-family:'Inter',Arial,sans-serif;background:#fff;padding:20px 24px;min-width:400px">`;
+  html += `<div style="margin-bottom:14px">
+    <div style="font-size:15px;font-weight:800;color:#0f2923;letter-spacing:-.3px">📅 Lịch Đăng Ký Làm — ${MONTH_VN[month-1]} ${year}</div>
+    <div style="font-size:11px;color:#8faaa4;margin-top:3px">Ngày ${fromDay} – ${toDay} &nbsp;·&nbsp; ${employees.length} nhân viên &nbsp;·&nbsp; Xuất lúc ${new Date().toLocaleTimeString('vi-VN')}</div>
+  </div>`;
+
+  html += `<table style="border-collapse:collapse;table-layout:fixed;width:100%"><thead><tr>`;
+  html += `<th style="background:#0d9488;color:#fff;font-size:11px;font-weight:800;padding:7px 10px;text-align:left;border:1px solid #0b7d74;white-space:nowrap;min-width:140px;max-width:160px">NHÂN VIÊN</th>`;
+  days.forEach(({ d, dow, isWeekend, isToday }) => {
+    const bg = isToday ? '#f59e0b' : isWeekend ? '#64748b' : '#0d9488';
+    html += `<th style="background:${bg};color:#fff;font-size:10px;font-weight:800;padding:5px 2px;text-align:center;border:1px solid rgba(0,0,0,.1);min-width:34px;width:34px">
+      <div style="font-size:11px;font-weight:800;line-height:1.2">${d}</div>
+      <div style="font-size:9px;font-weight:500;opacity:.9">${DOW_SHORT[dow]}</div>
+    </th>`;
+  });
+  html += `</tr></thead><tbody>`;
+
+  employees.forEach((emp, idx) => {
+    const rowBg = idx % 2 === 0 ? '#f8fdfc' : '#ffffff';
+    const wfhCount = countWfhInMonth(emp.id, year, month);
+    html += `<tr>`;
+    html += `<td style="background:${rowBg};font-size:11px;font-weight:700;color:#0f2923;padding:5px 10px;border:1px solid #c8e6e0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">
+      ${emp.name}${wfhCount > maxWfh ? ' <span style="font-size:9px;background:#fef3c7;color:#92400e;padding:1px 4px;border-radius:3px">WFH!</span>' : ''}
+    </td>`;
+    days.forEach(({ d, dow, isWeekend }) => {
+      if (isWeekend) {
+        html += `<td style="background:#f1f5f9;border:1px solid #e2e8f0;text-align:center;padding:3px 2px"></td>`;
+      } else {
+        const val = schGetVal(emp.id, year, month, d);
+        const s = SCH_STYLE[val] || SCH_STYLE['x'];
+        html += `<td style="background:${rowBg};border:1px solid #c8e6e0;text-align:center;padding:3px 2px">
+          <span style="display:inline-block;background:${s.bg};color:${s.color};border:1.5px solid ${s.border};border-radius:4px;font-size:9.5px;font-weight:800;padding:2px 4px;min-width:20px;line-height:1.2">${s.label}</span>
+        </td>`;
+      }
+    });
+    html += `</tr>`;
+  });
+  html += `</tbody></table>`;
+
+  // Legend
+  html += `<div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center">`;
+  const legend = [
+    { bg:'#bfdbfe',color:'#1e40af',border:'#93c5fd',label:'x — Office' },
+    { bg:'#bbf7d0',color:'#14532d',border:'#86efac',label:'w — WFH' },
+    { bg:'#fde68a',color:'#78350f',border:'#fbbf24',label:'o — Nghỉ phép' },
+    { bg:'#fbcfe8',color:'#831843',border:'#f9a8d4',label:'ph — Lễ' },
+    { bg:'#fed7aa',color:'#7c2d12',border:'#fdba74',label:'xo/wo — Nửa ngày' },
+    { bg:'#fecaca',color:'#7f1d1d',border:'#fca5a5',label:'om/oa — Off buổi' },
+  ];
+  legend.forEach(l => {
+    html += `<span style="display:inline-flex;align-items:center;gap:4px;font-size:9.5px;font-weight:700;background:${l.bg};color:${l.color};border:1px solid ${l.border};padding:2px 7px;border-radius:999px">${l.label}</span>`;
+  });
+  html += `</div></div>`;
+
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return div.firstChild;
 }
 
 // Render the schedule grid
@@ -2757,7 +2951,7 @@ function renderSchedule(year, month) {
   const y = year || parseInt(document.getElementById('sch-year').value);
   const daysInMonth = new Date(y,m,0).getDate();
 
-  const employees = S.employees.filter(e => e.is_active !== false);
+  const employees = getSortedScheduleEmployees(y, m);
   const today = new Date();
 
   const days = [];
