@@ -22,7 +22,7 @@
   --gold:#f59e0b;--gold-light:#fef3c7;
   --emerald:#10b981;--red:#ef4444;--orange:#f97316;--purple:#8b5cf6;--blue:#3b82f6;--pink:#ec4899;--cyan:#06b6d4;
   --text-1:#0f2923;--text-2:#4b6b63;--text-3:#8faaa4;
-  --border:#d1ece8;--surface:#ffffff;--surface2:#f0fdf9;--surface3:#e6f7f4;
+  --border:#c8e6e0;--surface:#ffffff;--surface2:#f0fdf9;--surface3:#e6f7f4;
   --shadow-sm:0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.04);
   --shadow-md:0 4px 16px rgba(13,148,136,.1),0 2px 6px rgba(0,0,0,.05);
   --shadow-lg:0 12px 40px rgba(13,148,136,.14),0 4px 12px rgba(0,0,0,.07);
@@ -104,9 +104,7 @@ body{background:var(--surface2);color:var(--text-1)}
 .btn-danger:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(239,68,68,.4)}
 .btn-sm{padding:.3rem .65rem;font-size:.7rem;border-radius:.45rem}
 
-
 .text-3xl { font-size: 1.775rem !important; }
-
 
 /* ── INPUTS ── */
 .input{
@@ -404,6 +402,196 @@ tr:hover td{background:rgba(13,148,136,.03)}
   text-transform:uppercase;letter-spacing:.1em;
   margin-top:.5rem;
 }
+
+/* ── SCHEDULE TABLE SPECIFIC ── */
+.sch-table-container{
+  overflow-x:auto;
+  border-radius:var(--radius-lg);
+  border:2px solid var(--border);
+  box-shadow:var(--shadow-md);
+}
+.sch-table{
+  width:100%;border-collapse:collapse;font-size:.72rem;
+}
+.sch-table thead tr:first-child th{
+  background:linear-gradient(135deg,#0d9488,#0f766e);
+  color:#fff;
+  font-size:.65rem;font-weight:800;
+  padding:.45rem .2rem;
+  text-align:center;
+  border-right:1px solid rgba(255,255,255,.2);
+  border-bottom:2px solid rgba(255,255,255,.25);
+  white-space:nowrap;
+}
+.sch-table thead tr:first-child th.sch-name-col{
+  background:linear-gradient(135deg,#0d9488,#0f766e);
+  text-align:left;padding:.45rem .75rem;
+  position:sticky;left:0;z-index:3;
+  min-width:150px;
+  border-right:2px solid rgba(255,255,255,.3);
+}
+.sch-table thead tr:first-child th.sch-today-col{
+  background:linear-gradient(135deg,#f59e0b,#d97706);
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.4);
+}
+.sch-table thead tr:first-child th.sch-weekend-col-head{
+  background:linear-gradient(135deg,#94a3b8,#64748b);
+}
+.dark .sch-table thead tr:first-child th{
+  background:linear-gradient(135deg,#0f766e,#115e59);
+}
+.dark .sch-table thead tr:first-child th.sch-name-col{
+  background:linear-gradient(135deg,#0f766e,#115e59);
+}
+
+.sch-table tbody tr{
+  border-bottom:1px solid var(--border);
+  transition:background .15s;
+}
+.sch-table tbody tr:nth-child(even){
+  background:#f8fffe;
+}
+.sch-table tbody tr:nth-child(odd){
+  background:#ffffff;
+}
+.sch-table tbody tr:hover td{
+  filter:brightness(.97);
+}
+.dark .sch-table tbody tr:nth-child(even){background:#0c2420;}
+.dark .sch-table tbody tr:nth-child(odd){background:#0e2520;}
+.dark .sch-table tbody tr:hover td{filter:brightness(1.05);}
+
+.sch-table td{
+  padding:.28rem .15rem;
+  text-align:center;
+  border-right:1px solid var(--border);
+  border-top:none;
+  vertical-align:middle;
+  position:relative;
+}
+.dark .sch-table td{ border-right-color:var(--border); }
+
+.sch-table td.sch-name-td{
+  position:sticky;left:0;z-index:1;
+  text-align:left;
+  padding:.35rem .75rem;
+  font-weight:700;
+  font-size:.76rem;
+  color:var(--text-1);
+  border-right:2px solid var(--border);
+  white-space:nowrap;
+  min-width:150px;
+  max-width:190px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  background:inherit;
+}
+.sch-table td.sch-weekend-col{
+  background:repeating-linear-gradient(
+    135deg,
+    rgba(148,163,184,.06),
+    rgba(148,163,184,.06) 3px,
+    transparent 3px,
+    transparent 9px
+  ) !important;
+  pointer-events:none;
+  opacity:.7;
+}
+.dark .sch-table td.sch-weekend-col{
+  background:repeating-linear-gradient(
+    135deg,
+    rgba(255,255,255,.03),
+    rgba(255,255,255,.03) 3px,
+    transparent 3px,
+    transparent 9px
+  ) !important;
+}
+.sch-cell{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:28px;height:22px;border-radius:5px;
+  font-weight:800;font-size:.68rem;letter-spacing:-.01em;
+  transition:transform .1s,box-shadow .1s;
+}
+.sch-cell-clickable:hover .sch-cell{
+  transform:scale(1.12);
+  box-shadow:0 2px 8px rgba(0,0,0,.15);
+}
+.sch-cell-clickable{cursor:pointer;}
+.sch-cell-empty{
+  display:inline-block;width:28px;height:22px;
+  border:1.5px dashed var(--border);border-radius:5px;
+  background:transparent;
+}
+/* Dark cells empty */
+.dark .sch-cell-empty{border-color:var(--border);}
+
+/* ── CELL POPUP DROPDOWN ── */
+.sch-popup{
+  position:fixed;
+  z-index:9999;
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-xl);
+  padding:.75rem;
+  min-width:200px;
+  animation:fadeUp .18s cubic-bezier(.4,0,.2,1);
+}
+.dark .sch-popup{background:var(--surface2);}
+.sch-popup-title{
+  font-size:.72rem;font-weight:800;
+  color:var(--text-2);margin-bottom:.5rem;
+  text-transform:uppercase;letter-spacing:.06em;
+  border-bottom:1px solid var(--border);padding-bottom:.4rem;
+}
+.sch-popup select{
+  width:100%;padding:.45rem .7rem;
+  border-radius:.5rem;
+  border:1.5px solid var(--border);
+  background:var(--surface);
+  color:var(--text-1);
+  font-size:.8rem;font-family:inherit;font-weight:600;
+  outline:none;margin-bottom:.5rem;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right .5rem center;background-size:1rem;padding-right:2rem;
+}
+.dark .sch-popup select{background-color:var(--surface2);border-color:var(--border);color:var(--text-1);}
+.sch-popup-btns{display:flex;gap:.4rem;justify-content:flex-end;}
+.sch-rule-warning{
+  font-size:.7rem;color:#b45309;
+  background:#fef3c7;border-radius:.4rem;
+  padding:.3rem .5rem;margin-bottom:.45rem;
+  border-left:3px solid #f59e0b;display:none;
+}
+.dark .sch-rule-warning{background:rgba(245,158,11,.12);color:#fbbf24;}
+
+/* ── RULES PANEL ── */
+.rules-panel{
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:1.25rem;
+  margin-bottom:1rem;
+  box-shadow:var(--shadow-sm);
+}
+.rules-panel-title{
+  font-size:.85rem;font-weight:800;
+  color:var(--text-1);margin-bottom:.75rem;
+  display:flex;align-items:center;gap:.5rem;
+}
+.rule-item{
+  display:flex;align-items:center;gap:.75rem;
+  padding:.5rem .6rem;border-radius:.5rem;
+  border:1px solid var(--border);margin-bottom:.4rem;
+  background:var(--surface2);
+  font-size:.78rem;
+}
+.rule-item-key{flex:1;font-weight:600;color:var(--text-2);}
+.rule-item-val{
+  font-weight:700;color:var(--text-1);
+  min-width:3rem;text-align:right;
+}
 </style>
 </head>
 <body>
@@ -414,24 +602,19 @@ tr:hover td{background:rgba(13,148,136,.03)}
      LOGIN SCREEN
 ======================================== -->
 <div id="login-screen" class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style="background:linear-gradient(135deg,#f0fdf9 0%,#ecfdf5 40%,#f0fdfa 100%)">
-  <!-- Decorative orbs -->
   <div class="login-bg-orb" style="width:500px;height:500px;top:-120px;left:-160px;background:radial-gradient(circle,rgba(13,148,136,.16),transparent 70%)"></div>
   <div class="login-bg-orb" style="width:400px;height:400px;bottom:-100px;right:-120px;background:radial-gradient(circle,rgba(20,184,166,.13),transparent 70%)"></div>
   <div class="login-bg-orb" style="width:300px;height:300px;top:40%;right:25%;background:radial-gradient(circle,rgba(16,185,129,.08),transparent 70%)"></div>
 
   <div class="w-full max-w-sm relative z-10">
-    <!-- Logo + Title -->
     <div class="text-center mb-8 fade">
       <div class="flex justify-center mb-5">
         <div class="logo-ring anim-float">
           <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- Person -->
             <circle cx="17" cy="11" r="5.5" fill="rgba(255,255,255,.97)"/>
             <path d="M4 33c0-7.5 5.8-13 13-13s13 5.5 13 13" stroke="rgba(255,255,255,.97)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-            <!-- Clipboard badge -->
             <rect x="26" y="20" width="14" height="17" rx="3" fill="rgba(255,255,255,.2)" stroke="rgba(255,255,255,.6)" stroke-width="1.2"/>
             <rect x="29" y="18" width="8" height="4" rx="1.5" fill="rgba(255,255,255,.85)"/>
-            <!-- Checkmark -->
             <path d="M29 29.5l2.5 2.5 5-5" stroke="rgba(255,255,255,.97)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
           </svg>
         </div>
@@ -440,9 +623,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
       <p class="text-slate-400 text-sm mt-1.5 font-medium">Hệ thống Quản lý Ngày Làm Việc Và Nghỉ Phép</p>
     </div>
 
-    <!-- Card -->
     <div class="login-card fade" style="animation-delay:.1s">
-      <!-- Tabs -->
       <div class="tab-container">
         <button id="tab-admin" class="tab-btn active" onclick="switchTab('admin')">
           <span style="margin-right:.35rem">🔐</span>Admin
@@ -452,7 +633,6 @@ tr:hover td{background:rgba(13,148,136,.03)}
         </button>
       </div>
 
-      <!-- Admin login -->
       <div id="form-admin">
         <div class="mb-4">
           <label class="label">Mật khẩu Admin</label>
@@ -467,7 +647,6 @@ tr:hover td{background:rgba(13,148,136,.03)}
         </button>
       </div>
 
-      <!-- First-time setup -->
       <div id="form-setup" class="hidden">
         <div class="mb-4 p-3.5 bg-indigo-50 dark:bg-indigo-950/40 rounded-xl border border-indigo-100 dark:border-indigo-900">
           <p class="text-xs text-indigo-700 dark:text-indigo-300 font-bold mb-0.5">🔐 Thiết lập lần đầu</p>
@@ -493,7 +672,6 @@ tr:hover td{background:rgba(13,148,136,.03)}
         </button>
       </div>
 
-      <!-- Employee view -->
       <div id="form-emp" class="hidden text-center py-2">
         <div class="w-16 h-16 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-2xl flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner">👤</div>
         <p class="text-sm text-slate-700 dark:text-slate-300 mb-1 font-semibold">Xem thông tin nhân sự</p>
@@ -502,7 +680,6 @@ tr:hover td{background:rgba(13,148,136,.03)}
       </div>
     </div>
 
-    <!-- Dark mode toggle -->
     <div class="flex justify-center mt-5">
       <button onclick="toggleDark()" class="text-xs text-slate-400 hover:text-indigo-500 flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-white/60 dark:hover:bg-white/5 transition-all font-medium">
         <span id="dm-ico-login">🌙</span><span id="dm-lbl-login">Chế độ tối</span>
@@ -518,10 +695,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
 
   <!-- SIDEBAR -->
   <aside class="flex flex-col min-h-screen fixed left-0 top-0 z-30" style="width:228px;background:var(--surface);border-right:1px solid var(--border);box-shadow:4px 0 24px rgba(0,0,0,.04)">
-    <!-- Sidebar top accent line -->
     <div style="height:3px;background:linear-gradient(90deg,#0d9488,#5eead4);flex-shrink:0"></div>
-
-    <!-- Logo -->
     <div class="p-4 flex items-center gap-3" style="border-bottom:1px solid var(--border)">
       <div class="logo-ring-sm">
         <svg width="20" height="20" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -533,13 +707,11 @@ tr:hover td{background:rgba(13,148,136,.03)}
         </svg>
       </div>
       <div>
-        <div class="font-extrabold text-slate-800 dark:text-white text-sm leading-tight tracking-tight">Work Attendance Summary
-</div>
+        <div class="font-extrabold text-slate-800 dark:text-white text-sm leading-tight tracking-tight">Work Attendance Summary</div>
         <div class="text-xs font-medium" style="color:var(--text-3)">Quản lý lịch làm việc và nghỉ phép</div>
       </div>
     </div>
 
-    <!-- Nav items -->
     <nav class="flex-1 p-2.5 overflow-y-auto space-y-0.5">
       <p class="nav-section-label">Tổng quan</p>
       <div class="nav-link active" data-s="dashboard" onclick="go('dashboard')">
@@ -569,12 +741,9 @@ tr:hover td{background:rgba(13,148,136,.03)}
       </div>
     </nav>
 
-    <!-- Bottom controls -->
     <div class="p-2.5" style="border-top:1px solid var(--border)">
       <div class="nav-link" onclick="toggleDark()">
-        <span class="nav-icon" style="font-size:.85rem">
-          <span id="dm-ico-app">🌙</span>
-        </span>
+        <span class="nav-icon" style="font-size:.85rem"><span id="dm-ico-app">🌙</span></span>
         <span id="dm-lbl-app">Chế độ tối</span>
       </div>
       <div class="nav-link" style="color:#ef4444" onclick="doLogout()">
@@ -587,7 +756,6 @@ tr:hover td{background:rgba(13,148,136,.03)}
   <!-- MAIN CONTENT -->
   <main class="flex-1 overflow-auto" style="margin-left:228px;padding:1.75rem">
 
-    <!-- Top header -->
     <div class="flex items-center justify-between mb-6">
       <div>
         <h2 id="page-title" class="text-2xl font-extrabold tracking-tight" style="color:var(--text-1)">Dashboard</h2>
@@ -738,11 +906,11 @@ tr:hover td{background:rgba(13,148,136,.03)}
       </div>
     </div>
 
-    <!-- CALENDAR -->
+    <!-- CALENDAR / SCHEDULE -->
     <div id="s-calendar" class="section">
-      <!-- Controls -->
-      <div class="flex flex-wrap items-center gap-3 mb-4">
-        <select id="sch-month" class="input" style="max-width:130px" onchange="renderSchedule()">
+      <!-- Controls Row -->
+      <div class="flex flex-wrap items-center gap-3 mb-3">
+        <select id="sch-month" class="input" style="max-width:130px" onchange="initCal()">
           <option value="1">Tháng 1</option><option value="2">Tháng 2</option>
           <option value="3">Tháng 3</option><option value="4">Tháng 4</option>
           <option value="5" selected>Tháng 5</option><option value="6">Tháng 6</option>
@@ -750,44 +918,46 @@ tr:hover td{background:rgba(13,148,136,.03)}
           <option value="9">Tháng 9</option><option value="10">Tháng 10</option>
           <option value="11">Tháng 11</option><option value="12">Tháng 12</option>
         </select>
-        <select id="sch-year" class="input" style="max-width:100px" onchange="renderSchedule()">
+        <select id="sch-year" class="input" style="max-width:100px" onchange="initCal()">
           <option value="2025">2025</option><option value="2026" selected>2026</option>
           <option value="2027">2027</option>
         </select>
-        <div class="flex flex-wrap gap-1.5 ml-auto">
+        <!-- Legend -->
+        <div class="flex flex-wrap gap-1.5 ml-auto items-center">
           <span style="display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;background:#e0f2fe;color:#0369a1;font-weight:700">x Office</span>
           <span style="display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;background:#dcfce7;color:#15803d;font-weight:700">w WFH</span>
           <span style="display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;background:#fef9c3;color:#854d0e;font-weight:700">o Nghỉ phép</span>
           <span style="display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;background:#fce7f3;color:#9d174d;font-weight:700">ph Lễ</span>
           <span style="display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;background:#f3e8ff;color:#7e22ce;font-weight:700">xo/wo Nửa ngày</span>
           <span style="display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;background:#fee2e2;color:#991b1b;font-weight:700">om/oa Off buổi</span>
+          <span id="btn-rules" class="hidden btn btn-secondary btn-sm" onclick="toggleRulesPanel()" style="font-size:.7rem;padding:.3rem .7rem;cursor:pointer">⚙️ Quy tắc</span>
         </div>
       </div>
-      <!-- Note WFH -->
-      <div style="font-size:.72rem;color:var(--text-3);margin-bottom:.75rem;padding:.5rem .75rem;background:var(--surface3);border-radius:.5rem;border-left:3px solid var(--indigo)">
-        ⚡ 1 tháng được phép WFH 1 lần (trừ T2, T3) &nbsp;·&nbsp; Admin có thể edit từng ô bên dưới
+
+      <!-- Rules panel (admin only, toggleable) -->
+      <div id="sch-rules-panel" class="hidden rules-panel">
+        <div class="rules-panel-title">
+          <span>⚙️</span> Quy tắc đăng ký lịch làm
+          <span style="font-size:.68rem;color:var(--text-3);font-weight:500;margin-left:.25rem">(Admin có thể chỉnh trực tiếp Supabase)</span>
+        </div>
+        <div id="rules-list"></div>
+        <div style="margin-top:.65rem;font-size:.7rem;color:var(--text-3);">
+          💡 Quy tắc được enforce khi Admin chỉnh ô. Vi phạm sẽ hiển thị cảnh báo vàng.
+        </div>
       </div>
-      <div class="card p-0 overflow-hidden">
-        <div id="sch-table-wrap" style="overflow-x:auto"></div>
+
+      <!-- Info note -->
+      <div id="sch-info-note" style="font-size:.72rem;color:var(--text-3);margin-bottom:.75rem;padding:.5rem .75rem;background:var(--surface3);border-radius:.5rem;border-left:3px solid var(--indigo)">
+        ⚡ Đang tải...
       </div>
-      <!-- Edit modal trigger info -->
-      <div id="sch-edit-bar" class="hidden" style="margin-top:.75rem;padding:.6rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:.6rem;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
-        <span style="font-size:.8rem;font-weight:600;color:var(--text-1)" id="sch-edit-info"></span>
-        <select id="sch-edit-val" class="input" style="max-width:160px;font-size:.8rem">
-          <option value="">— Trống —</option>
-          <option value="x">x — Office</option>
-          <option value="w">w — WFH</option>
-          <option value="o">o — Nghỉ phép</option>
-          <option value="ph">ph — Nghỉ lễ</option>
-          <option value="xo">xo — Đăng ký nhưng nghỉ nửa</option>
-          <option value="wo">wo — WFH nhưng nghỉ nửa</option>
-          <option value="xw">xw — Đăng ký office nhưng WFH</option>
-          <option value="om">om — Off buổi sáng</option>
-          <option value="oa">oa — Off buổi chiều</option>
-        </select>
-        <button class="btn btn-primary btn-sm" onclick="saveScheduleCell()">Lưu</button>
-        <button class="btn btn-secondary btn-sm" onclick="cancelScheduleEdit()">Hủy</button>
-        <span style="font-size:.7rem;color:var(--text-3);margin-left:.5rem">Hoặc nhấn Esc để hủy</span>
+
+      <!-- Schedule table -->
+      <div class="sch-table-container">
+        <div id="sch-loading" style="padding:3rem;text-align:center;color:var(--text-3);font-size:.85rem;font-weight:600;">
+          <div class="spinner" style="border-top-color:var(--indigo);border-color:var(--border);margin:0 auto .75rem;width:1.5rem;height:1.5rem;border-width:3px"></div>
+          Đang tải dữ liệu lịch...
+        </div>
+        <div id="sch-table-wrap" style="display:none"></div>
       </div>
     </div>
 
@@ -960,41 +1130,39 @@ const S = {
   lockUntil: parseInt(localStorage.getItem('hr_lu') || '0'),
   sessTimer: null,
   selectedLeaveYear: _initLeaveYear,
+  // Schedule state
+  scheduleData: {},    // { 'empId-YYYY-MM-DD': 'x' }
+  scheduleRules: {},   // { rule_key: rule_value }
+  scheduleLoading: false,
 };
 
 // ============ DARK MODE ============
-function applyDark(on) {
-  document.documentElement.classList.toggle('dark', on);
-  const ico = on ? '☀️' : '🌙', lbl = on ? 'Chế độ sáng' : 'Chế độ tối';
-  ['dm-ico-login','dm-ico-app'].forEach(id => { const e=document.getElementById(id); if(e) e.textContent=ico; });
-  ['dm-lbl-login','dm-lbl-app'].forEach(id => { const e=document.getElementById(id); if(e) e.textContent=lbl; });
-}
 function toggleDark() {
-  const d = !document.documentElement.classList.contains('dark');
-  localStorage.setItem('hr_dark', d ? '1' : '0');
-  applyDark(d);
-  if (S.calendar) S.calendar.render();
+  const isDark = document.documentElement.classList.toggle('dark');
+  localStorage.setItem('hr_dark', isDark ? '1' : '0');
+  updateDarkUI();
 }
-applyDark(localStorage.getItem('hr_dark') === '1');
+function updateDarkUI() {
+  const isDark = document.documentElement.classList.contains('dark');
+  ['dm-ico-login','dm-ico-app'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = isDark ? '☀️' : '🌙'; });
+  ['dm-lbl-login','dm-lbl-app'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = isDark ? 'Chế độ sáng' : 'Chế độ tối'; });
+}
+if (localStorage.getItem('hr_dark') === '1') { document.documentElement.classList.add('dark'); }
+updateDarkUI();
 
 // ============ TOAST ============
-function toast(msg, type = 'info') {
-  const configs = {
-    success: { bg: 'linear-gradient(135deg,#059669,#10b981)', icon: '✓' },
-    error:   { bg: 'linear-gradient(135deg,#dc2626,#ef4444)', icon: '✕' },
-    warning: { bg: 'linear-gradient(135deg,#d97706,#f59e0b)', icon: '!' },
-    info:    { bg: 'linear-gradient(135deg,#4338ca,#4f46e5)', icon: 'i' },
-  };
-  const cfg = configs[type] || configs.info;
-  const t = document.createElement('div');
-  t.className = 'toast';
-  t.style.background = cfg.bg;
-  t.innerHTML = `<div class="toast-icon">${cfg.icon}</div><span>${msg}</span>`;
-  document.getElementById('toasts').appendChild(t);
-  setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(1rem)'; t.style.transition='all .3s'; setTimeout(()=>t.remove(),300); }, 3800);
+function toast(msg, type = 'success') {
+  const colors = { success:'linear-gradient(135deg,#059669,#10b981)', error:'linear-gradient(135deg,#dc2626,#ef4444)', info:'linear-gradient(135deg,#2563eb,#3b82f6)', warn:'linear-gradient(135deg,#d97706,#f59e0b)' };
+  const icons = { success:'✓', error:'✕', info:'i', warn:'⚠' };
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.style.background = colors[type] || colors.info;
+  el.innerHTML = `<div class="toast-icon">${icons[type]||'i'}</div><span>${msg}</span>`;
+  document.getElementById('toasts').prepend(el);
+  setTimeout(() => el.remove(), 4000);
 }
 
-// ============ LOGIN TAB SWITCH ============
+// ============ LOGIN ============
 function switchTab(tab) {
   const isAdmin = tab === 'admin';
   document.getElementById('form-admin').classList.toggle('hidden', !isAdmin);
@@ -1128,6 +1296,10 @@ async function enterApp(isAdmin) {
     if (el) el.style.display = isAdmin ? '' : 'none';
   });
 
+  // Show rules button for admin
+  const btnRules = document.getElementById('btn-rules');
+  if (btnRules) btnRules.classList.toggle('hidden', !isAdmin);
+
   if (isAdmin) startSessTimer();
   await loadAll();
   const savedTab = localStorage.getItem('hr_tab');
@@ -1257,6 +1429,8 @@ function go(name) {
     document.getElementById('ly-label').textContent = '';
   }
 
+  closeSchPopup();
+
   if (name === 'dashboard') renderDash();
   else if (name === 'employees') { buildLeaveYearSel(); renderEmp(); }
   else if (name === 'leaves') { buildMonthOptions(); renderLeaves(); }
@@ -1305,9 +1479,7 @@ function renderDash() {
     </div>`).join('');
 
   const empWithAL = S.employees.map(e => ({
-    ...e,
-    _used: empAlUsed(e.id),
-    _rem: 12 - empAlUsed(e.id),
+    ...e, _used: empAlUsed(e.id), _rem: 12 - empAlUsed(e.id),
   }));
   const low = empWithAL.filter(e => e._rem <= 3).sort((a, b) => a._rem - b._rem);
   const el = document.getElementById('low-al');
@@ -1399,9 +1571,16 @@ function renderEmp() {
 }
 
 document.addEventListener('keydown', function(e){
-  if(e.key==='Escape') cancelScheduleEdit();
+  if(e.key==='Escape') closeSchPopup();
 });
+
 document.addEventListener('click', function(e) {
+  // Close popup if clicking outside
+  const popup = document.getElementById('sch-cell-popup');
+  if (popup && !popup.contains(e.target) && !e.target.closest('.sch-cell-clickable')) {
+    closeSchPopup();
+  }
+
   const editBtn = e.target.closest('.edit-emp-btn');
   if (editBtn) { openEmpModal(editBtn.dataset.id); return; }
   const delBtn = e.target.closest('.del-emp-btn');
@@ -1451,7 +1630,6 @@ async function saveEmp() {
     name,
     start_date: document.getElementById('me-start').value || null,
     is_active: document.getElementById('me-status').value !== 'false',
-
     other_leave: document.getElementById('me-other').value.trim() || null,
   };
   const { error } = id
@@ -1781,153 +1959,394 @@ async function doDelTet(id) {
   toast('Đã xóa', 'success'); await loadAll(); renderTet();
 }
 
-// ============ CALENDAR ============
-// ============ WORK SCHEDULE ============
-// Seed data from Excel May 2026
-const SCHEDULE_SEED = {
-  '2026-5': {
-    'Lương Diệu Hiền':       {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
-    'Lương Thanh Quy':       {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'w',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
-    'Lê Nguyễn Thiện Tâm':  {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'w',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
-    'Lý Phong':              {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'w'},
-    'Nguyễn Anh Dĩ':        {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
-    'Phạm Thị Thúy Hân':    {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
-    'Nguyễn Nhật Trường':   {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'w'},
-    'Nguyễn Thành Tân':     {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'w',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
-    'Lường Quang Hiếu':     {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'w',27:'x',28:'x',29:'x'},
-    'Nguyễn Trọng Nhân':    {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
-    'Võ Hoàng Kha':         {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'w'},
-    'Nguyễn Bá Vương':      {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'w',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
-    'Lê Hoàng Minh':        {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
-    'Nguyễn Xuân Danh':     {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'w',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
-    'Voòng Đình Lam Phối':  {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'w',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
-    'Nguyễn Việt Thành':    {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
-    'Phạm Đăng Quang':      {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'w',25:'x',26:'x',27:'x',28:'x',29:'x'},
-    'Phạm Ngọc Thành Huy':  {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
-    'Cao Đức Đạt':          {1:'ph',4:'o',5:'o',6:'o',7:'o',8:'w',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
-  }
-};
-
-// In-memory schedule store: key = 'YYYY-M', value = {name: {day: code}}
-const SCH = {};
-
-function schKey(y,m){ return y+'-'+m; }
-
-function schGet(y,m,name,day){
-  const k=schKey(y,m);
-  if(!SCH[k]) SCH[k]=JSON.parse(JSON.stringify(SCHEDULE_SEED[k]||{}));
-  return (SCH[k][name]||{})[day]||'';
-}
-
-function schSet(y,m,name,day,val){
-  const k=schKey(y,m);
-  if(!SCH[k]) SCH[k]=JSON.parse(JSON.stringify(SCHEDULE_SEED[k]||{}));
-  if(!SCH[k][name]) SCH[k][name]={};
-  if(val) SCH[k][name][day]=val; else delete SCH[k][name][day];
-}
+// ============================================================
+// WORK SCHEDULE (Lịch Đăng Ký Làm)
+// ============================================================
 
 // Cell style per code
 const SCH_STYLE = {
-  x:  {bg:'#e0f2fe',color:'#0369a1',label:'x'},
-  w:  {bg:'#dcfce7',color:'#15803d',label:'w'},
-  o:  {bg:'#fef9c3',color:'#854d0e',label:'o'},
-  ph: {bg:'#fce7f3',color:'#9d174d',label:'ph'},
-  xo: {bg:'#ffedd5',color:'#9a3412',label:'xo'},
-  wo: {bg:'#ffedd5',color:'#9a3412',label:'wo'},
-  xw: {bg:'#f3e8ff',color:'#7e22ce',label:'xw'},
-  om: {bg:'#fee2e2',color:'#991b1b',label:'om'},
-  oa: {bg:'#fee2e2',color:'#991b1b',label:'oa'},
+  x:  { bg:'#bfdbfe', color:'#1e40af', border:'#93c5fd', label:'x' },
+  w:  { bg:'#bbf7d0', color:'#14532d', border:'#86efac', label:'w' },
+  o:  { bg:'#fde68a', color:'#78350f', border:'#fbbf24', label:'o' },
+  ph: { bg:'#fbcfe8', color:'#831843', border:'#f9a8d4', label:'ph' },
+  xo: { bg:'#fed7aa', color:'#7c2d12', border:'#fdba74', label:'xo' },
+  wo: { bg:'#fed7aa', color:'#7c2d12', border:'#fdba74', label:'wo' },
+  xw: { bg:'#e9d5ff', color:'#4c1d95', border:'#c4b5fd', label:'xw' },
+  om: { bg:'#fecaca', color:'#7f1d1d', border:'#fca5a5', label:'om' },
+  oa: { bg:'#fecaca', color:'#7f1d1d', border:'#fca5a5', label:'oa' },
 };
 
 const DOW_VI = ['CN','T2','T3','T4','T5','T6','T7'];
-let _schEditCtx = null;
 
-function renderSchedule() {
+// Current popup context
+let _schPopupCtx = null;
+
+// Load schedule data from Supabase for given month/year
+async function loadScheduleData(year, month) {
+  const startDate = `${year}-${String(month).padStart(2,'0')}-01`;
+  const endDate = `${year}-${String(month).padStart(2,'0')}-${new Date(year,month,0).getDate()}`;
+  try {
+    const { data, error } = await db
+      .from('hr_work_schedule')
+      .select('employee_id, work_date, status')
+      .gte('work_date', startDate)
+      .lte('work_date', endDate);
+    if (error) throw error;
+    // Build lookup: empId + date -> status
+    const lookup = {};
+    (data || []).forEach(row => {
+      const dateStr = row.work_date.split('T')[0];
+      lookup[`${row.employee_id}|${dateStr}`] = row.status;
+    });
+    return lookup;
+  } catch(e) {
+    console.warn('Could not load schedule from DB:', e.message);
+    return {};
+  }
+}
+
+// Load schedule rules from Supabase
+async function loadScheduleRules() {
+  try {
+    const { data } = await db.from('hr_schedule_rules').select('rule_key, rule_value, description');
+    const rules = {};
+    (data || []).forEach(r => { rules[r.rule_key] = { value: r.rule_value, description: r.description }; });
+    return rules;
+  } catch(e) {
+    // Table may not exist yet — return defaults
+    return {
+      max_wfh_per_month: { value: '1', description: 'Số lần WFH tối đa mỗi tháng' },
+      wfh_blocked_days: { value: '2,3', description: 'Ngày không được WFH (2=T2, 3=T3...)' },
+      allow_employee_edit: { value: 'false', description: 'Nhân viên tự đăng ký' },
+    };
+  }
+}
+
+// Get value for a cell (DB-loaded or default)
+function schGetVal(empId, year, month, day) {
+  const dateStr = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+  const key = `${empId}|${dateStr}`;
+  if (S.scheduleData[key] !== undefined) return S.scheduleData[key];
+  // Default: weekdays = 'x', weekends = ''
+  const dow = new Date(year, month-1, day).getDay();
+  return (dow === 0 || dow === 6) ? '' : 'x';
+}
+
+// Save a cell to Supabase
+async function schSaveCell(empId, year, month, day, val) {
+  const dateStr = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+  const key = `${empId}|${dateStr}`;
+  if (!val) {
+    // Delete record (back to default = x for weekday)
+    const { error } = await db.from('hr_work_schedule')
+      .delete().eq('employee_id', empId).eq('work_date', dateStr);
+    if (error) throw error;
+    delete S.scheduleData[key];
+  } else {
+    const { error } = await db.from('hr_work_schedule')
+      .upsert({ employee_id: empId, work_date: dateStr, status: val }, { onConflict: 'employee_id,work_date' });
+    if (error) throw error;
+    S.scheduleData[key] = val;
+  }
+}
+
+// Count WFH for employee in month
+function countWfhInMonth(empId, year, month) {
+  const daysInMonth = new Date(year, month, 0).getDate();
+  let count = 0;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dow = new Date(year, month-1, d).getDay();
+    if (dow === 0 || dow === 6) continue;
+    const val = schGetVal(empId, year, month, d);
+    if (val === 'w' || val === 'wo') count++;
+  }
+  return count;
+}
+
+// Check rule violations for a proposed change
+function checkSchRules(empId, year, month, day, newVal) {
+  const rules = S.scheduleRules;
+  const warnings = [];
+  const dow = new Date(year, month-1, day).getDay(); // 0=Sun, 1=Mon...
+
+  // WFH max per month
+  if (newVal === 'w' || newVal === 'wo') {
+    const maxWfh = parseInt(rules.max_wfh_per_month?.value || '1');
+    const curWfh = countWfhInMonth(empId, year, month);
+    const existingVal = schGetVal(empId, year, month, day);
+    const isAlreadyWfh = existingVal === 'w' || existingVal === 'wo';
+    if (!isAlreadyWfh && curWfh >= maxWfh) {
+      warnings.push(`⚠️ Đã đạt giới hạn WFH (${maxWfh} lần/tháng). Hiện tại: ${curWfh} lần.`);
+    }
+  }
+
+  // WFH blocked days
+  if (newVal === 'w' || newVal === 'wo') {
+    const blocked = (rules.wfh_blocked_days?.value || '2,3').split(',').map(Number);
+    // JS dow: 0=Sun,1=Mon,2=Tue,3=Wed,4=Thu,5=Fri,6=Sat
+    // Rule dow: 1=CN,2=T2,3=T3,4=T4,5=T5,6=T6,7=T7
+    const jsDowToRuleDow = { 0:1, 1:2, 2:3, 3:4, 4:5, 5:6, 6:7 };
+    const ruleDow = jsDowToRuleDow[dow];
+    if (blocked.includes(ruleDow)) {
+      const dayNames = { 2:'Thứ 2',3:'Thứ 3',4:'Thứ 4',5:'Thứ 5',6:'Thứ 6',7:'Thứ 7',1:'Chủ nhật' };
+      warnings.push(`⚠️ WFH không được phép vào ${dayNames[ruleDow] || 'ngày này'} theo quy tắc.`);
+    }
+  }
+
+  return warnings;
+}
+
+// Render rules panel
+function renderRulesPanel() {
+  const container = document.getElementById('rules-list');
+  if (!container) return;
+  const r = S.scheduleRules;
+  const RULE_LABELS = {
+    max_wfh_per_month: 'WFH tối đa / tháng',
+    wfh_blocked_days: 'Ngày không cho WFH (2=T2,3=T3...)',
+    allow_employee_edit: 'Nhân viên tự đăng ký',
+    require_reason_for_off: 'Yêu cầu lý do khi nghỉ',
+    default_weekday_status: 'Trạng thái mặc định ngày thường',
+    advance_days_required: 'Phải đăng ký trước (ngày)',
+  };
+  if (!Object.keys(r).length) {
+    container.innerHTML = '<div style="font-size:.78rem;color:var(--text-3);padding:.5rem">Chưa có quy tắc. Hãy chạy SQL tạo bảng hr_schedule_rules.</div>';
+    return;
+  }
+  container.innerHTML = Object.entries(r).map(([k, v]) => `
+    <div class="rule-item">
+      <span class="rule-item-key">${RULE_LABELS[k] || k}</span>
+      <span class="rule-item-val">${v.value}</span>
+      ${v.description ? `<span style="font-size:.68rem;color:var(--text-3);flex:2">${v.description}</span>` : ''}
+    </div>`).join('');
+}
+
+function toggleRulesPanel() {
+  const panel = document.getElementById('sch-rules-panel');
+  if (panel) panel.classList.toggle('hidden');
+}
+
+// Init calendar section
+async function initCal() {
+  closeSchPopup();
+  const wrap = document.getElementById('sch-table-wrap');
+  const loading = document.getElementById('sch-loading');
+  wrap.style.display = 'none';
+  loading.style.display = 'block';
+
   const m = parseInt(document.getElementById('sch-month').value);
   const y = parseInt(document.getElementById('sch-year').value);
-  const daysInMonth = new Date(y,m,0).getDate();
-  const names = S.employees.filter(e=>e.is_active!==false).map(e=>e.name);
 
-  // Build columns: only workdays (Mon-Fri) — but show all days, gray out weekends
+  // Load schedule data and rules in parallel
+  const [schData, rules] = await Promise.all([
+    loadScheduleData(y, m),
+    loadScheduleRules(),
+  ]);
+  S.scheduleData = schData;
+  S.scheduleRules = rules;
+
+  renderRulesPanel();
+  renderSchedule(y, m);
+
+  loading.style.display = 'none';
+  wrap.style.display = 'block';
+}
+
+// Render the schedule grid
+function renderSchedule(year, month) {
+  const m = month || parseInt(document.getElementById('sch-month').value);
+  const y = year || parseInt(document.getElementById('sch-year').value);
+  const daysInMonth = new Date(y,m,0).getDate();
+
+  // Only active employees
+  const employees = S.employees.filter(e => e.is_active !== false);
+
+  const today = new Date();
+
+  // Build day info
   const days = [];
-  for(let d=1;d<=daysInMonth;d++){
-    const dow = new Date(y,m-1,d).getDay(); // 0=Sun
-    days.push({d, dow, isWeekend: dow===0||dow===6});
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dow = new Date(y, m-1, d).getDay();
+    const isWeekend = dow === 0 || dow === 6;
+    const isToday = today.getFullYear()===y && today.getMonth()===m-1 && today.getDate()===d;
+    days.push({ d, dow, isWeekend, isToday });
   }
 
-  let html = '<table style="width:100%;border-collapse:collapse;font-size:.72rem;min-width:'+((names.length?820:400))+'px">';
-  // Header row 1: days
-  html += '<thead><tr>';
-  html += '<th style="position:sticky;left:0;z-index:2;background:var(--surface2);padding:.5rem .75rem;text-align:left;border-bottom:2px solid var(--border);border-right:1px solid var(--border);min-width:140px;font-size:.7rem;font-weight:800;color:var(--text-2);white-space:nowrap">Nhân viên</th>';
-  days.forEach(({d,dow,isWeekend})=>{
-    const today = new Date(); const isToday = today.getFullYear()===y&&today.getMonth()===m-1&&today.getDate()===d;
-    const bg = isToday?'#0d9488':isWeekend?'var(--surface3)':'var(--surface2)';
-    const clr = isToday?'#fff':isWeekend?'var(--text-3)':'var(--text-2)';
-    html += `<th style="padding:.35rem .2rem;text-align:center;border-bottom:2px solid var(--border);border-right:1px solid var(--border);background:${bg};color:${clr};min-width:34px;font-weight:700">
-      <div>${d}</div><div style="font-size:.6rem;font-weight:500;opacity:.8">${DOW_VI[dow]}</div>
+  // Count WFH per employee this month (for rules display)
+  const maxWfh = parseInt(S.scheduleRules.max_wfh_per_month?.value || '1');
+
+  // Update info note
+  const wfhBlockedDays = (S.scheduleRules.wfh_blocked_days?.value || '2,3').split(',').map(Number);
+  const blockedNames = wfhBlockedDays.map(n => ({ 2:'T2',3:'T3',4:'T4',5:'T5',6:'T6',7:'T7',1:'CN' }[n] || n)).join(', ');
+  const note = document.getElementById('sch-info-note');
+  if (note) {
+    note.innerHTML = `⚡ WFH tối đa <strong>${maxWfh} lần/tháng</strong> (không WFH: ${blockedNames}) &nbsp;·&nbsp; ${S.isAdmin ? 'Click ô để chỉnh (Admin)' : 'Chế độ xem — chỉ Admin mới edit được'}`;
+  }
+
+  // Build table HTML
+  let html = `<table class="sch-table">`;
+
+  // Header row
+  html += `<thead><tr>`;
+  html += `<th class="sch-name-col">Nhân viên</th>`;
+  days.forEach(({ d, dow, isWeekend, isToday }) => {
+    let cls = '';
+    if (isToday) cls = 'sch-today-col';
+    else if (isWeekend) cls = 'sch-weekend-col-head';
+    html += `<th class="${cls}" style="min-width:36px;text-align:center;">
+      <div style="font-weight:800;font-size:.72rem;line-height:1.1">${d}</div>
+      <div style="font-size:.58rem;font-weight:500;opacity:.85">${DOW_VI[dow]}</div>
     </th>`;
   });
-  html += '</tr></thead><tbody>';
+  html += `</tr></thead><tbody>`;
 
   // Data rows
-  names.forEach((name,ri)=>{
-    html += `<tr style="background:${ri%2===0?'var(--surface)':'var(--surface2)'}">`;
-    html += `<td style="position:sticky;left:0;z-index:1;background:${ri%2===0?'var(--surface)':'var(--surface2)'};padding:.4rem .75rem;border-right:1px solid var(--border);border-top:1px solid var(--border);font-weight:600;color:var(--text-1);white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis" title="${name}">${name}</td>`;
-    days.forEach(({d,isWeekend})=>{
-      const val = schGet(y,m,name,d);
-      const s = SCH_STYLE[val]||{};
-      const cellBg = val?s.bg:(isWeekend?'var(--surface3)':'transparent');
-      const cellClr = val?s.color:'var(--text-3)';
-      const editable = S.isAdmin && !isWeekend;
-      html += `<td style="text-align:center;border-top:1px solid var(--border);border-right:1px solid var(--border);background:${cellBg};padding:.25rem .1rem;cursor:${editable?'pointer':'default'};transition:opacity .15s" ${editable?`onclick="openSchEdit(${y},${m},'${name.replace(/'/g,"\'")}',${d},this)"`:''}
-        onmouseover="${editable?"this.style.opacity='.7'":''}" onmouseout="this.style.opacity='1'">
-        <span style="font-weight:700;color:${cellClr};font-size:.7rem">${val||''}</span>
+  if (!employees.length) {
+    html += `<tr><td colspan="${days.length+1}" style="text-align:center;padding:3rem;color:var(--text-3);font-size:.85rem">Không có nhân viên active</td></tr>`;
+  } else {
+    employees.forEach((emp) => {
+      const empWfh = countWfhInMonth(emp.id, y, m);
+      const wfhOverLimit = empWfh > maxWfh;
+      html += `<tr>`;
+      // Sticky name cell
+      html += `<td class="sch-name-td" title="${escAttr(emp.name)}">
+        ${escAttr(emp.name)}
+        ${wfhOverLimit ? '<span style="margin-left:.3rem;font-size:.6rem;background:#fef3c7;color:#92400e;padding:.1rem .3rem;border-radius:4px;font-weight:700">WFH!</span>' : ''}
       </td>`;
+
+      // Day cells
+      days.forEach(({ d, dow, isWeekend, isToday }) => {
+        const dateStr = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const val = schGetVal(emp.id, y, m, d);
+        const style = SCH_STYLE[val] || null;
+        const editable = S.isAdmin && !isWeekend;
+
+        let cellInner;
+        if (isWeekend) {
+          cellInner = `<span style="display:inline-block;width:28px;height:22px"></span>`;
+        } else if (val && style) {
+          cellInner = `<span class="sch-cell" style="background:${style.bg};color:${style.color};border:1.5px solid ${style.border}">${style.label}</span>`;
+        } else {
+          // Weekday with no override = default 'x'
+          const defStyle = SCH_STYLE['x'];
+          cellInner = `<span class="sch-cell" style="background:${defStyle.bg};color:${defStyle.color};border:1.5px solid ${defStyle.border};opacity:.55">${defStyle.label}</span>`;
+        }
+
+        const weekendClass = isWeekend ? 'sch-weekend-col' : '';
+        const clickableClass = editable ? 'sch-cell-clickable' : '';
+        const todayBorder = isToday ? 'box-shadow:inset 0 0 0 2px #f59e0b;' : '';
+        const clickAttr = editable
+          ? `onclick="openSchPopup(event,'${emp.id}',${y},${m},${d},'${escAttr(emp.name)}')"`
+          : '';
+
+        html += `<td class="${weekendClass} ${clickableClass}" style="${todayBorder}" ${clickAttr}>${cellInner}</td>`;
+      });
+
+      html += `</tr>`;
     });
-    html += '</tr>';
-  });
-
-  if(!names.length) {
-    html += `<tr><td colspan="${days.length+1}" style="text-align:center;padding:2.5rem;color:var(--text-3)">Không có nhân viên</td></tr>`;
   }
-  html += '</tbody></table>';
+
+  html += `</tbody></table>`;
   document.getElementById('sch-table-wrap').innerHTML = html;
-  cancelScheduleEdit();
 }
 
-function openSchEdit(y,m,name,day,td){
-  if(!S.isAdmin) return;
-  _schEditCtx={y,m,name,day,td};
-  const val = schGet(y,m,name,day);
-  document.getElementById('sch-edit-val').value=val||'';
-  document.getElementById('sch-edit-info').textContent=`✏️ ${name} — Ngày ${day}/${m}/${y}`;
-  const bar = document.getElementById('sch-edit-bar');
-  bar.classList.remove('hidden');
-  bar.style.display='flex';
-  document.getElementById('sch-edit-val').focus();
+// Open inline popup dropdown at cell
+function openSchPopup(event, empId, year, month, day, empName) {
+  if (!S.isAdmin) return;
+  closeSchPopup();
+
+  const currentVal = schGetVal(empId, year, month, day);
+  _schPopupCtx = { empId, year, month, day };
+
+  const dateStr = `${String(day).padStart(2,'0')}/${String(month).padStart(2,'0')}/${year}`;
+  const ruleWarnings = checkSchRules(empId, year, month, day, currentVal);
+
+  const popup = document.createElement('div');
+  popup.id = 'sch-cell-popup';
+  popup.className = 'sch-popup';
+  popup.onclick = e => e.stopPropagation();
+
+  popup.innerHTML = `
+    <div class="sch-popup-title">✏️ ${escAttr(empName)} — ${dateStr}</div>
+    <div class="sch-rule-warning" id="popup-rule-warn" style="${ruleWarnings.length ? 'display:block' : ''}">
+      ${ruleWarnings.join('<br>')}
+    </div>
+    <select id="popup-val-sel" onchange="onPopupValChange(this.value,'${empId}',${year},${month},${day})">
+      <option value="">— Trống (xóa) —</option>
+      <option value="x"${currentVal==='x'?' selected':''}>x — Office (mặc định)</option>
+      <option value="w"${currentVal==='w'?' selected':''}>w — WFH</option>
+      <option value="o"${currentVal==='o'?' selected':''}>o — Nghỉ phép</option>
+      <option value="ph"${currentVal==='ph'?' selected':''}>ph — Nghỉ lễ</option>
+      <option value="xo"${currentVal==='xo'?' selected':''}>xo — Office nhưng nghỉ nửa</option>
+      <option value="wo"${currentVal==='wo'?' selected':''}>wo — WFH nhưng nghỉ nửa</option>
+      <option value="xw"${currentVal==='xw'?' selected':''}>xw — Đăng ký office nhưng WFH</option>
+      <option value="om"${currentVal==='om'?' selected':''}>om — Off buổi sáng</option>
+      <option value="oa"${currentVal==='oa'?' selected':''}>oa — Off buổi chiều</option>
+    </select>
+    <div class="sch-popup-btns">
+      <button class="btn btn-secondary btn-sm" onclick="closeSchPopup()">Hủy</button>
+      <button class="btn btn-primary btn-sm" onclick="saveSchPopup()">Lưu</button>
+    </div>`;
+
+  document.body.appendChild(popup);
+
+  // Position popup near the clicked cell
+  const rect = event.currentTarget.getBoundingClientRect();
+  const popW = 220, popH = 180;
+  let left = rect.left + rect.width / 2 - popW / 2;
+  let top = rect.bottom + 6;
+
+  if (left + popW > window.innerWidth - 16) left = window.innerWidth - popW - 16;
+  if (left < 16) left = 16;
+  if (top + popH > window.innerHeight - 16) top = rect.top - popH - 6;
+
+  popup.style.left = left + 'px';
+  popup.style.top = top + 'px';
+
+  // Focus select
+  setTimeout(() => {
+    const sel = document.getElementById('popup-val-sel');
+    if (sel) sel.focus();
+  }, 60);
 }
 
-function saveScheduleCell(){
-  if(!_schEditCtx) return;
-  const {y,m,name,day,td}=_schEditCtx;
-  const val = document.getElementById('sch-edit-val').value;
-  schSet(y,m,name,day,val);
-  // Update cell visually
-  const s = SCH_STYLE[val]||{};
-  td.style.background = val?s.bg:'transparent';
-  td.querySelector('span').style.color = val?s.color:'var(--text-3)';
-  td.querySelector('span').textContent = val||'';
-  toast('Đã lưu', 'success');
-  cancelScheduleEdit();
+// Live check rules when dropdown changes
+function onPopupValChange(newVal, empId, year, month, day) {
+  const warnings = checkSchRules(empId, year, month, day, newVal);
+  const warnEl = document.getElementById('popup-rule-warn');
+  if (warnEl) {
+    warnEl.innerHTML = warnings.join('<br>');
+    warnEl.style.display = warnings.length ? 'block' : 'none';
+  }
 }
 
-function cancelScheduleEdit(){
-  _schEditCtx=null;
-  const bar=document.getElementById('sch-edit-bar');
-  if(bar){bar.classList.add('hidden');bar.style.display='none';}
+async function saveSchPopup() {
+  if (!_schPopupCtx) return;
+  const { empId, year, month, day } = _schPopupCtx;
+  const sel = document.getElementById('popup-val-sel');
+  if (!sel) return;
+  const val = sel.value;
+
+  const btn = sel.parentElement.querySelector('.btn-primary');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; }
+
+  try {
+    await schSaveCell(empId, year, month, day, val);
+    toast('Đã lưu lịch', 'success');
+    closeSchPopup();
+    // Re-render table in place without full reload
+    renderSchedule(year, month);
+  } catch(e) {
+    toast('Lỗi lưu: ' + e.message, 'error');
+    if (btn) { btn.disabled = false; btn.innerHTML = 'Lưu'; }
+  }
 }
 
-function initCal() { renderSchedule(); }
+function closeSchPopup() {
+  const popup = document.getElementById('sch-cell-popup');
+  if (popup) popup.remove();
+  _schPopupCtx = null;
+}
 
 // ============ MODAL HELPERS ============
 function openModal(id) {
