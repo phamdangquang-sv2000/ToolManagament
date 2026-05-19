@@ -565,7 +565,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
 
       <p class="nav-section-label">Công cụ</p>
       <div class="nav-link" data-s="calendar" onclick="go('calendar')">
-        <span class="nav-icon">🗓</span>Lịch sự kiện
+        <span class="nav-icon">📋</span>Lịch Đăng Ký Làm
       </div>
     </nav>
 
@@ -740,14 +740,55 @@ tr:hover td{background:rgba(13,148,136,.03)}
 
     <!-- CALENDAR -->
     <div id="s-calendar" class="section">
-      <div class="flex flex-wrap gap-2 mb-4">
-        <span class="badge bg-green" style="font-size:.7rem">Nghỉ phép</span>
-        <span class="badge bg-orange" style="font-size:.7rem">Warning</span>
-        <span class="badge bg-purple" style="font-size:.7rem">Đi trễ</span>
-        <span class="badge bg-blue" style="font-size:.7rem">Về sớm</span>
-        <span class="badge" style="background:#fce7f3;color:#9d174d;font-size:.7rem">Nghỉ Tết</span>
+      <!-- Controls -->
+      <div class="flex flex-wrap items-center gap-3 mb-4">
+        <select id="sch-month" class="input" style="max-width:130px" onchange="renderSchedule()">
+          <option value="1">Tháng 1</option><option value="2">Tháng 2</option>
+          <option value="3">Tháng 3</option><option value="4">Tháng 4</option>
+          <option value="5" selected>Tháng 5</option><option value="6">Tháng 6</option>
+          <option value="7">Tháng 7</option><option value="8">Tháng 8</option>
+          <option value="9">Tháng 9</option><option value="10">Tháng 10</option>
+          <option value="11">Tháng 11</option><option value="12">Tháng 12</option>
+        </select>
+        <select id="sch-year" class="input" style="max-width:100px" onchange="renderSchedule()">
+          <option value="2025">2025</option><option value="2026" selected>2026</option>
+          <option value="2027">2027</option>
+        </select>
+        <div class="flex flex-wrap gap-1.5 ml-auto">
+          <span style="display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;background:#e0f2fe;color:#0369a1;font-weight:700">x Office</span>
+          <span style="display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;background:#dcfce7;color:#15803d;font-weight:700">w WFH</span>
+          <span style="display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;background:#fef9c3;color:#854d0e;font-weight:700">o Nghỉ phép</span>
+          <span style="display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;background:#fce7f3;color:#9d174d;font-weight:700">ph Lễ</span>
+          <span style="display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;background:#f3e8ff;color:#7e22ce;font-weight:700">xo/wo Nửa ngày</span>
+          <span style="display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;background:#fee2e2;color:#991b1b;font-weight:700">om/oa Off buổi</span>
+        </div>
       </div>
-      <div class="card"><div id="fc-cal"></div></div>
+      <!-- Note WFH -->
+      <div style="font-size:.72rem;color:var(--text-3);margin-bottom:.75rem;padding:.5rem .75rem;background:var(--surface3);border-radius:.5rem;border-left:3px solid var(--indigo)">
+        ⚡ 1 tháng được phép WFH 1 lần (trừ T2, T3) &nbsp;·&nbsp; Admin có thể edit từng ô bên dưới
+      </div>
+      <div class="card p-0 overflow-hidden">
+        <div id="sch-table-wrap" style="overflow-x:auto"></div>
+      </div>
+      <!-- Edit modal trigger info -->
+      <div id="sch-edit-bar" class="hidden" style="margin-top:.75rem;padding:.6rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:.6rem;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+        <span style="font-size:.8rem;font-weight:600;color:var(--text-1)" id="sch-edit-info"></span>
+        <select id="sch-edit-val" class="input" style="max-width:160px;font-size:.8rem">
+          <option value="">— Trống —</option>
+          <option value="x">x — Office</option>
+          <option value="w">w — WFH</option>
+          <option value="o">o — Nghỉ phép</option>
+          <option value="ph">ph — Nghỉ lễ</option>
+          <option value="xo">xo — Đăng ký nhưng nghỉ nửa</option>
+          <option value="wo">wo — WFH nhưng nghỉ nửa</option>
+          <option value="xw">xw — Đăng ký office nhưng WFH</option>
+          <option value="om">om — Off buổi sáng</option>
+          <option value="oa">oa — Off buổi chiều</option>
+        </select>
+        <button class="btn btn-primary btn-sm" onclick="saveScheduleCell()">Lưu</button>
+        <button class="btn btn-secondary btn-sm" onclick="cancelScheduleEdit()">Hủy</button>
+        <span style="font-size:.7rem;color:var(--text-3);margin-left:.5rem">Hoặc nhấn Esc để hủy</span>
+      </div>
     </div>
 
   </main>
@@ -1197,7 +1238,7 @@ function updateLyLabel() {
 // ============ NAVIGATION ============
 const PAGE_NAMES = {
   dashboard:'Dashboard', employees:'Nhân viên', leaves:'Nghỉ phép',
-  warnings:'Warning', attendance:'Đi trễ / Về sớm', tet:'Nghỉ Tết', calendar:'Lịch sự kiện'
+  warnings:'Warning', attendance:'Đi trễ / Về sớm', tet:'Nghỉ Tết', calendar:'Lịch Đăng Ký Làm'
 };
 
 const LEAVE_YEAR_PAGES = new Set(['dashboard','employees','leaves']);
@@ -1357,6 +1398,9 @@ function renderEmp() {
   }).join('') : emptyRow(S.isAdmin ? 8 : 7);
 }
 
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape') cancelScheduleEdit();
+});
 document.addEventListener('click', function(e) {
   const editBtn = e.target.closest('.edit-emp-btn');
   if (editBtn) { openEmpModal(editBtn.dataset.id); return; }
@@ -1738,46 +1782,152 @@ async function doDelTet(id) {
 }
 
 // ============ CALENDAR ============
-function initCal() {
-  const el = document.getElementById('fc-cal');
-  if (!el) return;
-  const evts = buildCalEvents();
-  if (S.calendar) {
-    S.calendar.removeAllEvents();
-    evts.forEach(e => S.calendar.addEvent(e));
-    S.calendar.render();
-    return;
+// ============ WORK SCHEDULE ============
+// Seed data from Excel May 2026
+const SCHEDULE_SEED = {
+  '2026-5': {
+    'Lương Diệu Hiền':       {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
+    'Lương Thanh Quy':       {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'w',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
+    'Lê Nguyễn Thiện Tâm':  {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'w',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
+    'Lý Phong':              {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'w'},
+    'Nguyễn Anh Dĩ':        {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
+    'Phạm Thị Thúy Hân':    {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
+    'Nguyễn Nhật Trường':   {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'w'},
+    'Nguyễn Thành Tân':     {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'w',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
+    'Lường Quang Hiếu':     {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'w',27:'x',28:'x',29:'x'},
+    'Nguyễn Trọng Nhân':    {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
+    'Võ Hoàng Kha':         {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'w'},
+    'Nguyễn Bá Vương':      {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'w',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
+    'Lê Hoàng Minh':        {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
+    'Nguyễn Xuân Danh':     {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'w',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
+    'Voòng Đình Lam Phối':  {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'w',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
+    'Nguyễn Việt Thành':    {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
+    'Phạm Đăng Quang':      {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'w',25:'x',26:'x',27:'x',28:'x',29:'x'},
+    'Phạm Ngọc Thành Huy':  {1:'ph',4:'x',5:'x',6:'x',7:'x',8:'x',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
+    'Cao Đức Đạt':          {1:'ph',4:'o',5:'o',6:'o',7:'o',8:'w',11:'x',12:'x',13:'x',14:'x',15:'x',18:'x',19:'x',20:'x',21:'x',22:'x',25:'x',26:'x',27:'x',28:'x',29:'x'},
   }
-  S.calendar = new FullCalendar.Calendar(el, {
-    initialView: 'dayGridMonth', locale: 'vi',
-    headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,listMonth' },
-    events: evts,
-    eventClick(info) { toast(info.event.title + ': ' + (info.event.extendedProps.detail || ''), 'info'); },
-  });
-  S.calendar.render();
+};
+
+// In-memory schedule store: key = 'YYYY-M', value = {name: {day: code}}
+const SCH = {};
+
+function schKey(y,m){ return y+'-'+m; }
+
+function schGet(y,m,name,day){
+  const k=schKey(y,m);
+  if(!SCH[k]) SCH[k]=JSON.parse(JSON.stringify(SCHEDULE_SEED[k]||{}));
+  return (SCH[k][name]||{})[day]||'';
 }
 
-function buildCalEvents() {
-  const evts = [];
-  S.leaves.forEach(l => {
-    if (!l.month) return;
-    evts.push({ title: `${eName(l.employee_id)} (${l.days_absent || 0}d)`, date: l.month.split('T')[0], color: '#059669', extendedProps: { detail: `Nghỉ ${l.days_absent || 0} ngày` } });
-  });
-  S.warnings.forEach(w => {
-    if (!w.warning_date) return;
-    evts.push({ title: `${w.employee_name || eName(w.employee_id)}`, date: w.warning_date, color: '#f97316', extendedProps: { detail: `Lần ${w.warning_number}: ${w.reason || ''}` } });
-  });
-  S.attendance.forEach(a => {
-    if (!a.event_date) return;
-    const late = a.event_type === 'Late';
-    evts.push({ title: `${a.employee_name || eName(a.employee_id)}`, date: a.event_date, color: late ? '#7c3aed' : '#2563eb', extendedProps: { detail: `${late ? 'Đi trễ' : 'Về sớm'} lần ${a.occurrence || 1}` } });
-  });
-  S.tet.forEach(t => {
-    if (!t.departure_date) return;
-    evts.push({ title: `${t.full_name || eName(t.employee_id)}`, start: t.departure_date, end: t.return_date || t.departure_date, color: '#db2777', extendedProps: { detail: 'Nghỉ Tết' } });
-  });
-  return evts;
+function schSet(y,m,name,day,val){
+  const k=schKey(y,m);
+  if(!SCH[k]) SCH[k]=JSON.parse(JSON.stringify(SCHEDULE_SEED[k]||{}));
+  if(!SCH[k][name]) SCH[k][name]={};
+  if(val) SCH[k][name][day]=val; else delete SCH[k][name][day];
 }
+
+// Cell style per code
+const SCH_STYLE = {
+  x:  {bg:'#e0f2fe',color:'#0369a1',label:'x'},
+  w:  {bg:'#dcfce7',color:'#15803d',label:'w'},
+  o:  {bg:'#fef9c3',color:'#854d0e',label:'o'},
+  ph: {bg:'#fce7f3',color:'#9d174d',label:'ph'},
+  xo: {bg:'#ffedd5',color:'#9a3412',label:'xo'},
+  wo: {bg:'#ffedd5',color:'#9a3412',label:'wo'},
+  xw: {bg:'#f3e8ff',color:'#7e22ce',label:'xw'},
+  om: {bg:'#fee2e2',color:'#991b1b',label:'om'},
+  oa: {bg:'#fee2e2',color:'#991b1b',label:'oa'},
+};
+
+const DOW_VI = ['CN','T2','T3','T4','T5','T6','T7'];
+let _schEditCtx = null;
+
+function renderSchedule() {
+  const m = parseInt(document.getElementById('sch-month').value);
+  const y = parseInt(document.getElementById('sch-year').value);
+  const daysInMonth = new Date(y,m,0).getDate();
+  const names = S.employees.filter(e=>e.is_active!==false).map(e=>e.name);
+
+  // Build columns: only workdays (Mon-Fri) — but show all days, gray out weekends
+  const days = [];
+  for(let d=1;d<=daysInMonth;d++){
+    const dow = new Date(y,m-1,d).getDay(); // 0=Sun
+    days.push({d, dow, isWeekend: dow===0||dow===6});
+  }
+
+  let html = '<table style="width:100%;border-collapse:collapse;font-size:.72rem;min-width:'+((names.length?820:400))+'px">';
+  // Header row 1: days
+  html += '<thead><tr>';
+  html += '<th style="position:sticky;left:0;z-index:2;background:var(--surface2);padding:.5rem .75rem;text-align:left;border-bottom:2px solid var(--border);border-right:1px solid var(--border);min-width:140px;font-size:.7rem;font-weight:800;color:var(--text-2);white-space:nowrap">Nhân viên</th>';
+  days.forEach(({d,dow,isWeekend})=>{
+    const today = new Date(); const isToday = today.getFullYear()===y&&today.getMonth()===m-1&&today.getDate()===d;
+    const bg = isToday?'#0d9488':isWeekend?'var(--surface3)':'var(--surface2)';
+    const clr = isToday?'#fff':isWeekend?'var(--text-3)':'var(--text-2)';
+    html += `<th style="padding:.35rem .2rem;text-align:center;border-bottom:2px solid var(--border);border-right:1px solid var(--border);background:${bg};color:${clr};min-width:34px;font-weight:700">
+      <div>${d}</div><div style="font-size:.6rem;font-weight:500;opacity:.8">${DOW_VI[dow]}</div>
+    </th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  // Data rows
+  names.forEach((name,ri)=>{
+    html += `<tr style="background:${ri%2===0?'var(--surface)':'var(--surface2)'}">`;
+    html += `<td style="position:sticky;left:0;z-index:1;background:${ri%2===0?'var(--surface)':'var(--surface2)'};padding:.4rem .75rem;border-right:1px solid var(--border);border-top:1px solid var(--border);font-weight:600;color:var(--text-1);white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis" title="${name}">${name}</td>`;
+    days.forEach(({d,isWeekend})=>{
+      const val = schGet(y,m,name,d);
+      const s = SCH_STYLE[val]||{};
+      const cellBg = val?s.bg:(isWeekend?'var(--surface3)':'transparent');
+      const cellClr = val?s.color:'var(--text-3)';
+      const editable = S.isAdmin && !isWeekend;
+      html += `<td style="text-align:center;border-top:1px solid var(--border);border-right:1px solid var(--border);background:${cellBg};padding:.25rem .1rem;cursor:${editable?'pointer':'default'};transition:opacity .15s" ${editable?`onclick="openSchEdit(${y},${m},'${name.replace(/'/g,"\'")}',${d},this)"`:''}
+        onmouseover="${editable?"this.style.opacity='.7'":''}" onmouseout="this.style.opacity='1'">
+        <span style="font-weight:700;color:${cellClr};font-size:.7rem">${val||''}</span>
+      </td>`;
+    });
+    html += '</tr>';
+  });
+
+  if(!names.length) {
+    html += `<tr><td colspan="${days.length+1}" style="text-align:center;padding:2.5rem;color:var(--text-3)">Không có nhân viên</td></tr>`;
+  }
+  html += '</tbody></table>';
+  document.getElementById('sch-table-wrap').innerHTML = html;
+  cancelScheduleEdit();
+}
+
+function openSchEdit(y,m,name,day,td){
+  if(!S.isAdmin) return;
+  _schEditCtx={y,m,name,day,td};
+  const val = schGet(y,m,name,day);
+  document.getElementById('sch-edit-val').value=val||'';
+  document.getElementById('sch-edit-info').textContent=`✏️ ${name} — Ngày ${day}/${m}/${y}`;
+  const bar = document.getElementById('sch-edit-bar');
+  bar.classList.remove('hidden');
+  bar.style.display='flex';
+  document.getElementById('sch-edit-val').focus();
+}
+
+function saveScheduleCell(){
+  if(!_schEditCtx) return;
+  const {y,m,name,day,td}=_schEditCtx;
+  const val = document.getElementById('sch-edit-val').value;
+  schSet(y,m,name,day,val);
+  // Update cell visually
+  const s = SCH_STYLE[val]||{};
+  td.style.background = val?s.bg:'transparent';
+  td.querySelector('span').style.color = val?s.color:'var(--text-3)';
+  td.querySelector('span').textContent = val||'';
+  toast('Đã lưu', 'success');
+  cancelScheduleEdit();
+}
+
+function cancelScheduleEdit(){
+  _schEditCtx=null;
+  const bar=document.getElementById('sch-edit-bar');
+  if(bar){bar.classList.add('hidden');bar.style.display='none';}
+}
+
+function initCal() { renderSchedule(); }
 
 // ============ MODAL HELPERS ============
 function openModal(id) {
