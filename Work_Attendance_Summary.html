@@ -922,6 +922,9 @@ tr:hover td{background:rgba(13,148,136,.03)}
           <option value="2025">2025</option><option value="2026" selected>2026</option>
           <option value="2027">2027</option>
         </select>
+        <button id="btn-init-month" class="hidden btn btn-secondary btn-sm" onclick="initializeMonth()" style="font-size:.75rem;gap:.35rem">
+          <span>⚡</span> Khởi tạo tháng
+        </button>
         <!-- Legend -->
         <div class="flex flex-wrap gap-1.5 ml-auto items-center">
           <span style="display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;background:#e0f2fe;color:#0369a1;font-weight:700">x Office</span>
@@ -936,13 +939,13 @@ tr:hover td{background:rgba(13,148,136,.03)}
 
       <!-- Rules panel (admin only, toggleable) -->
       <div id="sch-rules-panel" class="hidden rules-panel">
-        <div class="rules-panel-title">
-          <span>⚙️</span> Quy tắc đăng ký lịch làm
-          <span style="font-size:.68rem;color:var(--text-3);font-weight:500;margin-left:.25rem">(Admin có thể chỉnh trực tiếp Supabase)</span>
+        <div class="rules-panel-title" style="justify-content:space-between">
+          <span style="display:flex;align-items:center;gap:.4rem">⚙️ Quy tắc đăng ký lịch làm</span>
+          <button id="btn-save-rules" class="btn btn-primary btn-sm" onclick="saveRules()" style="font-size:.72rem">💾 Lưu quy tắc</button>
         </div>
         <div id="rules-list"></div>
         <div style="margin-top:.65rem;font-size:.7rem;color:var(--text-3);">
-          💡 Quy tắc được enforce khi Admin chỉnh ô. Vi phạm sẽ hiển thị cảnh báo vàng.
+          💡 Ngày WFH bị chặn: hệ thống sẽ <strong>từ chối</strong> lưu, không chỉ cảnh báo.
         </div>
       </div>
 
@@ -1296,9 +1299,11 @@ async function enterApp(isAdmin) {
     if (el) el.style.display = isAdmin ? '' : 'none';
   });
 
-  // Show rules button for admin
+  // Show rules button and init-month button for admin
   const btnRules = document.getElementById('btn-rules');
   if (btnRules) btnRules.classList.toggle('hidden', !isAdmin);
+  const btnInit = document.getElementById('btn-init-month');
+  if (btnInit) btnInit.classList.toggle('hidden', !isAdmin);
 
   if (isAdmin) startSessTimer();
   await loadAll();
@@ -2006,19 +2011,29 @@ async function loadScheduleData(year, month) {
 }
 
 // Load schedule rules from Supabase
+function getDefaultRules() {
+  return {
+    max_wfh_per_month:      { value: '1',     description: 'Số lần WFH tối đa mỗi tháng' },
+    wfh_blocked_days:       { value: '2,3',   description: 'Ngày không được WFH (2=T2, 3=T3...)' },
+    allow_employee_edit:    { value: 'false', description: 'Nhân viên tự đăng ký lịch' },
+    require_reason_for_off: { value: 'false', description: 'Yêu cầu lý do khi đăng ký nghỉ' },
+    default_weekday_status: { value: 'x',     description: 'Trạng thái mặc định ngày thường' },
+    advance_days_required:  { value: '0',     description: 'Số ngày cần đăng ký trước (0 = không giới hạn)' },
+  };
+}
+
 async function loadScheduleRules() {
   try {
-    const { data } = await db.from('hr_schedule_rules').select('rule_key, rule_value, description');
+    const { data, error } = await db.from('hr_schedule_rules').select('rule_key, rule_value, description');
+    // Supabase trả { data: null, error } khi RLS chặn — KHÔNG throw exception
+    if (error || !data || !data.length) {
+      return getDefaultRules();
+    }
     const rules = {};
-    (data || []).forEach(r => { rules[r.rule_key] = { value: r.rule_value, description: r.description }; });
+    data.forEach(r => { rules[r.rule_key] = { value: r.rule_value, description: r.description }; });
     return rules;
   } catch(e) {
-    // Table may not exist yet — return defaults
-    return {
-      max_wfh_per_month: { value: '1', description: 'Số lần WFH tối đa mỗi tháng' },
-      wfh_blocked_days: { value: '2,3', description: 'Ngày không được WFH (2=T2, 3=T3...)' },
-      allow_employee_edit: { value: 'false', description: 'Nhân viên tự đăng ký' },
-    };
+    return getDefaultRules();
   }
 }
 
@@ -2096,34 +2111,124 @@ function checkSchRules(empId, year, month, day, newVal) {
   return warnings;
 }
 
-// Render rules panel
+// Render rules panel (editable for admin)
 function renderRulesPanel() {
   const container = document.getElementById('rules-list');
   if (!container) return;
   const r = S.scheduleRules;
   const RULE_LABELS = {
-    max_wfh_per_month: 'WFH tối đa / tháng',
-    wfh_blocked_days: 'Ngày không cho WFH (2=T2,3=T3...)',
-    allow_employee_edit: 'Nhân viên tự đăng ký',
-    require_reason_for_off: 'Yêu cầu lý do khi nghỉ',
-    default_weekday_status: 'Trạng thái mặc định ngày thường',
-    advance_days_required: 'Phải đăng ký trước (ngày)',
+    max_wfh_per_month:      { label: 'WFH tối đa / tháng', hint: 'Số nguyên, vd: 1' },
+    wfh_blocked_days:       { label: 'Ngày không cho WFH', hint: '2=T2, 3=T3, 4=T4... cách nhau dấu phẩy, vd: 2,3' },
+    allow_employee_edit:    { label: 'Nhân viên tự đăng ký', hint: 'true hoặc false' },
+    require_reason_for_off: { label: 'Yêu cầu lý do khi nghỉ', hint: 'true hoặc false' },
+    default_weekday_status: { label: 'Trạng thái mặc định ngày thường', hint: 'x, w, o...' },
+    advance_days_required:  { label: 'Phải đăng ký trước (ngày)', hint: '0 = không giới hạn' },
   };
   if (!Object.keys(r).length) {
-    container.innerHTML = '<div style="font-size:.78rem;color:var(--text-3);padding:.5rem">Chưa có quy tắc. Hãy chạy SQL tạo bảng hr_schedule_rules.</div>';
+    container.innerHTML = '<div style="font-size:.78rem;color:var(--text-3);padding:.5rem">Không tải được quy tắc từ Supabase (kiểm tra kết nối hoặc RLS).</div>';
     return;
   }
-  container.innerHTML = Object.entries(r).map(([k, v]) => `
-    <div class="rule-item">
-      <span class="rule-item-key">${RULE_LABELS[k] || k}</span>
-      <span class="rule-item-val">${v.value}</span>
-      ${v.description ? `<span style="font-size:.68rem;color:var(--text-3);flex:2">${v.description}</span>` : ''}
-    </div>`).join('');
+  container.innerHTML = Object.entries(r).map(([k, v]) => {
+    const meta = RULE_LABELS[k] || { label: k, hint: '' };
+    return `<div class="rule-item" style="align-items:flex-start;flex-direction:column;gap:.3rem;padding:.6rem .75rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;width:100%;gap:.75rem">
+        <span class="rule-item-key" style="font-size:.78rem">${meta.label}</span>
+        <input class="input rule-val-input" data-key="${k}" value="${escAttr(v.value)}"
+          style="max-width:160px;padding:.3rem .6rem;font-size:.8rem;font-weight:700;text-align:center"
+          placeholder="${meta.hint}">
+      </div>
+      ${meta.hint ? `<span style="font-size:.67rem;color:var(--text-3)">${meta.hint}</span>` : ''}
+    </div>`;
+  }).join('');
+}
+
+async function saveRules() {
+  if (!S.isAdmin) return;
+  const inputs = document.querySelectorAll('.rule-val-input');
+  if (!inputs.length) return;
+  const btn = document.getElementById('btn-save-rules');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; }
+  try {
+    const updates = [];
+    inputs.forEach(inp => {
+      const key = inp.dataset.key;
+      const val = inp.value.trim();
+      updates.push({ rule_key: key, rule_value: val, description: S.scheduleRules[key]?.description || null });
+    });
+    const { error } = await db.from('hr_schedule_rules')
+      .upsert(updates, { onConflict: 'rule_key' });
+    if (error) throw error;
+    // Update local state
+    updates.forEach(u => { if (S.scheduleRules[u.rule_key]) S.scheduleRules[u.rule_key].value = u.rule_value; });
+    toast('Đã lưu quy tắc!', 'success');
+    // Re-render schedule info note
+    const m = parseInt(document.getElementById('sch-month').value);
+    const y = parseInt(document.getElementById('sch-year').value);
+    renderSchedule(y, m);
+  } catch(e) {
+    toast('Lỗi lưu quy tắc: ' + e.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '💾 Lưu quy tắc'; }
+  }
 }
 
 function toggleRulesPanel() {
   const panel = document.getElementById('sch-rules-panel');
   if (panel) panel.classList.toggle('hidden');
+}
+
+// Bulk-initialize a month: insert 'x' for all active employees × all weekdays
+async function initializeMonth() {
+  if (!S.isAdmin) return;
+  const m = parseInt(document.getElementById('sch-month').value);
+  const y = parseInt(document.getElementById('sch-year').value);
+  const daysInMonth = new Date(y, m, 0).getDate();
+  const employees = S.employees.filter(e => e.is_active !== false);
+  if (!employees.length) { toast('Không có nhân viên active!', 'warn'); return; }
+
+  const btn = document.getElementById('btn-init-month');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; }
+
+  try {
+    // Build list of all (employee, weekday) pairs not yet in DB
+    const rows = [];
+    const defaultStatus = S.scheduleRules.default_weekday_status?.value || 'x';
+    employees.forEach(emp => {
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dow = new Date(y, m-1, d).getDay();
+        if (dow === 0 || dow === 6) continue; // skip weekends
+        const dateStr = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const key = `${emp.id}|${dateStr}`;
+        if (S.scheduleData[key] === undefined) {
+          rows.push({ employee_id: emp.id, work_date: dateStr, status: defaultStatus });
+        }
+      }
+    });
+
+    if (!rows.length) {
+      toast('Tháng này đã đầy đủ dữ liệu rồi!', 'info');
+      return;
+    }
+
+    // Batch insert in chunks of 500
+    const CHUNK = 500;
+    for (let i = 0; i < rows.length; i += CHUNK) {
+      const chunk = rows.slice(i, i + CHUNK);
+      const { error } = await db.from('hr_work_schedule')
+        .upsert(chunk, { onConflict: 'employee_id,work_date', ignoreDuplicates: true });
+      if (error) throw error;
+    }
+
+    // Update local state
+    rows.forEach(r => { S.scheduleData[`${r.employee_id}|${r.work_date}`] = r.status; });
+
+    toast(`Đã khởi tạo ${rows.length} ô cho ${employees.length} nhân viên!`, 'success');
+    renderSchedule(y, m);
+  } catch(e) {
+    toast('Lỗi khởi tạo: ' + e.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<span>⚡</span> Khởi tạo tháng'; }
+  }
 }
 
 // Init calendar section
@@ -2327,6 +2432,20 @@ async function saveSchPopup() {
   if (!sel) return;
   const val = sel.value;
 
+  // Check rules and HARD BLOCK if violated
+  const violations = checkSchRules(empId, year, month, day, val);
+  if (violations.length) {
+    // Show violations inside popup if possible, otherwise toast
+    const warn = document.getElementById('popup-rule-warn');
+    if (warn) {
+      warn.innerHTML = violations.join('<br>');
+      warn.style.display = 'block';
+    } else {
+      violations.forEach(w => toast(w, 'warn'));
+    }
+    return; // BLOCK save
+  }
+
   const btn = sel.parentElement.querySelector('.btn-primary');
   if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; }
 
@@ -2334,7 +2453,6 @@ async function saveSchPopup() {
     await schSaveCell(empId, year, month, day, val);
     toast('Đã lưu lịch', 'success');
     closeSchPopup();
-    // Re-render table in place without full reload
     renderSchedule(year, month);
   } catch(e) {
     toast('Lỗi lưu: ' + e.message, 'error');
