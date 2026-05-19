@@ -772,9 +772,10 @@ tr:hover td{background:rgba(13,148,136,.03)}
         </select>
       </div>
       <div class="grid grid-cols-2 gap-3">
-        <div><label class="label">AL đã dùng</label><input id="me-used" type="number" step="0.5" min="0" value="0" class="input"></div>
-        <div><label class="label">AL còn lại</label><input id="me-rem" type="number" step="0.5" min="0" value="0" class="input"></div>
+        <div><label class="label">AL đã dùng</label><div id="me-used" class="input" style="background:var(--surface3);color:var(--text-2);cursor:default;pointer-events:none">0</div></div>
+        <div><label class="label">AL còn lại</label><div id="me-rem" class="input" style="background:var(--surface3);cursor:default;pointer-events:none;font-weight:700">0</div></div>
       </div>
+      <p style="font-size:.7rem;color:var(--text-3);margin-top:-.25rem;margin-bottom:.25rem">⚡ Tính tự động từ bảng nghỉ phép — không thể chỉnh tay</p>
       <div><label class="label">Ghi chú nghỉ khác</label><textarea id="me-other" class="input" rows="2"></textarea></div>
     </div>
     <div class="flex gap-2.5 mt-6 justify-end">
@@ -1390,8 +1391,10 @@ function openEmpModal(id) {
   document.getElementById('me-name').value = e?.name || '';
   document.getElementById('me-start').value = e?.start_date || '';
   document.getElementById('me-status').value = (e?.is_active === false) ? 'false' : 'true';
-  document.getElementById('me-used').value = e?.annual_leave_used || 0;
-  document.getElementById('me-rem').value = e?.annual_leave_remaining || 0;
+  const _used = e ? empAlUsed(e.id) : 0;
+  document.getElementById('me-used').textContent = _used.toFixed(1);
+  document.getElementById('me-rem').textContent = (12 - _used).toFixed(1);
+  document.getElementById('me-rem').style.color = (12 - _used) <= 3 ? '#ef4444' : (12 - _used) <= 5 ? '#f97316' : 'var(--text-1)';
   document.getElementById('me-other').value = e?.other_leave || '';
   openModal('m-emp');
 }
@@ -1404,8 +1407,7 @@ async function saveEmp() {
     name,
     start_date: document.getElementById('me-start').value || null,
     is_active: document.getElementById('me-status').value !== 'false',
-    annual_leave_used: parseFloat(document.getElementById('me-used').value) || 0,
-    annual_leave_remaining: parseFloat(document.getElementById('me-rem').value) || 0,
+
     other_leave: document.getElementById('me-other').value.trim() || null,
   };
   const { error } = id
