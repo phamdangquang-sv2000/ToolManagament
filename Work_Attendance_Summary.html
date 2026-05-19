@@ -40,6 +40,8 @@
 html,body{font-family:'Inter',system-ui,sans-serif;transition:background .35s,color .35s;-webkit-font-smoothing:antialiased}
 body{background:var(--surface2);color:var(--text-1)}
 .dark body{background:var(--navy);color:var(--text-1)}
+@keyframes spin-icon{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+#refresh-icon.spinning{animation:spin-icon .7s linear infinite}
 
 /* ── CARD ── */
 .card{
@@ -851,6 +853,10 @@ tr:hover td{background:rgba(13,148,136,.03)}
       </div>
       <div class="flex items-center gap-3">
         <span id="sess-timer" class="hidden text-xs font-semibold px-3 py-1.5 rounded-lg" style="background:var(--surface3);color:var(--text-2)"></span>
+        <button id="btn-refresh" onclick="refreshAll()" title="Tải lại dữ liệu" class="btn btn-secondary btn-sm" style="font-size:.75rem;padding:.35rem .75rem;gap:.3rem">
+          <svg id="refresh-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Làm mới
+        </button>
         <span id="role-badge" class="text-xs px-3 py-1.5 rounded-lg font-bold border"></span>
       </div>
     </div>
@@ -1437,7 +1443,10 @@ async function doLogin() {
   finally { btn.disabled = false; btn.innerHTML = 'Đăng nhập Admin'; }
 }
 
-async function enterAsEmployee() { await enterApp(false); }
+async function enterAsEmployee() {
+  localStorage.setItem('hr_role', 'employee');
+  await enterApp(false);
+}
 
 async function enterApp(isAdmin) {
   S.isAdmin = isAdmin;
@@ -1509,6 +1518,7 @@ function doLogout() {
   clearInterval(S.sessTimer);
   S.isAdmin = false; S.session = null;
   localStorage.removeItem('hr_sess');
+  localStorage.removeItem('hr_role');
   document.getElementById('app').classList.add('hidden');
   document.getElementById('login-screen').classList.remove('hidden');
   document.getElementById('pwd-input').value = '';
@@ -1517,17 +1527,47 @@ function doLogout() {
 }
 
 async function tryRestoreSession() {
+  // Try restoring admin session first
   try {
     const raw = localStorage.getItem('hr_sess');
-    if (!raw) return false;
-    const s = JSON.parse(raw);
-    if (s.expiresAt > Date.now()) {
-      const { data } = await db.from('hr_sessions').select('id').eq('token', s.token).limit(1);
-      if (data && data.length) { S.session = s; await enterApp(true); return true; }
+    if (raw) {
+      const s = JSON.parse(raw);
+      if (s.expiresAt > Date.now()) {
+        const { data } = await db.from('hr_sessions').select('id').eq('token', s.token).limit(1);
+        if (data && data.length) { S.session = s; await enterApp(true); return true; }
+      }
+      localStorage.removeItem('hr_sess');
     }
   } catch (e) {}
-  localStorage.removeItem('hr_sess');
+
+  // Try restoring employee session (no server token needed)
+  try {
+    const role = localStorage.getItem('hr_role');
+    if (role === 'employee') { await enterApp(false); return true; }
+  } catch (e) {}
+
   return false;
+}
+
+// ============ GLOBAL REFRESH ============
+async function refreshAll() {
+  const icon = document.getElementById('refresh-icon');
+  const btn = document.getElementById('btn-refresh');
+  if (btn) btn.disabled = true;
+  if (icon) icon.classList.add('spinning');
+  try {
+    await loadAll();
+    // Re-render the currently active tab
+    const active = document.querySelector('.nav-link.active');
+    const tab = active ? active.getAttribute('data-s') : localStorage.getItem('hr_tab');
+    if (tab) go(tab);
+    toast('Đã tải lại dữ liệu mới nhất.', 'success');
+  } catch (e) {
+    toast('Lỗi tải dữ liệu: ' + e.message, 'error');
+  } finally {
+    if (icon) icon.classList.remove('spinning');
+    if (btn) btn.disabled = false;
+  }
 }
 
 // ============ DATA LOADING ============
