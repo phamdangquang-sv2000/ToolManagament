@@ -42,21 +42,10 @@
     overflow: hidden;
   }
 
-  /* Animated mesh background */
-  body::before {
-    content: '';
+  /* Background canvas */
+  #bg-canvas {
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background:
-      radial-gradient(ellipse 80% 60% at 10% 20%,  rgba(99,102,241,.12) 0%, transparent 55%),
-      radial-gradient(ellipse 60% 50% at 90% 80%,  rgba(168,85,247,.09) 0%, transparent 55%),
-      radial-gradient(ellipse 50% 70% at 50% 100%, rgba(232,187,80,.06) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 40% at 80% 10%,  rgba(56,189,248,.07) 0%, transparent 50%);
-    animation: meshShift 18s ease-in-out infinite alternate;
-  }
-  @keyframes meshShift {
-    0%   { opacity: .8; transform: scale(1)    rotate(0deg);   }
-    50%  { opacity: 1;  transform: scale(1.04) rotate(.5deg);  }
-    100% { opacity: .9; transform: scale(1.02) rotate(-.3deg); }
+    width: 100%; height: 100%;
   }
 
   /* Fine grid overlay for depth */
@@ -64,10 +53,10 @@
     content: '';
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
     background-image:
-      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-    background-size: 48px 48px;
-    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 0%, transparent 100%);
+      linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+    background-size: 52px 52px;
+    mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, black 0%, transparent 100%);
   }
 
   /* ══════════════ TOPBAR ══════════════ */
@@ -997,6 +986,9 @@
   <div class="ro-label">ĐANG LÀM MỚI</div>
   <div class="ro-sub">Xóa cache · Tải dữ liệu mới</div>
 </div>
+<canvas id="bg-canvas"></canvas>
+
+<!-- ── Top bar (fixed, never blocks content) ── -->
 <div id="topbar">
   <button class="logo" onclick="showHome()">
     <div class="logo-icon">
@@ -2162,8 +2154,190 @@ document.addEventListener('keydown', e => {
 });
 
 // ════════════════════════════════════════
-// INIT
+// BACKGROUND CANVAS ANIMATION
 // ════════════════════════════════════════
+(function initBgCanvas() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, raf;
+
+  // ── Resize ──────────────────────────────
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ── Aurora orbs ─────────────────────────
+  const ORBS = [
+    { x:.12, y:.22, rx:.55, ry:.42, r:0,   dr:.00018, r2:0,   dr2:.00011, color:[99,102,241],  a:.13 },
+    { x:.88, y:.75, rx:.48, ry:.38, r:1.2, dr:.00014, r2:1.5, dr2:.00009, color:[168,85,247],  a:.10 },
+    { x:.50, y:.95, rx:.42, ry:.55, r:2.4, dr:.00020, r2:2.2, dr2:.00013, color:[232,187,80],  a:.07 },
+    { x:.80, y:.12, rx:.35, ry:.32, r:3.6, dr:.00016, r2:3.8, dr2:.00010, color:[56,189,248],  a:.08 },
+    { x:.30, y:.60, rx:.30, ry:.40, r:5.0, dr:.00022, r2:4.8, dr2:.00015, color:[104,211,145], a:.06 },
+    { x:.65, y:.35, rx:.38, ry:.28, r:4.2, dr:.00012, r2:4.0, dr2:.00008, color:[245,158,11],  a:.05 },
+  ];
+
+  // ── Particles ───────────────────────────
+  const PARTICLE_COUNT = 55;
+  const particles = [];
+
+  function mkParticle() {
+    const hues = [
+      [232,187,80], [99,102,241], [168,85,247],
+      [56,189,248], [104,211,145], [255,255,255],
+    ];
+    const c = hues[Math.floor(Math.random() * hues.length)];
+    return {
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: .6 + Math.random() * 1.8,
+      vx: (Math.random() - .5) * .22,
+      vy: -.08 - Math.random() * .18,
+      alpha: .1 + Math.random() * .45,
+      life: Math.random(),          // 0-1 phase offset
+      speed: .0006 + Math.random() * .0008,
+      color: c,
+      twinkle: .5 + Math.random() * .5,
+    };
+  }
+
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const p = mkParticle();
+    p.life = Math.random(); // stagger phases
+    particles.push(p);
+  }
+
+  // ── Shooting stars ───────────────────────
+  const shoots = [];
+  function spawnShoot() {
+    if (shoots.length >= 2) return;
+    if (Math.random() > .003) return;
+    const angle = -.3 - Math.random() * .3;
+    const speed = 6 + Math.random() * 8;
+    shoots.push({
+      x: Math.random() * W * .8,
+      y: Math.random() * H * .4,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      len: 80 + Math.random() * 120,
+      alpha: 1,
+      life: 1,
+    });
+  }
+
+  // ── Draw ────────────────────────────────
+  let t = 0;
+  function draw() {
+    t++;
+    ctx.clearRect(0, 0, W, H);
+
+    // Base deep navy
+    ctx.fillStyle = '#0c1322';
+    ctx.fillRect(0, 0, W, H);
+
+    // Aurora orbs — slow breathing ellipses
+    ORBS.forEach(o => {
+      o.r  += o.dr;
+      o.r2 += o.dr2;
+
+      // Gently drift center using Lissajous
+      const cx = (o.x + Math.sin(o.r)  * .06) * W;
+      const cy = (o.y + Math.cos(o.r2) * .05) * H;
+      const rx = o.rx * W * (.85 + .15 * Math.sin(o.r * 1.3));
+      const ry = o.ry * H * (.85 + .15 * Math.cos(o.r2 * 1.1));
+
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(rx, ry));
+      const [r,g2,b] = o.color;
+      g.addColorStop(0,   `rgba(${r},${g2},${b},${o.a})`);
+      g.addColorStop(.5,  `rgba(${r},${g2},${b},${o.a * .4})`);
+      g.addColorStop(1,   `rgba(${r},${g2},${b},0)`);
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(rx / Math.max(rx, ry), ry / Math.max(rx, ry));
+      ctx.beginPath();
+      ctx.arc(0, 0, Math.max(rx, ry), 0, Math.PI * 2);
+      ctx.fillStyle = g;
+      ctx.fill();
+      ctx.restore();
+    });
+
+    // Particles
+    particles.forEach(p => {
+      p.life += p.speed;
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // Wrap around
+      if (p.x < -4) p.x = W + 4;
+      if (p.x > W + 4) p.x = -4;
+      if (p.y < -4) { p.y = H + 4; p.x = Math.random() * W; }
+
+      const pulse = Math.sin(p.life * Math.PI * 2) * .5 + .5;
+      const a = p.alpha * (.4 + .6 * pulse) * p.twinkle;
+      const [r, g2, b] = p.color;
+
+      // Glow halo
+      const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
+      glow.addColorStop(0,   `rgba(${r},${g2},${b},${a * .6})`);
+      glow.addColorStop(1,   `rgba(${r},${g2},${b},0)`);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
+      ctx.fillStyle = glow;
+      ctx.fill();
+
+      // Core dot
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * (.6 + .4 * pulse), 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${r},${g2},${b},${Math.min(1, a * 1.8)})`;
+      ctx.fill();
+    });
+
+    // Shooting stars
+    spawnShoot();
+    for (let i = shoots.length - 1; i >= 0; i--) {
+      const s = shoots[i];
+      s.x += s.vx;
+      s.y += s.vy;
+      s.life -= .018;
+      if (s.life <= 0) { shoots.splice(i, 1); continue; }
+
+      const tail = ctx.createLinearGradient(
+        s.x - s.vx * (s.len / Math.hypot(s.vx, s.vy)),
+        s.y - s.vy * (s.len / Math.hypot(s.vx, s.vy)),
+        s.x, s.y
+      );
+      tail.addColorStop(0, `rgba(255,255,255,0)`);
+      tail.addColorStop(.7, `rgba(245,210,120,${s.life * .6})`);
+      tail.addColorStop(1, `rgba(255,255,255,${s.life})`);
+
+      ctx.beginPath();
+      ctx.moveTo(
+        s.x - s.vx * (s.len / Math.hypot(s.vx, s.vy)),
+        s.y - s.vy * (s.len / Math.hypot(s.vx, s.vy))
+      );
+      ctx.lineTo(s.x, s.y);
+      ctx.strokeStyle = tail;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Head flash
+      const hg = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, 5);
+      hg.addColorStop(0, `rgba(255,255,255,${s.life})`);
+      hg.addColorStop(1, `rgba(255,255,255,0)`);
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, 5, 0, Math.PI * 2);
+      ctx.fillStyle = hg;
+      ctx.fill();
+    }
+
+    raf = requestAnimationFrame(draw);
+  }
+
+  draw();
+})();
 (async () => {
   // Restore admin session if it was active before refresh
   if (sessionStorage.getItem('itHub_admin') === '1') {
