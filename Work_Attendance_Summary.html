@@ -1819,6 +1819,19 @@ async function submitLeaveRequest() {
       ? 'Đã gửi đơn xin nghỉ phép! Chờ Admin xét duyệt.'
       : `Đã gửi ${weekdays.length} đơn nghỉ phép (${startDate} → ${endDate})! Chờ Admin xét duyệt.`;
     toast(msg, 'success');
+
+    // ── AUTO-COMPOSE EMAIL ──
+    composeLeaveEmail({
+      empName: emp?.name || '',
+      startDate,
+      endDate,
+      daysCount: isHalf ? 0.5 : weekdays.length,
+      sessionType,
+      daysType,
+      reason,
+      weekdays,
+    });
+
     // Clear form
     document.getElementById('lr-date').value = '';
     document.getElementById('lr-date-end').value = '';
@@ -1836,6 +1849,56 @@ async function submitLeaveRequest() {
     if (btn) { btn.disabled = false; btn.innerHTML = '📤 Gửi đơn xin nghỉ phép'; }
   }
 }
+
+
+// ── COMPOSE LEAVE EMAIL ──
+function composeLeaveEmail({ empName, startDate, endDate, daysCount, sessionType, reason, weekdays }) {
+  const toList = [
+    'TangHien.Phat@heineken.com',
+    'SharedaccountforD&TApplication@heineken.com',
+    'SHRVNB2B06@heineken.com',
+  ];
+  const ccList = [
+    'Luongdieu.hien-B2B09@heineken.com',
+    'L2SupportTeam@heiway.onmicrosoft.com',
+  ];
+
+  function fmtDateVN(iso) {
+    if (!iso) return '';
+    const [y, m, d] = iso.split('-');
+    return d + '/' + m + '/' + y;
+  }
+
+  const sessionLabel = sessionType === 'morning' ? 'Buổi sáng' :
+                       sessionType === 'afternoon' ? 'Buổi chiều' : 'Cả ngày';
+  const daysLabel = daysCount === 0.5
+    ? '0.5 ngày (' + sessionLabel + ')'
+    : daysCount + ' ngày';
+
+  const dateRange = startDate === endDate
+    ? 'Ngày ' + fmtDateVN(startDate)
+    : 'Từ ' + fmtDateVN(startDate) + ' đến ' + fmtDateVN(endDate);
+
+  const subjectRaw = '[Xin nghỉ phép AL] ' + empName + ' \u2014 ' + fmtDateVN(startDate) +
+    (startDate !== endDate ? ' \u2192 ' + fmtDateVN(endDate) : '');
+  const subject = encodeURIComponent(subjectRaw);
+
+  const bodyRaw = 'Kính gửi anh Phát, anh Quang, anh Tâm,\n\nEm tên ' + empName + ' kính xin phép được nghỉ phép AL với thông tin như sau:\n\n' +
+    '• Họ Tên   : ' + empName + '\n' +
+    '• Thời gian   : ' + dateRange + '\n' +
+    '• Số ngày nghỉ: ' + daysLabel + '\n' +
+    '• Lý do       : ' + (reason || '(Không có lý do cụ thể)') + '\n\n' +
+    'Kính mong các anh xem xét và duyệt cho phép em được nghỉ phép AL. Xin trân trọng cảm ơn!\n\nTrân trọng,\n' + empName;
+  const body = encodeURIComponent(bodyRaw);
+
+  const to = encodeURIComponent(toList.join(';'));
+  const cc = encodeURIComponent(ccList.join(';'));
+  const mailtoLink = 'mailto:' + to + '?cc=' + cc + '&subject=' + subject + '&body=' + body;
+
+  // Tự động mở ứng dụng mail ngay lập tức
+  window.location.href = mailtoLink;
+}
+
 
 async function approveLeaveRequest(reqId) {
   const req = S.leaveRequests.find(r => r.id === reqId);
