@@ -963,21 +963,29 @@ CREATE TABLE hr_leave_requests (<br>
           <div style="font-size:.9rem;font-weight:800;color:var(--text-1);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem">
             📝 Đăng ký xin nghỉ phép AL
           </div>
+          <div style="margin-bottom:.75rem">
+            <label class="label">Nhân viên *</label>
+            <select id="lr-emp" class="input"></select>
+          </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem">
             <div>
-              <label class="label">Nhân viên *</label>
-              <select id="lr-emp" class="input"></select>
+              <label class="label">Ngày bắt đầu *</label>
+              <input id="lr-date" type="date" class="input" onchange="onLrDateRangeChange()">
             </div>
             <div>
-              <label class="label">Ngày nghỉ *</label>
-              <input id="lr-date" type="date" class="input">
+              <label class="label">Ngày kết thúc *</label>
+              <input id="lr-date-end" type="date" class="input" onchange="onLrDateRangeChange()">
             </div>
           </div>
+          <div style="margin-bottom:.75rem" id="lr-days-count-row">
+            <label class="label">Số ngày nghỉ (ước tính, bỏ qua T7/CN)</label>
+            <div id="lr-days-preview" class="input" style="background:var(--surface3);color:var(--text-2);cursor:default;pointer-events:none;font-weight:700">—</div>
+          </div>
           <div style="margin-bottom:.75rem">
-            <label class="label">Số ngày nghỉ *</label>
+            <label class="label">Loại nghỉ *</label>
             <select id="lr-days-type" class="input" onchange="onLrDaysTypeChange()">
-              <option value="1">1 ngày</option>
-              <option value="half">0.5 ngày (chọn buổi bên dưới)</option>
+              <option value="1">Cả ngày (cho mỗi ngày trong khoảng)</option>
+              <option value="half">0.5 ngày (chỉ áp dụng khi chọn 1 ngày)</option>
             </select>
           </div>
           <div id="lr-session-row" class="hidden" style="margin-bottom:.75rem">
@@ -997,9 +1005,16 @@ CREATE TABLE hr_leave_requests (<br>
         </div>
 
         <!-- Employee: My pending requests -->
-        <div id="emp-my-requests-section" style="margin-bottom:1rem">
-          <div style="font-size:.8rem;font-weight:800;color:var(--text-2);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.06em">Đơn của tôi</div>
-          <div id="emp-my-requests-list"></div>
+        <div id="emp-my-requests-section" style="margin-bottom:1.25rem">
+          <div class="section-header" style="margin-bottom:.75rem">
+            <div style="display:flex;align-items:center;gap:.5rem">
+              <div style="width:1.75rem;height:1.75rem;border-radius:.45rem;background:linear-gradient(135deg,#e0f2fe,#bae6fd);display:flex;align-items:center;justify-content:center;font-size:.85rem">📋</div>
+              <span style="font-size:.85rem;font-weight:800;color:var(--text-1)">Đơn của tôi</span>
+            </div>
+          </div>
+          <div class="card p-0 overflow-hidden">
+            <div id="emp-my-requests-list"></div>
+          </div>
         </div>
       </div>
 
@@ -1683,32 +1698,97 @@ function onLrDaysTypeChange() {
   const val = document.getElementById('lr-days-type').value;
   const sessionRow = document.getElementById('lr-session-row');
   if (sessionRow) sessionRow.classList.toggle('hidden', val !== 'half');
+  onLrDateRangeChange();
+}
+
+function getWeekdaysBetween(startStr, endStr) {
+  if (!startStr || !endStr) return [];
+  const start = new Date(startStr + 'T00:00:00');
+  const end   = new Date(endStr   + 'T00:00:00');
+  if (end < start) return [];
+  const days = [];
+  const cur = new Date(start);
+  while (cur <= end) {
+    const dow = cur.getDay();
+    if (dow !== 0 && dow !== 6) {
+      const y = cur.getFullYear();
+      const mo = String(cur.getMonth() + 1).padStart(2, "0");
+      const dy = String(cur.getDate()).padStart(2, "0");
+      days.push(`${y}-${mo}-${dy}`);
+    }
+    cur.setDate(cur.getDate() + 1);
+  }
+  return days;
+}
+
+function onLrDateRangeChange() {
+  const startVal = document.getElementById('lr-date').value;
+  const endInput = document.getElementById('lr-date-end');
+  const preview  = document.getElementById('lr-days-preview');
+  const daysType = document.getElementById('lr-days-type').value;
+
+  // Auto-fill end date if not set or earlier than start
+  if (startVal && endInput) {
+    if (!endInput.value || endInput.value < startVal) {
+      endInput.value = startVal;
+    }
+    endInput.min = startVal;
+  }
+
+  const endVal = endInput ? endInput.value : startVal;
+  const weekdays = getWeekdaysBetween(startVal, endVal);
+
+  // half-day only allowed for single day
+  const isHalf = daysType === 'half';
+  const totalDays = isHalf ? 0.5 : weekdays.length;
+
+  if (preview) {
+    if (!startVal || !endVal) {
+      preview.textContent = '—';
+    } else if (isHalf && weekdays.length > 1) {
+      preview.textContent = 'Nửa ngày chỉ dùng khi chọn 1 ngày';
+      preview.style.color = '#ef4444';
+    } else {
+      preview.textContent = totalDays + ' ngày làm việc (' + weekdays.length + ' ngày, bỏ qua T7/CN)';
+      preview.style.color = '';
+    }
+  }
 }
 
 async function submitLeaveRequest() {
-  const empId = document.getElementById('lr-emp').value;
-  const leaveDate = document.getElementById('lr-date').value;
-  const daysType = document.getElementById('lr-days-type').value;
-  const reason = (document.getElementById('lr-reason').value || '').trim();
+  const empId    = document.getElementById('lr-emp').value;
+  const startDate = document.getElementById('lr-date').value;
+  const endDate   = document.getElementById('lr-date-end').value;
+  const daysType  = document.getElementById('lr-days-type').value;
+  const reason    = (document.getElementById('lr-reason').value || '').trim();
 
-  if (!empId) { toast('Vui lòng chọn nhân viên!', 'error'); return; }
-  if (!leaveDate) { toast('Vui lòng chọn ngày nghỉ!', 'error'); return; }
+  if (!empId)    { toast('Vui lòng chọn nhân viên!', 'error'); return; }
+  if (!startDate) { toast('Vui lòng chọn ngày bắt đầu!', 'error'); return; }
+  if (!endDate)   { toast('Vui lòng chọn ngày kết thúc!', 'error'); return; }
+  if (endDate < startDate) { toast('Ngày kết thúc phải sau ngày bắt đầu!', 'error'); return; }
+
+  const weekdays = getWeekdaysBetween(startDate, endDate);
+  if (!weekdays.length) { toast('Không có ngày làm việc trong khoảng đã chọn!', 'warn'); return; }
+
+  const isHalf = daysType === 'half';
+  if (isHalf && weekdays.length > 1) {
+    toast('Nghỉ nửa ngày chỉ áp dụng cho 1 ngày. Vui lòng chọn cùng ngày bắt đầu và kết thúc.', 'warn'); return;
+  }
 
   let daysCount, sessionType;
-  if (daysType === '1') {
-    daysCount = 1;
-    sessionType = 'full';
-  } else {
+  if (isHalf) {
     const session = document.getElementById('lr-session').value;
     daysCount = 0.5;
-    sessionType = session; // 'morning' or 'afternoon'
+    sessionType = session;
+  } else {
+    daysCount = 1;
+    sessionType = 'full';
   }
 
   const emp = S.employees.find(e => e.id === empId);
   const btn = document.querySelector('#emp-leave-form-section .btn-primary');
   if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner" style="border-color:rgba(255,255,255,.3);border-top-color:#fff"></span> Đang gửi...'; }
 
-  // Check if table exists before attempting insert
   if (!S.leaveRequestsReady) {
     if (btn) { btn.disabled = false; btn.innerHTML = '📤 Gửi đơn xin nghỉ phép'; }
     toast('Tính năng này chưa được thiết lập. Vui lòng liên hệ Admin để tạo bảng hr_leave_requests trong Supabase.', 'warn');
@@ -1716,20 +1796,26 @@ async function submitLeaveRequest() {
   }
 
   try {
-    const { error } = await db.from('hr_leave_requests').insert({
+    const rows = weekdays.map(date => ({
       employee_id: empId,
       employee_name: emp?.name || '',
-      leave_date: leaveDate,
+      leave_date: date,
       days_count: daysCount,
       session_type: sessionType,
       reason: reason || null,
       status: 'pending',
-    });
+    }));
+    const { error } = await db.from('hr_leave_requests').insert(rows);
     if (error) throw error;
 
-    toast('Đã gửi đơn xin nghỉ phép! Chờ Admin xét duyệt.', 'success');
+    const msg = weekdays.length === 1
+      ? 'Đã gửi đơn xin nghỉ phép! Chờ Admin xét duyệt.'
+      : `Đã gửi ${weekdays.length} đơn nghỉ phép (${startDate} → ${endDate})! Chờ Admin xét duyệt.`;
+    toast(msg, 'success');
     // Clear form
     document.getElementById('lr-date').value = '';
+    document.getElementById('lr-date-end').value = '';
+    document.getElementById('lr-days-preview').textContent = '—';
     document.getElementById('lr-reason').value = '';
     document.getElementById('lr-days-type').value = '1';
     document.getElementById('lr-session-row').classList.add('hidden');
@@ -1878,29 +1964,30 @@ function renderEmpMyRequests() {
   if (!container) return;
 
   if (!S.leaveRequestsReady) {
-    container.innerHTML = '<div style="font-size:.8rem;color:#92400e;background:#fef3c7;border-radius:.5rem;padding:.65rem .85rem;font-weight:500;line-height:1.5">⚙️ Tính năng đăng ký nghỉ phép chưa được thiết lập. Vui lòng liên hệ Admin.</div>';
+    container.innerHTML = '<div style="padding:1.25rem;font-size:.8rem;color:#92400e;font-weight:500;line-height:1.5;display:flex;align-items:center;gap:.5rem"><span style="font-size:1rem">⚙️</span> Tính năng đăng ký nghỉ phép chưa được thiết lập. Vui lòng liên hệ Admin.</div>';
     return;
   }
   if (!S.leaveRequests.length) {
-    container.innerHTML = '<div style="font-size:.8rem;color:var(--text-3);padding:.5rem;font-weight:500">Chưa có đơn xin nghỉ nào.</div>';
+    container.innerHTML = '<div style="padding:2rem;text-align:center;font-size:.8rem;color:var(--text-3);font-weight:500">Chưa có đơn xin nghỉ nào.</div>';
     return;
   }
   const recent = S.leaveRequests.slice(0, 10);
   container.innerHTML = `<div class="tw"><table><thead><tr>
-    <th>Nhân viên</th><th>Ngày nghỉ</th><th>Số ngày</th><th>Buổi</th><th>Lý do</th><th>Trạng thái</th>
-  </tr></thead><tbody>` + recent.map(r => {
+    <th>#</th><th>Nhân viên</th><th>Ngày nghỉ</th><th>Số ngày</th><th>Buổi</th><th>Lý do</th><th>Trạng thái</th>
+  </tr></thead><tbody>` + recent.map((r, i) => {
     const sessBadge = r.session_type === 'morning'
       ? '<span class="badge bg-orange" style="font-size:.62rem">Sáng</span>'
       : r.session_type === 'afternoon'
       ? '<span class="badge bg-purple" style="font-size:.62rem">Chiều</span>'
       : '<span class="badge bg-yellow" style="font-size:.62rem">Cả ngày</span>';
     const statusBadge = r.status === 'pending'
-      ? '<span class="badge bg-orange">⏳ Chờ duyệt</span>'
+      ? '<span class="badge" style="background:#fff3cd;color:#856404;border:1.5px solid #ffc107;font-weight:800">⏳ Chờ duyệt</span>'
       : r.status === 'approved'
-      ? '<span class="badge bg-green">✓ Đã duyệt</span>'
-      : '<span class="badge bg-red">✕ Từ chối</span>';
+      ? '<span class="badge" style="background:#0d9488;color:#fff;border:1.5px solid #0a7a70;font-weight:800">✓ Đã duyệt</span>'
+      : '<span class="badge" style="background:#dc2626;color:#fff;border:1.5px solid #b91c1c;font-weight:800">✕ Từ chối</span>';
     return `<tr>
-      <td style="font-weight:600;color:var(--text-1)">${escAttr(r.employee_name || eName(r.employee_id))}</td>
+      <td style="color:var(--text-3);font-size:.75rem">${i + 1}</td>
+      <td style="font-weight:700;color:var(--text-1)">${escAttr(r.employee_name || eName(r.employee_id))}</td>
       <td style="color:var(--text-2)">${r.leave_date ? fmtD(r.leave_date) : '—'}</td>
       <td><span class="badge bg-blue">${r.days_count} ngày</span></td>
       <td>${sessBadge}</td>
@@ -2885,7 +2972,7 @@ function drawScheduleCanvas(year, month, fromDay, toDay) {
   const BADGE_R = 5;
 
   const totalW = PAD + NAME_W + wdCols.length * CELL_W + PAD;
-  const totalH = PAD + TITLE_H + HEAD_H + employees.length * ROW_H + LEG_H + PAD;
+  const totalH = PAD + TITLE_H + HEAD_H + employees.length * ROW_H + PAD;
 
   const canvas = document.createElement('canvas');
   canvas.width  = totalW * SC;
@@ -2906,7 +2993,7 @@ function drawScheduleCanvas(year, month, fromDay, toDay) {
   ctx.fillText('Lich Dang Ky Lam - ' + MONTH_VN[month-1] + ' ' + year, PAD, cy + 13);
   ctx.fillStyle = '#8faaa4';
   ctx.font = '10px Arial,sans-serif';
-  ctx.fillText('Ngay ' + fromDay + ' - ' + toDay + '  |  ' + employees.length + ' nhan vien  |  Xuat luc ' + new Date().toLocaleTimeString('vi-VN'), PAD, cy + 31);
+  ctx.fillText('Ngay ' + fromDay + ' - ' + toDay + '  |  ' + employees.length + ' nhan vien', PAD, cy + 31);
   cy += TITLE_H;
 
   // ── Header row ──
@@ -2988,29 +3075,7 @@ function drawScheduleCanvas(year, month, fromDay, toDay) {
       ctx.fillText(s.label, bx + BADGE_W / 2, by + BADGE_H / 2);
     });
   });
-  cy += employees.length * ROW_H + 12;
-
-  // ── Legend ──
-  const legends = [
-    { bg:'#bfdbfe', color:'#1e40af', border:'#93c5fd', label:'x Office' },
-    { bg:'#bbf7d0', color:'#14532d', border:'#86efac', label:'w WFH' },
-    { bg:'#fde68a', color:'#78350f', border:'#fbbf24', label:'o Nghi phep' },
-    { bg:'#fbcfe8', color:'#831843', border:'#f9a8d4', label:'ph Le' },
-    { bg:'#fed7aa', color:'#7c2d12', border:'#fdba74', label:'xo/wo Nua ngay' },
-    { bg:'#fecaca', color:'#7f1d1d', border:'#fca5a5', label:'om/oa Off buoi' },
-  ];
-  let lx = PAD;
-  legends.forEach(l => {
-    ctx.font = 'bold 9px Arial,sans-serif';
-    ctx.textBaseline = 'middle';
-    ctx.textAlign = 'left';
-    const tw = ctx.measureText(l.label).width + 18;
-    canvasRoundRect(ctx, lx, cy, tw, 20, 10, l.bg, l.border);
-    ctx.fillStyle = l.color;
-    ctx.textAlign = 'center';
-    ctx.fillText(l.label, lx + tw / 2, cy + 10);
-    lx += tw + 7;
-  });
+  cy += employees.length * ROW_H;
 
   return canvas.toDataURL('image/png');
 }
