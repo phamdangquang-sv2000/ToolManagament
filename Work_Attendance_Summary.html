@@ -904,9 +904,16 @@ tr:hover td{background:rgba(13,148,136,.03)}
                 <th style="width:2.5rem">#</th>
                 <th>Họ tên</th>
                 <th>Status</th>
-                <th style="color:#3b82f6">AL hiện có</th>
+                <th style="color:#3b82f6">
+                  AL hiện có
+                  <span title="Annual Leave – Nghỉ phép năm có lương (12 ngày/kỳ)" style="display:inline-flex;align-items:center;justify-content:center;width:1rem;height:1rem;border-radius:50%;background:#3b82f6;color:#fff;font-size:.6rem;font-weight:800;cursor:help;margin-left:.25rem;vertical-align:middle">?</span>
+                </th>
                 <th style="color:#ef4444">AL đã dùng</th>
                 <th style="color:#10b981">AL còn lại</th>
+                <th style="color:#f59e0b">
+                  UL đã dùng
+                  <span title="Unpaid Leave – Nghỉ phép không lương (không giới hạn, tính riêng)" style="display:inline-flex;align-items:center;justify-content:center;width:1rem;height:1rem;border-radius:50%;background:#f59e0b;color:#fff;font-size:.6rem;font-weight:800;cursor:help;margin-left:.25rem;vertical-align:middle">?</span>
+                </th>
                 <th>Warning</th>
                 <th id="th-action" style="display:none">Thao tác</th>
               </tr>
@@ -1032,7 +1039,7 @@ CREATE TABLE hr_leave_requests (<br>
       <div class="card p-0 overflow-hidden">
         <div class="tw">
           <table>
-            <thead><tr><th>#</th><th>Nhân viên</th><th>Ngày nghỉ</th><th>Số ngày</th><th>Lý do</th><th id="th-leave-action" style="display:none">Thao tác</th></tr></thead>
+            <thead><tr><th>#</th><th>Nhân viên</th><th>Ngày nghỉ</th><th>Loại</th><th>Số ngày</th><th>Lý do</th><th id="th-leave-action" style="display:none">Thao tác</th></tr></thead>
             <tbody id="leave-body"></tbody>
           </table>
         </div>
@@ -1214,8 +1221,12 @@ CREATE TABLE hr_leave_requests (<br>
         </select>
       </div>
       <div class="grid grid-cols-2 gap-3">
-        <div><label class="label">AL đã dùng</label><div id="me-used" class="input" style="background:var(--surface3);color:var(--text-2);cursor:default;pointer-events:none">0</div></div>
+        <div><label class="label">AL đã dùng <span title="Annual Leave – Nghỉ phép năm có lương" style="display:inline-flex;align-items:center;justify-content:center;width:.9rem;height:.9rem;border-radius:50%;background:#3b82f6;color:#fff;font-size:.55rem;font-weight:800;cursor:help;vertical-align:middle">?</span></label><div id="me-used" class="input" style="background:var(--surface3);color:var(--text-2);cursor:default;pointer-events:none">0</div></div>
         <div><label class="label">AL còn lại</label><div id="me-rem" class="input" style="background:var(--surface3);cursor:default;pointer-events:none;font-weight:700">0</div></div>
+      </div>
+      <div class="grid grid-cols-2 gap-3" style="margin-top:-.5rem">
+        <div><label class="label">UL đã dùng <span title="Unpaid Leave – Nghỉ phép không lương" style="display:inline-flex;align-items:center;justify-content:center;width:.9rem;height:.9rem;border-radius:50%;background:#f59e0b;color:#fff;font-size:.55rem;font-weight:800;cursor:help;vertical-align:middle">?</span></label><div id="me-ul-used" class="input" style="background:var(--surface3);color:var(--text-2);cursor:default;pointer-events:none">0</div></div>
+        <div style="display:flex;align-items:flex-end"><p style="font-size:.68rem;color:var(--text-3);line-height:1.5;padding-bottom:.5rem">UL không giới hạn<br>& không trừ AL</p></div>
       </div>
       <p style="font-size:.7rem;color:var(--text-3);margin-top:-.25rem;margin-bottom:.25rem">⚡ Tính tự động từ bảng nghỉ phép — không thể chỉnh tay</p>
       <div><label class="label">Ghi chú nghỉ khác</label><textarea id="me-other" class="input" rows="2"></textarea></div>
@@ -1235,6 +1246,12 @@ CREATE TABLE hr_leave_requests (<br>
     <div class="space-y-4">
       <div><label class="label">Nhân viên *</label><select id="ml-emp" class="input"></select></div>
       <div><label class="label">Ngày nghỉ *</label><input id="ml-month" type="date" class="input"></div>
+      <div><label class="label">Loại nghỉ *</label>
+        <select id="ml-type" class="input">
+          <option value="AL">AL – Annual Leave (Nghỉ phép năm có lương)</option>
+          <option value="UL">UL – Unpaid Leave (Nghỉ phép không lương)</option>
+        </select>
+      </div>
       <div><label class="label">Số ngày nghỉ</label>
         <select id="ml-days" class="input">
           <option value="0.25">0.25 ngày</option>
@@ -2146,12 +2163,14 @@ function renderDash() {
 
   const totalEmp = S.employees.length;
   const totalDays = leavesInPeriod.reduce((s, l) => s + (parseFloat(l.days_absent) || 0), 0);
+  const totalAlDays = leavesInPeriod.filter(l => (l.leave_type || 'AL') === 'AL').reduce((s, l) => s + (parseFloat(l.days_absent) || 0), 0);
+  const totalUlDays = leavesInPeriod.filter(l => l.leave_type === 'UL').reduce((s, l) => s + (parseFloat(l.days_absent) || 0), 0);
   const activeWarn = S.warnings.filter(w => !w.resolve_date).length;
   const totalWarn = S.warnings.length;
   const totalLate = S.attendance.filter(a => a.event_type === 'Late').length;
   const totalEarly = S.attendance.filter(a => a.event_type === 'LeaveEarly').length;
   const totalPend = S.attendance.filter(a => a.status === 'pending').length;
-  const totalUsed = totalDays;
+  const totalUsed = totalAlDays;
   const totalRem = S.employees.length * 12 - totalUsed;
 
   const stats = [
@@ -2163,6 +2182,7 @@ function renderDash() {
     { ico:'🔴', grad:'linear-gradient(135deg,#dc2626,#ef4444)', shadow:'rgba(239,68,68,.3)', label:'Không xin phép (pending)', val: totalPend },
     { ico:'📤', grad:'linear-gradient(135deg,#b45309,#f59e0b)', shadow:'rgba(245,158,11,.3)', label:'AL đã dùng (kỳ này)', val: totalUsed.toFixed(1) },
     { ico:'📥', grad:'linear-gradient(135deg,#0e7490,#06b6d4)', shadow:'rgba(6,182,212,.3)', label:'AL còn lại (kỳ này)', val: totalRem.toFixed(1) },
+    { ico:'🕐', grad:'linear-gradient(135deg,#92400e,#f59e0b)', shadow:'rgba(245,158,11,.2)', label:'UL đã dùng (kỳ này)', val: totalUlDays.toFixed(1) },
   ];
 
   document.getElementById('stat-cards').innerHTML = stats.map((s, i) => `
@@ -2208,7 +2228,15 @@ function empAlUsed(empId) {
   const ly = S.selectedLeaveYear;
   const startD = `${ly}-04-01`, endD = `${ly+1}-03-31`;
   return S.leaves
-    .filter(l => l.employee_id === empId && l.month && l.month >= startD && l.month <= endD)
+    .filter(l => l.employee_id === empId && l.month && l.month >= startD && l.month <= endD && (l.leave_type || 'AL') === 'AL')
+    .reduce((s, l) => s + (parseFloat(l.days_absent) || 0), 0);
+}
+
+function empUlUsed(empId) {
+  const ly = S.selectedLeaveYear;
+  const startD = `${ly}-04-01`, endD = `${ly+1}-03-31`;
+  return S.leaves
+    .filter(l => l.employee_id === empId && l.month && l.month >= startD && l.month <= endD && l.leave_type === 'UL')
     .reduce((s, l) => s + (parseFloat(l.days_absent) || 0), 0);
 }
 
@@ -2304,6 +2332,7 @@ function renderEmp() {
       ? `<span class="badge bg-gray">Inactive</span>`
       : `<span class="badge bg-green">Active</span>`;
 
+    const ulUsed = empUlUsed(e.id);
     return `<tr style="${rowStyle}">
       <td style="color:var(--text-3);font-size:.75rem">${start + i + 1}</td>
       <td style="font-weight:700;color:var(--text-1)">${e.name}${nameExtra}</td>
@@ -2311,10 +2340,11 @@ function renderEmp() {
       <td style="color:#3b82f6;font-weight:700">${AL_TOTAL}</td>
       <td style="color:#ef4444;font-weight:700">${used}</td>
       <td style="color:${remColor};font-weight:${fw}">${rem}</td>
+      <td style="color:${ulUsed > 0 ? '#f59e0b' : 'var(--text-3)'};font-weight:${ulUsed > 0 ? '700' : '500'}">${ulUsed}</td>
       <td>${wBadge}</td>
       ${actionCell}
     </tr>`;
-  }).join('') : emptyRow(S.isAdmin ? 8 : 7);
+  }).join('') : emptyRow(S.isAdmin ? 9 : 8);
 
   renderEmpPager(list.length, totalPages);
 }
@@ -2399,9 +2429,12 @@ function openEmpModal(id) {
   document.getElementById('me-start').value = e?.start_date || '';
   document.getElementById('me-status').value = (e?.is_active === false) ? 'false' : 'true';
   const _used = e ? empAlUsed(e.id) : 0;
+  const _ulUsed = e ? empUlUsed(e.id) : 0;
   document.getElementById('me-used').textContent = _used.toFixed(1);
   document.getElementById('me-rem').textContent = (12 - _used).toFixed(1);
   document.getElementById('me-rem').style.color = (12 - _used) <= 3 ? '#ef4444' : (12 - _used) <= 5 ? '#f97316' : 'var(--text-1)';
+  document.getElementById('me-ul-used').textContent = _ulUsed.toFixed(1);
+  document.getElementById('me-ul-used').style.color = _ulUsed > 0 ? '#f59e0b' : 'var(--text-3)';
   document.getElementById('me-other').value = e?.other_leave || '';
   openModal('m-emp');
 }
@@ -2502,15 +2535,19 @@ function renderLeaves() {
           <button class="btn btn-danger btn-sm del-leave-btn" data-id="${l.id}">🗑️</button>
         </div></td>`
       : '';
+    const leaveTypeBadge = (l.leave_type === 'UL')
+      ? `<span class="badge" style="background:#fef3c7;color:#92400e;border:1px solid #f59e0b;font-weight:800">UL</span>`
+      : `<span class="badge" style="background:#dbeafe;color:#1e40af;border:1px solid #3b82f6;font-weight:800">AL</span>`;
     return `<tr>
       <td style="color:var(--text-3);font-size:.75rem">${startIdx + i + 1}</td>
       <td style="font-weight:700;color:var(--text-1)">${eName(l.employee_id)}</td>
       <td>${l.month ? fmtD(l.month.split('T')[0]) : '—'}</td>
+      <td>${leaveTypeBadge}</td>
       <td>${daysBadge}</td>
       <td style="max-width:280px;white-space:normal;font-size:.75rem;line-height:1.5;color:var(--text-2)">${(l.note || '—').replace(/\r?\n/g, '<br>')}</td>
       ${actionCell}
     </tr>`;
-  }).join('') : emptyRow(S.isAdmin ? 6 : 5);
+  }).join('') : emptyRow(S.isAdmin ? 7 : 6);
   renderGenericPager('leave-pager', totalItems, _leavePage, 'gotoLeavePage', 'bản ghi');
 }
 
@@ -2535,6 +2572,7 @@ function openLeaveModal(id) {
   } else {
     sel.value = '1';
   }
+  document.getElementById('ml-type').value = l?.leave_type || 'AL';
   document.getElementById('ml-note').value = l?.note || '';
   openModal('m-leave');
 }
@@ -2545,7 +2583,8 @@ async function saveLeave() {
   const leaveDate = document.getElementById('ml-month').value;
   if (!empId || !leaveDate) { toast('Chọn nhân viên và ngày nghỉ!', 'error'); return; }
   const days = parseFloat(document.getElementById('ml-days').value) || 1;
-  const data = { employee_id: empId, month: leaveDate, days_absent: days, note: document.getElementById('ml-note').value.trim() || null };
+  const leaveType = document.getElementById('ml-type').value || 'AL';
+  const data = { employee_id: empId, month: leaveDate, days_absent: days, leave_type: leaveType, note: document.getElementById('ml-note').value.trim() || null };
   const { error } = id ? await db.from('hr_leave_records').update(data).eq('id', id) : await db.from('hr_leave_records').insert(data);
   if (error) { toast('Lỗi: ' + error.message, 'error'); return; }
   toast('Đã lưu', 'success'); closeModal('m-leave');
@@ -2758,7 +2797,7 @@ function renderTet() {
       <td style="color:var(--text-2)">${typeof days === 'number' ? days + ' ngày' : days}</td>
       ${actionCell}
     </tr>`;
-  }).join('') : emptyRow(S.isAdmin ? 6 : 5);
+  }).join('') : emptyRow(S.isAdmin ? 7 : 6);
   renderGenericPager('tet-pager', totalItems, _tetPage, 'gotoTetPage', 'bản ghi');
 }
 
