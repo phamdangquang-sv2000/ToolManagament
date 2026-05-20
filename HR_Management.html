@@ -819,6 +819,15 @@
     background: rgba(255,255,255,0.08);
   }
   .form-select { cursor: pointer; padding-right: 36px; }
+  .form-select option, .form-input option,
+  select.form-select option, select.form-input option {
+    background-color: #1a1f2e !important;
+    color: #f1f5f9 !important;
+  }
+  .form-select option:checked, .form-input option:checked {
+    background-color: #2d3748 !important;
+    color: #ffffff !important;
+  }
   .form-select-wrap { position: relative; }
   .form-select-wrap::after {
     content: ''; position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
@@ -1617,6 +1626,51 @@ const SUPABASE_KEY = _d([
 // mới được nâng quyền admin. Thêm email mới vào mảng nếu cần.
 const ADMIN_EMAILS = ["adminl2@gmail.com"];
 
+// ============================================================
+// SYNC sang Work_Attendance Supabase (bảng hr_employees, cột is_active)
+// Khớp theo ho_ten (nhan_su) === name (hr_employees)
+// ============================================================
+const WA_SUPABASE_URL = 'https://edsowiramriosgwfuewg.supabase.co';
+const WA_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkc293aXJhbXJpb3Nnd2Z1ZXdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNDMzMDgsImV4cCI6MjA5MzgxOTMwOH0.aocvFLnJrl5LFPdxDf9zbhvT6HT7NpCEMFtiUr_M3gM';
+
+// Map trạng thái nhan_su -> is_active của hr_employees
+// Active / Probation => true (đang làm việc), Inactive => false (đã nghỉ)
+function _mapTrangThaiToActive(trang_thai) {
+  if (trang_thai === 'Inactive') return false;
+  return true; // Active hoặc Probation
+}
+
+async function syncStatusToAttendance(ho_ten, trang_thai) {
+  try {
+    if (!ho_ten || !trang_thai) return { skipped: true };
+    const name = String(ho_ten).trim();
+    if (!name) return { skipped: true };
+    const is_active = _mapTrangThaiToActive(trang_thai);
+    const url = `${WA_SUPABASE_URL}/rest/v1/hr_employees?name=eq.${encodeURIComponent(name)}`;
+    const r = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'apikey': WA_SUPABASE_KEY,
+        'Authorization': `Bearer ${WA_SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation',
+      },
+      body: JSON.stringify({ is_active }),
+    });
+    if (!r.ok) {
+      const t = await r.text().catch(()=> '');
+      console.warn('[sync] Lỗi sync sang Work_Attendance:', r.status, t);
+      return { ok: false, status: r.status, error: t };
+    }
+    const rows = await r.json().catch(()=>[]);
+    console.log(`[sync] ${name} -> is_active=${is_active} (cập nhật ${rows.length} dòng)`);
+    return { ok: true, updated: rows.length, is_active };
+  } catch (e) {
+    console.warn('[sync] Exception:', e);
+    return { ok: false, error: String(e?.message || e) };
+  }
+}
+
 // Phiên đăng nhập Supabase (lưu trong sessionStorage — đóng tab là mất)
 let _session = null;
 try { _session = JSON.parse(localStorage.getItem("sb_session") || "null"); } catch(_) {}
@@ -2344,7 +2398,11 @@ async function saveNew() {
   if (errs.length) { showFormError(errs[0]); return; }
   setBtnLoading("save-btn", true);
   try {
-    await dbInsert(p);
+    const inserted = await dbInsert(p);
+    try {
+      const row = Array.isArray(inserted) ? inserted[0] : inserted;
+      await syncStatusToAttendance(row?.ho_ten || p.ho_ten, row?.trang_thai || p.trang_thai);
+    } catch(_) {}
     closeModal();
     toast("Thêm nhân sự thành công", "success");
     loadData();
@@ -2360,6 +2418,7 @@ async function saveEdit(id) {
   if (errs.length) { showFormError(errs[0]); return; }
   try {
     await dbUpdate(id, p);
+    try { await syncStatusToAttendance(p.ho_ten, p.trang_thai); } catch(_) {}
     closeModal();
     toast("Cập nhật thành công", "success");
     loadData();
