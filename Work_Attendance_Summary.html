@@ -239,7 +239,9 @@ select.input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xml
 @keyframes sectionIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
 /* ── TABLE ── */
-.tw{overflow-x:auto;border-radius:var(--radius-lg);border:1px solid var(--border)}
+.tw{overflow-x:auto}
+.card > .tw{border:none;border-radius:0}
+.card > .tw + #emp-pager,.card > .tw + [id$="-pager"]{background:var(--surface)}
 .dark .tw{border-color:var(--border)}
 table{width:100%;font-size:.8rem;border-collapse:collapse}
 thead{background:var(--surface2)}
@@ -880,13 +882,13 @@ tr:hover td{background:rgba(13,148,136,.03)}
     <!-- EMPLOYEES -->
     <div id="s-employees" class="section">
       <div class="filters-row">
-        <input id="f-emp" type="text" class="input" style="max-width:210px" placeholder="Tìm theo tên..." oninput="renderEmp()">
-        <select id="f-emp-status" class="input" style="max-width:165px" onchange="renderEmp()">
+        <input id="f-emp" type="text" class="input" style="max-width:210px" placeholder="Tìm theo tên..." oninput="resetEmpPage()">
+        <select id="f-emp-status" class="input" style="max-width:165px" onchange="resetEmpPage()">
           <option value="active">Đang làm việc</option>
           <option value="">Tất cả</option>
           <option value="inactive">Đã nghỉ việc</option>
         </select>
-        <select id="f-emp-al" class="input" style="max-width:140px" onchange="renderEmp()">
+        <select id="f-emp-al" class="input" style="max-width:140px" onchange="resetEmpPage()">
           <option value="">Tất cả AL</option>
           <option value="low">AL thấp (≤3)</option>
           <option value="ok">AL đủ (>3)</option>
@@ -912,6 +914,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
             <tbody id="emp-body"></tbody>
           </table>
         </div>
+        <div id="emp-pager" style="border-top:1px solid var(--border)"></div>
       </div>
     </div>
 
@@ -1020,8 +1023,8 @@ CREATE TABLE hr_leave_requests (<br>
 
       <!-- Filters & table (shown for both roles) -->
       <div class="filters-row">
-        <input id="f-leave" type="text" class="input" style="max-width:270px" placeholder="Tìm theo tên..." oninput="renderLeaves()">
-        <select id="f-leave-m" class="input" style="max-width:190px" onchange="renderLeaves()">
+        <input id="f-leave" type="text" class="input" style="max-width:270px" placeholder="Tìm theo tên..." oninput="resetLeavePage()">
+        <select id="f-leave-m" class="input" style="max-width:190px" onchange="resetLeavePage()">
           <option value="">Tất cả tháng</option>
         </select>
         <button id="btn-add-leave" onclick="openLeaveModal(null)" class="btn btn-primary ml-auto" style="display:none">+ Thêm bản ghi</button>
@@ -1033,14 +1036,15 @@ CREATE TABLE hr_leave_requests (<br>
             <tbody id="leave-body"></tbody>
           </table>
         </div>
+        <div id="leave-pager" style="border-top:1px solid var(--border)"></div>
       </div>
     </div>
 
     <!-- WARNINGS -->
     <div id="s-warnings" class="section">
       <div class="filters-row">
-        <input id="f-warn" type="text" class="input" style="max-width:270px" placeholder="Tìm theo tên..." oninput="renderWarn()">
-        <select id="f-warn-s" class="input" style="max-width:170px" onchange="renderWarn()">
+        <input id="f-warn" type="text" class="input" style="max-width:270px" placeholder="Tìm theo tên..." oninput="resetWarnPage()">
+        <select id="f-warn-s" class="input" style="max-width:170px" onchange="resetWarnPage()">
           <option value="">Tất cả</option>
           <option value="active">Đang active</option>
           <option value="resolved">Đã gỡ</option>
@@ -1058,19 +1062,20 @@ CREATE TABLE hr_leave_requests (<br>
             <tbody id="warn-body"></tbody>
           </table>
         </div>
+        <div id="warn-pager" style="border-top:1px solid var(--border)"></div>
       </div>
     </div>
 
     <!-- ATTENDANCE -->
     <div id="s-attendance" class="section">
       <div class="filters-row">
-        <input id="f-att" type="text" class="input" style="max-width:270px" placeholder="Tìm theo tên..." oninput="renderAtt()">
-        <select id="f-att-t" class="input" style="max-width:170px" onchange="renderAtt()">
+        <input id="f-att" type="text" class="input" style="max-width:270px" placeholder="Tìm theo tên..." oninput="resetAttPage()">
+        <select id="f-att-t" class="input" style="max-width:170px" onchange="resetAttPage()">
           <option value="">Tất cả loại</option>
           <option value="Late">Đi trễ</option>
           <option value="LeaveEarly">Về sớm</option>
         </select>
-        <select id="f-att-s" class="input" style="max-width:210px" onchange="renderAtt()">
+        <select id="f-att-s" class="input" style="max-width:210px" onchange="resetAttPage()">
           <option value="">Tất cả trạng thái</option>
           <option value="approved">Approved</option>
           <option value="pending">Không xin phép</option>
@@ -1084,13 +1089,14 @@ CREATE TABLE hr_leave_requests (<br>
             <tbody id="att-body"></tbody>
           </table>
         </div>
+        <div id="att-pager" style="border-top:1px solid var(--border)"></div>
       </div>
     </div>
 
     <!-- TET -->
     <div id="s-tet" class="section">
       <div class="filters-row">
-        <input id="f-tet" type="text" class="input" style="max-width:270px" placeholder="Tìm theo tên..." oninput="renderTet()">
+        <input id="f-tet" type="text" class="input" style="max-width:270px" placeholder="Tìm theo tên..." oninput="resetTetPage()">
         <button id="btn-add-tet" onclick="openTetModal(null)" class="btn btn-primary ml-auto" style="display:none">+ Thêm nghỉ Tết</button>
       </div>
       <div class="card p-0 overflow-hidden">
@@ -1100,6 +1106,7 @@ CREATE TABLE hr_leave_requests (<br>
             <tbody id="tet-body"></tbody>
           </table>
         </div>
+        <div id="tet-pager" style="border-top:1px solid var(--border)"></div>
       </div>
     </div>
 
@@ -2142,6 +2149,49 @@ function empAlUsed(empId) {
     .reduce((s, l) => s + (parseFloat(l.days_absent) || 0), 0);
 }
 
+let _empPage = 1, _leavePage = 1, _warnPage = 1, _attPage = 1, _tetPage = 1;
+const EMP_PAGE_SIZE = 10;
+const PAGE_SIZE = 10;
+
+function renderGenericPager(pagerId, totalItems, currentPage, gotoFnName, itemLabel) {
+  const pager = document.getElementById(pagerId);
+  if (!pager) return;
+  const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+  if (totalItems <= PAGE_SIZE) { pager.innerHTML = ''; return; }
+  const from = (currentPage - 1) * PAGE_SIZE + 1;
+  const to = Math.min(currentPage * PAGE_SIZE, totalItems);
+  let btns = '';
+  const maxBtns = 7;
+  let s = Math.max(1, currentPage - 3);
+  let eP = Math.min(totalPages, s + maxBtns - 1);
+  s = Math.max(1, eP - maxBtns + 1);
+  for (let p = s; p <= eP; p++) {
+    btns += `<button class="btn ${p === currentPage ? 'btn-primary' : 'btn-secondary'} btn-sm" onclick="${gotoFnName}(${p})">${p}</button>`;
+  }
+  pager.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.75rem 1rem;flex-wrap:wrap">
+      <div style="font-size:.8rem;color:var(--text-3);font-weight:500">
+        Hiển thị <b style="color:var(--text-1)">${from}–${to}</b> / <b style="color:var(--text-1)">${totalItems}</b> ${itemLabel}
+      </div>
+      <div style="display:flex;gap:.3rem;align-items:center;flex-wrap:wrap">
+        <button class="btn btn-secondary btn-sm" onclick="${gotoFnName}(1)" ${currentPage===1?'disabled':''}>«</button>
+        <button class="btn btn-secondary btn-sm" onclick="${gotoFnName}(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>
+        ${btns}
+        <button class="btn btn-secondary btn-sm" onclick="${gotoFnName}(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>›</button>
+        <button class="btn btn-secondary btn-sm" onclick="${gotoFnName}(${totalPages})" ${currentPage===totalPages?'disabled':''}>»</button>
+      </div>
+    </div>`;
+}
+
+function gotoLeavePage(p) { _leavePage = p; renderLeaves(); }
+function resetLeavePage() { _leavePage = 1; renderLeaves(); }
+function gotoWarnPage(p) { _warnPage = p; renderWarn(); }
+function resetWarnPage() { _warnPage = 1; renderWarn(); }
+function gotoAttPage(p) { _attPage = p; renderAtt(); }
+function resetAttPage() { _attPage = 1; renderAtt(); }
+function gotoTetPage(p) { _tetPage = p; renderTet(); }
+function resetTetPage() { _tetPage = 1; renderTet(); }
+
 function renderEmp() {
   const q = (document.getElementById('f-emp')?.value || '').toLowerCase();
   const af = document.getElementById('f-emp-al')?.value || '';
@@ -2155,7 +2205,13 @@ function renderEmp() {
   if (af === 'low') list = list.filter(e => (AL_TOTAL - empAlUsed(e.id)) <= 3);
   if (af === 'ok')  list = list.filter(e => (AL_TOTAL - empAlUsed(e.id)) > 3);
 
-  document.getElementById('emp-body').innerHTML = list.length ? list.map((e, i) => {
+  const totalPages = Math.max(1, Math.ceil(list.length / EMP_PAGE_SIZE));
+  if (_empPage > totalPages) _empPage = totalPages;
+  if (_empPage < 1) _empPage = 1;
+  const start = (_empPage - 1) * EMP_PAGE_SIZE;
+  const pageList = list.slice(start, start + EMP_PAGE_SIZE);
+
+  document.getElementById('emp-body').innerHTML = pageList.length ? pageList.map((e, i) => {
     const used = empAlUsed(e.id);
     const rem = AL_TOTAL - used;
     const remColor = rem <= 1 ? '#ef4444' : rem <= 3 ? '#f97316' : '#10b981';
@@ -2186,7 +2242,7 @@ function renderEmp() {
       : `<span class="badge bg-green">Active</span>`;
 
     return `<tr style="${rowStyle}">
-      <td style="color:var(--text-3);font-size:.75rem">${i + 1}</td>
+      <td style="color:var(--text-3);font-size:.75rem">${start + i + 1}</td>
       <td style="font-weight:700;color:var(--text-1)">${e.name}${nameExtra}</td>
       <td>${statusBadge}</td>
       <td style="color:#3b82f6;font-weight:700">${AL_TOTAL}</td>
@@ -2196,7 +2252,44 @@ function renderEmp() {
       ${actionCell}
     </tr>`;
   }).join('') : emptyRow(S.isAdmin ? 8 : 7);
+
+  renderEmpPager(list.length, totalPages);
 }
+
+function renderEmpPager(totalItems, totalPages) {
+  const pager = document.getElementById('emp-pager');
+  if (!pager) return;
+  if (totalItems <= EMP_PAGE_SIZE) { pager.innerHTML = ''; return; }
+
+  const from = (_empPage - 1) * EMP_PAGE_SIZE + 1;
+  const to = Math.min(_empPage * EMP_PAGE_SIZE, totalItems);
+
+  let btns = '';
+  const maxBtns = 7;
+  let s = Math.max(1, _empPage - 3);
+  let eP = Math.min(totalPages, s + maxBtns - 1);
+  s = Math.max(1, eP - maxBtns + 1);
+  for (let p = s; p <= eP; p++) {
+    btns += `<button class="btn ${p === _empPage ? 'btn-primary' : 'btn-secondary'} btn-sm" onclick="gotoEmpPage(${p})">${p}</button>`;
+  }
+
+  pager.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.75rem 1rem;flex-wrap:wrap">
+      <div style="font-size:.8rem;color:var(--text-3);font-weight:500">
+        Hiển thị <b style="color:var(--text-1)">${from}–${to}</b> / <b style="color:var(--text-1)">${totalItems}</b> nhân viên
+      </div>
+      <div style="display:flex;gap:.3rem;align-items:center;flex-wrap:wrap">
+        <button class="btn btn-secondary btn-sm" onclick="gotoEmpPage(1)" ${_empPage===1?'disabled':''}>«</button>
+        <button class="btn btn-secondary btn-sm" onclick="gotoEmpPage(${_empPage-1})" ${_empPage===1?'disabled':''}>‹</button>
+        ${btns}
+        <button class="btn btn-secondary btn-sm" onclick="gotoEmpPage(${_empPage+1})" ${_empPage===totalPages?'disabled':''}>›</button>
+        <button class="btn btn-secondary btn-sm" onclick="gotoEmpPage(${totalPages})" ${_empPage===totalPages?'disabled':''}>»</button>
+      </div>
+    </div>`;
+}
+
+function gotoEmpPage(p) { _empPage = p; renderEmp(); }
+function resetEmpPage() { _empPage = 1; renderEmp(); }
 
 document.addEventListener('keydown', function(e){
   if(e.key==='Escape') closeSchPopup();
@@ -2327,7 +2420,13 @@ function renderLeaves() {
   }
   list = [...list].sort((a, b) => (b.month || '').localeCompare(a.month || ''));
 
-  document.getElementById('leave-body').innerHTML = list.length ? list.map((l, i) => {
+  const totalItems = list.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+  if (_leavePage > totalPages) _leavePage = totalPages;
+  const startIdx = (_leavePage - 1) * PAGE_SIZE;
+  const pageList = list.slice(startIdx, startIdx + PAGE_SIZE);
+
+  document.getElementById('leave-body').innerHTML = pageList.length ? pageList.map((l, i) => {
     const days = parseFloat(l.days_absent) || 0;
     let daysBadge;
     if (days === 0.25) daysBadge = `<span class="badge bg-teal">0.25 ngày</span>`;
@@ -2341,7 +2440,7 @@ function renderLeaves() {
         </div></td>`
       : '';
     return `<tr>
-      <td style="color:var(--text-3);font-size:.75rem">${i + 1}</td>
+      <td style="color:var(--text-3);font-size:.75rem">${startIdx + i + 1}</td>
       <td style="font-weight:700;color:var(--text-1)">${eName(l.employee_id)}</td>
       <td>${l.month ? fmtD(l.month.split('T')[0]) : '—'}</td>
       <td>${daysBadge}</td>
@@ -2349,6 +2448,7 @@ function renderLeaves() {
       ${actionCell}
     </tr>`;
   }).join('') : emptyRow(S.isAdmin ? 6 : 5);
+  renderGenericPager('leave-pager', totalItems, _leavePage, 'gotoLeavePage', 'bản ghi');
 }
 
 function fillSel(selId, curId) {
@@ -2414,7 +2514,14 @@ function renderWarn() {
   if (sf === 'active') list = list.filter(w => !w.resolve_date);
   if (sf === 'resolved') list = list.filter(w => !!w.resolve_date);
 
-  document.getElementById('warn-body').innerHTML = list.length ? list.map((w, i) => {
+
+  const totalItems = list.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+  if (_warnPage > totalPages) _warnPage = totalPages;
+  const startIdx = (_warnPage - 1) * PAGE_SIZE;
+  const pageList = list.slice(startIdx, startIdx + PAGE_SIZE);
+
+  document.getElementById('warn-body').innerHTML = pageList.length ? pageList.map((w, i) => {
     const actionCell = S.isAdmin
       ? `<td><div style="display:flex;gap:.3rem">
           <button class="btn btn-secondary btn-sm edit-warn-btn" data-id="${w.id}">✏️</button>
@@ -2425,7 +2532,7 @@ function renderWarn() {
     const wType = w.warning_type || '';
     const wTypeColor = WARN_TYPE_COLOR[wType] || 'bg-gray';
     return `<tr>
-      <td style="color:var(--text-3);font-size:.75rem">${i + 1}</td>
+      <td style="color:var(--text-3);font-size:.75rem">${startIdx + i + 1}</td>
       <td style="font-weight:700;color:var(--text-1)">${w.employee_name || eName(w.employee_id)}</td>
       <td style="font-weight:700;color:var(--text-1)">Lần ${warnNum}</td>
       <td>${wType ? `<span class="badge ${wTypeColor}">${wType}</span>` : '—'}</td>
@@ -2436,6 +2543,7 @@ function renderWarn() {
       ${actionCell}
     </tr>`;
   }).join('') : emptyRow(S.isAdmin ? 9 : 8);
+  renderGenericPager('warn-pager', totalItems, _warnPage, 'gotoWarnPage', 'warning');
 }
 
 function openWarnModal(id) {
@@ -2488,7 +2596,14 @@ function renderAtt() {
   if (tf) list = list.filter(a => a.event_type === tf);
   if (sf) list = list.filter(a => a.status === sf);
 
-  document.getElementById('att-body').innerHTML = list.length ? list.map((a, i) => {
+
+  const totalItems = list.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+  if (_attPage > totalPages) _attPage = totalPages;
+  const startIdx = (_attPage - 1) * PAGE_SIZE;
+  const pageList = list.slice(startIdx, startIdx + PAGE_SIZE);
+
+  document.getElementById('att-body').innerHTML = pageList.length ? pageList.map((a, i) => {
     const tb = a.event_type === 'Late' ? '<span class="badge bg-purple">Đi trễ</span>' : '<span class="badge bg-blue">Về sớm</span>';
     const sb = a.status === 'approved' ? '<span class="badge bg-green">Approved</span>' : '<span class="badge bg-red">Không xin phép</span>';
     const actionCell = S.isAdmin
@@ -2498,7 +2613,7 @@ function renderAtt() {
         </div></td>`
       : '';
     return `<tr>
-      <td style="color:var(--text-3);font-size:.75rem">${i + 1}</td>
+      <td style="color:var(--text-3);font-size:.75rem">${startIdx + i + 1}</td>
       <td style="font-weight:700;color:var(--text-1)">${a.employee_name || eName(a.employee_id)}</td>
       <td>${tb}</td>
       <td style="color:var(--text-2)">${a.event_date ? fmtD(a.event_date) : '—'}</td>
@@ -2507,6 +2622,7 @@ function renderAtt() {
       ${actionCell}
     </tr>`;
   }).join('') : emptyRow(S.isAdmin ? 7 : 6);
+  renderGenericPager('att-pager', totalItems, _attPage, 'gotoAttPage', 'sự kiện');
 }
 
 function openAttModal(id) {
@@ -2554,7 +2670,14 @@ function renderTet() {
   let list = S.tet;
   if (q) list = list.filter(t => (t.full_name || eName(t.employee_id)).toLowerCase().includes(q));
 
-  document.getElementById('tet-body').innerHTML = list.length ? list.map((t, i) => {
+
+  const totalItems = list.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+  if (_tetPage > totalPages) _tetPage = totalPages;
+  const startIdx = (_tetPage - 1) * PAGE_SIZE;
+  const pageList = list.slice(startIdx, startIdx + PAGE_SIZE);
+
+  document.getElementById('tet-body').innerHTML = pageList.length ? pageList.map((t, i) => {
     const dep = t.departure_date ? new Date(t.departure_date + 'T00:00:00') : null;
     const ret = t.return_date ? new Date(t.return_date + 'T00:00:00') : null;
     const days = dep && ret ? Math.ceil((ret - dep) / 86400000) : '—';
@@ -2565,7 +2688,7 @@ function renderTet() {
         </div></td>`
       : '';
     return `<tr>
-      <td style="color:var(--text-3);font-size:.75rem">${i + 1}</td>
+      <td style="color:var(--text-3);font-size:.75rem">${startIdx + i + 1}</td>
       <td style="font-weight:700;color:var(--text-1)">${t.full_name || eName(t.employee_id)}</td>
       <td style="color:var(--text-2)">${t.departure_date ? fmtD(t.departure_date) : '—'}</td>
       <td style="color:var(--text-2)">${t.return_date ? fmtD(t.return_date) : '—'}</td>
@@ -2573,6 +2696,7 @@ function renderTet() {
       ${actionCell}
     </tr>`;
   }).join('') : emptyRow(S.isAdmin ? 6 : 5);
+  renderGenericPager('tet-pager', totalItems, _tetPage, 'gotoTetPage', 'bản ghi');
 }
 
 function openTetModal(id) {
