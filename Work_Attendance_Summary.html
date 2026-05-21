@@ -2242,9 +2242,14 @@ function _emptyTop() {
   return '<div style="text-align:center;padding:1.5rem;color:var(--text-3);font-size:.8rem;font-weight:500">Không có dữ liệu</div>';
 }
 
+function _activeEmpIds() {
+  return new Set(S.employees.filter(e => e.is_active !== false).map(e => e.id));
+}
+
 function renderTopLeave() {
   const mode = _dashMode.leave;
-  const filtered = S.leaves.filter(l => _dashFilterDate(l.month, mode));
+  const activeIds = _activeEmpIds();
+  const filtered = S.leaves.filter(l => _dashFilterDate(l.month, mode) && activeIds.has(l.employee_id));
   const map = {};
   filtered.forEach(l => {
     const id = l.employee_id;
@@ -2259,7 +2264,8 @@ function renderTopLeave() {
 
 function renderTopWarn() {
   const mode = _dashMode.warn;
-  const filtered = S.warnings.filter(w => _dashFilterDate(w.warn_date || w.created_at, mode));
+  const activeIds = _activeEmpIds();
+  const filtered = S.warnings.filter(w => _dashFilterDate(w.warn_date || w.created_at, mode) && activeIds.has(w.employee_id));
   const map = {};
   filtered.forEach(w => {
     const id = w.employee_id;
@@ -2274,7 +2280,8 @@ function renderTopWarn() {
 
 function renderTopAtt() {
   const mode = _dashMode.att;
-  const filtered = S.attendance.filter(a => _dashFilterDate(a.date || a.att_date || a.created_at, mode));
+  const activeIds = _activeEmpIds();
+  const filtered = S.attendance.filter(a => _dashFilterDate(a.date || a.att_date || a.created_at, mode) && activeIds.has(a.employee_id));
   const map = {};
   filtered.forEach(a => {
     const id = a.employee_id;
