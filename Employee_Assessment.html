@@ -513,7 +513,7 @@
       font-size: 18px; line-height: 1;
     }
     .modal-close:hover { background: rgba(255,88,88,0.15); color: #ff6b6b; }
-    .modal-body { padding: 24px 26px; overflow-y: auto; flex: 1; }
+    .modal-body { padding: 24px 26px; overflow-y: auto; flex: 1; position: relative; }
     .modal-footer {
       padding: 16px 26px; border-top: 1px solid rgba(255,255,255,0.07);
       display: flex; justify-content: flex-end; gap: 10px; flex-shrink: 0;
@@ -651,6 +651,23 @@
       background: rgba(255,255,255,0.02); border-radius: 0 0 20px 20px;
     }
     .modal-question-footer-info { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+    /* ── ADD QUESTION BAR (fixed to modal bottom, outside scroll) ── */
+    .modal-add-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px; flex-wrap: wrap;
+      padding: 11px 26px 13px;
+      border-top: 1px solid rgba(255,255,255,0.09);
+      background: rgba(14,17,30,0.98);
+      border-radius: 0 0 20px 20px;
+      flex-shrink: 0;
+    }
+    .modal-add-bar-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.8px; color: var(--text-muted); white-space: nowrap;
+    }
+    .modal-add-bar-btns { display: flex; gap: 7px; flex-wrap: wrap; }
+    #question-list-container { padding-bottom: 4px; }
 
     /* =====================================================
        EXAM / TEST TAKING
@@ -1158,6 +1175,24 @@
     </div>
     <div class="modal-body">
       <div id="modal-question-content"></div>
+    </div>
+    <!-- Add-question bar always anchored at bottom of modal, outside scroll area -->
+    <div class="modal-add-bar" id="modal-question-add-bar">
+      <span class="modal-add-bar-label">+ THÊM CÂU HỎI</span>
+      <div class="modal-add-bar-btns">
+        <button class="btn btn-primary btn-sm" onclick="App.questions.addQuestion('single')">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/></svg>
+          Trắc nghiệm 1 đáp án
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="App.questions.addQuestion('multiple')">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 12l2 2 4-4"/></svg>
+          Nhiều đáp án
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="App.questions.addQuestion('essay')">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Tự luận
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -1725,6 +1760,13 @@ const App = {
         ]);
         const projMap = {};
         (projectsRes.data||[]).forEach(p => { projMap[p.id] = p.name; });
+        const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+        // Auto-close tests whose close_date has passed
+        const toClose = (testsRes.data||[]).filter(t => t.close_date && t.close_date <= today && t.status !== 'closed');
+        if (toClose.length) {
+          await Promise.all(toClose.map(t => db.from('exam_tests').update({ status: 'closed' }).eq('id', t.id)));
+          toClose.forEach(t => { t.status = 'closed'; });
+        }
         App.state.tables.tests.data = (testsRes.data || []).map(t => ({ ...t, project_name: projMap[t.project_id] || '' }));
         // Populate project filter
         const sel = document.getElementById('test-filter-project');
@@ -2072,7 +2114,7 @@ const App = {
       document.getElementById('test-desc').value = '';
       document.getElementById('test-duration').value = 60;
       document.getElementById('test-pass-score').value = 70;
-      document.getElementById('test-status').value = 'draft';
+      document.getElementById('test-status').value = 'active';
       document.getElementById('test-open-date').value = '';
       document.getElementById('test-close-date').value = '';
       App.modal.open('modal-test');
@@ -2294,46 +2336,28 @@ const App = {
       const container = document.getElementById('modal-question-content');
       if (!container) return;
       const totalScore = App.questions.questionList.reduce((s,q) => s + (q.score||0), 0);
+      const hasQ = App.questions.questionList.length > 0;
+
+      // Build question list
+      const questionsHtml = App.questions.questionList.map((q,i) =>
+        App.questions.renderQuestion(q,i)
+      ).join('');
+
       container.innerHTML = `
-        <div class="flex items-center justify-between mb-4" style="flex-wrap:wrap;gap:8px;">
-          <div class="flex gap-2" style="flex-wrap:wrap;">
-            <button class="btn btn-primary btn-sm" onclick="App.questions.addQuestion('single')">
-              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/></svg>
-              Trắc nghiệm 1 đáp án
-            </button>
-            <button class="btn btn-secondary btn-sm" onclick="App.questions.addQuestion('multiple')">
-              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 12l2 2 4-4"/></svg>
-              Nhiều đáp án
-            </button>
-            <button class="btn btn-secondary btn-sm" onclick="App.questions.addQuestion('essay')">
-              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-              Tự luận
-            </button>
-          </div>
-          <div class="flex gap-2">
-            <button class="btn btn-ghost btn-sm" onclick="App.questions.importExcel()">
-              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-              Import Excel
-            </button>
-            <button class="btn btn-ghost btn-sm" onclick="App.questions.exportExcel()">
-              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-              Export Excel
-            </button>
-          </div>
+        <div class="flex items-center mb-4">
+          <span style="font-size:13px;color:var(--text-muted);font-weight:500;">
+            ${hasQ ? `${App.questions.questionList.length} câu hỏi · Tổng <strong style="color:var(--accent)">${totalScore}</strong> điểm · Kéo thả để sắp xếp` : 'Chưa có câu hỏi nào'}
+          </span>
         </div>
+
         <div id="question-list-container">
-          ${App.questions.questionList.length === 0 ? `
-            <div class="empty-state">
+          ${!hasQ ? `
+            <div class="empty-state" style="padding:50px 20px;">
               <svg width="42" height="42" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 14px;opacity:0.35;display:block;"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-              <p>Chưa có câu hỏi nào. Nhấn nút bên trên để thêm.</p>
-            </div>` : ''}
-          ${App.questions.questionList.map((q,i) => App.questions.renderQuestion(q,i)).join('')}
+              <p>Nhấn nút bên dưới để thêm câu hỏi đầu tiên.</p>
+            </div>` : questionsHtml}
         </div>
-        ${App.questions.questionList.length > 0 ? `
-        <div class="modal-question-footer" style="margin: 12px -26px -24px; border-top: 1px solid var(--border); padding: 11px 26px; background: var(--bg-soft); display:flex; align-items:center; justify-content:space-between; border-radius: 0 0 18px 18px;">
-          <span class="modal-question-footer-info">${App.questions.questionList.length} câu hỏi · Tổng ${totalScore} điểm · Kéo thả để sắp xếp</span>
-        </div>` : ''}
-        <input type="file" id="excel-import-input" accept=".xlsx,.xls" style="display:none" onchange="App.questions.handleExcelImport(event)">
+
       `;
       // Init Sortable
       setTimeout(() => {
@@ -2791,6 +2815,14 @@ const App = {
         const assignments = assignRes.data;
         const testMap = {}; (testsRes.data||[]).forEach(t => { testMap[t.id] = t; });
         const projMap = {}; (projRes.data||[]).forEach(p => { projMap[p.id] = p.name; });
+
+        // Auto-close expired tests (runs for every user, not just admin)
+        const today = new Date().toISOString().slice(0, 10);
+        const toClose = (testsRes.data||[]).filter(t => t.close_date && t.close_date <= today && t.status !== 'closed');
+        if (toClose.length) {
+          await Promise.all(toClose.map(t => db.from('exam_tests').update({ status: 'closed' }).eq('id', t.id)));
+          toClose.forEach(t => { t.status = 'closed'; testMap[t.id] = t; });
+        }
         if (!assignments?.length) {
           content.innerHTML = `<div class="empty-state"><p>Bạn chưa được phân công bài thi nào.</p></div>`;
           return;
@@ -2815,20 +2847,26 @@ const App = {
               const attempt = attemptMap[a.test_id];
               const result = resultMap[a.test_id];
               const now = new Date();
-              const isClosed = test.close_date && new Date(test.close_date) < now;
-              const isNotOpen = test.open_date && new Date(test.open_date) > now;
+              // close_date is YYYY-MM-DD, treat as end of that day
+              const closeDate = test.close_date ? new Date(test.close_date + 'T23:59:59') : null;
+              const openDate = test.open_date ? new Date(test.open_date + 'T00:00:00') : null;
+              const isClosed = (closeDate && closeDate < now) || test.status === 'closed';
+              const isNotOpen = openDate && openDate > now;
               const isCompleted = attempt?.status === 'submitted' || attempt?.status === 'graded';
               const isInProgress = attempt?.status === 'in_progress';
 
               let statusHtml = '';
               let actionHtml = '';
               if (result) {
+                // Đã có kết quả — luôn cho xem lại dù bài đã đóng
                 statusHtml = `<span class="badge ${result.pass_fail==='pass'?'badge-success':'badge-danger'}">${result.pass_fail==='pass'?'PASS':'FAIL'} · ${result.total_score} điểm</span>`;
                 actionHtml = attempt ? `<button class="btn btn-ghost btn-sm" onclick="App.exam.review('${attempt.id}')">👁 Xem lại bài</button>` : '';
               } else if (isCompleted) {
+                // Đã nộp chờ chấm — luôn cho xem lại
                 statusHtml = '<span class="badge badge-warning">Đã nộp - Chờ chấm</span>';
-                actionHtml = '';
+                actionHtml = attempt ? `<button class="btn btn-ghost btn-sm" onclick="App.exam.review('${attempt.id}')">👁 Xem lại bài</button>` : '';
               } else if (isClosed) {
+                // Bài đã đóng — không cho làm/tiếp tục
                 statusHtml = '<span class="badge badge-muted">Đã đóng</span>';
                 actionHtml = '';
               } else if (isNotOpen) {
@@ -2883,6 +2921,15 @@ const App = {
 
       // Load test
       const { data: test } = await db.from('exam_tests').select('*').eq('id', testId).single();
+
+      // Block if test is closed (by status or close_date)
+      const now = new Date();
+      const closeDate = test?.close_date ? new Date(test.close_date + 'T23:59:59') : null;
+      if (test?.status === 'closed' || (closeDate && closeDate < now)) {
+        App.toast.show('Bài thi này đã đóng, không thể tiếp tục.', 'error');
+        App.employee.load();
+        return;
+      }
       let testProjectName = '';
       if (test?.project_id) {
         const { data: proj } = await db.from('exam_projects').select('name').eq('id', test.project_id).single();
@@ -2916,8 +2963,7 @@ const App = {
 
       // Calculate time left
       const expiresAt = new Date(attempt.expires_at).getTime();
-      const now = Date.now();
-      App.state.examState.secondsLeft = Math.max(0, Math.floor((expiresAt - now) / 1000));
+      App.state.examState.secondsLeft = Math.max(0, Math.floor((expiresAt - Date.now()) / 1000));
 
       // Render exam UI
       App.screen.show('exam');
@@ -3088,25 +3134,30 @@ const App = {
               const hasAnswer = userArr.length > 0;
 
               let optionsHtml = '';
-              if (!isEssay && q.options?.length) {
-                optionsHtml = `<div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
-                  ${q.options.map(opt => {
-                    const isUserPick = userSet.has(opt);
-                    const isCorrectOpt = correctSet.has(opt);
+              if (!isEssay) {
+                const opts = ['A','B','C','D'].map(l => q['option_'+l.toLowerCase()]).filter(Boolean);
+                if (opts.length) {
+                  optionsHtml = `<div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
+                  ${['A','B','C','D'].filter(l => q['option_'+l.toLowerCase()]).map(l => {
+                    const opt = q['option_'+l.toLowerCase()];
+                    const isUserPick = userSet.has(l);
+                    const isCorrectOpt = correctSet.has(l);
                     let bg = 'transparent', border = '1px solid var(--border)', icon = '';
                     if (isCorrectOpt && isUserPick) { bg = 'rgba(34,197,94,0.12)'; border = '1px solid var(--success)'; icon = '<span style="color:var(--success);font-weight:700;">✓</span>'; }
                     else if (isCorrectOpt) { bg = 'rgba(34,197,94,0.07)'; border = '1px solid var(--success)'; icon = '<span style="color:var(--success);">✓</span>'; }
                     else if (isUserPick) { bg = 'rgba(239,68,68,0.10)'; border = '1px solid var(--danger)'; icon = '<span style="color:var(--danger);">✗</span>'; }
                     return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:${bg};border:${border};">
+                      <span style="width:22px;height:22px;border-radius:5px;background:rgba(255,255,255,0.06);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">${l}</span>
+                      <span style="${isUserPick?'font-weight:600;':''};flex:1;">${opt}</span>
                       <span style="min-width:20px;">${icon}</span>
-                      <span style="${isUserPick?'font-weight:600;':''}">${opt}</span>
-                      ${isUserPick && !isCorrectOpt ? '<span style="font-size:11px;color:var(--danger);margin-left:auto;">Bạn chọn</span>' : ''}
-                      ${isCorrectOpt && !isUserPick ? '<span style="font-size:11px;color:var(--success);margin-left:auto;">Đáp án đúng</span>' : ''}
-                      ${isCorrectOpt && isUserPick ? '<span style="font-size:11px;color:var(--success);margin-left:auto;">Bạn chọn ✓</span>' : ''}
+                      ${isUserPick && !isCorrectOpt ? '<span style="font-size:11px;color:var(--danger);">Bạn chọn</span>' : ''}
+                      ${isCorrectOpt && !isUserPick ? '<span style="font-size:11px;color:var(--success);">Đáp án đúng</span>' : ''}
+                      ${isCorrectOpt && isUserPick ? '<span style="font-size:11px;color:var(--success);">Bạn chọn ✓</span>' : ''}
                     </div>`;
                   }).join('')}
                 </div>`;
-              } else if (isEssay) {
+                }
+              } else {
                 optionsHtml = `<div style="margin-top:10px;padding:10px 14px;background:var(--bg-secondary);border-radius:8px;border:1px solid var(--border);">
                   <div class="text-sm text-muted" style="margin-bottom:4px;">Câu trả lời của bạn:</div>
                   <div style="${!hasAnswer?'color:var(--text-muted);font-style:italic;':''}">${hasAnswer ? userArr.join(', ') : 'Không trả lời'}</div>
