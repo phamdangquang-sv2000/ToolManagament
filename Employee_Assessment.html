@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hệ Thống Đánh Giá Probation</title>
+  <title>Hệ Thống Đánh Giá Nhân Viên</title>
   <!-- Supabase JS v2 -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- bcryptjs: client-side password hashing -->
@@ -1160,7 +1160,7 @@
      ===================================================== -->
 <div id="screen-employee" class="screen">
   <div class="emp-header">
-    <div class="logo">ProEval</div>
+    <div class="logo">Employee Assessment</div>
     <div class="flex items-center gap-4">
       <div id="emp-user-info" style="font-size:13px;color:var(--text-secondary);"></div>
       <button class="btn btn-ghost btn-sm" onclick="App.auth.employeeLogout()">Đăng xuất</button>
@@ -1484,7 +1484,7 @@
    ========================================================= */
 const SUPABASE_URL = 'https://edsowiramriosgwfuewg.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkc293aXJhbXJpb3Nnd2Z1ZXdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNDMzMDgsImV4cCI6MjA5MzgxOTMwOH0.aocvFLnJrl5LFPdxDf9zbhvT6HT7NpCEMFtiUr_M3gM';
-const SESSION_KEY = 'proeval_session';
+const SESSION_KEY = 'Employee Assessment_session';
 const SESSION_DURATION_MS = 8 * 60 * 60 * 1000; // 8 hours
 const BCRYPT_ROUNDS = 10;
 
@@ -1554,7 +1554,7 @@ const App = {
       }
 
       // Check employee session
-      const empSession = sessionStorage.getItem('proeval_employee');
+      const empSession = sessionStorage.getItem('Employee Assessment_employee');
       if (empSession) {
         App.state.employee = JSON.parse(empSession);
         App.screen.show('employee');
@@ -1707,7 +1707,7 @@ const App = {
         const { data, error } = await db.from('hr_employees').select('*').ilike('email', email).single();
         if (error || !data) { errEl.textContent = 'Email không tìm thấy trong hệ thống.'; return; }
         App.state.employee = data;
-        sessionStorage.setItem('proeval_employee', JSON.stringify(data));
+        sessionStorage.setItem('Employee Assessment_employee', JSON.stringify(data));
         App.screen.show('employee');
         App.employee.load();
       } catch(e) {
@@ -1727,7 +1727,7 @@ const App = {
 
     employeeLogout() {
       App.state.employee = null;
-      sessionStorage.removeItem('proeval_employee');
+      sessionStorage.removeItem('Employee Assessment_employee');
       App.screen.show('auth');
     }
   },
