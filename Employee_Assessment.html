@@ -2070,6 +2070,12 @@ const App = {
       btnEl.innerHTML = '<span style="display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;margin-right:6px;vertical-align:middle;"></span>Đang xác thực...';
 
       try {
+        if (!App.state.pendingLogin) {
+          btnEl.disabled = false; btnEl.textContent = 'Đăng nhập';
+          errEl.textContent = 'Phiên đăng nhập hết hạn. Vui lòng thử lại từ đầu.';
+          setTimeout(() => App.auth._backToEmail(), 1500);
+          return;
+        }
         const { data: empData, myToken } = App.state.pendingLogin;
         const { data: pinRow } = await db.from('exam_employee_pins')
           .select('pin_hash').eq('employee_id', empData.id).single();
@@ -2221,8 +2227,22 @@ const App = {
       }
       App.state.employee = null;
       App.state.empSessionToken = null;
+      App.state.pendingLogin = null;
       sessionStorage.removeItem('Employee Assessment_employee');
       sessionStorage.removeItem('Employee Assessment_emp_token');
+      // Reset auth UI về bước email, xóa sạch PIN fields
+      try {
+        document.getElementById('emp-step-create-pin').classList.add('hidden');
+        document.getElementById('emp-step-enter-pin').classList.add('hidden');
+        document.getElementById('emp-step-email').classList.remove('hidden');
+        document.getElementById('auth-emp-error').innerHTML = '';
+        document.getElementById('emp-email').value = '';
+        const pinInput = document.getElementById('emp-pin-input');
+        if (pinInput) { pinInput.value = ''; pinInput.disabled = false; }
+        const verifyBtn = document.getElementById('emp-verify-pin-btn');
+        if (verifyBtn) { verifyBtn.disabled = false; verifyBtn.textContent = 'Đăng nhập'; }
+        App.auth._pinFailCount = 0;
+      } catch(e) {}
       App.screen.show('auth');
     }
   },
