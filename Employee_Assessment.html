@@ -3791,8 +3791,9 @@ const App = {
         attempt = newAttempt;
       }
 
-      // Load questions
-      const { data: questions } = await db.from('exam_questions')
+      // Load questions — dùng exam_questions_public (không có correct_answers)
+      // Ngăn nhân viên đọc đáp án qua App.state.examState.questions trong DevTools
+      const { data: questions } = await db.from('exam_questions_public')
         .select('*').eq('test_id', testId).is('deleted_at', null).order('order_no');
       // Load saved answers
       const { data: savedAnswers } = await db.from('exam_test_answers')
@@ -4108,7 +4109,7 @@ const App = {
       try {
         const [attemptRes, answersRes] = await Promise.all([
           db.from('exam_exam_attempts').select('*').eq('id', attemptId).single(),
-          db.from('exam_test_answers').select('*, exam_questions(*)').eq('attempt_id', attemptId)
+          db.from('exam_test_answers').select('*').eq('attempt_id', attemptId)
         ]);
         const attempt = attemptRes.data;
         const { data: reviewTest } = await db.from('exam_tests').select('*').eq('id', attempt.test_id).single();
@@ -4119,10 +4120,18 @@ const App = {
           reviewProjName = rp?.name || '';
         }
         const answers = answersRes.data || [];
-        const { data: questions } = await db.from('exam_questions')
+        const { data: questions } = await db.from('exam_questions_public')
           .select('*').eq('test_id', attempt.test_id).is('deleted_at', null).order('order_no');
         const { data: result } = await db.from('exam_test_results')
           .select('*').eq('attempt_id', attemptId).single();
+
+        // Lấy correct_answers qua RPC — chỉ trả về nếu attempt đã submitted
+        // An toàn: server kiểm tra trạng thái, không leak khi đang làm bài
+        let correctAnswersMap = {};
+        if (attempt.status === 'submitted' || attempt.submitted_at) {
+          const { data: caData } = await db.rpc('get_correct_answers_for_attempt', { p_attempt_id: attemptId });
+          (caData || []).forEach(row => { correctAnswersMap[row.question_id] = row.correct_answers; });
+        }
 
         const answerMap = {};
         answers.forEach(a => { answerMap[a.question_id] = a.answer_data; });
@@ -4147,7 +4156,7 @@ const App = {
             ${(questions||[]).map((q, i) => {
               const userAns = answerMap[q.id];
               const userArr = Array.isArray(userAns) ? userAns : (userAns ? [userAns] : []);
-              const correctArr = q.correct_answers || [];
+              const correctArr = correctAnswersMap[q.id] || [];
               const correctSet = new Set(correctArr);
               const userSet = new Set(userArr);
               const isEssay = q.type === 'essay';
