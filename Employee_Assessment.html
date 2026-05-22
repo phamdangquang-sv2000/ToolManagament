@@ -170,6 +170,7 @@
     @keyframes popIn { 0% { opacity: 0; transform: scale(0.90); } 100% { opacity: 1; transform: scale(1); } }
     @keyframes glow { 0%,100% { box-shadow: 0 0 0 0 rgba(124,106,247,0.4); } 50% { box-shadow: 0 0 0 8px rgba(124,106,247,0); } }
     @keyframes gradientShift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
 
     /* =====================================================
        SCREENS
@@ -1101,12 +1102,79 @@
 
     <!-- === EMPLOYEE LOGIN FORM === -->
     <div id="auth-employee-form" class="hidden">
-      <div class="alert alert-info">Nhập tài khoản Heiway của bạn để xem bài thi.</div>
-      <div class="form-group">
-        <label>Email nhân viên</label>
-        <input type="email" id="emp-email" placeholder="shrvn***@heiway.net" onkeydown="if(event.key==='Enter')App.auth.employeeLogin()">
+
+      <!-- STEP 1: Nhập email -->
+      <div id="emp-step-email">
+        <div class="alert alert-info">Nhập tài khoản Heiway của bạn để xem bài thi.</div>
+        <div class="form-group">
+          <label>Email nhân viên</label>
+          <input type="email" id="emp-email" placeholder="shrvn***@heiway.net" onkeydown="if(event.key==='Enter')App.auth.employeeLogin()">
+        </div>
+        <button class="btn btn-primary w-full" id="emp-login-btn" onclick="App.auth.employeeLogin()">Tiếp tục</button>
       </div>
-      <button class="btn btn-primary w-full" onclick="App.auth.employeeLogin()">Tiếp tục</button>
+
+      <!-- STEP 2a: Tạo PIN mới -->
+      <div id="emp-step-create-pin" class="hidden">
+        <div style="text-align:center;margin-bottom:20px;">
+          <div style="width:52px;height:52px;border-radius:16px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:24px;">🔐</div>
+          <div style="font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:4px;">Tạo mã PIN cá nhân</div>
+          <div style="font-size:12px;color:var(--text-muted);">Mã PIN 6 chữ số — chỉ bạn mới biết</div>
+        </div>
+        <div class="form-group">
+          <label>Nhập mã PIN mới (6 chữ số)</label>
+          <div style="position:relative;">
+            <input type="password" id="emp-pin-new" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="••••••" autocomplete="new-password"
+              style="letter-spacing:8px;font-size:22px;text-align:center;padding:12px 40px 12px 14px;"
+              oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6);App.auth._pinDots('emp-pin-new-dots',this.value.length)"
+              onkeydown="if(event.key==='Enter')App.auth.confirmCreatePin()">
+            <button type="button" onclick="App.auth._togglePinVis('emp-pin-new',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);padding:4px;cursor:pointer;font-size:16px;">👁</button>
+          </div>
+          <div id="emp-pin-new-dots" style="display:flex;gap:8px;justify-content:center;margin-top:8px;">
+            <div data-idx="0" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="1" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="2" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="3" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="4" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="5" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Xác nhận mã PIN</label>
+          <div style="position:relative;">
+            <input type="password" id="emp-pin-confirm" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="••••••" autocomplete="new-password"
+              style="letter-spacing:8px;font-size:22px;text-align:center;padding:12px 40px 12px 14px;"
+              oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6);App.auth._pinDots('emp-pin-confirm-dots',this.value.length)"
+              onkeydown="if(event.key==='Enter')App.auth.confirmCreatePin()">
+            <button type="button" onclick="App.auth._togglePinVis('emp-pin-confirm',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);padding:4px;cursor:pointer;font-size:16px;">👁</button>
+          </div>
+          <div id="emp-pin-confirm-dots" style="display:flex;gap:8px;justify-content:center;margin-top:8px;">
+            <div data-idx="0" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="1" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="2" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="3" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="4" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="5" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div>
+          </div>
+        </div>
+        <button class="btn btn-primary w-full" id="emp-create-pin-btn" onclick="App.auth.confirmCreatePin()">Tạo mã PIN & Đăng nhập</button>
+        <button class="btn btn-ghost w-full mt-2" onclick="App.auth._backToEmail()">← Quay lại</button>
+      </div>
+
+      <!-- STEP 2b: Nhập PIN đã có -->
+      <div id="emp-step-enter-pin" class="hidden">
+        <div style="text-align:center;margin-bottom:20px;">
+          <div style="width:52px;height:52px;border-radius:16px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:24px;">🔑</div>
+          <div style="font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:4px;" id="emp-pin-welcome">Xin chào!</div>
+          <div style="font-size:12px;color:var(--text-muted);">Nhập mã PIN 6 chữ số để tiếp tục</div>
+        </div>
+        <div class="form-group">
+          <label>Mã PIN của bạn</label>
+          <div style="position:relative;">
+            <input type="password" id="emp-pin-input" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="••••••" autocomplete="current-password"
+              style="letter-spacing:8px;font-size:22px;text-align:center;padding:12px 40px 12px 14px;"
+              oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6);App.auth._pinDots('emp-pin-enter-dots',this.value.length)"
+              onkeydown="if(event.key==='Enter')App.auth.verifyPin()">
+            <button type="button" onclick="App.auth._togglePinVis('emp-pin-input',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);padding:4px;cursor:pointer;font-size:16px;">👁</button>
+          </div>
+          <div id="emp-pin-enter-dots" style="display:flex;gap:8px;justify-content:center;margin-top:8px;">
+            <div data-idx="0" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="1" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="2" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="3" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="4" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="5" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div>
+          </div>
+          <div id="emp-pin-attempts" style="text-align:center;margin-top:8px;font-size:12px;color:var(--text-muted);"></div>
+        </div>
+        <button class="btn btn-primary w-full" id="emp-verify-pin-btn" onclick="App.auth.verifyPin()">Đăng nhập</button>
+        <button class="btn btn-ghost w-full mt-2" onclick="App.auth._backToEmail()">← Quay lại</button>
+      </div>
+
       <div id="auth-emp-error" class="mt-2 text-sm" style="color:var(--danger);"></div>
     </div>
 
@@ -1587,6 +1655,9 @@ const App = {
       results: { data: [], filtered: [], page: 1, perPage: 10, sort: '', dir: 'asc', search: '' },
     },
     gradeContext: null, // current grading context
+    empSessionToken: null,  // unique token for concurrent-login detection
+    empPresenceChannel: null, // realtime presence channel for employee
+    pendingLogin: null,  // { data, myToken, presenceCh } — waiting for PIN verification
   },
 
   /* =========================================================
@@ -1622,6 +1693,20 @@ const App = {
       const empSession = sessionStorage.getItem('Employee Assessment_employee');
       if (empSession) {
         App.state.employee = JSON.parse(empSession);
+        // Restore presence channel để giữ "slot" đang login, ngăn người khác chiếm trong khi đang thi
+        const savedToken = sessionStorage.getItem('Employee Assessment_emp_token');
+        if (savedToken && App.state.employee) {
+          const myToken = savedToken;
+          const channelName = `emp-presence-${App.state.employee.id}`;
+          const presenceCh = db.channel(channelName, { config: { presence: { key: myToken } } });
+          presenceCh.subscribe(async (status) => {
+            if (status === 'SUBSCRIBED') {
+              await presenceCh.track({ email: App.state.employee.email, loginAt: new Date().toISOString(), token: myToken });
+            }
+          });
+          App.state.empPresenceChannel = presenceCh;
+          App.state.empSessionToken = myToken;
+        }
         App.screen.show('employee');
         App.employee.load();
         return;
@@ -1766,18 +1851,333 @@ const App = {
     async employeeLogin() {
       const email = document.getElementById('emp-email').value.trim().toLowerCase();
       const errEl = document.getElementById('auth-emp-error');
+      const btnEl = document.getElementById('emp-login-btn');
       errEl.textContent = '';
       if (!email) { errEl.textContent = 'Vui lòng nhập email.'; return; }
+
+      // Loading state
+      btnEl.disabled = true;
+      btnEl.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;margin-right:6px;"></span>Đang kiểm tra...</span>';
+
       try {
         const { data, error } = await db.from('hr_employees').select('*').ilike('email', email).single();
-        if (error || !data) { errEl.textContent = 'Email không tìm thấy trong hệ thống.'; return; }
-        App.state.employee = data;
-        sessionStorage.setItem('Employee Assessment_employee', JSON.stringify(data));
-        App.screen.show('employee');
-        App.employee.load();
+        if (error || !data) {
+          errEl.textContent = 'Email không tìm thấy trong hệ thống.';
+          btnEl.disabled = false; btnEl.textContent = 'Tiếp tục';
+          return;
+        }
+
+        // --- CONCURRENT LOGIN DETECTION ---
+        // Tạo một unique session token cho lần đăng nhập này
+        const myToken = crypto.randomUUID();
+        const channelName = `emp-presence-${data.id}`;
+
+        // Tham gia channel presence và chờ xem có ai đang online chưa
+        // QUAN TRỌNG: chỉ track presence SAU KHI xác nhận không có ai → B không bao giờ kick A
+        const presenceCh = db.channel(channelName, { config: { presence: { key: myToken } } });
+
+        const loginResult = await new Promise((resolve) => {
+          let resolved = false;
+          const done = (result) => { if (!resolved) { resolved = true; resolve(result); } };
+
+          presenceCh
+            .on('presence', { event: 'sync' }, () => {
+              // Chỉ kiểm tra sau khi đã subscribe (không phải lần sync đầu tiên trống)
+            })
+            .subscribe(async (status) => {
+              if (status === 'SUBSCRIBED') {
+                // Đọc state TRƯỚC khi track — nếu có ai đang online thì block ngay, không track
+                const currentState = presenceCh.presenceState();
+                const occupied = Object.keys(currentState).length > 0;
+                if (occupied) {
+                  // Có người đang login → block B, KHÔNG track, A không bị ảnh hưởng
+                  done({ blocked: true });
+                  return;
+                }
+                // Chưa có ai → track presence của mình
+                await presenceCh.track({ email: data.email, loginAt: new Date().toISOString(), token: myToken });
+                // Đợi thêm 600ms để catch race condition (2 người click cùng lúc)
+                setTimeout(() => {
+                  const state = presenceCh.presenceState();
+                  const others = Object.keys(state).filter(k => k !== myToken);
+                  if (others.length > 0) {
+                    // Race: có người khác cũng track cùng lúc → người đến sau (others) bị thua
+                    // Giữ nguyên: mình đã track rồi → mình thắng, họ sẽ bị block ở phía họ
+                    done({ blocked: false });
+                  } else {
+                    done({ blocked: false });
+                  }
+                }, 600);
+              }
+            });
+
+          // Timeout fallback nếu Realtime không kết nối được (cho phép login)
+          setTimeout(() => done({ blocked: false }), 4000);
+        });
+
+        if (loginResult.blocked) {
+          // Hủy channel nếu bị block
+          try { db.removeChannel(presenceCh); } catch(e) {}
+          btnEl.disabled = false; btnEl.textContent = 'Tiếp tục';
+          errEl.innerHTML = `
+            <div style="display:flex;align-items:flex-start;gap:8px;padding:12px 14px;background:rgba(255,88,88,0.10);border:1px solid rgba(255,88,88,0.30);border-radius:10px;font-size:13px;color:#ff8585;">
+              <span style="font-size:16px;flex-shrink:0;">⚠️</span>
+              <div>
+                <div style="font-weight:700;margin-bottom:2px;">Tài khoản đang được sử dụng</div>
+                <div style="color:rgba(255,133,133,0.80);">Tài khoản <strong>${data.email}</strong> đang đăng nhập ở một thiết bị khác. Chỉ một người có thể đăng nhập cùng lúc.</div>
+              </div>
+            </div>`;
+          return;
+        }
+
+        // Không có người khác → tiến đến bước PIN
+        App.state.pendingLogin = { data, myToken, presenceCh };
+        btnEl.disabled = false; btnEl.textContent = 'Tiếp tục';
+
+        // Kiểm tra nhân viên đã có PIN chưa
+        const { data: pinRow } = await db.from('exam_employee_pins')
+          .select('id').eq('employee_id', data.id).maybeSingle();
+
+        if (pinRow) {
+          // Đã có PIN → bước nhập PIN
+          App.auth._showPinEnter(data);
+        } else {
+          // Chưa có PIN → bước tạo PIN
+          App.auth._showPinCreate();
+        }
       } catch(e) {
+        btnEl.disabled = false; btnEl.textContent = 'Tiếp tục';
         errEl.textContent = 'Lỗi: ' + e.message;
       }
+    },
+
+    // ── PIN UI HELPERS ──
+    _showPinCreate() {
+      document.getElementById('emp-step-email').classList.add('hidden');
+      document.getElementById('emp-step-enter-pin').classList.add('hidden');
+      document.getElementById('emp-step-create-pin').classList.remove('hidden');
+      document.getElementById('auth-emp-error').innerHTML = '';
+      // Reset fields
+      ['emp-pin-new','emp-pin-confirm'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      App.auth._pinDots('emp-pin-new-dots', 0);
+      App.auth._pinDots('emp-pin-confirm-dots', 0);
+      setTimeout(() => document.getElementById('emp-pin-new')?.focus(), 100);
+    },
+
+    _showPinEnter(data) {
+      document.getElementById('emp-step-email').classList.add('hidden');
+      document.getElementById('emp-step-create-pin').classList.add('hidden');
+      document.getElementById('emp-step-enter-pin').classList.remove('hidden');
+      document.getElementById('auth-emp-error').innerHTML = '';
+      const nameEl = document.getElementById('emp-pin-welcome');
+      if (nameEl) nameEl.textContent = `Xin chào, ${data.name || data.full_name || data.email.split('@')[0]}!`;
+      const attemptsEl = document.getElementById('emp-pin-attempts');
+      if (attemptsEl) attemptsEl.textContent = '';
+      const pinInput = document.getElementById('emp-pin-input');
+      if (pinInput) pinInput.value = '';
+      App.auth._pinDots('emp-pin-enter-dots', 0);
+      App.auth._pinFailCount = 0;
+      setTimeout(() => pinInput?.focus(), 100);
+    },
+
+    _backToEmail() {
+      // Huỷ pending login nếu có
+      if (App.state.pendingLogin?.presenceCh) {
+        try { db.removeChannel(App.state.pendingLogin.presenceCh); } catch(e) {}
+      }
+      App.state.pendingLogin = null;
+      document.getElementById('emp-step-create-pin').classList.add('hidden');
+      document.getElementById('emp-step-enter-pin').classList.add('hidden');
+      document.getElementById('emp-step-email').classList.remove('hidden');
+      document.getElementById('auth-emp-error').innerHTML = '';
+      document.getElementById('emp-email').value = '';
+      setTimeout(() => document.getElementById('emp-email')?.focus(), 100);
+    },
+
+    _pinDots(containerId, count) {
+      const dots = document.querySelectorAll(`#${containerId} [data-idx]`);
+      dots.forEach((dot, i) => {
+        if (i < count) {
+          dot.style.background = 'var(--accent)';
+          dot.style.transform = 'scale(1.25)';
+          dot.style.boxShadow = '0 0 8px rgba(124,106,247,0.6)';
+        } else {
+          dot.style.background = 'rgba(255,255,255,0.12)';
+          dot.style.transform = 'scale(1)';
+          dot.style.boxShadow = 'none';
+        }
+      });
+    },
+
+    _togglePinVis(inputId, btn) {
+      const el = document.getElementById(inputId);
+      if (!el) return;
+      el.type = el.type === 'password' ? 'text' : 'password';
+      btn.textContent = el.type === 'password' ? '👁' : '🙈';
+    },
+
+    _pinFailCount: 0,
+
+    // ── TẠO PIN MỚI ──
+    async confirmCreatePin() {
+      const pinNew = document.getElementById('emp-pin-new').value;
+      const pinConfirm = document.getElementById('emp-pin-confirm').value;
+      const errEl = document.getElementById('auth-emp-error');
+      const btnEl = document.getElementById('emp-create-pin-btn');
+      errEl.innerHTML = '';
+
+      if (pinNew.length < 6) { errEl.textContent = 'Mã PIN phải đủ 6 chữ số.'; return; }
+      if (!/^\d{6}$/.test(pinNew)) { errEl.textContent = 'Mã PIN chỉ gồm chữ số.'; return; }
+      if (pinNew !== pinConfirm) {
+        errEl.textContent = 'Mã PIN xác nhận không khớp.';
+        document.getElementById('emp-pin-confirm').value = '';
+        App.auth._pinDots('emp-pin-confirm-dots', 0);
+        document.getElementById('emp-pin-confirm').focus();
+        return;
+      }
+      // Các PIN quá đơn giản
+      const weak = ['000000','111111','222222','333333','444444','555555','666666','777777','888888','999999','123456','654321','012345'];
+      if (weak.includes(pinNew)) { errEl.textContent = 'Mã PIN quá đơn giản, hãy chọn PIN khác.'; return; }
+
+      btnEl.disabled = true;
+      btnEl.innerHTML = '<span style="display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;margin-right:6px;vertical-align:middle;"></span>Đang lưu...';
+
+      try {
+        const { data: empData, myToken, presenceCh } = App.state.pendingLogin;
+        const hash = await bcrypt.hash(pinNew, BCRYPT_ROUNDS);
+        const { error } = await db.from('exam_employee_pins').upsert({
+          employee_id: empData.id,
+          pin_hash: hash,
+          created_at: new Date().toISOString()
+        }, { onConflict: 'employee_id' });
+        if (error) throw error;
+
+        // PIN tạo xong → đăng nhập luôn
+        App.auth._finalizeLogin(empData, myToken, presenceCh);
+        App.toast.show('Mã PIN đã được tạo! Đăng nhập thành công.', 'success');
+      } catch(e) {
+        btnEl.disabled = false; btnEl.textContent = 'Tạo mã PIN & Đăng nhập';
+        errEl.textContent = 'Lỗi lưu PIN: ' + e.message;
+      }
+    },
+
+    // ── XÁC THỰC PIN ──
+    async verifyPin() {
+      const pinInput = document.getElementById('emp-pin-input');
+      const pin = pinInput.value;
+      const errEl = document.getElementById('auth-emp-error');
+      const attemptsEl = document.getElementById('emp-pin-attempts');
+      const btnEl = document.getElementById('emp-verify-pin-btn');
+      errEl.innerHTML = '';
+
+      if (pin.length < 6) { errEl.textContent = 'Vui lòng nhập đủ 6 chữ số.'; return; }
+
+      btnEl.disabled = true;
+      btnEl.innerHTML = '<span style="display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;margin-right:6px;vertical-align:middle;"></span>Đang xác thực...';
+
+      try {
+        const { data: empData, myToken, presenceCh } = App.state.pendingLogin;
+        const { data: pinRow } = await db.from('exam_employee_pins')
+          .select('pin_hash').eq('employee_id', empData.id).single();
+
+        const match = pinRow && await bcrypt.compare(pin, pinRow.pin_hash);
+        if (!match) {
+          App.auth._pinFailCount = (App.auth._pinFailCount || 0) + 1;
+          const remaining = 5 - App.auth._pinFailCount;
+          pinInput.value = '';
+          App.auth._pinDots('emp-pin-enter-dots', 0);
+          btnEl.disabled = false; btnEl.textContent = 'Đăng nhập';
+          // Hiệu ứng rung
+          pinInput.style.animation = 'none';
+          pinInput.offsetHeight; // reflow
+          pinInput.style.animation = 'shake 0.4s ease';
+          setTimeout(() => { pinInput.style.animation = ''; }, 400);
+          if (remaining <= 0) {
+            // Quá 5 lần sai → huỷ phiên, về email
+            errEl.innerHTML = `<div style="padding:10px 12px;background:rgba(255,88,88,0.12);border:1px solid rgba(255,88,88,0.30);border-radius:8px;font-size:12px;color:#ff8585;font-weight:600;">🔒 Sai PIN quá nhiều lần. Vui lòng thử lại từ đầu.</div>`;
+            setTimeout(() => App.auth._backToEmail(), 2000);
+          } else {
+            attemptsEl.innerHTML = `<span style="color:var(--warning);">⚠ PIN không đúng — còn ${remaining} lần thử</span>`;
+            errEl.textContent = 'Mã PIN không chính xác.';
+            pinInput.focus();
+          }
+          return;
+        }
+
+        // PIN đúng → đăng nhập
+        App.auth._finalizeLogin(empData, myToken, presenceCh);
+        App.toast.show('Đăng nhập thành công!', 'success');
+      } catch(e) {
+        btnEl.disabled = false; btnEl.textContent = 'Đăng nhập';
+        errEl.textContent = 'Lỗi xác thực: ' + e.message;
+      }
+    },
+
+    // ── HOÀN TẤT ĐĂNG NHẬP (sau khi PIN ok) ──
+    _finalizeLogin(data, myToken, presenceCh) {
+      App.state.employee = data;
+      App.state.empSessionToken = myToken;
+      App.state.empPresenceChannel = presenceCh;
+      App.state.pendingLogin = null;
+      sessionStorage.setItem('Employee Assessment_employee', JSON.stringify(data));
+      sessionStorage.setItem('Employee Assessment_emp_token', myToken);
+      // Reset UI về step email cho lần sau
+      document.getElementById('emp-step-create-pin').classList.add('hidden');
+      document.getElementById('emp-step-enter-pin').classList.add('hidden');
+      document.getElementById('emp-step-email').classList.remove('hidden');
+      document.getElementById('emp-email').value = '';
+      App.screen.show('employee');
+      App.employee.load();
+    },
+
+    _kickEmployee(message) {
+      const wasExamActive = !!(App.state.examState?.attempt && App.state.examState?.timerInterval);
+
+      // Dừng timer nếu đang thi
+      if (App.state.examState && App.state.examState.timerInterval) {
+        clearInterval(App.state.examState.timerInterval);
+        App.state.examState.timerInterval = null;
+      }
+      // Cleanup anti-cheat listeners để tránh memory leak
+      if (typeof App.exam?.antiCheat?.cleanup === 'function') {
+        try { App.exam.antiCheat.cleanup(); } catch(e) {}
+      }
+      // Xoá overlay anti-cheat nếu đang hiện
+      const acOverlay = document.getElementById('anticheat-overlay');
+      if (acOverlay) acOverlay.remove();
+
+      // Xoá presence channel
+      if (App.state.empPresenceChannel) {
+        try { db.removeChannel(App.state.empPresenceChannel); } catch(e) {}
+        App.state.empPresenceChannel = null;
+      }
+      App.state.employee = null;
+      App.state.empSessionToken = null;
+      sessionStorage.removeItem('Employee Assessment_employee');
+      sessionStorage.removeItem('Employee Assessment_emp_token');
+
+      // Hiển thị thông báo bị kick trên màn hình auth
+      App.screen.show('auth');
+      setTimeout(() => {
+        const errEl = document.getElementById('auth-emp-error');
+        if (errEl) {
+          errEl.innerHTML = `
+            <div style="display:flex;align-items:flex-start;gap:8px;padding:14px 16px;background:rgba(255,88,88,0.10);border:1px solid rgba(255,88,88,0.30);border-radius:10px;font-size:13px;color:#ff8585;">
+              <span style="font-size:18px;flex-shrink:0;">🔒</span>
+              <div>
+                <div style="font-weight:700;margin-bottom:4px;">Phiên đăng nhập bị chấm dứt</div>
+                <div style="color:rgba(255,133,133,0.85);margin-bottom:${wasExamActive ? '8px' : '0'};">${message}</div>
+                ${wasExamActive ? `<div style="padding:8px 10px;background:rgba(255,210,0,0.10);border:1px solid rgba(255,210,0,0.30);border-radius:8px;color:#ffd200;font-size:12px;font-weight:600;">
+                  ℹ️ Bài thi của bạn <strong>chưa bị nộp</strong> và vẫn được bảo toàn. Đăng nhập lại để tiếp tục từ chỗ dở.
+                </div>` : ''}
+              </div>
+            </div>`;
+          App.auth.switchTab('employee');
+        }
+      }, 100);
     },
 
     async logout() {
@@ -1795,8 +2195,14 @@ const App = {
     },
 
     employeeLogout() {
+      if (App.state.empPresenceChannel) {
+        try { db.removeChannel(App.state.empPresenceChannel); } catch(e) {}
+        App.state.empPresenceChannel = null;
+      }
       App.state.employee = null;
+      App.state.empSessionToken = null;
       sessionStorage.removeItem('Employee Assessment_employee');
+      sessionStorage.removeItem('Employee Assessment_emp_token');
       App.screen.show('auth');
     }
   },
