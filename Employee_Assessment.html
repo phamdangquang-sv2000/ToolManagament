@@ -1784,6 +1784,10 @@ const App = {
       if (App.state.session) {
         await db.from('exam_admin_sessions').delete().eq('session_token', App.state.session.token);
       }
+      // Cleanup realtime channels and polling
+      App.realtime.channels.forEach(ch => { try { db.removeChannel(ch); } catch(e) {} });
+      App.realtime.channels = [];
+      if (App.realtime.pollInterval) { clearInterval(App.realtime.pollInterval); App.realtime.pollInterval = null; }
       App.state.session = null;
       sessionStorage.removeItem(SESSION_KEY);
       App.screen.show('auth');
@@ -3413,7 +3417,13 @@ const App = {
       const totalPossible = questions.reduce((sum, q) => sum + (parseFloat(q.score)||0), 0);
       const totalScoreLabel = document.getElementById('exam-total-score-label');
       if (totalScoreLabel) totalScoreLabel.textContent = `Tổng ${totalPossible} điểm · ${questions.length} câu`;
-      container.innerHTML = questions.map((q, i) => {
+      // C3 FIX: Loại bỏ correct_answers và các field nhạy cảm trước khi render vào DOM
+      // Ngăn nhân viên đọc đáp án đúng qua DevTools → inspect element
+      const safeQuestions = questions.map(q => {
+        const { correct_answers, correct_answer, answer_key, ...safeQ } = q;
+        return safeQ;
+      });
+      container.innerHTML = safeQuestions.map((q, i) => {
         const savedAns = answers[q.id];
         const typeLabel = q.type === 'essay' ? 'Tự luận' : q.type === 'multiple' ? 'Nhiều đáp án' : 'Trắc nghiệm';
         const optHtml = q.type === 'essay' ? `
@@ -3441,7 +3451,7 @@ const App = {
           </div>
         `;
       }).join('');
-      navGrid.innerHTML = questions.map((q,i) => {
+      navGrid.innerHTML = safeQuestions.map((q,i) => {
         const answered = answers[q.id] && (Array.isArray(answers[q.id]) ? answers[q.id].length > 0 : answers[q.id] !== '');
         return `<button class="q-nav-btn ${answered?'answered':''}" onclick="document.getElementById('qblock_${q.id}').scrollIntoView({behavior:'smooth'});">${i+1}</button>`;
       }).join('');
@@ -3488,8 +3498,15 @@ const App = {
     },
 
     startTimer() {
+      // C2 FIX: Tính thời gian còn lại từ expires_at server-side thay vì giảm dần client-side
+      // Ngăn chặn việc chỉnh App.state.examState.secondsLeft qua DevTools
+      const getSecondsLeft = () => {
+        const expiresAt = App.state.examState.attempt?.expires_at;
+        if (!expiresAt) return 0;
+        return Math.max(0, Math.floor((new Date(expiresAt).getTime() - Date.now()) / 1000));
+      };
       const update = () => {
-        const s = App.state.examState.secondsLeft;
+        const s = getSecondsLeft();
         const m = Math.floor(s / 60);
         const sec = s % 60;
         const timerEl = document.getElementById('exam-timer');
@@ -3500,8 +3517,6 @@ const App = {
         if (s <= 0) {
           clearInterval(App.state.examState.timerInterval);
           App.exam.submit(true);
-        } else {
-          App.state.examState.secondsLeft--;
         }
       };
       update();
@@ -3795,26 +3810,57 @@ const App = {
      ========================================================= */
   realtime: {
     channels: [],
+    pollInterval: null,
+
     subscribe() {
-      // Unsubscribe any existing channels first to avoid duplicate callbacks
+      // M4 FIX: Dùng nhiều channel có tên cố định thay vì 1 channel với Date.now()
+      // Tránh trường hợp channel bị lỗi/quá tải làm mất toàn bộ thông báo
+      // Unsubscribe các channel cũ
       App.realtime.channels.forEach(ch => { try { db.removeChannel(ch); } catch(e) {} });
       App.realtime.channels = [];
-      const channel = db.channel('admin-realtime-' + Date.now())
+      if (App.realtime.pollInterval) { clearInterval(App.realtime.pollInterval); App.realtime.pollInterval = null; }
+
+      let realtimeOk = false;
+
+      // Channel 1: theo dõi attempts (chấm điểm + dashboard)
+      const chAttempts = db.channel('admin-attempts-v1')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'exam_exam_attempts' }, () => {
           if (App.state.currentView === 'grading') App.views.grading.load();
           if (App.state.currentView === 'dashboard') App.views.dashboard.load();
         })
+        .subscribe((status, err) => {
+          if (status === 'SUBSCRIBED') realtimeOk = true;
+          if (err) console.warn('Realtime attempts error:', err);
+        });
+
+      // Channel 2: theo dõi results
+      const chResults = db.channel('admin-results-v1')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'exam_test_results' }, () => {
           if (App.state.currentView === 'results') App.views.results.load();
           if (App.state.currentView === 'dashboard') App.views.dashboard.load();
         })
+        .subscribe((status, err) => {
+          if (err) console.warn('Realtime results error:', err);
+        });
+
+      // Channel 3: theo dõi assignments
+      const chAssignments = db.channel('admin-assignments-v1')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'exam_test_assignments' }, () => {
           if (App.state.currentView === 'assignments') App.views.assignments.load();
         })
         .subscribe((status, err) => {
-          if (err) console.warn('Realtime subscription error:', err);
+          if (err) console.warn('Realtime assignments error:', err);
         });
-      App.realtime.channels.push(channel);
+
+      App.realtime.channels.push(chAttempts, chResults, chAssignments);
+
+      // M4 FIX: Polling fallback mỗi 30s phòng khi Realtime Supabase lỗi/quá tải
+      // Đảm bảo admin không cần refresh tay để thấy bài mới nộp
+      App.realtime.pollInterval = setInterval(() => {
+        if (App.state.currentView === 'grading') App.views.grading.load();
+        else if (App.state.currentView === 'dashboard') App.views.dashboard.load();
+        else if (App.state.currentView === 'results') App.views.results.load();
+      }, 30000);
     }
   },
 
