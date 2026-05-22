@@ -778,6 +778,16 @@ tr:hover td{background:rgba(13,148,136,.03)}
         <span id="dm-ico-login">🌙</span><span id="dm-lbl-login">Chế độ tối</span>
       </button>
     </div>
+    <div class="flex justify-center mt-2">
+      <a href="Huong_Dan_Su_Dung_Work_Attendance_Summary.html" target="_blank"
+         class="text-xs flex items-center gap-2 px-4 py-2 rounded-xl transition-all font-semibold"
+         style="color:#0d9488;background:rgba(13,148,136,0.08);border:1px solid rgba(13,148,136,0.2);"
+         onmouseover="this.style.background='rgba(13,148,136,0.15)'"
+         onmouseout="this.style.background='rgba(13,148,136,0.08)'">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        📖 Hướng dẫn sử dụng
+      </a>
+    </div>
   </div>
 </div>
 
@@ -835,6 +845,10 @@ tr:hover td{background:rgba(13,148,136,.03)}
     </nav>
 
     <div class="p-2.5" style="border-top:1px solid var(--border)">
+      <a href="Huong_Dan_Su_Dung_Work_Attendance_Summary.html" target="_blank" class="nav-link" style="color:#0d9488;text-decoration:none;display:flex;align-items:center;">
+        <span class="nav-icon">📖</span>
+        Hướng dẫn sử dụng
+      </a>
       <div class="nav-link" onclick="toggleDark()">
         <span class="nav-icon" style="font-size:.85rem"><span id="dm-ico-app">🌙</span></span>
         <span id="dm-lbl-app">Chế độ tối</span>
@@ -855,6 +869,11 @@ tr:hover td{background:rgba(13,148,136,.03)}
         <p id="ly-label" class="text-xs font-medium mt-0.5" style="color:var(--text-3)"></p>
       </div>
       <div class="flex items-center gap-3">
+        <a href="Huong_Dan_Su_Dung_Work_Attendance_Summary.html" target="_blank"
+           class="btn btn-secondary btn-sm" style="font-size:.75rem;padding:.35rem .75rem;gap:.3rem;color:#0d9488;border-color:rgba(13,148,136,0.3);text-decoration:none;">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          Hướng dẫn
+        </a>
         <span id="sess-timer" class="hidden text-xs font-semibold px-3 py-1.5 rounded-lg" style="background:var(--surface3);color:var(--text-2)"></span>
         <button id="btn-refresh" onclick="refreshAll()" title="Tải lại dữ liệu" class="btn btn-secondary btn-sm" style="font-size:.75rem;padding:.35rem .75rem;gap:.3rem">
           <svg id="refresh-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
