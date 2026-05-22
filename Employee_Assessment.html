@@ -1111,7 +1111,11 @@
     </div>
 
     <hr class="divider">
-    <div style="text-align:center;">
+    <div style="text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center;">
+      <a href="Huong_Dan_Su_Dung_Employee_Assessment.html" target="_blank" style="font-size:13px;color:var(--text-secondary);font-weight:600;display:inline-flex;align-items:center;gap:6px;text-decoration:none;padding:8px 16px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);transition:all 0.2s;background:var(--bg-soft);" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)';this.style.background='var(--accent-light)';" onmouseout="this.style.color='var(--text-secondary)';this.style.borderColor='var(--border-strong)';this.style.background='var(--bg-soft)';">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        📖 Hướng dẫn sử dụng
+      </a>
       <a href="#" onclick="App.showResults()" style="font-size:13px;color:var(--accent);font-weight:600;display:inline-flex;align-items:center;gap:6px;">
         <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
         Xem kết quả tổng hợp →
@@ -1200,6 +1204,10 @@
           <span style="width:6px;height:6px;background:var(--success);border-radius:50%;display:inline-block;"></span>
           Realtime
         </div>
+        <a href="Huong_Dan_Su_Dung_Employee_Assessment.html" target="_blank" class="btn btn-ghost btn-sm" title="Hướng dẫn sử dụng" style="display:flex;align-items:center;gap:6px;text-decoration:none;">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          Hướng dẫn
+        </a>
       </div>
     </div>
     <div class="content-area" id="admin-content">
@@ -1216,6 +1224,10 @@
     <div class="logo">Employee Assessment</div>
     <div class="flex items-center gap-4">
       <div id="emp-user-info" style="font-size:13px;color:var(--text-secondary);"></div>
+      <a href="Huong_Dan_Su_Dung_Employee_Assessment.html" target="_blank" class="btn btn-ghost btn-sm" title="Hướng dẫn sử dụng" style="display:flex;align-items:center;gap:6px;text-decoration:none;">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        Hướng dẫn
+      </a>
       <button class="btn btn-ghost btn-sm" onclick="App.auth.employeeLogout()">Đăng xuất</button>
     </div>
   </div>
