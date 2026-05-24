@@ -2949,8 +2949,8 @@ function viewLap(id){
           </div>
           ${isImageUrl(f.url) ? `<a href="${f.url}" target="_blank" rel="noopener"><img src="${f.url}" alt="Biên bản ${i+1}" style="width:100%;max-height:200px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,0.08);margin-bottom:8px;"/></a>` : ""}
           <div style="display:flex;gap:8px;">
-            <button class="btn btn-ghost btn-sm" style="flex:1;" onclick="window.open('${f.url}','_blank')">👁 Xem</button>
-            <button class="btn btn-primary btn-sm" style="flex:1;" onclick="downloadBienBan('${f.url}','bien-ban-${safeName}-${i+1}')">⬇ Tải về</button>
+            <button class="btn btn-ghost btn-sm" style="flex:1;" data-url="${f.url}" data-name="${f.name||('File '+(i+1))}" onclick="viewBienBan(this.dataset.url,this.dataset.name)">👁 Xem</button>
+            <button class="btn btn-primary btn-sm" style="flex:1;" data-url="${f.url}" onclick="downloadBienBan(this.dataset.url,'bien-ban-${safeName}-${i+1}')">⬇ Tải về</button>
           </div>
         </div>
       `).join("")}
@@ -3122,16 +3122,37 @@ async function createLap(){
 }
 // Tải file biên bản về máy (force download để tránh mở tab mới)
 function downloadBienBan(url, filename){
-  // Mở URL trực tiếp — tránh CORS khi fetch từ PWA/Safari standalone
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename || "bien-ban";
-  a.target = "_blank";
-  a.rel = "noopener";
-  a.style.display = "none";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  // iOS PWA: window.location.href triggers QuickLook/download trực tiếp
+  window.location.href = url;
+}
+
+function viewBienBan(url, name){
+  // Hiện preview ngay trong modal — không mở tab mới
+  const isImg = /\.(png|jpe?g|webp|gif)(\?|$)/i.test(url);
+  const isPdf = /\.pdf(\?|$)/i.test(url);
+  document.getElementById("modal-title").textContent = name || "Xem file";
+  if(isImg){
+    document.getElementById("modal-body").innerHTML =
+      `<div style="text-align:center;padding:8px;">
+         <img src="${url}" style="max-width:100%;border-radius:10px;" onerror="this.parentNode.innerHTML='Không tải được ảnh.'"/>
+       </div>`;
+  } else if(isPdf){
+    document.getElementById("modal-body").innerHTML =
+      `<iframe src="${url}" style="width:100%;height:70vh;border:none;border-radius:10px;"
+         onerror="this.parentNode.innerHTML='Không tải được PDF.'"></iframe>`;
+  } else {
+    // docx / file khác: không preview được, hỏi tải về
+    document.getElementById("modal-body").innerHTML =
+      `<div style="padding:24px;text-align:center;color:var(--text-secondary);">
+         <div style="font-size:40px;margin-bottom:12px;">📄</div>
+         <div style="font-size:15px;font-weight:600;margin-bottom:8px;">${name||"File"}</div>
+         <div style="font-size:13px;margin-bottom:20px;">File này không xem trực tiếp được.<br>Nhấn Tải về để mở.</div>
+         <button class="btn btn-primary" onclick="downloadBienBan('${url.replace(/'/g,"\'")}','${(name||"file").replace(/'/g,"\'")}')">⬇ Tải về</button>
+       </div>`;
+  }
+  document.getElementById("modal-footer").innerHTML =
+    `<button class="btn btn-ghost btn-full" onclick="closeModal()">Đóng</button>`;
+  openModal();
 }
 
 // --- Detail/Edit/Delete ACCOUNTS ---
