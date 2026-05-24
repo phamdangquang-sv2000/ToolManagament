@@ -2,7 +2,10 @@
 <html lang="vi" class="light">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
 <title>Work Attendance Summary</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>tailwind.config={darkMode:'class'}</script>
@@ -650,42 +653,442 @@ tr:hover td{background:rgba(13,148,136,.03)}
   background:var(--surface2);
 }
 
-/* ── MOBILE OVERLAY ── */
-#mobile-overlay{
+/* ── MOBILE: hide overlay always ── */
+#mobile-overlay{ display:none !important; }
+
+/* ══════════════════════════════════════
+   MOBILE LAYOUT  (≤ 1023px)
+══════════════════════════════════════ */
+/* Mobile top header */
+#mob-header{
   display:none;
-  position:fixed;inset:0;z-index:9999;
-  background:linear-gradient(135deg,#f0fdf9,#ecfdf5);
-  align-items:center;justify-content:center;
-  padding:2rem;text-align:center;
-  flex-direction:column;gap:1.5rem;
+  position:fixed;top:0;left:0;right:0;z-index:40;
+  height:52px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  align-items:center;justify-content:space-between;
+  padding:0 1rem;
+  gap:.75rem;
+  padding-top:env(safe-area-inset-top);
 }
-.dark #mobile-overlay{background:var(--navy);}
+.dark #mob-header{background:var(--surface2);}
+#mob-header::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,#0d9488,#5eead4);
+}
+
+/* Mobile bottom nav */
+#mob-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;z-index:40;
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.dark #mob-nav{background:var(--surface2);}
+.mob-nav-inner{
+  display:flex;align-items:stretch;
+  height:56px;
+}
+.mob-nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;cursor:pointer;border:none;background:transparent;
+  color:var(--text-3);font-size:9px;font-weight:600;
+  font-family:'Inter',system-ui,sans-serif;
+  letter-spacing:.03em;
+  transition:color .2s;
+  padding:0;
+  -webkit-tap-highlight-color:transparent;
+}
+.mob-nav-btn.active{ color:var(--indigo); }
+.dark .mob-nav-btn.active{ color:#14b8a6; }
+.mob-nav-btn svg{ transition:transform .2s; }
+.mob-nav-btn.active svg{ transform:scale(1.12); }
+.mob-nav-dot{
+  width:4px;height:4px;border-radius:50%;
+  background:var(--indigo);margin-top:1px;
+  opacity:0;transition:opacity .2s;
+}
+.mob-nav-btn.active .mob-nav-dot{ opacity:1; }
+
+/* Mobile "more" drawer */
+#mob-drawer{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;z-index:50;
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  border-radius:1.25rem 1.25rem 0 0;
+  padding:1rem;
+  padding-bottom:calc(1rem + env(safe-area-inset-bottom));
+  box-shadow:0 -8px 32px rgba(0,0,0,.12);
+  transform:translateY(100%);
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+.dark #mob-drawer{background:var(--surface2);}
+#mob-drawer.open{transform:translateY(0);}
+#mob-drawer-backdrop{
+  display:none;
+  position:fixed;inset:0;z-index:49;
+  background:rgba(0,0,0,.4);
+}
+#mob-drawer-backdrop.open{display:block;}
+.mob-drawer-item{
+  display:flex;align-items:center;gap:.75rem;
+  padding:.7rem .75rem;border-radius:.6rem;
+  font-size:.85rem;font-weight:600;
+  color:var(--text-1);cursor:pointer;
+  transition:background .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.mob-drawer-item:hover,.mob-drawer-item:active{background:var(--surface3);}
+.mob-drawer-item.active{color:var(--indigo);}
+.dark .mob-drawer-item.active{color:#14b8a6;}
+
 @media (max-width:1023px){
-  #mobile-overlay{display:flex;}
+  /* Show mobile chrome */
+  #mob-header{ display:flex; }
+  #mob-nav{ display:block; }
+
+  /* Hide desktop sidebar */
+  aside{ display:none !important; }
+
+  /* Main content: full width, top/bottom padding for chrome */
+  main{
+    margin-left:0 !important;
+    padding:calc(52px + env(safe-area-inset-top) + 1rem) 1rem calc(56px + env(safe-area-inset-bottom) + 1rem) 1rem !important;
+  }
+
+  /* Page header: stack on mobile */
+  main > .flex.items-center.justify-between{
+    flex-direction:column !important;
+    align-items:flex-start !important;
+    gap:.5rem !important;
+    margin-bottom:1rem !important;
+  }
+  main > .flex.items-center.justify-between > div:last-child{
+    flex-wrap:wrap !important;
+    gap:.4rem !important;
+    width:100% !important;
+  }
+
+  /* Dashboard grid: 1 col on mobile */
+  #s-dashboard > div[style*="grid-template-columns:repeat(3"]{
+    grid-template-columns:1fr !important;
+  }
+  /* Stat grid inside dashboard */
+  div[style*="grid-template-columns:repeat(4"]{
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+  div[style*="grid-template-columns:repeat(3"]{
+    grid-template-columns:1fr !important;
+  }
+  div[style*="grid-template-columns:repeat(2"]{
+    grid-template-columns:1fr !important;
+  }
+
+  /* Cards padding tighter on mobile */
+  .card{ padding:1rem !important; }
+
+  /* Tables: horizontally scrollable */
+  .tw{ overflow-x:auto; }
+  table{ font-size:.75rem; }
+  th{ padding:.55rem .75rem !important; }
+  td{ padding:.5rem .75rem !important; }
+
+  /* Inputs: 16px to prevent iOS zoom; zoom visually to ~13px */
+  .input, input, select, textarea{
+    font-size:16px !important;
+    zoom:0.84;
+  }
+
+  /* Filters row: wrap */
+  .filters-row{ gap:.45rem !important; }
+  .filters-row .input{ flex:1 1 calc(50% - .45rem); min-width:120px; }
+
+  /* Section header: stack */
+  .section-header{ flex-direction:column; align-items:flex-start !important; }
+
+  /* Modal: bottom sheet */
+  .modal-bd{ align-items:flex-end !important; padding:0 !important; }
+  .modal-box{
+    border-radius:1.5rem 1.5rem 0 0 !important;
+    max-width:100% !important;
+    max-height:88vh !important;
+    padding:1.5rem 1.25rem !important;
+    padding-bottom:calc(1.5rem + env(safe-area-inset-bottom)) !important;
+  }
+
+  /* Toast position */
+  #toasts{
+    top:auto !important;
+    bottom:calc(56px + env(safe-area-inset-bottom) + .75rem) !important;
+    right:.75rem !important;
+    left:.75rem !important;
+  }
+  .toast{ max-width:100% !important; font-size:.75rem !important; }
+
+  /* Schedule table: make name col narrower */
+  .sch-table thead tr:first-child th.sch-name-col{ min-width:110px !important; }
+
+  /* Stat value slightly smaller */
+  .stat-value{ font-size:1.4rem !important; }
+
+  /* Section title smaller */
+  h2#page-title{ font-size:1.1rem !important; }
+
+  /* Buttons compact */
+  .btn{ padding:.45rem .75rem !important; font-size:.75rem !important; }
+  .btn-sm{ padding:.3rem .55rem !important; font-size:.68rem !important; }
+
+  /* Calendar: smaller toolbar */
+  .fc .fc-toolbar{ flex-direction:column !important; gap:.4rem !important; }
+  .fc .fc-toolbar-title{ font-size:.95rem !important; }
+}
+
+@media (max-width:374px){
+  main{
+    padding-left:.75rem !important;
+    padding-right:.75rem !important;
+  }
+  div[style*="grid-template-columns:repeat(2"]{
+    grid-template-columns:1fr !important;
+  }
+}
+
+/* ── NO HORIZONTAL SCROLL on mobile (regular tables only) ── */
+@media (max-width:1023px){
+  .tw{ overflow-x:hidden !important; }
+  .tw table{ table-layout:fixed; width:100%; }
+  .tw td, .tw th{ overflow:hidden; text-overflow:ellipsis; }
+
+  /* Schedule table: keep horizontal scroll, fix name column visibility */
+  .sch-table-container{ overflow-x:auto !important; -webkit-overflow-scrolling:touch; }
+  .sch-table{ table-layout:auto !important; }
+  .sch-table thead tr:first-child th.sch-name-col{
+    min-width:88px !important; max-width:108px !important;
+    font-size:.6rem !important; padding:.4rem .5rem !important;
+  }
+  .sch-table td.sch-name-td{
+    min-width:88px !important; max-width:108px !important;
+    font-size:.64rem !important; padding:.3rem .45rem !important;
+  }
+  .sch-cell{ width:20px !important; height:18px !important; font-size:.58rem !important; border-radius:3px !important; }
+  .sch-cell-empty{ width:20px !important; height:18px !important; border-radius:3px !important; }
+  .sch-table thead tr:first-child th:not(.sch-name-col){ padding:.35rem .1rem !important; font-size:.56rem !important; }
+  .sch-table td:not(.sch-name-td){ padding:.2rem .08rem !important; }
+
+  /* Schedule controls: hide export row on mobile, stack month/year */
+  #s-calendar > div:nth-child(2){ display:none !important; }
+
+  /* Schedule first control row: compact */
+  #s-calendar > div:first-child{
+    gap:.5rem !important; margin-bottom:.6rem !important;
+  }
+  #s-calendar #sch-month{ max-width:110px !important; font-size:.8rem !important; }
+  #s-calendar #sch-year{ max-width:82px !important; font-size:.8rem !important; }
+  /* Hide legend on mobile to save space */
+  #s-calendar .flex.flex-wrap.gap-1\\.5.ml-auto{ display:none !important; }
+  #s-calendar #btn-rules{ display:none !important; }
+}
+
+/* ── MOBILE ROW CARDS for leaves/warnings/attendance/tet ── */
+.mob-row-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:.75rem;
+  padding:.75rem .9rem;
+  margin-bottom:.55rem;
+  position:relative;
+}
+.dark .mob-row-card{ background:var(--surface2); }
+.mob-row-card-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:.45rem;gap:.5rem;
+}
+.mob-row-card-name{
+  font-size:.85rem;font-weight:800;color:var(--text-1);flex:1;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.mob-row-card-body{
+  display:flex;flex-wrap:wrap;gap:.35rem .75rem;
+  font-size:.75rem;color:var(--text-2);
+}
+.mob-row-card-field{
+  display:flex;align-items:center;gap:.3rem;
+}
+.mob-row-card-label{
+  font-size:.65rem;font-weight:700;color:var(--text-3);
+  text-transform:uppercase;letter-spacing:.05em;
+}
+.mob-row-card-val{ font-weight:600;color:var(--text-1); }
+.mob-row-card-reason{
+  font-size:.75rem;color:var(--text-2);
+  margin-top:.35rem;line-height:1.45;
+  word-break:break-word;white-space:normal;
+}
+.mob-row-card-actions{
+  display:flex;gap:.35rem;margin-top:.5rem;
+}
+/* hide table, show card list on mobile */
+@media (max-width:1023px){
+  .mob-table-hide{ display:none !important; }
+  .mob-card-show{ display:block !important; }
+}
+@media (min-width:1024px){
+  .mob-card-show{ display:none !important; }
+}
+
+/* ── Employee card list (mobile only) ─────────────────── */
+.emp-card-list{ display:none; }
+.emp-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:.85rem;
+  padding:.85rem 1rem;
+  margin-bottom:.6rem;
+  transition:box-shadow .2s;
+}
+.emp-card-name{
+  font-size:.9rem;font-weight:800;
+  color:var(--text-1);margin-bottom:.5rem;
+  display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;
+}
+.emp-card-stats{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:.4rem;margin-bottom:.5rem;
+}
+.emp-card-stat{
+  background:var(--surface2);
+  border-radius:.55rem;
+  padding:.45rem .4rem;
+  text-align:center;
+}
+.emp-card-stat-label{
+  font-size:.58rem;font-weight:700;
+  color:var(--text-3);text-transform:uppercase;
+  letter-spacing:.05em;margin-bottom:.2rem;
+}
+.emp-card-stat-val{
+  font-size:.9rem;font-weight:800;
+  line-height:1;
+}
+.emp-card-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:.5rem;
+}
+
+/* FAB: Thêm nhân viên */
+#fab-add-emp{
+  display:none;
+  position:fixed;
+  bottom:calc(56px + env(safe-area-inset-bottom) + .6rem);
+  right:.75rem;
+  z-index:35;
+  width:2.5rem;height:2.5rem;
+  border-radius:50%;
+  background:linear-gradient(135deg,#0d9488,#14b8a6);
+  color:#fff;
+  border:none;cursor:pointer;
+  box-shadow:0 4px 16px rgba(13,148,136,.38);
+  font-size:1.2rem;line-height:1;
+  display:none;align-items:center;justify-content:center;
+  transition:transform .2s,box-shadow .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+#fab-add-emp:active{transform:scale(.92);}
+
+@media (max-width:1023px){
+  /* Show card list, hide table wrapper */
+  #emp-card-list-wrap{ display:block !important; }
+  .emp-card-list{ display:block; }
+  #s-employees .card.p-0{ display:none !important; }
+
+  /* Nút thêm nhân viên: ẩn trong filter row, hiện FAB */
+  #btn-add-emp{ display:none !important; }
+  #fab-add-emp{ display:flex !important; }
+
+  /* Filters row: stack nicely */
+  #s-employees .filters-row{
+    flex-direction:column;
+    align-items:stretch;
+  }
+  #s-employees .filters-row .input{
+    max-width:100% !important;
+  }
 }
 </style>
 </head>
 <body>
 
-<!-- ── MOBILE OVERLAY ── -->
-<div id="mobile-overlay">
-  <div style="width:5rem;height:5rem;border-radius:1.5rem;background:linear-gradient(135deg,#0d9488,#14b8a6);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 28px rgba(13,148,136,.45);margin:0 auto">
-    <svg width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="17" cy="11" r="5.5" fill="rgba(255,255,255,.97)"/>
-      <path d="M4 33c0-7.5 5.8-13 13-13s13 5.5 13 13" stroke="rgba(255,255,255,.97)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-      <rect x="26" y="20" width="14" height="17" rx="3" fill="rgba(255,255,255,.2)" stroke="rgba(255,255,255,.6)" stroke-width="1.2"/>
-      <rect x="29" y="18" width="8" height="4" rx="1.5" fill="rgba(255,255,255,.85)"/>
-      <path d="M29 29.5l2.5 2.5 5-5" stroke="rgba(255,255,255,.97)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    </svg>
+<!-- ── MOBILE CHROME (hidden on desktop) ── -->
+
+<!-- Top header -->
+<div id="mob-header">
+  <div style="display:flex;align-items:center;gap:.5rem;">
+    <div style="width:1.75rem;height:1.75rem;border-radius:.45rem;background:linear-gradient(135deg,#0d9488,#14b8a6);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <svg width="14" height="14" viewBox="0 0 40 40" fill="none"><circle cx="17" cy="11" r="5.5" fill="rgba(255,255,255,.97)"/><path d="M4 33c0-7.5 5.8-13 13-13s13 5.5 13 13" stroke="rgba(255,255,255,.97)" stroke-width="2.5" stroke-linecap="round" fill="none"/><rect x="26" y="20" width="14" height="17" rx="3" fill="rgba(255,255,255,.2)" stroke="rgba(255,255,255,.6)" stroke-width="1.2"/><rect x="29" y="18" width="8" height="4" rx="1.5" fill="rgba(255,255,255,.85)"/><path d="M29 29.5l2.5 2.5 5-5" stroke="rgba(255,255,255,.97)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+    </div>
+    <span id="mob-title" style="font-size:.85rem;font-weight:800;color:var(--text-1);letter-spacing:-.01em;">Dashboard</span>
   </div>
-  <div>
-    <h2 style="font-size:1.35rem;font-weight:800;color:#0f2923;margin-bottom:.5rem">Work Attendance Summary</h2>
-    <p style="font-size:.95rem;color:#4b6b63;font-weight:500;margin-bottom:.25rem">Ứng dụng này được thiết kế cho máy tính</p>
-    <p style="font-size:.8rem;color:#8faaa4">Vui lòng truy cập bằng máy tính (desktop/laptop) để có trải nghiệm tốt nhất.</p>
+  <div style="display:flex;align-items:center;gap:.4rem;">
+    <button onclick="refreshAll()" class="btn btn-secondary btn-sm" style="padding:.3rem .5rem;">
+      <svg id="mob-refresh-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+    </button>
+    <button onclick="toggleDark()" class="btn btn-secondary btn-sm" style="padding:.3rem .5rem;">
+      <span id="mob-dm-ico">🌙</span>
+    </button>
   </div>
-  <div style="display:flex;align-items:center;gap:.75rem;padding:1rem 1.5rem;background:rgba(13,148,136,.08);border-radius:1rem;border:1px solid rgba(13,148,136,.15)">
-    <span style="font-size:1.5rem">💻</span>
-    <span style="font-size:.8rem;color:#4b6b63;font-weight:500">Màn hình tối thiểu khuyến nghị: 1024px</span>
+</div>
+
+<!-- Bottom navigation -->
+<div id="mob-nav">
+  <div class="mob-nav-inner">
+    <button class="mob-nav-btn active" id="mnb-dashboard" onclick="mobGo('dashboard')">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Dashboard</span>
+      <div class="mob-nav-dot"></div>
+    </button>
+    <button class="mob-nav-btn" id="mnb-employees" onclick="mobGo('employees')">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Nhân viên</span>
+      <div class="mob-nav-dot"></div>
+    </button>
+    <button class="mob-nav-btn" id="mnb-leaves" onclick="mobGo('leaves')">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>Nghỉ phép</span>
+      <div class="mob-nav-dot"></div>
+    </button>
+    <button class="mob-nav-btn" id="mnb-calendar" onclick="mobGo('calendar')">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <span>Lịch làm</span>
+      <div class="mob-nav-dot"></div>
+    </button>
+
+  </div>
+</div>
+
+<!-- Drawer backdrop -->
+<div id="mob-drawer-backdrop" onclick="closeMobDrawer()"></div>
+
+<!-- More drawer -->
+<div id="mob-drawer">
+  <div style="width:2.5rem;height:3px;border-radius:999px;background:var(--border);margin:0 auto .75rem;"></div>
+  <div style="font-size:.65rem;font-weight:800;color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;padding:.25rem .5rem .5rem;">Thêm chức năng</div>
+  <div class="mob-drawer-item" id="mdi-warnings" onclick="mobGo('warnings');closeMobDrawer()">
+    <span style="font-size:1.1rem">⚠️</span><span>Warning</span>
+  </div>
+  <div class="mob-drawer-item" id="mdi-attendance" onclick="mobGo('attendance');closeMobDrawer()">
+    <span style="font-size:1.1rem">⏰</span><span>Đi trễ / Về sớm</span>
+  </div>
+  <div class="mob-drawer-item" id="mdi-tet" onclick="mobGo('tet');closeMobDrawer()">
+    <span style="font-size:1.1rem">🏠</span><span>Nghỉ Tết</span>
+  </div>
+  <div style="height:1px;background:var(--border);margin:.5rem 0;"></div>
+  <div class="mob-drawer-item" onclick="toggleDark();closeMobDrawer()">
+    <span style="font-size:1.1rem" id="mob-drawer-dm-ico">🌙</span><span id="mob-drawer-dm-lbl">Chế độ tối</span>
+  </div>
+  <div class="mob-drawer-item" onclick="doLogout();closeMobDrawer()" style="color:#ef4444;">
+    <span style="font-size:1.1rem">🚪</span><span>Thoát</span>
   </div>
 </div>
 
@@ -961,6 +1364,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
         <select id="f-emp-year" class="input" style="max-width:220px" onchange="onLeaveYearChange()" title="Kỳ phép theo năm tài chính Tháng 4–Tháng 3"></select>
         <button id="btn-add-emp" onclick="openEmpModal(null)" class="btn btn-primary ml-auto" style="display:none">+ Thêm nhân viên</button>
       </div>
+      <!-- Desktop table -->
       <div class="card p-0 overflow-hidden">
         <div class="tw">
           <table>
@@ -988,7 +1392,17 @@ tr:hover td{background:rgba(13,148,136,.03)}
         </div>
         <div id="emp-pager" style="border-top:1px solid var(--border)"></div>
       </div>
+      <!-- Mobile card list -->
+      <div id="emp-card-list-wrap" style="display:none">
+        <div id="emp-card-list" class="emp-card-list"></div>
+        <div id="emp-card-pager"></div>
+      </div>
     </div>
+
+    <!-- FAB: Thêm nhân viên (mobile) -->
+    <button id="fab-add-emp" onclick="openEmpModal(null)" title="Thêm nhân viên">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
 
     <!-- LEAVES -->
     <div id="s-leaves" class="section">
@@ -1101,7 +1515,7 @@ CREATE TABLE hr_leave_requests (<br>
         </select>
         <button id="btn-add-leave" onclick="openLeaveModal(null)" class="btn btn-primary ml-auto" style="display:none">+ Thêm bản ghi</button>
       </div>
-      <div class="card p-0 overflow-hidden">
+      <div class="card p-0 overflow-hidden mob-table-hide">
         <div class="tw">
           <table>
             <thead><tr><th>#</th><th>Nhân viên</th><th>Ngày nghỉ</th><th>Loại</th><th>Số ngày</th><th>Lý do</th><th id="th-leave-action" style="display:none">Thao tác</th></tr></thead>
@@ -1109,6 +1523,11 @@ CREATE TABLE hr_leave_requests (<br>
           </table>
         </div>
         <div id="leave-pager" style="border-top:1px solid var(--border)"></div>
+      </div>
+      <!-- Mobile card list for leaves -->
+      <div id="leave-card-list-wrap" class="mob-card-show" style="display:none">
+        <div id="leave-card-list"></div>
+        <div id="leave-card-pager"></div>
       </div>
     </div>
 
@@ -1123,7 +1542,7 @@ CREATE TABLE hr_leave_requests (<br>
         </select>
         <button id="btn-add-warn" onclick="openWarnModal(null)" class="btn btn-primary ml-auto" style="display:none">+ Thêm warning</button>
       </div>
-      <div class="card p-0 overflow-hidden">
+      <div class="card p-0 overflow-hidden mob-table-hide">
         <div class="tw">
           <table>
             <thead><tr>
@@ -1135,6 +1554,11 @@ CREATE TABLE hr_leave_requests (<br>
           </table>
         </div>
         <div id="warn-pager" style="border-top:1px solid var(--border)"></div>
+      </div>
+      <!-- Mobile card list for warnings -->
+      <div id="warn-card-list-wrap" class="mob-card-show" style="display:none">
+        <div id="warn-card-list"></div>
+        <div id="warn-card-pager"></div>
       </div>
     </div>
 
@@ -1154,7 +1578,7 @@ CREATE TABLE hr_leave_requests (<br>
         </select>
         <button id="btn-add-att" onclick="openAttModal(null)" class="btn btn-primary ml-auto" style="display:none">+ Thêm sự kiện</button>
       </div>
-      <div class="card p-0 overflow-hidden">
+      <div class="card p-0 overflow-hidden mob-table-hide">
         <div class="tw">
           <table>
             <thead><tr><th>#</th><th>Nhân viên</th><th>Loại</th><th>Ngày</th><th>Lần</th><th>Trạng thái</th><th id="th-att-action" style="display:none">Thao tác</th></tr></thead>
@@ -1162,6 +1586,11 @@ CREATE TABLE hr_leave_requests (<br>
           </table>
         </div>
         <div id="att-pager" style="border-top:1px solid var(--border)"></div>
+      </div>
+      <!-- Mobile card list for attendance -->
+      <div id="att-card-list-wrap" class="mob-card-show" style="display:none">
+        <div id="att-card-list"></div>
+        <div id="att-card-pager"></div>
       </div>
     </div>
 
@@ -1171,7 +1600,7 @@ CREATE TABLE hr_leave_requests (<br>
         <input id="f-tet" type="text" class="input" style="max-width:270px" placeholder="Tìm theo tên..." oninput="resetTetPage()">
         <button id="btn-add-tet" onclick="openTetModal(null)" class="btn btn-primary ml-auto" style="display:none">+ Thêm nghỉ Tết</button>
       </div>
-      <div class="card p-0 overflow-hidden">
+      <div class="card p-0 overflow-hidden mob-table-hide">
         <div class="tw">
           <table>
             <thead><tr><th>#</th><th>Họ tên</th><th>Ngày về quê / WFH</th><th>Ngày đi làm lại</th><th>Số ngày</th><th id="th-tet-action" style="display:none">Thao tác</th></tr></thead>
@@ -1179,6 +1608,11 @@ CREATE TABLE hr_leave_requests (<br>
           </table>
         </div>
         <div id="tet-pager" style="border-top:1px solid var(--border)"></div>
+      </div>
+      <!-- Mobile card list for tet -->
+      <div id="tet-card-list-wrap" class="mob-card-show" style="display:none">
+        <div id="tet-card-list"></div>
+        <div id="tet-card-pager"></div>
       </div>
     </div>
 
@@ -1469,8 +1903,8 @@ function toggleDark() {
 }
 function updateDarkUI() {
   const isDark = document.documentElement.classList.contains('dark');
-  ['dm-ico-login','dm-ico-app'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = isDark ? '☀️' : '🌙'; });
-  ['dm-lbl-login','dm-lbl-app'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = isDark ? 'Chế độ sáng' : 'Chế độ tối'; });
+  ['dm-ico-login','dm-ico-app','mob-dm-ico','mob-drawer-dm-ico'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = isDark ? '☀️' : '🌙'; });
+  ['dm-lbl-login','dm-lbl-app','mob-drawer-dm-lbl'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = isDark ? 'Chế độ sáng' : 'Chế độ tối'; });
 }
 if (localStorage.getItem('hr_dark') === '1') { document.documentElement.classList.add('dark'); }
 updateDarkUI();
@@ -1618,7 +2052,7 @@ async function enterApp(isAdmin) {
     badge.className = 'text-xs px-3 py-1.5 rounded-lg font-bold border bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-400 dark:border-emerald-900';
   }
 
-  const adminEls = ['btn-add-emp','btn-add-leave','btn-add-warn','btn-add-att','btn-add-tet','th-action','th-leave-action','th-warn-action','th-att-action','th-tet-action'];
+  const adminEls = ['btn-add-emp','btn-add-leave','btn-add-warn','btn-add-att','btn-add-tet','th-action','th-leave-action','th-warn-action','th-att-action','th-tet-action','fab-add-emp'];
   adminEls.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = isAdmin ? '' : 'none';
@@ -2124,9 +2558,7 @@ function renderEmpMyRequests() {
     return;
   }
   const recent = S.leaveRequests.slice(0, 10);
-  container.innerHTML = `<div class="tw"><table><thead><tr>
-    <th>#</th><th>Nhân viên</th><th>Ngày nghỉ</th><th>Số ngày</th><th>Buổi</th><th>Lý do</th><th>Trạng thái</th>
-  </tr></thead><tbody>` + recent.map((r, i) => {
+  container.innerHTML = recent.map((r, i) => {
     const sessBadge = r.session_type === 'morning'
       ? '<span class="badge bg-orange" style="font-size:.62rem">Sáng</span>'
       : r.session_type === 'afternoon'
@@ -2137,16 +2569,19 @@ function renderEmpMyRequests() {
       : r.status === 'approved'
       ? '<span class="badge" style="background:#0d9488;color:#fff;border:1.5px solid #0a7a70;font-weight:800">✓ Đã duyệt</span>'
       : '<span class="badge" style="background:#dc2626;color:#fff;border:1.5px solid #b91c1c;font-weight:800">✕ Từ chối</span>';
-    return `<tr>
-      <td style="color:var(--text-3);font-size:.75rem">${i + 1}</td>
-      <td style="font-weight:700;color:var(--text-1)">${escAttr(r.employee_name || eName(r.employee_id))}</td>
-      <td style="color:var(--text-2)">${r.leave_date ? fmtD(r.leave_date) : '—'}</td>
-      <td><span class="badge bg-blue">${r.days_count} ngày</span></td>
-      <td>${sessBadge}</td>
-      <td style="max-width:180px;white-space:normal;font-size:.75rem;color:var(--text-2)">${escAttr(r.reason || '—')}</td>
-      <td>${statusBadge}</td>
-    </tr>`;
-  }).join('') + '</tbody></table></div>';
+    return `<div class="mob-row-card" style="margin:0;border-radius:0;border-top:none;border-left:none;border-right:none;${i===0?'border-top:none':''}padding:.75rem 1rem">
+      <div class="mob-row-card-header">
+        <div class="mob-row-card-name">${escAttr(r.employee_name || eName(r.employee_id))}</div>
+        <div style="display:flex;gap:.3rem;align-items:center;flex-shrink:0">${statusBadge}</div>
+      </div>
+      <div class="mob-row-card-body">
+        <div class="mob-row-card-field"><span class="mob-row-card-label">Ngày</span><span class="mob-row-card-val">${r.leave_date ? fmtD(r.leave_date) : '—'}</span></div>
+        <div class="mob-row-card-field"><span class="mob-row-card-label">Số ngày</span><span class="mob-row-card-val"><span class="badge bg-blue" style="font-size:.62rem">${r.days_count} ngày</span></span></div>
+        <div class="mob-row-card-field"><span class="mob-row-card-label">Buổi</span><span class="mob-row-card-val">${sessBadge}</span></div>
+      </div>
+      ${r.reason ? `<div class="mob-row-card-reason">${escAttr(r.reason)}</div>` : ''}
+    </div>`;
+  }).join('');
 }
 
 // ============ LEAVE YEAR HELPERS ============
@@ -2203,6 +2638,11 @@ function go(name) {
   document.getElementById('page-title').textContent = PAGE_NAMES[name] || name;
   localStorage.setItem('hr_tab', name);
 
+  // Update mobile title & bottom nav active state
+  const mobTitle = document.getElementById('mob-title');
+  if (mobTitle) mobTitle.textContent = PAGE_NAMES[name] || name;
+  syncMobNav(name);
+
   if (LEAVE_YEAR_PAGES.has(name)) {
     updateLyLabel();
   } else {
@@ -2219,6 +2659,45 @@ function go(name) {
   else if (name === 'tet') renderTet();
   else if (name === 'calendar') initCal();
 }
+
+// ── Mobile helpers ─────────────────────────────────────
+const MOB_NAV_TABS = ['dashboard','employees','leaves','calendar'];
+
+function syncMobNav(name) {
+  // Bottom nav buttons
+  MOB_NAV_TABS.forEach(t => {
+    const btn = document.getElementById('mnb-' + t);
+    if (btn) btn.classList.toggle('active', t === name);
+  });
+  // "More" button active when a drawer-tab is selected
+  const moreBtn = document.getElementById('mnb-more');
+  if (moreBtn) moreBtn.classList.toggle('active', !MOB_NAV_TABS.includes(name));
+  // Drawer items
+  ['warnings','attendance','tet'].forEach(t => {
+    const el = document.getElementById('mdi-' + t);
+    if (el) el.classList.toggle('active', t === name);
+  });
+}
+
+function mobGo(name) {
+  go(name);
+  // Scroll main back to top
+  const main = document.querySelector('main');
+  if (main) main.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function openMobDrawer() {
+  document.getElementById('mob-drawer').classList.add('open');
+  document.getElementById('mob-drawer-backdrop').classList.add('open');
+}
+
+function closeMobDrawer() {
+  document.getElementById('mob-drawer').classList.remove('open');
+  document.getElementById('mob-drawer-backdrop').classList.remove('open');
+}
+
+// Sync dark mode icon in mobile chrome
+const _origToggleDark = typeof toggleDark === 'function' ? toggleDark : null;
 
 // ============ DASHBOARD ============
 const _dashMode = { leave: 'month', warn: 'month', att: 'month' };
@@ -2448,6 +2927,107 @@ function renderEmp() {
   }).join('') : emptyRow(S.isAdmin ? 9 : 8);
 
   renderEmpPager(list.length, totalPages);
+  renderEmpCards(pageList, list.length, totalPages, start);
+}
+
+function renderEmpCards(pageList, totalItems, totalPages, start) {
+  const cardList = document.getElementById('emp-card-list');
+  const cardPager = document.getElementById('emp-card-pager');
+  if (!cardList) return;
+
+  const AL_TOTAL = 12;
+
+  cardList.innerHTML = pageList.length ? pageList.map((e, i) => {
+    const used = empAlUsed(e.id);
+    const rem = AL_TOTAL - used;
+    const ulUsed = empUlUsed(e.id);
+    const remColor = rem <= 1 ? '#ef4444' : rem <= 3 ? '#f97316' : '#10b981';
+    const isInactive = e.is_active === false;
+    const statusBadge = isInactive
+      ? `<span class="badge bg-gray" style="font-size:.6rem">Inactive</span>`
+      : `<span class="badge bg-green" style="font-size:.6rem">Active</span>`;
+
+    const totalW  = S.warnings.filter(w => w.employee_id === e.id).length;
+    const activeW = S.warnings.filter(w => w.employee_id === e.id && !w.resolve_date).length;
+    let wBadge;
+    if (totalW === 0) wBadge = `<span class="badge bg-gray" style="font-size:.6rem">0</span>`;
+    else if (activeW > 0) wBadge = `<span class="badge bg-orange" style="font-size:.6rem">${activeW} active</span>`;
+    else wBadge = `<span class="badge bg-green" style="font-size:.6rem">${totalW} (đã gỡ)</span>`;
+
+    const actionBtns = S.isAdmin
+      ? `<div style="display:flex;gap:.35rem">
+          <button class="btn btn-secondary btn-sm edit-emp-btn" data-id="${e.id}">✏️</button>
+          <button class="btn btn-danger btn-sm del-emp-btn" data-id="${e.id}" data-name="${escAttr(e.name)}">🗑️</button>
+         </div>`
+      : '';
+
+    return `<div class="emp-card" style="${isInactive ? 'opacity:.5' : ''}">
+      <div class="emp-card-name">
+        <span style="color:var(--text-3);font-size:.72rem;font-weight:600;min-width:1.4rem">${start + i + 1}.</span>
+        ${e.name}
+        ${statusBadge}
+      </div>
+      <div class="emp-card-stats">
+        <div class="emp-card-stat">
+          <div class="emp-card-stat-label" style="color:#3b82f6">AL hiện có</div>
+          <div class="emp-card-stat-val" style="color:#3b82f6">${AL_TOTAL}</div>
+        </div>
+        <div class="emp-card-stat">
+          <div class="emp-card-stat-label" style="color:#ef4444">Đã dùng</div>
+          <div class="emp-card-stat-val" style="color:#ef4444">${used}</div>
+        </div>
+        <div class="emp-card-stat">
+          <div class="emp-card-stat-label" style="color:${remColor}">Còn lại</div>
+          <div class="emp-card-stat-val" style="color:${remColor}">${rem}</div>
+        </div>
+        <div class="emp-card-stat">
+          <div class="emp-card-stat-label" style="color:#f59e0b">UL dùng</div>
+          <div class="emp-card-stat-val" style="color:${ulUsed > 0 ? '#f59e0b' : 'var(--text-3)'}">${ulUsed}</div>
+        </div>
+      </div>
+      <div class="emp-card-footer">
+        <div style="display:flex;align-items:center;gap:.4rem;font-size:.75rem;color:var(--text-2)">
+          ⚠️ Warning: ${wBadge}
+        </div>
+        ${actionBtns}
+      </div>
+    </div>`;
+  }).join('') : `<div style="text-align:center;padding:2rem;color:var(--text-3);font-size:.85rem">Không có dữ liệu</div>`;
+
+  // Mobile pager
+  if (!cardPager) return;
+  if (totalItems <= EMP_PAGE_SIZE) { cardPager.innerHTML = ''; return; }
+  const from = ((_empPage - 1) * EMP_PAGE_SIZE) + 1;
+  const to = Math.min(_empPage * EMP_PAGE_SIZE, totalItems);
+  let btns = '';
+  const maxBtns = 5;
+  let s = Math.max(1, _empPage - 2);
+  let eP = Math.min(totalPages, s + maxBtns - 1);
+  s = Math.max(1, eP - maxBtns + 1);
+  for (let p = s; p <= eP; p++) {
+    btns += `<button class="btn ${p === _empPage ? 'btn-primary' : 'btn-secondary'} btn-sm" onclick="gotoEmpPage(${p})" style="min-width:2rem">${p}</button>`;
+  }
+  cardPager.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.65rem 0;flex-wrap:wrap">
+      <div style="font-size:.75rem;color:var(--text-3);font-weight:500">
+        <b style="color:var(--text-1)">${from}–${to}</b> / <b style="color:var(--text-1)">${totalItems}</b> nhân viên
+      </div>
+      <div style="display:flex;gap:.25rem;align-items:center">
+        <button class="btn btn-secondary btn-sm" onclick="gotoEmpPage(1)" ${_empPage===1?'disabled':''}>«</button>
+        <button class="btn btn-secondary btn-sm" onclick="gotoEmpPage(${_empPage-1})" ${_empPage===1?'disabled':''}>‹</button>
+        ${btns}
+        <button class="btn btn-secondary btn-sm" onclick="gotoEmpPage(${_empPage+1})" ${_empPage===totalPages?'disabled':''}>›</button>
+        <button class="btn btn-secondary btn-sm" onclick="gotoEmpPage(${totalPages})" ${_empPage===totalPages?'disabled':''}>»</button>
+      </div>
+    </div>`;
+
+  // Re-bind edit/delete buttons on cards
+  cardList.querySelectorAll('.edit-emp-btn').forEach(btn => {
+    btn.addEventListener('click', () => openEmpModal(S.employees.find(e => e.id === btn.dataset.id)));
+  });
+  cardList.querySelectorAll('.del-emp-btn').forEach(btn => {
+    btn.addEventListener('click', () => confirmDel(`Xóa nhân viên "${btn.dataset.name}"?`, () => deleteEmp(btn.dataset.id)));
+  });
 }
 
 function renderEmpPager(totalItems, totalPages) {
@@ -2650,6 +3230,30 @@ function renderLeaves() {
     </tr>`;
   }).join('') : emptyRow(S.isAdmin ? 7 : 6);
   renderGenericPager('leave-pager', totalItems, _leavePage, 'gotoLeavePage', 'bản ghi');
+
+  // Mobile card list
+  const leaveCardList = document.getElementById('leave-card-list');
+  const leaveCardPager = document.getElementById('leave-card-pager');
+  if (leaveCardList) {
+    leaveCardList.innerHTML = pageList.length ? pageList.map(l => {
+      const days = parseFloat(l.days_absent) || 0;
+      let daysBadge = days === 0.25 ? `<span class="badge bg-teal">0.25 ngày</span>` : days === 0.5 ? `<span class="badge bg-indigo">0.5 ngày</span>` : `<span class="badge bg-blue">${days} ngày</span>`;
+      const leaveTypeBadge = (l.leave_type === 'UL') ? `<span class="badge" style="background:#fef3c7;color:#92400e;border:1px solid #f59e0b;font-weight:800">UL</span>` : `<span class="badge" style="background:#dbeafe;color:#1e40af;border:1px solid #3b82f6;font-weight:800">AL</span>`;
+      const actions = S.isAdmin ? `<div class="mob-row-card-actions"><button class="btn btn-secondary btn-sm edit-leave-btn" data-id="${l.id}">✏️ Sửa</button><button class="btn btn-danger btn-sm del-leave-btn" data-id="${l.id}">🗑️ Xóa</button></div>` : '';
+      return `<div class="mob-row-card">
+        <div class="mob-row-card-header">
+          <div class="mob-row-card-name">${eName(l.employee_id)}</div>
+          <div style="display:flex;gap:.3rem;align-items:center">${leaveTypeBadge}${daysBadge}</div>
+        </div>
+        <div class="mob-row-card-body">
+          <div class="mob-row-card-field"><span class="mob-row-card-label">Ngày nghỉ</span><span class="mob-row-card-val">${l.month ? fmtD(l.month.split('T')[0]) : '—'}</span></div>
+        </div>
+        ${l.note ? `<div class="mob-row-card-reason">${(l.note).replace(/\r?\n/g,'<br>')}</div>` : ''}
+        ${actions}
+      </div>`;
+    }).join('') : `<div style="text-align:center;padding:2rem;color:var(--text-3);font-size:.85rem;font-weight:500">Không có dữ liệu</div>`;
+    if (leaveCardPager) leaveCardPager.innerHTML = document.getElementById('leave-pager')?.innerHTML || '';
+  }
 }
 
 function fillSel(selId, curId) {
@@ -2747,6 +3351,31 @@ function renderWarn() {
     </tr>`;
   }).join('') : emptyRow(S.isAdmin ? 9 : 8);
   renderGenericPager('warn-pager', totalItems, _warnPage, 'gotoWarnPage', 'warning');
+
+  // Mobile card list
+  const warnCardList = document.getElementById('warn-card-list');
+  if (warnCardList) {
+    warnCardList.innerHTML = pageList.length ? pageList.map(w => {
+      const warnNum = w.warning_number || 1;
+      const wType = w.warning_type || '';
+      const wTypeColor = WARN_TYPE_COLOR[wType] || 'bg-gray';
+      const statusBadge = w.resolve_date ? '<span class="badge bg-green">Đã gỡ</span>' : '<span class="badge bg-red">Active</span>';
+      const actions = S.isAdmin ? `<div class="mob-row-card-actions"><button class="btn btn-secondary btn-sm edit-warn-btn" data-id="${w.id}">✏️ Sửa</button><button class="btn btn-danger btn-sm del-warn-btn" data-id="${w.id}">🗑️ Xóa</button></div>` : '';
+      return `<div class="mob-row-card">
+        <div class="mob-row-card-header">
+          <div class="mob-row-card-name">${w.employee_name || eName(w.employee_id)}</div>
+          <div style="display:flex;gap:.3rem;align-items:center">${statusBadge}${wType ? `<span class="badge ${wTypeColor}">${wType}</span>` : ''}</div>
+        </div>
+        <div class="mob-row-card-body">
+          <div class="mob-row-card-field"><span class="mob-row-card-label">Lần</span><span class="mob-row-card-val">Lần ${warnNum}</span></div>
+          <div class="mob-row-card-field"><span class="mob-row-card-label">Ngày</span><span class="mob-row-card-val">${w.warning_date ? fmtD(w.warning_date) : '—'}</span></div>
+          ${w.resolve_date ? `<div class="mob-row-card-field"><span class="mob-row-card-label">Ngày gỡ</span><span class="mob-row-card-val">${fmtD(w.resolve_date)}</span></div>` : ''}
+        </div>
+        ${w.reason ? `<div class="mob-row-card-reason">${w.reason}</div>` : ''}
+        ${actions}
+      </div>`;
+    }).join('') : `<div style="text-align:center;padding:2rem;color:var(--text-3);font-size:.85rem;font-weight:500">Không có dữ liệu</div>`;
+  }
 }
 
 function openWarnModal(id) {
@@ -2826,6 +3455,27 @@ function renderAtt() {
     </tr>`;
   }).join('') : emptyRow(S.isAdmin ? 7 : 6);
   renderGenericPager('att-pager', totalItems, _attPage, 'gotoAttPage', 'sự kiện');
+
+  // Mobile card list
+  const attCardList = document.getElementById('att-card-list');
+  if (attCardList) {
+    attCardList.innerHTML = pageList.length ? pageList.map(a => {
+      const tb = a.event_type === 'Late' ? '<span class="badge bg-purple">Đi trễ</span>' : '<span class="badge bg-blue">Về sớm</span>';
+      const sb = a.status === 'approved' ? '<span class="badge bg-green">Approved</span>' : '<span class="badge bg-red">Không xin phép</span>';
+      const actions = S.isAdmin ? `<div class="mob-row-card-actions"><button class="btn btn-secondary btn-sm edit-att-btn" data-id="${a.id}">✏️ Sửa</button><button class="btn btn-danger btn-sm del-att-btn" data-id="${a.id}">🗑️ Xóa</button></div>` : '';
+      return `<div class="mob-row-card">
+        <div class="mob-row-card-header">
+          <div class="mob-row-card-name">${a.employee_name || eName(a.employee_id)}</div>
+          <div style="display:flex;gap:.3rem;align-items:center">${tb}${sb}</div>
+        </div>
+        <div class="mob-row-card-body">
+          <div class="mob-row-card-field"><span class="mob-row-card-label">Ngày</span><span class="mob-row-card-val">${a.event_date ? fmtD(a.event_date) : '—'}</span></div>
+          <div class="mob-row-card-field"><span class="mob-row-card-label">Lần</span><span class="mob-row-card-val">Lần ${a.occurrence || 1}</span></div>
+        </div>
+        ${actions}
+      </div>`;
+    }).join('') : `<div style="text-align:center;padding:2rem;color:var(--text-3);font-size:.85rem;font-weight:500">Không có dữ liệu</div>`;
+  }
 }
 
 function openAttModal(id) {
@@ -2900,6 +3550,28 @@ function renderTet() {
     </tr>`;
   }).join('') : emptyRow(S.isAdmin ? 7 : 6);
   renderGenericPager('tet-pager', totalItems, _tetPage, 'gotoTetPage', 'bản ghi');
+
+  // Mobile card list
+  const tetCardList = document.getElementById('tet-card-list');
+  if (tetCardList) {
+    tetCardList.innerHTML = pageList.length ? pageList.map(t => {
+      const dep = t.departure_date ? new Date(t.departure_date + 'T00:00:00') : null;
+      const ret = t.return_date ? new Date(t.return_date + 'T00:00:00') : null;
+      const days = dep && ret ? Math.ceil((ret - dep) / 86400000) : null;
+      const actions = S.isAdmin ? `<div class="mob-row-card-actions"><button class="btn btn-secondary btn-sm edit-tet-btn" data-id="${t.id}">✏️ Sửa</button><button class="btn btn-danger btn-sm del-tet-btn" data-id="${t.id}">🗑️ Xóa</button></div>` : '';
+      return `<div class="mob-row-card">
+        <div class="mob-row-card-header">
+          <div class="mob-row-card-name">${t.full_name || eName(t.employee_id)}</div>
+          ${days !== null ? `<span class="badge bg-indigo">${days} ngày</span>` : ''}
+        </div>
+        <div class="mob-row-card-body">
+          <div class="mob-row-card-field"><span class="mob-row-card-label">Về quê</span><span class="mob-row-card-val">${t.departure_date ? fmtD(t.departure_date) : '—'}</span></div>
+          <div class="mob-row-card-field"><span class="mob-row-card-label">Đi làm lại</span><span class="mob-row-card-val">${t.return_date ? fmtD(t.return_date) : '—'}</span></div>
+        </div>
+        ${actions}
+      </div>`;
+    }).join('') : `<div style="text-align:center;padding:2rem;color:var(--text-3);font-size:.85rem;font-weight:500">Không có dữ liệu</div>`;
+  }
 }
 
 function openTetModal(id) {
