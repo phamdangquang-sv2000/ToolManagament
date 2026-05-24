@@ -1870,7 +1870,7 @@ function startApp(role) {
   loadData();
   startAutoRefresh();
   initOfflineDetect();
-  lucide.createIcons();
+  if (typeof lucide !== "undefined") lucide.createIcons();
 }
 
 function setupRoleUI() {
@@ -2521,8 +2521,9 @@ function exportEmployees() {
   const a = document.createElement("a");
   const now = new Date();
   const fn = `nhan_su_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,"0")}${String(now.getDate()).padStart(2,"0")}.csv`;
-  a.href=url; a.download=fn; a.click();
-  URL.revokeObjectURL(url);
+  a.href=url; a.download=fn; a.style.display="none";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
   toast(`Đã xuất ${allRecords.length} nhân sự`, "success");
 }
 
@@ -2540,8 +2541,9 @@ function exportLaptops() {
   const a = document.createElement("a");
   const now = new Date();
   const fn = `thiet_bi_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,"0")}${String(now.getDate()).padStart(2,"0")}.csv`;
-  a.href=url; a.download=fn; a.click();
-  URL.revokeObjectURL(url);
+  a.href=url; a.download=fn; a.style.display="none";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
   toast(`Đã xuất ${records.length} thiết bị`, "success");
 }
 
@@ -2559,8 +2561,9 @@ function exportAccounts() {
   const a = document.createElement("a");
   const now = new Date();
   const fn = `tai_khoan_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,"0")}${String(now.getDate()).padStart(2,"0")}.csv`;
-  a.href=url; a.download=fn; a.click();
-  URL.revokeObjectURL(url);
+  a.href=url; a.download=fn; a.style.display="none";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
   toast(`Đã xuất ${records.length} tài khoản`, "success");
 }
 
