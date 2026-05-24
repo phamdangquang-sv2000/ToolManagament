@@ -1870,7 +1870,7 @@ function startApp(role) {
   loadData();
   startAutoRefresh();
   initOfflineDetect();
-  if (typeof lucide !== "undefined") lucide.createIcons();
+  lucide.createIcons();
 }
 
 function setupRoleUI() {
@@ -2521,9 +2521,8 @@ function exportEmployees() {
   const a = document.createElement("a");
   const now = new Date();
   const fn = `nhan_su_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,"0")}${String(now.getDate()).padStart(2,"0")}.csv`;
-  a.href=url; a.download=fn; a.style.display="none";
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  a.href=url; a.download=fn; a.click();
+  URL.revokeObjectURL(url);
   toast(`Đã xuất ${allRecords.length} nhân sự`, "success");
 }
 
@@ -2541,9 +2540,8 @@ function exportLaptops() {
   const a = document.createElement("a");
   const now = new Date();
   const fn = `thiet_bi_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,"0")}${String(now.getDate()).padStart(2,"0")}.csv`;
-  a.href=url; a.download=fn; a.style.display="none";
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  a.href=url; a.download=fn; a.click();
+  URL.revokeObjectURL(url);
   toast(`Đã xuất ${records.length} thiết bị`, "success");
 }
 
@@ -2561,9 +2559,8 @@ function exportAccounts() {
   const a = document.createElement("a");
   const now = new Date();
   const fn = `tai_khoan_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,"0")}${String(now.getDate()).padStart(2,"0")}.csv`;
-  a.href=url; a.download=fn; a.style.display="none";
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  a.href=url; a.download=fn; a.click();
+  URL.revokeObjectURL(url);
   toast(`Đã xuất ${records.length} tài khoản`, "success");
 }
 
@@ -2699,6 +2696,22 @@ function formatBBTime(ts){
   } catch(e){ return ts; }
 }
 function isImageUrl(url){ return /\.(png|jpe?g|webp|gif)(\?|$)/i.test(url); }
+function isPdfUrl(url){ return /\.pdf(\?|$)/i.test(url); }
+function isOfficeUrl(url){ return /\.(docx?|xlsx?|pptx?)(\?|$)/i.test(url); }
+function isIOS(){ return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1); }
+// Mở file an toàn trên iOS: docx/xlsx/pptx → Office Online Viewer (iOS Safari không render được)
+function openFileSmart(url){
+  try{
+    if(!url){ toast("Không có file","error"); return; }
+    if(isOfficeUrl(url)){
+      const viewer = "https://view.officeapps.live.com/op/view.aspx?src=" + encodeURIComponent(url);
+      window.open(viewer, "_blank", "noopener");
+      return;
+    }
+    // ảnh và PDF: iOS Safari xem trực tiếp OK
+    window.open(url, "_blank", "noopener");
+  }catch(e){ toast("Không mở được file: "+e.message,"error"); }
+}
 const ACC_FIELDS = ["heiway_account","pic_name","job_title","status","note"];
 const STATUS_OPTIONS_DEV = ["In Used","Backup","Returned","Broken","Spare"];
 
@@ -2949,8 +2962,8 @@ function viewLap(id){
           </div>
           ${isImageUrl(f.url) ? `<a href="${f.url}" target="_blank" rel="noopener"><img src="${f.url}" alt="Biên bản ${i+1}" style="width:100%;max-height:200px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,0.08);margin-bottom:8px;"/></a>` : ""}
           <div style="display:flex;gap:8px;">
-            <button class="btn btn-ghost btn-sm" style="flex:1;" data-url="${f.url}" data-name="${f.name||('File '+(i+1))}" onclick="viewBienBan(this.dataset.url,this.dataset.name)">👁 Xem</button>
-            <button class="btn btn-primary btn-sm" style="flex:1;" data-url="${f.url}" onclick="downloadBienBan(this.dataset.url,'bien-ban-${safeName}-${i+1}')">⬇ Tải về</button>
+            <button class="btn btn-ghost btn-sm" style="flex:1;" onclick="openFileSmart('${f.url}')">👁 Xem</button>
+            <button class="btn btn-primary btn-sm" style="flex:1;" onclick="downloadBienBan('${f.url}','bien-ban-${safeName}-${i+1}')">⬇ Tải về</button>
           </div>
         </div>
       `).join("")}
@@ -3017,7 +3030,7 @@ function lapForm(r){
               <div style="font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${f.name||("File "+(i+1))}</div>
               ${f.uploaded_at?`<div style="font-size:10px;color:var(--text-tertiary);">${formatBBTime(f.uploaded_at)}</div>`:""}
             </div>
-            <a href="${f.url}" target="_blank" rel="noopener" style="font-size:11px;color:#60a5fa;text-decoration:none;">Xem</a>
+            <a href="javascript:void(0)" onclick="openFileSmart('${f.url}')" style="font-size:11px;color:#60a5fa;text-decoration:none;">Xem</a>
           </div>`).join("")}
         </div>`;
       })()}
@@ -3121,38 +3134,42 @@ async function createLap(){
   } catch(e){ toast("Lỗi: "+e.message,"error"); }
 }
 // Tải file biên bản về máy (force download để tránh mở tab mới)
-function downloadBienBan(url, filename){
-  // iOS PWA: window.location.href triggers QuickLook/download trực tiếp
-  window.location.href = url;
-}
+async function downloadBienBan(url, filename){
+  try {
+    if(!url){ toast("Không có file","error"); return; }
+    // Lấy đuôi file gốc
+    const ext = (url.split("?")[0].split(".").pop() || "bin").toLowerCase();
+    const safeName = (filename || "bien-ban").replace(/[^\w\-]+/g,"_");
+    const fullName = safeName.endsWith("."+ext) ? safeName : (safeName+"."+ext);
 
-function viewBienBan(url, name){
-  // Hiện preview ngay trong modal — không mở tab mới
-  const isImg = /\.(png|jpe?g|webp|gif)(\?|$)/i.test(url);
-  const isPdf = /\.pdf(\?|$)/i.test(url);
-  document.getElementById("modal-title").textContent = name || "Xem file";
-  if(isImg){
-    document.getElementById("modal-body").innerHTML =
-      `<div style="text-align:center;padding:8px;">
-         <img src="${url}" style="max-width:100%;border-radius:10px;" onerror="this.parentNode.innerHTML='Không tải được ảnh.'"/>
-       </div>`;
-  } else if(isPdf){
-    document.getElementById("modal-body").innerHTML =
-      `<iframe src="${url}" style="width:100%;height:70vh;border:none;border-radius:10px;"
-         onerror="this.parentNode.innerHTML='Không tải được PDF.'"></iframe>`;
-  } else {
-    // docx / file khác: không preview được, hỏi tải về
-    document.getElementById("modal-body").innerHTML =
-      `<div style="padding:24px;text-align:center;color:var(--text-secondary);">
-         <div style="font-size:40px;margin-bottom:12px;">📄</div>
-         <div style="font-size:15px;font-weight:600;margin-bottom:8px;">${name||"File"}</div>
-         <div style="font-size:13px;margin-bottom:20px;">File này không xem trực tiếp được.<br>Nhấn Tải về để mở.</div>
-         <button class="btn btn-primary" onclick="downloadBienBan('${url.replace(/'/g,"\'")}','${(name||"file").replace(/'/g,"\'")}')">⬇ Tải về</button>
-       </div>`;
-  }
-  document.getElementById("modal-footer").innerHTML =
-    `<button class="btn btn-ghost btn-full" onclick="closeModal()">Đóng</button>`;
-  openModal();
+    // Supabase Storage hỗ trợ ?download=<filename> → trả Content-Disposition: attachment
+    // → hoạt động trên iOS Safari, Android, desktop (không cần thuộc tính <a download>)
+    const sep = url.includes("?") ? "&" : "?";
+    const dlUrl = url + sep + "download=" + encodeURIComponent(fullName);
+
+    if (isIOS()) {
+      // iOS: điều hướng trực tiếp để Safari hiện hộp thoại "Tải xuống" → vào app Files
+      window.location.href = dlUrl;
+      return;
+    }
+
+    // Desktop/Android: thử blob để giữ tên file đẹp, fallback sang điều hướng
+    try {
+      const res = await fetch(dlUrl);
+      if(!res.ok) throw new Error("HTTP "+res.status);
+      const blob = await res.blob();
+      const a = document.createElement("a");
+      const objUrl = URL.createObjectURL(blob);
+      a.href = objUrl;
+      a.download = fullName;
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(()=>{ a.remove(); URL.revokeObjectURL(objUrl); }, 1500);
+    } catch(_){
+      window.location.href = dlUrl;
+    }
+  } catch(e){ toast("Không tải được: "+e.message,"error"); }
 }
 
 // --- Detail/Edit/Delete ACCOUNTS ---
