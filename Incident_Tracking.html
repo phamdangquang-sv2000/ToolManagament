@@ -596,15 +596,22 @@
         padding: 16px 14px 80px 14px !important;
       }
 
-      /* iOS: font-size must be >=16px to prevent auto-zoom on focus.
-         We use zoom:0.84 so text visually appears ~13.5px
-         while the browser still treats it as 16px. */
+      /* iOS: font-size MUST be exactly 16px on the element itself — no zoom trick.
+         iOS ignores user-scalable=no since iOS 10. The only reliable fix is genuine 16px.
+         We compensate visual size with a slightly tighter padding instead. */
       .field,
       input[type="text"], input[type="email"], input[type="password"],
       input[type="number"], input[type="datetime-local"],
       select, textarea {
         font-size: 16px !important;
-        zoom: 0.84;
+        zoom: unset !important;
+      }
+
+      /* Override inline font-size on dynamically rendered field elements */
+      input.field[style*="font-size"],
+      select.field[style*="font-size"],
+      textarea.field[style*="font-size"] {
+        font-size: 16px !important;
       }
 
       /* Section headings */
