@@ -596,12 +596,15 @@
         padding: 16px 14px 80px 14px !important;
       }
 
-      /* All inputs/selects/textareas: 16px prevents iOS zoom */
-      .field { font-size: 16px !important; }
+      /* iOS: font-size must be >=16px to prevent auto-zoom on focus.
+         We use zoom:0.84 so text visually appears ~13.5px
+         while the browser still treats it as 16px. */
+      .field,
       input[type="text"], input[type="email"], input[type="password"],
       input[type="number"], input[type="datetime-local"],
       select, textarea {
         font-size: 16px !important;
+        zoom: 0.84;
       }
 
       /* Section headings */
@@ -703,6 +706,34 @@
     @media (max-width: 374px) {
       #page-app > div[style*="flex:1"] { padding: 12px 10px 80px 10px !important; }
       .stat-card div[style*="font-size:26px"] { font-size: 22px !important; }
+    }
+
+    /* ── iPhone PWA / mobile: tighten overall font scale ── */
+    @media (max-width: 1023px) {
+      html { font-size: 14px; }
+      body { font-size: 13px; }
+      .btn { font-size: 12px !important; padding: 8px 13px !important; }
+      .section-title { font-size: 13px !important; }
+      .badge { font-size: 10px !important; padding: 2px 7px !important; }
+      /* Inline style font sizes in detail view */
+      [style*="font-size:22px"] { font-size: 17px !important; }
+      [style*="font-size:20px"] { font-size: 16px !important; }
+      [style*="font-size:18px"] { font-size: 14px !important; }
+      [style*="font-size:15px"]:not(input):not(select):not(textarea) { font-size: 13px !important; }
+      [style*="font-size:14px"]:not(input):not(select):not(textarea) { font-size: 12.5px !important; }
+      [style*="font-size:13px"]:not(input):not(select):not(textarea) { font-size: 12px !important; }
+      /* Mobile header title */
+      #mobile-header .mh-title { font-size: 13px !important; }
+      /* Nav labels */
+      #mobile-bottom-nav span { font-size: 9px !important; }
+    }
+
+    /* ── Detail view Timeline Logs: table ↔ cards ─────── */
+    .view-tl-cards-wrap { display: none; }
+    .view-tl-table-wrap { display: block; }
+    @media (max-width: 1023px) {
+      .view-tl-table-wrap { display: none !important; }
+      .view-tl-cards-wrap { display: block !important; }
     }
 
     /* ── Timeline rows: card layout on mobile ── */
@@ -3727,9 +3758,11 @@ function buildDetailHTML(inc, logs) {
     </div>`;
   }
 
+  // Build timeline logs: table on desktop, cards on mobile
   html += `<div class="card" style="padding:26px; margin-bottom:14px; box-shadow:0 4px 24px rgba(0,0,0,.3);">
     <div class="section-title">Timeline Logs (${logs.length})</div>
-    <div style="overflow-x:auto;">
+    <!-- Desktop table -->
+    <div class="view-tl-table-wrap" style="overflow-x:auto;">
     <table class="tbl"><thead><tr>
       <th>Timestamp</th><th>Ticket / Ref</th><th>Priority</th><th>Status</th><th>Activity</th>
     </tr></thead><tbody>`;
@@ -3743,7 +3776,26 @@ function buildDetailHTML(inc, logs) {
       <td style="font-size:13px; color:var(--text); line-height:1.5;">${esc(l.activity)}</td>
     </tr>`;
   });
-  html += '</tbody></table></div></div>';
+  html += '</tbody></table></div>';
+  // Mobile card layout
+  html += `<div class="view-tl-cards-wrap" style="display:none;">`;
+  logs.forEach(l => {
+    const ts = formatDateTime(l.timestamp);
+    html += `<div style="background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:8px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; flex-wrap:wrap;">
+        <span style="font-family:var(--mono); font-size:11px; color:var(--text2);">${ts}</span>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <span class="badge badge-${l.priority.toLowerCase()}">${l.priority}</span>
+          <span class="badge badge-${statusClass(l.log_status)}">${esc(l.log_status)}</span>
+        </div>
+      </div>
+      <div style="font-family:var(--mono); font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:.05em; margin-bottom:3px;">Ticket / Ref</div>
+      <div style="font-family:var(--mono); font-size:12px; color:var(--text2); margin-bottom:8px;">${esc(l.ticket_ref)}</div>
+      <div style="font-family:var(--mono); font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:.05em; margin-bottom:3px;">Activity</div>
+      <div style="font-size:12.5px; color:var(--text); line-height:1.6;">${esc(l.activity)}</div>
+    </div>`;
+  });
+  html += '</div></div>';
 
   if (images.length) {
     html += `<div class="card" style="padding:26px; margin-bottom:14px; box-shadow:0 4px 24px rgba(0,0,0,.3);">
