@@ -795,10 +795,10 @@ tr:hover td{background:rgba(13,148,136,.03)}
   th{ padding:.55rem .75rem !important; }
   td{ padding:.5rem .75rem !important; }
 
-  /* Inputs: 16px to prevent iOS zoom; zoom visually to ~13px */
+  /* Inputs: 16px to prevent iOS zoom on focus */
   .input, input, select, textarea{
     font-size:16px !important;
-    zoom:0.84;
+    min-width:0;
   }
 
   /* Filters row: wrap */
@@ -877,8 +877,11 @@ tr:hover td{background:rgba(13,148,136,.03)}
   .sch-table thead tr:first-child th:not(.sch-name-col){ padding:.35rem .1rem !important; font-size:.56rem !important; }
   .sch-table td:not(.sch-name-td){ padding:.2rem .08rem !important; }
 
-  /* Schedule controls: hide export row on mobile, stack month/year */
-  #s-calendar > div:nth-child(2){ display:none !important; }
+  /* Schedule controls: hide only sort label+select on mobile, keep export */
+  #s-calendar > div:nth-child(2){ flex-wrap:wrap !important; gap:.5rem !important; }
+  #s-calendar > div:nth-child(2) > span:first-child,
+  #s-calendar > div:nth-child(2) > #sch-sort{ display:none !important; }
+  #s-calendar > div:nth-child(2) > div.flex{ width:100% !important; justify-content:flex-start !important; flex-wrap:wrap !important; gap:.4rem !important; margin-left:0 !important; }
 
   /* Schedule first control row: compact */
   #s-calendar > div:first-child{
@@ -1459,11 +1462,11 @@ CREATE TABLE hr_leave_requests (<br>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem">
             <div>
               <label class="label">Ngày bắt đầu *</label>
-              <input id="lr-date" type="date" class="input" onchange="onLrDateRangeChange()">
+              <input id="lr-date" type="date" class="input" style="width:100%;min-width:0;" onchange="onLrDateRangeChange()">
             </div>
             <div>
               <label class="label">Ngày kết thúc *</label>
-              <input id="lr-date-end" type="date" class="input" onchange="onLrDateRangeChange()">
+              <input id="lr-date-end" type="date" class="input" style="width:100%;min-width:0;" onchange="onLrDateRangeChange()">
             </div>
           </div>
           <div style="margin-bottom:.75rem" id="lr-days-count-row">
@@ -1473,8 +1476,8 @@ CREATE TABLE hr_leave_requests (<br>
           <div style="margin-bottom:.75rem">
             <label class="label">Loại nghỉ *</label>
             <select id="lr-days-type" class="input" onchange="onLrDaysTypeChange()">
-              <option value="1">Cả ngày (cho mỗi ngày trong khoảng)</option>
-              <option value="half">0.5 ngày (chỉ áp dụng khi chọn 1 ngày)</option>
+              <option value="1">Cả ngày</option>
+              <option value="half">0.5 ngày</option>
             </select>
           </div>
           <div id="lr-session-row" class="hidden" style="margin-bottom:.75rem">
