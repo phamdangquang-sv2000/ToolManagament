@@ -801,6 +801,11 @@ tr:hover td{background:rgba(13,148,136,.03)}
     min-width:0;
   }
 
+  /* Date fields: force single column on mobile */
+  #lr-date-grid{
+    grid-template-columns:1fr !important;
+  }
+
   /* Filters row: wrap */
   .filters-row{ gap:.45rem !important; }
   .filters-row .input{ flex:1 1 calc(50% - .45rem); min-width:120px; }
@@ -1459,7 +1464,7 @@ CREATE TABLE hr_leave_requests (<br>
             <label class="label">Nhân viên *</label>
             <select id="lr-emp" class="input"></select>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem" id="lr-date-grid">
             <div>
               <label class="label">Ngày bắt đầu *</label>
               <input id="lr-date" type="date" class="input" style="width:100%;min-width:0;" onchange="onLrDateRangeChange()">
