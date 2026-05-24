@@ -2,7 +2,10 @@
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <title>IT Incident Tracker</title>
 
   <!-- Favicon -->
@@ -54,6 +57,7 @@
 
     /* ── Reset & Base ──────────────────────────────────── */
     * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 
     /* Refresh spin animation */
     @keyframes spin-once {
@@ -523,51 +527,234 @@
       padding-left: 38px;
     }
 
-    /* ── Mobile block overlay ──────────────────────────── */
-    #mobile-block {
+    /* ══════════════════════════════════════════════════════
+       MOBILE RESPONSIVE LAYOUT
+    ══════════════════════════════════════════════════════ */
+
+    /* Safe area support (notch / Dynamic Island / Home Bar) */
+    @supports (padding: env(safe-area-inset-bottom)) {
+      body { padding-bottom: env(safe-area-inset-bottom); }
+      #mobile-bottom-nav { padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
+      #toast-container { bottom: calc(70px + env(safe-area-inset-bottom)); }
+    }
+
+    /* ── Mobile bottom navigation bar ── */
+    #mobile-bottom-nav {
       display: none;
-      position: fixed; inset: 0; z-index: 99999;
-      background: var(--bg);
-      background-image: radial-gradient(circle, #1a2740 1px, transparent 1px);
-      background-size: 28px 28px;
-      align-items: center; justify-content: center;
-      padding: 32px; text-align: center;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      z-index: 90;
+      padding: 8px 0;
+      box-shadow: 0 -4px 24px rgba(0,0,0,.5);
     }
-    #mobile-block .mb-card {
-      max-width: 420px;
-      background: var(--surface);
-      border: 1px solid var(--border2);
-      border-radius: 18px;
-      padding: 36px 28px;
-      box-shadow: 0 10px 50px rgba(0,0,0,.6), 0 0 30px var(--red-soft);
+    #mobile-bottom-nav .mnav-inner {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
     }
-    #mobile-block .mb-icon {
-      width: 64px; height: 64px;
-      margin: 0 auto 18px;
-      border-radius: 14px;
-      background: linear-gradient(135deg,#7d1417,#2a0a0b);
-      border: 1px solid var(--red-dim);
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 0 24px var(--red-glow);
+    .mnav-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      padding: 6px 14px;
+      background: none; border: none; cursor: pointer;
+      color: var(--text3); font-size: 10px; font-family: var(--mono);
+      font-weight: 700; letter-spacing: .04em;
+      transition: color .18s;
     }
-    #mobile-block h2 {
-      color: #fff; font-size: 22px; font-weight: 800;
-      margin: 0 0 10px; letter-spacing: -.02em;
+    .mnav-btn.active { color: var(--red); }
+    .mnav-btn svg { flex-shrink: 0; }
+
+    /* ── Mobile header bar ── */
+    #mobile-header {
+      display: none;
+      position: sticky; top: 0; z-index: 50;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 12px rgba(0,0,0,.4);
     }
-    #mobile-block p {
-      color: var(--text2); font-size: 13.5px;
-      line-height: 1.55; margin: 0;
+    #mobile-header .mh-title {
+      font-size: 14px; font-weight: 800; color: #fff;
+      letter-spacing: -.01em;
     }
-    #mobile-block .mb-tag {
-      display: inline-block; margin-top: 16px;
-      font-family: var(--mono); font-size: 11px;
-      color: var(--red); letter-spacing: .08em;
-      padding: 5px 10px; border-radius: 6px;
-      background: var(--red-soft); border: 1px solid var(--red-dim);
+    #mobile-header .mh-actions {
+      display: flex; gap: 4px;
     }
+
     @media (max-width: 1023px) {
-      #mobile-block { display: flex !important; }
-      body > *:not(#mobile-block) { display: none !important; }
+      /* Hide sidebar, show mobile chrome */
+      #sidebar { display: none !important; }
+      #mobile-bottom-nav { display: block; }
+      #mobile-header { display: flex; }
+
+      /* Main content padding adjustments */
+      #page-app { flex-direction: column !important; }
+      #page-app > div[style*="flex:1"] {
+        padding: 16px 14px 80px 14px !important;
+      }
+
+      /* All inputs/selects/textareas: 16px prevents iOS zoom */
+      .field { font-size: 16px !important; }
+      input[type="text"], input[type="email"], input[type="password"],
+      input[type="number"], input[type="datetime-local"],
+      select, textarea {
+        font-size: 16px !important;
+      }
+
+      /* Section headings */
+      h2[style*="font-size:24px"] { font-size: 20px !important; }
+      h2[style*="font-size:22px"] { font-size: 18px !important; }
+
+      /* Form grids: 2-col → 1-col */
+      div[style*="grid-template-columns:1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+      }
+      div[style*="grid-column:1/-1"] {
+        grid-column: span 1 !important;
+      }
+
+      /* Stat cards: 2-col on mobile */
+      div[style*="repeat(auto-fit, minmax(150px, 1fr))"] {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+      }
+      .stat-card { padding: 14px 14px !important; }
+      .stat-card div[style*="font-size:34px"] { font-size: 26px !important; }
+
+      /* Filters: wrap on mobile */
+      div[style*="display:flex; align-items:center; gap:12px; margin-bottom:16px"] {
+        flex-wrap: wrap !important;
+      }
+      #filter-month, #filter-severity, #filter-system {
+        width: calc(50% - 6px) !important;
+        flex: 0 0 calc(50% - 6px) !important;
+      }
+
+      /* Cards padding */
+      .card[style*="padding:26px"] { padding: 16px !important; }
+      .panel-elevated { padding: 14px !important; }
+
+      /* Timeline table: horizontally scrollable */
+      .tbl { font-size: 12px !important; }
+      .tbl th, .tbl td { padding: 8px 10px !important; }
+
+      /* Modal full-screen bottom sheet */
+      .modal-overlay {
+        align-items: flex-end !important;
+        padding: 0 !important;
+      }
+      .modal-box {
+        border-radius: 20px 20px 0 0 !important;
+        max-width: 100% !important;
+        max-height: 90vh !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding: 20px 18px !important;
+      }
+
+      /* Login page */
+      #page-login { padding: 24px 16px !important; }
+      #page-login h1 { font-size: 22px !important; }
+
+      /* Toast */
+      #toast-container {
+        bottom: 76px !important;
+        right: 12px !important;
+        left: 12px !important;
+      }
+      .toast { max-width: 100% !important; font-size: 12px !important; }
+
+      /* Inc card grid: 1 column */
+      .inc-cards-grid { grid-template-columns: 1fr !important; }
+
+      /* Detail view back header */
+      div[style*="display:flex; align-items:center; gap:12px; margin-bottom:28px"] {
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+      }
+      div[style*="margin-left:auto; display:flex; gap:10px"] {
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+        margin-left: 0 !important;
+        width: 100% !important;
+      }
+      div[style*="margin-left:auto; display:flex; gap:10px"] .btn {
+        flex: 1 !important;
+        justify-content: center !important;
+      }
+
+      /* Employee inc card detail */
+      .inc-card[style*="margin-bottom:14px"] { padding: 14px !important; }
+
+      /* Submit buttons row */
+      div[style*="display:flex; gap:12px; justify-content:flex-end"] {
+        gap: 8px !important;
+      }
+      div[style*="display:flex; gap:12px; justify-content:flex-end"] .btn {
+        flex: 1 !important;
+        justify-content: center !important;
+      }
+    }
+
+    /* Extra small phones */
+    @media (max-width: 374px) {
+      #page-app > div[style*="flex:1"] { padding: 12px 10px 80px 10px !important; }
+      .stat-card div[style*="font-size:26px"] { font-size: 22px !important; }
+    }
+
+    /* ── Timeline rows: card layout on mobile ── */
+    .tl-card {
+      display: none;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 8px;
+      gap: 8px;
+      flex-direction: column;
+    }
+    .tl-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .tl-card-row {
+      display: flex;
+      gap: 8px;
+    }
+    .tl-card-row > * { flex: 1; }
+    .tl-card label {
+      font-size: 10px; font-weight: 700;
+      color: var(--text3); text-transform: uppercase;
+      letter-spacing: .06em; font-family: var(--mono);
+      margin-bottom: 4px; display: block;
+    }
+
+    @media (max-width: 1023px) {
+      /* Hide desktop timeline table wrapper, show card container */
+      .tl-table-wrap { display: none !important; }
+      .tl-cards-wrap { display: block !important; }
+
+      /* Force card view for incident lists */
+      .inc-table-wrap { display: none !important; }
+      .inc-mobile-cards { display: block !important; }
+
+      /* Show timeline cards */
+      .tl-card { display: flex !important; }
+
+      /* Filters stack */
+      #filter-month, #filter-severity, #filter-system {
+        width: 100% !important;
+        flex: 1 1 calc(50% - 6px) !important;
+      }
+
+      /* "Add Row" button full width */
+      .tl-add-btn { width: 100% !important; justify-content: center !important; }
     }
 
     /* ══════════════════════════════════════════════════════
@@ -1280,17 +1467,52 @@
 <!-- ════════════════════════════════════════════════════
      MOBILE / SMALL-SCREEN BLOCK
 ═════════════════════════════════════════════════════ -->
-<div id="mobile-block">
-  <div class="mb-card">
-    <div class="mb-icon">
-      <svg width="30" height="30" fill="none" stroke="#ff8b8d" stroke-width="2" viewBox="0 0 24 24">
-        <rect x="2" y="4" width="20" height="13" rx="2"/>
-        <path d="M8 21h8M12 17v4"/>
+<!-- ════════════════════════════════════════════════════
+     MOBILE HEADER (sticky top bar, shown on mobile only)
+═════════════════════════════════════════════════════ -->
+<div id="mobile-header">
+  <div style="display:flex; align-items:center; gap:8px;">
+    <svg width="18" height="18" fill="none" stroke="var(--red)" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+    <span class="mh-title">IT Incident Tracker</span>
+  </div>
+  <div class="mh-actions">
+    <button class="btn btn-ghost" onclick="refreshApp()" style="padding:6px 8px;" title="Refresh">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <polyline points="23,4 23,10 17,10"/><polyline points="1,20 1,14 7,14"/>
+        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
       </svg>
+    </button>
+    <button class="btn btn-ghost" onclick="doLogout()" style="padding:6px 8px;" title="Logout">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     MOBILE BOTTOM NAV
+═════════════════════════════════════════════════════ -->
+<div id="mobile-bottom-nav">
+  <div class="mnav-inner">
+    <div id="mnav-employee" style="display:none; contents;">
+      <button class="mnav-btn active" id="mnav-report" onclick="showView('employee-create'); updateMobileNav('mnav-report')">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        Report
+      </button>
+      <button class="mnav-btn" id="mnav-my" onclick="showView('employee-list'); updateMobileNav('mnav-my')">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"/></svg>
+        My Incidents
+      </button>
     </div>
-    <h2>Desktop only</h2>
-    <p>This application is designed for desktop use. Please open it on a computer with a screen width of at least 1024&nbsp;px.</p>
-    <div class="mb-tag">DESKTOP REQUIRED</div>
+    <div id="mnav-admin" style="display:none; contents;">
+      <button class="mnav-btn active" id="mnav-dashboard" onclick="showView('admin-dashboard'); updateMobileNav('mnav-dashboard')">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </button>
+    </div>
   </div>
 </div>
 
@@ -1950,12 +2172,13 @@
       <div class="card" style="padding:26px; margin-bottom:14px; box-shadow:0 4px 24px rgba(0,0,0,.3);">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
           <div class="section-title" style="margin-bottom:0;">Timeline Logs <span style="color:var(--red); font-size:12px;">*</span></div>
-          <button class="btn btn-secondary" onclick="addTimelineRow()">
+          <button class="btn btn-secondary tl-add-btn" onclick="addTimelineRow()">
             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
             Add Row
           </button>
         </div>
-        <div style="overflow-x:auto;">
+        <!-- Desktop table -->
+        <div class="tl-table-wrap" style="overflow-x:auto;">
           <table class="tbl">
             <thead>
               <tr>
@@ -1970,6 +2193,8 @@
             <tbody id="timeline-body"></tbody>
           </table>
         </div>
+        <!-- Mobile cards container (populated by JS, hidden on desktop) -->
+        <div class="tl-cards-wrap" style="display:none;" id="timeline-cards"></div>
       </div>
 
       <!-- Section 3: Final Details -->
@@ -2340,6 +2565,18 @@ function toast(msg, type = 'success') {
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(`page-${id}`).classList.add('active');
+  // Mobile chrome: only show on app page
+  const mobileHeader = document.getElementById('mobile-header');
+  const mobileNav    = document.getElementById('mobile-bottom-nav');
+  if (mobileHeader) mobileHeader.style.display = id === 'app' ? '' : 'none';
+  if (mobileNav)    mobileNav.style.display    = id === 'app' ? '' : 'none';
+}
+
+// ── Mobile nav active state helper ────────────────────────
+function updateMobileNav(activeBtnId) {
+  document.querySelectorAll('.mnav-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById(activeBtnId);
+  if (btn) btn.classList.add('active');
 }
 
 function showView(view) {
@@ -2350,15 +2587,20 @@ function showView(view) {
   // Persist current view so F5 restores it
   localStorage.setItem('it_last_view', view);
 
-  // Update nav links
+  // Update sidebar nav links
   document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-  if (view === 'employee-create') { document.getElementById('nav-report')?.classList.add('active'); }
+  if (view === 'employee-create') {
+    document.getElementById('nav-report')?.classList.add('active');
+    updateMobileNav('mnav-report');
+  }
   if (view === 'employee-list')   {
     document.getElementById('nav-my')?.classList.add('active');
+    updateMobileNav('mnav-my');
     loadEmployeeList();
   }
   if (view === 'admin-dashboard') {
     document.getElementById('nav-dashboard')?.classList.add('active');
+    updateMobileNav('mnav-dashboard');
     loadStats();
     loadAdminIncidents();
   }
@@ -2559,6 +2801,12 @@ function enterApp(role) {
   document.getElementById('nav-admin').style.display    = role === 'admin'    ? 'flex' : 'none';
   document.getElementById('sidebar-role').textContent   = `ROLE: ${role.toUpperCase()}`;
 
+  // Mobile nav: show correct section
+  const mnavEmp = document.getElementById('mnav-employee');
+  const mnavAdm = document.getElementById('mnav-admin');
+  if (mnavEmp) mnavEmp.style.display = role === 'employee' ? 'contents' : 'none';
+  if (mnavAdm) mnavAdm.style.display = role === 'admin'    ? 'contents' : 'none';
+
   // Restore last visited tab (only if it belongs to this role)
   const lastView = localStorage.getItem('it_last_view');
   const employeeViews = ['employee-create', 'employee-list'];
@@ -2621,6 +2869,8 @@ function addTimelineRow(ts='', ref='', prio='P1', status='In Process', activity=
   const tbody = document.getElementById('timeline-body');
   const tr = document.createElement('tr');
   tr.className = 'timeline-row';
+  const rowId = 'tlrow-' + Date.now() + Math.random().toString(36).slice(2);
+  tr.dataset.rowId = rowId;
   tr.innerHTML = `
     <td><div style="display:flex;gap:4px;align-items:center;">
       <input type="text" class="field tl-ts" value="${ts}" placeholder="YYYY-MM-DD HH:MM:SS" autocomplete="off" style="min-width:185px;" />
@@ -2654,10 +2904,101 @@ function addTimelineRow(ts='', ref='', prio='P1', status='In Process', activity=
   // Auto-resize the new activity textarea
   const ta = tr.querySelector('.tl-activity');
   if (ta) { autoResize(ta); ta.addEventListener('input', () => autoResize(ta)); }
+
+  // ── Mobile card (mirrors the hidden table row) ──
+  const cardsWrap = document.getElementById('timeline-cards');
+  if (cardsWrap) {
+    const idx = tbody.rows.length;
+    const card = document.createElement('div');
+    card.className = 'tl-card';
+    card.dataset.rowId = rowId;
+    card.innerHTML = `
+      <div class="tl-card-header">
+        <span style="font-size:11px; font-weight:700; color:var(--text3); font-family:var(--mono);">LOG #${idx}</span>
+        <button class="btn btn-ghost" onclick="removeMobileCard(this)" style="padding:4px 6px; color:#ef4444; margin-left:auto;">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a1,1,0,0,1,1-1h4a1,1,0,0,1,1,1v2"/></svg>
+        </button>
+      </div>
+      <div>
+        <label>Timestamp</label>
+        <div style="display:flex; gap:4px; align-items:center;">
+          <input type="text" class="field tl-ts" value="${ts}" placeholder="YYYY-MM-DD HH:MM:SS" autocomplete="off" style="flex:1;" />
+          <button class="btn btn-ghost" onclick="setNowCard(this)" style="padding:6px 8px; flex-shrink:0;" title="Now">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="tl-card-row">
+        <div>
+          <label>Ticket / Ref</label>
+          <input type="text" class="field tl-ref" value="${ref}" placeholder="INCXXXXXXX" />
+        </div>
+        <div style="flex:0 0 90px;">
+          <label>Priority</label>
+          <select class="field tl-prio">
+            <option value="P1" ${prio==='P1'?'selected':''}>P1</option>
+            <option value="P2" ${prio==='P2'?'selected':''}>P2</option>
+            <option value="P3" ${prio==='P3'?'selected':''}>P3</option>
+            <option value="P4" ${prio==='P4'?'selected':''}>P4</option>
+          </select>
+        </div>
+        <div style="flex:0 0 110px;">
+          <label>Status</label>
+          <select class="field tl-status">
+            <option value="In Process" ${status==='In Process'?'selected':''}>In Process</option>
+            <option value="On Hold" ${status==='On Hold'?'selected':''}>On Hold</option>
+            <option value="Resolved" ${status==='Resolved'?'selected':''}>Resolved</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label>Activity</label>
+        <textarea class="field tl-activity" rows="3" style="resize:none;" placeholder="Describe the action taken..." oninput="syncCardToRow(this)">${activity}</textarea>
+      </div>`;
+    cardsWrap.appendChild(card);
+    // sync card inputs ↔ table row
+    bindCardToRow(card, tr);
+  }
 }
 
 function setNow(btn) {
   btn.closest('td').querySelector('.tl-ts').value = nowStr();
+}
+
+function setNowCard(btn) {
+  btn.closest('.tl-card').querySelector('.tl-ts').value = nowStr();
+  // sync to hidden table row
+  const card = btn.closest('.tl-card');
+  const rowId = card.dataset.rowId;
+  const tr = document.querySelector(`#timeline-body tr[data-row-id="${rowId}"]`);
+  if (tr) tr.querySelector('.tl-ts').value = nowStr();
+}
+
+function bindCardToRow(card, tr) {
+  const fields = ['tl-ts', 'tl-ref', 'tl-prio', 'tl-status', 'tl-activity'];
+  fields.forEach(cls => {
+    const cardEl = card.querySelector('.' + cls);
+    const rowEl  = tr.querySelector('.' + cls);
+    if (!cardEl || !rowEl) return;
+    cardEl.addEventListener('input', () => { rowEl.value = cardEl.value; });
+    cardEl.addEventListener('change', () => { rowEl.value = cardEl.value; });
+  });
+}
+
+function syncCardToRow(ta) {
+  // triggered by oninput on card textarea (already handled by bindCardToRow, this is a fallback)
+}
+
+function removeMobileCard(btn) {
+  const card = btn.closest('.tl-card');
+  const rowId = card.dataset.rowId;
+  const tbody = document.getElementById('timeline-body');
+  if (document.querySelectorAll('#timeline-body tr').length <= 1) {
+    toast('At least 1 timeline row is required', 'error'); return;
+  }
+  const tr = tbody.querySelector(`tr[data-row-id="${rowId}"]`);
+  if (tr) tr.remove();
+  card.remove();
 }
 
 function removeRow(btn) {
@@ -2666,7 +3007,11 @@ function removeRow(btn) {
     toast('At least 1 timeline row is required', 'error');
     return;
   }
+  const rowId = row.dataset.rowId;
   row.remove();
+  // also remove corresponding mobile card
+  const card = document.querySelector(`.tl-card[data-row-id="${rowId}"]`);
+  if (card) card.remove();
 }
 
 function autoResize(el) {
@@ -2870,6 +3215,8 @@ function resetForm() {
   document.getElementById('f-system').value   = '';
   document.getElementById('f-starttime').value = '';
   document.getElementById('timeline-body').innerHTML = '';
+  const tc = document.getElementById('timeline-cards');
+  if (tc) tc.innerHTML = '';
   document.getElementById('image-preview').innerHTML = '';
   document.getElementById('f-images').value = '';
   uploadedFiles = [];
@@ -2899,7 +3246,8 @@ function renderEmployeeList(rows) {
     el.innerHTML = '<p style="color:var(--text2); padding:24px 4px; font-size:13px;">No incidents found.</p>';
     return;
   }
-  el.innerHTML = renderTable(rows, false);
+  const isMobile = window.innerWidth < 1024;
+  el.innerHTML = isMobile ? renderCards(rows) : renderTable(rows, false);
 }
 
 function filterEmployeeList() {
@@ -2983,7 +3331,9 @@ function renderAdminList(rows) {
     el.innerHTML = '<p style="color:var(--text2); padding:24px 4px; font-size:13px;">No incidents found.</p>';
     return;
   }
-  el.innerHTML = listView === 'table' ? renderTable(rows, true) : renderCards(rows);
+  // On mobile always render cards; desktop respects listView toggle
+  const isMobile = window.innerWidth < 1024;
+  el.innerHTML = (listView === 'table' && !isMobile) ? renderTable(rows, true) : renderCards(rows);
 }
 
 function filterAdminList() {
@@ -3036,20 +3386,26 @@ function renderTable(data, isAdmin) {
 
 function renderCards(data) {
   data = sortByStartTime(data);
-  let html = '<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px;">';
+  const isMobile = window.innerWidth < 1024;
+  const colStyle = isMobile
+    ? 'display:flex; flex-direction:column; gap:10px;'
+    : 'display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px;';
+  let html = `<div class="inc-cards-grid" style="${colStyle}">`;
   for (const inc of data) {
     const dt = formatDateTime(inc.start_time);
-    html += `<div class="inc-card" onclick="openDetail(${inc.id})">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-        <span class="badge badge-${inc.severity.toLowerCase()}">${inc.severity}</span>
-        <span class="badge badge-${statusClass(inc.status)}">${esc(inc.status)}</span>
+    const statusCls = statusClass(inc.status);
+    const sevCls = inc.severity.toLowerCase();
+    html += `<div class="inc-card" onclick="openDetail(${inc.id})" style="${isMobile ? 'padding:14px 16px;' : ''}">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="badge badge-${sevCls}">${inc.severity}</span>
+          <span class="sys-tag" style="font-size:11px;">${esc(inc.system)}</span>
+        </div>
+        <span class="badge badge-${statusCls}">${esc(inc.status)}</span>
       </div>
-      <div style="font-weight:700; color:#fff; font-size:14px; margin-bottom:6px; line-height:1.4;">${esc(inc.title)}</div>
-      <div style="font-size:12px; color:var(--text2); font-family:var(--mono); margin-bottom:12px;">${esc(inc.ticket_id)}</div>
-      <div style="display:flex; align-items:center; justify-content:space-between;">
-        <span class="sys-tag">${esc(inc.system)}</span>
-        <span style="font-size:11px; color:var(--text3); font-family:var(--mono);">${dt}</span>
-      </div>
+      <div style="font-family:var(--mono); font-size:11.5px; color:var(--text3); margin-bottom:4px;">${esc(inc.ticket_id)}</div>
+      <div style="font-weight:700; color:#fff; font-size:${isMobile?'14px':'14px'}; line-height:1.4; margin-bottom:8px;">${esc(inc.title)}</div>
+      <div style="font-size:11px; color:var(--text3); font-family:var(--mono);">${dt}</div>
     </div>`;
   }
   html += '</div>';
