@@ -2,7 +2,10 @@
 <html lang="vi" class="dark">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="mobile-web-app-capable" content="yes" />
 <title>L2 Support · Quỹ</title>
 
 <!-- Animated Wallet Favicon -->
@@ -28,6 +31,7 @@
     --grad-green:linear-gradient(135deg,#34d399 0%,#22d3ee 100%);
   }
   *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   html,body{margin:0;padding:0}
   body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;
     background-image:
@@ -333,6 +337,7 @@
     section.glass.p-4{padding:12px!important;margin-bottom:12px!important}
     section.glass.p-4 .flex{flex-wrap:wrap;gap:8px!important}
     #searchInput{font-size:16px!important;} /* prevent iOS zoom */
+    .field{font-size:16px!important;} /* prevent iOS zoom on ALL inputs */
     .fdd-trigger{font-size:12px!important;padding:7px 10px!important}
     .fdd-menu{min-width:160px!important}
 
@@ -434,9 +439,14 @@
     header h1{font-size:1rem!important}
   }
 
-  /* Safe area for notched phones */
+  /* Safe area for notched phones (Dynamic Island, Home Bar) */
   @supports(padding-bottom:env(safe-area-inset-bottom)){
-    body{padding-bottom:env(safe-area-inset-bottom)}
+    body{
+      padding-top:env(safe-area-inset-top);
+      padding-bottom:env(safe-area-inset-bottom);
+      padding-left:env(safe-area-inset-left);
+      padding-right:env(safe-area-inset-right);
+    }
     .modal{padding-bottom:env(safe-area-inset-bottom)}
     .toast{bottom:calc(16px + env(safe-area-inset-bottom))!important}
   }
@@ -755,10 +765,10 @@
       </div>
       <div id="roleChoice" class="space-y-3">
         <button class="btn btn-primary w-full justify-center" style="padding:14px" onclick="toggleAdminForm(true)">
-          🔐 Admin (chỉnh sửa)
+          🔐 Admin
         </button>
         <button class="btn btn-ghost w-full justify-center" style="padding:14px" onclick="loginAsEmployee()">
-          👀 Employee (chỉ xem)
+          👤 Employee
         </button>
       </div>
       <div id="loginErr" class="text-xs text-[color:var(--danger)] text-center" style="display:none"></div>
