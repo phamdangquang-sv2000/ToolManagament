@@ -3133,38 +3133,71 @@ async function createLap(){
     closeModal(); toast("Đã thêm","success"); loadLaptops();
   } catch(e){ toast("Lỗi: "+e.message,"error"); }
 }
-// Tải file biên bản về máy (force download để tránh mở tab mới)
+// Tải file biên bản về máy — hoạt động cả trên iPhone shortcut (standalone PWA)
+function isStandalone(){
+  return (window.navigator.standalone === true) ||
+         window.matchMedia('(display-mode: standalone)').matches;
+}
 async function downloadBienBan(url, filename){
   try {
     if(!url){ toast("Không có file","error"); return; }
-    // Lấy đuôi file gốc
     const ext = (url.split("?")[0].split(".").pop() || "bin").toLowerCase();
     const safeName = (filename || "bien-ban").replace(/[^\w\-]+/g,"_");
     const fullName = safeName.endsWith("."+ext) ? safeName : (safeName+"."+ext);
-
-    // Supabase Storage hỗ trợ ?download=<filename> → trả Content-Disposition: attachment
-    // → hoạt động trên iOS Safari, Android, desktop (không cần thuộc tính <a download>)
     const sep = url.includes("?") ? "&" : "?";
     const dlUrl = url + sep + "download=" + encodeURIComponent(fullName);
 
+    toast("Đang tải file...","success");
+
+    // ===== iOS (Safari + Home Screen shortcut/PWA) =====
     if (isIOS()) {
-      // iOS: điều hướng trực tiếp để Safari hiện hộp thoại "Tải xuống" → vào app Files
-      window.location.href = dlUrl;
-      return;
+      // Cách 1: thử fetch blob rồi dùng Web Share API (iOS 15+) → lưu vào Files
+      try {
+        const res = await fetch(dlUrl, { mode: "cors" });
+        if(!res.ok) throw new Error("HTTP "+res.status);
+        const blob = await res.blob();
+        const file = new File([blob], fullName, { type: blob.type || "application/octet-stream" });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: fullName });
+          return;
+        }
+
+        // Cách 2: mở blob trong tab mới — iOS Safari sẽ hiện nút Share/Save to Files
+        const objUrl = URL.createObjectURL(blob);
+        const win = window.open(objUrl, "_blank");
+        if (!win) {
+          // Standalone không mở được tab → tạo link tạm cho user bấm
+          const a = document.createElement("a");
+          a.href = objUrl; a.target = "_blank"; a.rel = "noopener";
+          a.download = fullName;
+          document.body.appendChild(a); a.click(); a.remove();
+        }
+        setTimeout(()=>URL.revokeObjectURL(objUrl), 60000);
+        return;
+      } catch(err){
+        console.warn("iOS blob fail, fallback navigate:", err);
+        // Cách 3 (cuối cùng): nếu đang standalone, mở Safari thật qua link _blank
+        if (isStandalone()) {
+          const a = document.createElement("a");
+          a.href = dlUrl; a.target = "_blank"; a.rel = "noopener";
+          document.body.appendChild(a); a.click(); a.remove();
+        } else {
+          window.location.href = dlUrl;
+        }
+        return;
+      }
     }
 
-    // Desktop/Android: thử blob để giữ tên file đẹp, fallback sang điều hướng
+    // ===== Desktop / Android =====
     try {
       const res = await fetch(dlUrl);
       if(!res.ok) throw new Error("HTTP "+res.status);
       const blob = await res.blob();
-      const a = document.createElement("a");
       const objUrl = URL.createObjectURL(blob);
-      a.href = objUrl;
-      a.download = fullName;
-      a.style.display = "none";
-      document.body.appendChild(a);
-      a.click();
+      const a = document.createElement("a");
+      a.href = objUrl; a.download = fullName; a.style.display = "none";
+      document.body.appendChild(a); a.click();
       setTimeout(()=>{ a.remove(); URL.revokeObjectURL(objUrl); }, 1500);
     } catch(_){
       window.location.href = dlUrl;
