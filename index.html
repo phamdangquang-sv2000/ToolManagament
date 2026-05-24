@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Internal L2 Tools Hub</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f1a2e'/%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%231a2a4a'/%3E%3Cstop offset='1' stop-color='%230a1020'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M18 4 L9 17 H15.5 L14 28 L23 15 H16.5 Z' fill='%23f5d278' filter='url(%23s)'/%3E%3Cdefs%3E%3Cfilter id='s' x='-30%25' y='-30%25' width='160%25' height='160%25'%3E%3CfeDropShadow dx='0' dy='0' stdDeviation='2' flood-color='%23e8bb50' flood-opacity='0.8'/%3E%3C/filter%3E%3C/defs%3E%3C/svg%3E"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="L2 Tools"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
@@ -2349,6 +2352,72 @@ document.addEventListener('keydown', e => {
   const _restored = loadSession();
   if (_restored !== 'home' && typeof _restored === 'number' && _restored < apps.length) {
     openApp(_restored);
+  }
+})();
+</script>
+
+<script>
+// ════════════════════════════════════════
+// APPLE TOUCH ICON — tự tạo PNG 180x180 cho iOS Home Screen
+// ════════════════════════════════════════
+(function generateAppleTouchIcon() {
+  try {
+    const size = 180;
+    const canvas = document.createElement('canvas');
+    canvas.width = size; canvas.height = size;
+    const ctx = canvas.getContext('2d');
+
+    // Bo góc iOS (40px radius)
+    const radius = 40;
+    ctx.beginPath();
+    ctx.moveTo(radius, 0);
+    ctx.lineTo(size - radius, 0);
+    ctx.quadraticCurveTo(size, 0, size, radius);
+    ctx.lineTo(size, size - radius);
+    ctx.quadraticCurveTo(size, size, size - radius, size);
+    ctx.lineTo(radius, size);
+    ctx.quadraticCurveTo(0, size, 0, size - radius);
+    ctx.lineTo(0, radius);
+    ctx.quadraticCurveTo(0, 0, radius, 0);
+    ctx.closePath();
+    ctx.clip();
+
+    // Nền gradient navy
+    const bg = ctx.createLinearGradient(0, 0, size, size);
+    bg.addColorStop(0, '#1a2a4a');
+    bg.addColorStop(1, '#0a1020');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, size, size);
+
+    // Glow vàng phía sau bolt
+    const glow = ctx.createRadialGradient(90, 90, 10, 90, 90, 80);
+    glow.addColorStop(0, 'rgba(232,187,80,0.25)');
+    glow.addColorStop(1, 'rgba(232,187,80,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, size, size);
+
+    // Bolt vàng — căn giữa 180x180
+    const sc = 5.0, ox = 2, oy = 8;
+    ctx.shadowColor = '#e8bb50';
+    ctx.shadowBlur = 22;
+    ctx.fillStyle = '#f5d278';
+    ctx.beginPath();
+    ctx.moveTo((18+ox)*sc, (4 +oy)*sc);
+    ctx.lineTo((9 +ox)*sc, (17+oy)*sc);
+    ctx.lineTo((15.5+ox)*sc,(17+oy)*sc);
+    ctx.lineTo((14+ox)*sc, (28+oy)*sc);
+    ctx.lineTo((23+ox)*sc, (15+oy)*sc);
+    ctx.lineTo((16.5+ox)*sc,(15+oy)*sc);
+    ctx.closePath();
+    ctx.fill();
+
+    // Gắn link vào <head>
+    const link = document.createElement('link');
+    link.rel  = 'apple-touch-icon';
+    link.href = canvas.toDataURL('image/png');
+    document.head.appendChild(link);
+  } catch(e) {
+    console.warn('apple-touch-icon generation failed:', e);
   }
 })();
 </script>
