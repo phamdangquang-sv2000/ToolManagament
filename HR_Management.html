@@ -2949,7 +2949,7 @@ function viewLap(id){
           </div>
           ${isImageUrl(f.url) ? `<a href="${f.url}" target="_blank" rel="noopener"><img src="${f.url}" alt="Biên bản ${i+1}" style="width:100%;max-height:200px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,0.08);margin-bottom:8px;"/></a>` : ""}
           <div style="display:flex;gap:8px;">
-            <a class="btn btn-ghost btn-sm" href="${f.url}" target="_blank" rel="noopener" style="flex:1;text-decoration:none;text-align:center;">👁 Xem</a>
+            <button class="btn btn-ghost btn-sm" style="flex:1;" onclick="window.open('${f.url}','_blank')">👁 Xem</button>
             <button class="btn btn-primary btn-sm" style="flex:1;" onclick="downloadBienBan('${f.url}','bien-ban-${safeName}-${i+1}')">⬇ Tải về</button>
           </div>
         </div>
@@ -3121,16 +3121,17 @@ async function createLap(){
   } catch(e){ toast("Lỗi: "+e.message,"error"); }
 }
 // Tải file biên bản về máy (force download để tránh mở tab mới)
-async function downloadBienBan(url, filename){
-  try {
-    const res = await fetch(url);
-    const blob = await res.blob();
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = filename || ("bien-ban." + ((url.split(".").pop()||"bin").split("?")[0]));
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
-  } catch(e){ toast("Không tải được: "+e.message,"error"); }
+function downloadBienBan(url, filename){
+  // Mở URL trực tiếp — tránh CORS khi fetch từ PWA/Safari standalone
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename || "bien-ban";
+  a.target = "_blank";
+  a.rel = "noopener";
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 // --- Detail/Edit/Delete ACCOUNTS ---
