@@ -791,8 +791,8 @@
         flex: 1 1 calc(50% - 6px) !important;
       }
 
-      /* "Add Row" button full width */
-      .tl-add-btn { width: 100% !important; justify-content: center !important; }
+      /* "Add Row" button: auto width, don't stretch */
+      .tl-add-btn { width: auto !important; justify-content: center !important; flex-shrink: 0; }
     }
 
     /* ══════════════════════════════════════════════════════
@@ -2967,11 +2967,11 @@ function addTimelineRow(ts='', ref='', prio='P1', status='In Process', activity=
         </div>
       </div>
       <div class="tl-card-row">
-        <div>
+        <div style="flex:0 0 120px;">
           <label>Ticket / Ref</label>
           <input type="text" class="field tl-ref" value="${ref}" placeholder="INCXXXXXXX" />
         </div>
-        <div style="flex:0 0 90px;">
+        <div style="flex:0 0 76px;">
           <label>Priority</label>
           <select class="field tl-prio">
             <option value="P1" ${prio==='P1'?'selected':''}>P1</option>
@@ -2980,7 +2980,7 @@ function addTimelineRow(ts='', ref='', prio='P1', status='In Process', activity=
             <option value="P4" ${prio==='P4'?'selected':''}>P4</option>
           </select>
         </div>
-        <div style="flex:0 0 110px;">
+        <div style="flex:1; min-width:0;">
           <label>Status</label>
           <select class="field tl-status">
             <option value="In Process" ${status==='In Process'?'selected':''}>In Process</option>
