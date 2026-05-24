@@ -1307,6 +1307,117 @@
 <!-- =====================================================
      SCREEN: EXAM (Taking the test)
      ===================================================== -->
+<!-- =====================================================
+     SCREEN: NỘI QUY THI
+     ===================================================== -->
+<div id="screen-rules" class="screen" style="flex-direction:column;align-items:center;justify-content:flex-start;background:#080a14;overflow-y:auto;padding:40px 16px 60px;height:100vh;">
+  <div style="width:100%;max-width:680px;">
+    <!-- Header -->
+    <div style="text-align:center;margin-bottom:32px;">
+      <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 6px 24px rgba(245,158,11,0.35);">
+        <svg width="28" height="28" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div style="font-family:'Sora',sans-serif;font-size:24px;font-weight:800;color:#f0f2ff;letter-spacing:-0.5px;">Nội quy & Quy định thi</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-top:6px;" id="rules-exam-subtitle">Vui lòng đọc kỹ trước khi bắt đầu</div>
+    </div>
+
+    <!-- Rules box -->
+    <div style="background:rgba(20,23,38,0.95);border:1.5px solid rgba(255,255,255,0.1);border-radius:20px;padding:32px 36px;margin-bottom:24px;box-shadow:0 8px 40px rgba(0,0,0,0.5);">
+
+      <!-- Section: Thời gian -->
+      <div style="margin-bottom:24px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(124,106,247,0.2);border:1px solid rgba(124,106,247,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="16" height="16" fill="none" stroke="#a89df9" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#f0f2ff;">Thời gian làm bài</span>
+        </div>
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">
+          <li style="display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--text-secondary);line-height:1.6;"><span style="color:#a89df9;flex-shrink:0;margin-top:2px;">▸</span>Đồng hồ đếm ngược sẽ <strong style="color:#f0f2ff;">bắt đầu chạy ngay khi bạn xác nhận</strong> đã đọc nội quy này.</li>
+          <li style="display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--text-secondary);line-height:1.6;"><span style="color:#a89df9;flex-shrink:0;margin-top:2px;">▸</span>Khi hết giờ, bài thi sẽ <strong style="color:#f0f2ff;">tự động nộp</strong> với các câu đã làm.</li>
+        </ul>
+      </div>
+
+      <div style="height:1px;background:rgba(255,255,255,0.07);margin-bottom:24px;"></div>
+
+      <!-- Section: Cấm tải lại trang -->
+      <div style="margin-bottom:24px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,88,88,0.15);border:1px solid rgba(255,88,88,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="16" height="16" fill="none" stroke="#ff8080" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+          </div>
+          <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#ff8080;">⚠️ Tuyệt đối không tải lại trang</span>
+        </div>
+        <div style="background:rgba(255,88,88,0.08);border:1px solid rgba(255,88,88,0.25);border-radius:12px;padding:16px 18px;margin-bottom:12px;">
+          <p style="font-size:13.5px;color:#ffb3b3;line-height:1.7;margin:0;font-weight:500;">Trong suốt thời gian làm bài, bạn <strong>không được phép</strong> nhấn phím <kbd style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:4px;padding:1px 6px;font-size:12px;">F5</kbd> hoặc nút <strong>Refresh ↻</strong> trên trình duyệt.</p>
+        </div>
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">
+          <li style="display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--text-secondary);line-height:1.6;"><span style="color:#ff8080;flex-shrink:0;margin-top:2px;">▸</span>Mỗi lần tải lại trang bị ghi nhận là <strong style="color:#ff8080;">1 lần vi phạm</strong>.</li>
+          <li style="display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--text-secondary);line-height:1.6;"><span style="color:#ff8080;flex-shrink:0;margin-top:2px;">▸</span>Đến <strong style="color:#ff8080;">lần vi phạm thứ 3</strong>, bài thi sẽ bị <strong style="color:#ff8080;">tự động nộp</strong> và ghi nhận hành vi gian lận.</li>
+          <li style="display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--text-secondary);line-height:1.6;"><span style="color:#ff8080;flex-shrink:0;margin-top:2px;">▸</span>Hành vi này sẽ được <strong style="color:#f0f2ff;">ghi chú vào kết quả</strong> và báo cáo lên quản lý.</li>
+        </ul>
+      </div>
+
+      <div style="height:1px;background:rgba(255,255,255,0.07);margin-bottom:24px;"></div>
+
+      <!-- Section: Cấm chuyển tab -->
+      <div style="margin-bottom:24px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(251,167,106,0.15);border:1px solid rgba(251,167,106,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="16" height="16" fill="none" stroke="#fba76a" stroke-width="2.2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#fba76a;">Không chuyển tab hoặc rời cửa sổ</span>
+        </div>
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">
+          <li style="display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--text-secondary);line-height:1.6;"><span style="color:#fba76a;flex-shrink:0;margin-top:2px;">▸</span>Chuyển sang tab khác, cửa sổ khác hoặc dùng <kbd style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:4px;padding:1px 6px;font-size:12px;">Alt+Tab</kbd> đều bị ghi nhận vi phạm.</li>
+          <li style="display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--text-secondary);line-height:1.6;"><span style="color:#fba76a;flex-shrink:0;margin-top:2px;">▸</span>Đồng hồ sẽ <strong style="color:#f0f2ff;">tạm dừng</strong> khi phát hiện vi phạm và chỉ tiếp tục sau khi bạn xác nhận cảnh báo.</li>
+        </ul>
+      </div>
+
+      <div style="height:1px;background:rgba(255,255,255,0.07);margin-bottom:24px;"></div>
+
+      <!-- Section: Làm bài trung thực -->
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(104,211,145,0.15);border:1px solid rgba(104,211,145,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="16" height="16" fill="none" stroke="#68d391" stroke-width="2.2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#68d391;">Làm bài trung thực</span>
+        </div>
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">
+          <li style="display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--text-secondary);line-height:1.6;"><span style="color:#68d391;flex-shrink:0;margin-top:2px;">▸</span>Không sử dụng tài liệu, internet hay sự hỗ trợ từ người khác trong khi thi.</li>
+          <li style="display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--text-secondary);line-height:1.6;"><span style="color:#68d391;flex-shrink:0;margin-top:2px;">▸</span>Kết quả bài thi phản ánh năng lực thực tế của bạn và được dùng để đánh giá probation.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div id="rules-scroll-hint" style="text-align:center;margin-bottom:16px;font-size:12px;color:var(--text-muted);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.3s;">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      Cuộn xuống để xem hết nội quy
+    </div>
+
+    <!-- Confirm checkbox -->
+    <div id="rules-confirm-area" style="background:rgba(20,23,38,0.95);border:1.5px solid rgba(255,255,255,0.1);border-radius:16px;padding:24px 28px;margin-bottom:20px;opacity:0.4;transition:opacity 0.3s;pointer-events:none;" >
+      <label style="display:flex;align-items:flex-start;gap:14px;cursor:pointer;user-select:none;">
+        <div style="position:relative;flex-shrink:0;margin-top:1px;">
+          <input type="checkbox" id="rules-checkbox" onchange="App.exam.rules.onCheckbox()" style="position:absolute;opacity:0;width:0;height:0;">
+          <div id="rules-checkbox-box" style="width:22px;height:22px;border-radius:6px;border:2px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;transition:all 0.2s;">
+            <svg id="rules-checkbox-check" width="13" height="13" fill="none" stroke="#fff" stroke-width="3" viewBox="0 0 24 24" style="opacity:0;transition:opacity 0.15s;"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+        </div>
+        <span style="font-size:13.5px;color:var(--text-secondary);line-height:1.65;">Tôi đã đọc kỹ và hiểu rõ toàn bộ nội quy thi. Tôi cam kết làm bài trung thực và <strong style="color:#f0f2ff;">tự chịu trách nhiệm</strong> về mọi hành vi vi phạm trong quá trình thi.</span>
+      </label>
+    </div>
+
+    <!-- Start button -->
+    <button id="rules-start-btn" onclick="App.exam.rules.confirm()" disabled style="width:100%;padding:16px;border-radius:14px;border:none;background:linear-gradient(135deg,rgba(124,106,247,0.3),rgba(124,106,247,0.2));color:rgba(255,255,255,0.35);font-family:'Sora',sans-serif;font-size:15px;font-weight:700;cursor:not-allowed;transition:all 0.3s;letter-spacing:-0.2px;">
+      Bắt đầu làm bài →
+    </button>
+    <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--text-muted);">Đồng hồ đếm ngược sẽ bắt đầu ngay khi bạn nhấn nút trên</div>
+  </div>
+</div>
+
 <div id="screen-exam" class="screen" style="height:100vh;overflow:hidden;">
   <div class="exam-header">
     <div style="display:flex;align-items:center;gap:14px;">
@@ -2216,6 +2327,23 @@ const App = {
     },
 
     employeeLogout() {
+      // Cleanup exam if active (timer, antiCheat listeners, overlays)
+      if (App.state.examState?.timerInterval) {
+        clearInterval(App.state.examState.timerInterval);
+        App.state.examState.timerInterval = null;
+      }
+      if (typeof App.exam?.antiCheat?.cleanup === 'function') {
+        try { App.exam.antiCheat.cleanup(); } catch(e) {}
+      }
+      const acOverlay = document.getElementById('anticheat-overlay');
+      if (acOverlay) acOverlay.remove();
+      // Cleanup rules scroll handler if still attached
+      const rulesContainer = document.getElementById('screen-rules');
+      if (rulesContainer?._rulesScrollHandler) {
+        rulesContainer.removeEventListener('scroll', rulesContainer._rulesScrollHandler);
+        rulesContainer._rulesScrollHandler = null;
+      }
+      App.state.examState = null;
       // Dừng ping và xoá session DB
       if (App.state.empPingInterval) { clearInterval(App.state.empPingInterval); App.state.empPingInterval = null; }
       if (App.state.employee) {
@@ -3848,12 +3976,19 @@ const App = {
       App.state.examState.secondsLeft = Math.max(0, Math.floor((expiresAt - Date.now()) / 1000));
 
       // Render exam UI
-      App.screen.show('exam');
       document.getElementById('exam-title').textContent = test.name;
       document.getElementById('exam-project').textContent = testProjectName;
       App.exam.renderQuestions();
-      App.exam.startTimer();
-      App.exam.antiCheat.init();
+
+      // If resuming an existing attempt → skip rules screen, go straight to exam
+      if (existing) {
+        App.screen.show('exam');
+        App.exam.startTimer();
+        App.exam.antiCheat.init();
+      } else {
+        // New attempt → show rules screen first, timer starts only after confirmation
+        App.exam.rules.show(test.name);
+      }
     },
 
     renderQuestions() {
@@ -3945,6 +4080,11 @@ const App = {
     },
 
     startTimer() {
+      // Clear any existing interval first to prevent double-running timers
+      if (App.state.examState?.timerInterval) {
+        clearInterval(App.state.examState.timerInterval);
+        App.state.examState.timerInterval = null;
+      }
       // C2 FIX: Tính thời gian còn lại từ expires_at server-side thay vì giảm dần client-side
       // Ngăn chặn việc chỉnh App.state.examState.secondsLeft qua DevTools
       const getSecondsLeft = () => {
@@ -3971,6 +4111,84 @@ const App = {
     },
 
     /* ── ANTI-CHEAT ── */
+    // ── RULES SCREEN ────────────────────────────────────
+    rules: {
+      show(examName) {
+        const subtitle = document.getElementById('rules-exam-subtitle');
+        if (subtitle && examName) subtitle.textContent = `Bài thi: ${examName}`;
+        // Reset state
+        const checkbox = document.getElementById('rules-checkbox');
+        if (checkbox) checkbox.checked = false;
+        App.exam.rules._setChecked(false);
+        App.exam.rules._setScrolled(false);
+        App.screen.show('rules');
+        // Listen for scroll to unlock checkbox
+        const container = document.getElementById('screen-rules');
+        if (container) {
+          // Remove old handler if exists (prevents leak when show() called multiple times)
+          if (container._rulesScrollHandler) {
+            container.removeEventListener('scroll', container._rulesScrollHandler);
+            container._rulesScrollHandler = null;
+          }
+          const checkScrolled = () => {
+            // Check if user has scrolled near the bottom of the rules container
+            const near = container.scrollTop + container.clientHeight >= container.scrollHeight - 80;
+            if (near) App.exam.rules._setScrolled(true);
+          };
+          container._rulesScrollHandler = checkScrolled;
+          container.addEventListener('scroll', container._rulesScrollHandler);
+          // Unlock immediately if all content fits without scrolling (short screens or zoom out)
+          setTimeout(() => {
+            if (container.scrollHeight <= container.clientHeight + 80) {
+              App.exam.rules._setScrolled(true);
+            }
+          }, 400);
+        }
+      },
+      _setScrolled(scrolled) {
+        const area = document.getElementById('rules-confirm-area');
+        const hint = document.getElementById('rules-scroll-hint');
+        if (area) {
+          area.style.opacity = scrolled ? '1' : '0.4';
+          area.style.pointerEvents = scrolled ? 'auto' : 'none';
+        }
+        if (hint) hint.style.opacity = scrolled ? '0' : '1';
+      },
+      onCheckbox() {
+        const checked = document.getElementById('rules-checkbox')?.checked;
+        App.exam.rules._setChecked(checked);
+      },
+      _setChecked(checked) {
+        const box = document.getElementById('rules-checkbox-box');
+        const check = document.getElementById('rules-checkbox-check');
+        const btn = document.getElementById('rules-start-btn');
+        if (box) {
+          box.style.background = checked ? 'linear-gradient(135deg,#7c6af7,#5b4de0)' : 'rgba(255,255,255,0.05)';
+          box.style.borderColor = checked ? '#7c6af7' : 'rgba(255,255,255,0.25)';
+        }
+        if (check) check.style.opacity = checked ? '1' : '0';
+        if (btn) {
+          btn.disabled = !checked;
+          btn.style.background = checked ? 'linear-gradient(135deg,#7c6af7,#5b4de0)' : 'linear-gradient(135deg,rgba(124,106,247,0.3),rgba(124,106,247,0.2))';
+          btn.style.color = checked ? '#fff' : 'rgba(255,255,255,0.35)';
+          btn.style.cursor = checked ? 'pointer' : 'not-allowed';
+          btn.style.boxShadow = checked ? '0 6px 24px rgba(124,106,247,0.45)' : 'none';
+        }
+      },
+      confirm() {
+        if (!document.getElementById('rules-checkbox')?.checked) return;
+        // Cleanup scroll listener
+        const container = document.getElementById('screen-rules');
+        if (container?._rulesScrollHandler) {
+          container.removeEventListener('scroll', container._rulesScrollHandler);
+        }
+        // Now show exam and START timer
+        App.screen.show('exam');
+        App.exam.startTimer();
+        App.exam.antiCheat.init();
+      }
+    },
+
     antiCheat: {
       violationCount: 0,
       overlayEl: null,
@@ -3979,23 +4197,23 @@ const App = {
       init() {
         const ac = App.exam.antiCheat;
         ac.violationCount = 0;
+        ac._lastViolationTs = 0;
         // Intercept beforeunload (F5 / refresh / close tab)
         window._acBeforeUnload = function(e) {
           if (!App.state.examState?.attempt) return;
           e.preventDefault();
           e.returnValue = '';
-          // On next load we increment via sessionStorage
-          const cur = parseInt(sessionStorage.getItem('_ac_v') || '0');
-          sessionStorage.setItem('_ac_v', cur + 1);
+          // On next load we mark 1 refresh violation (never accumulate across multiple F5 before page loads)
+          sessionStorage.setItem('_ac_v', '1');
           return '';
         };
         window.addEventListener('beforeunload', window._acBeforeUnload);
 
-        // Check if returning from a refresh
+        // Check if returning from a refresh — add 1 violation (each refresh = 1 violation regardless of how many F5 before page loaded)
         const stored = parseInt(sessionStorage.getItem('_ac_v') || '0');
         if (stored > 0) {
           sessionStorage.removeItem('_ac_v');
-          ac.violationCount = stored;
+          ac.violationCount = ac.violationCount + 1; // always +1, never jump to arbitrary stored value
           if (ac.violationCount >= 3) {
             // Auto-submit immediately
             setTimeout(() => App.exam.submit(true, true), 800);
@@ -4008,14 +4226,19 @@ const App = {
         // Tab visibility detection
         window._acVisChange = function() {
           if (document.hidden && App.state.examState?.attempt) {
+            ac._lastViolationTs = Date.now();
             ac.handleViolation('tab');
           }
         };
         document.addEventListener('visibilitychange', window._acVisChange);
 
         // Dual-monitor / window focus loss detection
+        // Guard: skip if visibilitychange already fired within 200ms (same tab-switch event)
         window._acBlur = function() {
           if (App.state.examState?.attempt) {
+            const now = Date.now();
+            if (ac._lastViolationTs && now - ac._lastViolationTs < 200) return;
+            ac._lastViolationTs = now;
             ac.handleViolation('focus');
           }
         };
@@ -4125,7 +4348,10 @@ const App = {
     },
 
     async submit(auto, fraud) {
-      if (App.state.examState.timerInterval) clearInterval(App.state.examState.timerInterval);
+      // Guard against double-submit (race: timer expiry + fraud overlay timeout)
+      if (App.state.examState?._submitting) return;
+      if (App.state.examState) App.state.examState._submitting = true;
+      if (App.state.examState?.timerInterval) clearInterval(App.state.examState.timerInterval);
       App.exam.antiCheat.cleanup();
       const overlay = document.getElementById('anticheat-overlay');
       if (overlay) overlay.remove();
