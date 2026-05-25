@@ -1,77 +1,65 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hệ Thống Đánh Giá Nhân Viên</title>
-
-  <!-- ╔══════════════════════════════════════════════════════════════╗
-       ║  ANTI-CHEAT F5 EARLY CANCEL — chạy TRƯỚC mọi CDN script    ║
-       ║  Inline script không cần tải bất kỳ thư viện nào, thực thi  ║
-       ║  ngay trong vài ms → cancel tới Edge Function trước 3 giây. ║
-       ╚══════════════════════════════════════════════════════════════╝ -->
   <script>
   (function() {
+    'use strict';
     try {
-      var navEntry = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
-      var navType  = navEntry ? navEntry.type
-                    : (performance.navigation && performance.navigation.type === 1 ? 'reload' : 'navigate');
-      if (navType !== 'reload') return;
-
       var SUPA_URL = 'https://edsowiramriosgwfuewg.supabase.co';
       var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkc293aXJhbXJpb3Nnd2Z1ZXdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNDMzMDgsImV4cCI6MjA5MzgxOTMwOH0.aocvFLnJrl5LFPdxDf9zbhvT6HT7NpCEMFtiUr_M3gM';
-      var EMP_KEY  = 'Employee Assessment_employee';
-      var TOK_KEY  = 'Employee Assessment_emp_token';
-
-      // ── SESSION RESTORE khi F5 ──
-      // beforeunload đã xóa emp_token (để đóng tab bị chặn login lại).
-      // Nhưng F5 = reload hợp lệ → cần khôi phục token để App.init() resume bài thi.
-      // beforeunload lưu backup vào _ac_tok_backup trước khi xóa.
-      var tokBackup = sessionStorage.getItem('_ac_tok_backup');
-      var empBackup = sessionStorage.getItem('_ac_emp_backup');
-      // FIX: restore từng key độc lập — không yêu cầu phải có CẢ HAI.
-      // Nếu chỉ thiếu 1 trong 2 (edge case) thì vẫn restore được key còn lại,
-      // App.init() sẽ check DB rồi xử lý tiếp.
-      if (tokBackup) sessionStorage.setItem(TOK_KEY, tokBackup);
-      if (empBackup) sessionStorage.setItem(EMP_KEY, empBackup);
-      sessionStorage.removeItem('_ac_tok_backup');
-      sessionStorage.removeItem('_ac_emp_backup');
-
-      // ── GHI VI PHẠM F5 để exam.start() đọc sau ──
-      // _ac_saved_v = chỉ vi phạm tab/blur (không tính F5 trước)
-      // _ac_f5_count = số lần F5 đã xảy ra trước đó
-      var savedV  = parseInt(sessionStorage.getItem('_ac_saved_v')  || '-1');
-      var savedTs = parseInt(sessionStorage.getItem('_ac_saved_ts') || '0');
-      var f5Count = parseInt(sessionStorage.getItem('_ac_f5_count') || '0');
-
-      if (savedV >= 0 && savedTs > 0) {
-        var newF5Count = f5Count + 1;
-        sessionStorage.setItem('_ac_f5_count',      String(newF5Count));
-        sessionStorage.setItem('_ac_f5_pending_v',  String(savedV));
-        sessionStorage.setItem('_ac_f5_pending_ts', String(savedTs));
-      }
-      sessionStorage.removeItem('_ac_saved_v');
-      sessionStorage.removeItem('_ac_saved_ts');
-
-      // ── CANCEL PENDING SUBMIT ngay trong vài ms ──
-      var pendingAttempt = sessionStorage.getItem('_ac_pending_attempt');
-      var pendingEmp     = sessionStorage.getItem('_ac_pending_emp');
-      if (pendingAttempt && pendingEmp) {
-        sessionStorage.removeItem('_ac_pending_attempt');
-        sessionStorage.removeItem('_ac_pending_emp');
+      var AS_URL   = SUPA_URL + '/functions/v1/auto-submit';
+      function sendAction(payload) {
+        var bodyStr = JSON.stringify(payload);
+        try { navigator.sendBeacon(AS_URL, new Blob([bodyStr], { type: 'text/plain' })); } catch(e) {}
         try {
-          fetch(SUPA_URL + '/functions/v1/submit-on-close', {
+          fetch(AS_URL, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'apikey': SUPA_KEY,
-              'Authorization': 'Bearer ' + SUPA_KEY,
-            },
-            body: JSON.stringify({ action: 'cancel', attempt_id: pendingAttempt, employee_id: pendingEmp }),
+            headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY },
+            body: bodyStr,
             keepalive: true,
           }).catch(function() {});
         } catch(e) {}
       }
+
+      // ── Bước 1: Detect F5 vs navigate ──────────────────────────────────────
+      var navEntry = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+      var navType  = navEntry ? navEntry.type
+                   : (performance.navigation && performance.navigation.type === 1 ? 'reload' : 'navigate');
+      var isReload = (navType === 'reload');
+
+      // ── Bước 2: Restore session token nếu F5 ────────────────────────────────
+      var tokBackup = sessionStorage.getItem('_ac_tok_backup');
+      var empBackup = sessionStorage.getItem('_ac_emp_backup');
+      if (isReload) {
+        if (tokBackup) sessionStorage.setItem('Employee Assessment_emp_token', tokBackup);
+        if (empBackup) sessionStorage.setItem('Employee Assessment_employee',  empBackup);
+      }
+      sessionStorage.removeItem('_ac_tok_backup');
+      sessionStorage.removeItem('_ac_emp_backup');
+
+      // ── Bước 3: Đọc snapshot + xử lý ──────────────────────────────────────
+      var raw = sessionStorage.getItem('_ac_snapshot');
+      sessionStorage.removeItem('_ac_snapshot'); // XÓA NGAY
+
+      if (!raw) return;
+      var snap;
+      try { snap = JSON.parse(raw); } catch(e) { return; }
+      if (!snap || !snap.attemptId || !snap.empId || !(snap.ts > 0)) return;
+
+      if (isReload) {
+        // F5: gửi cancel để Edge Function undo submit (PATCH in_progress)
+        sendAction({ action: 'cancel', attempt_id: snap.attemptId, employee_id: snap.empId, test_id: snap.testId || '' });
+        // Ghi vi phạm F5 để exam.start() áp dụng
+        sessionStorage.setItem('_ac_f5_violation', JSON.stringify({
+          violations: (snap.violations || 0) + 1,
+          ts: snap.ts,
+        }));
+      }
+      // Đóng tab thật → không làm gì; beforeunload đã gửi action:"submit"
+
     } catch(e) {}
   })();
   </script>
@@ -2506,6 +2494,8 @@ const App = {
       sessionStorage.removeItem('Employee Assessment_emp_token');
       sessionStorage.removeItem('_ac_tok_backup');
       sessionStorage.removeItem('_ac_emp_backup');
+      sessionStorage.removeItem('_ac_snapshot');
+      sessionStorage.removeItem('_ac_f5_violation');
 
       // Hiển thị thông báo bị kick trên màn hình auth
       App.screen.show('auth');
@@ -2576,6 +2566,8 @@ const App = {
       sessionStorage.removeItem('Employee Assessment_emp_token');
       sessionStorage.removeItem('_ac_tok_backup');
       sessionStorage.removeItem('_ac_emp_backup');
+      sessionStorage.removeItem('_ac_snapshot');
+      sessionStorage.removeItem('_ac_f5_violation');
       // Reset auth UI về bước email, xóa sạch PIN fields
       try {
         document.getElementById('emp-step-create-pin').classList.add('hidden');
@@ -4227,37 +4219,34 @@ const App = {
 
       // If resuming an existing attempt → skip rules screen, go straight to exam
       if (existing) {
-        // ── Đọc _ac_f5_pending_v và _ac_f5_count TRƯỚC khi gọi antiCheat.init() ──
-        // antiCheat.init() gọi cleanup() bên trong → cleanup() xóa các key này
-        // Nếu đọc sau init() thì key đã bị xóa → không bao giờ thấy vi phạm F5
-        //
-        // FIX LOGIC:
-        // _ac_f5_pending_v = violationCount (tab/blur) tại thời điểm bấm F5 (chưa +1)
-        // _ac_f5_count     = số lần đã bấm F5 (chỉ đếm F5 thuần)
-        // violationCount đúng = _ac_f5_pending_v (tab/blur cũ) + _ac_f5_count (số lần F5)
-        // Điều này tránh inflate: F5 lần 2 không nhảy thẳng >= 3 vì đang dùng
-        // violationCount bị inflate bởi overlay dismiss trước đó.
-        const f5BaseV  = parseInt(sessionStorage.getItem('_ac_f5_pending_v')  ?? '-1');
-        const f5Ts     = parseInt(sessionStorage.getItem('_ac_f5_pending_ts') || '0');
-        const f5Count  = parseInt(sessionStorage.getItem('_ac_f5_count')      || '0');
-        sessionStorage.removeItem('_ac_f5_pending_v');
-        sessionStorage.removeItem('_ac_f5_pending_ts');
-        sessionStorage.removeItem('_ac_f5_count');
-
-        // Tổng vi phạm = vi phạm tab/blur tích lũy trước đó + số lần F5
-        // f5BaseV là violationCount (không kể F5 này), f5Count là tổng số lần F5
-        const totalViolations = (f5BaseV >= 0 && f5Ts > 0) ? (f5BaseV + f5Count) : 0;
+        // ── Đọc _ac_f5_violation TRƯỚC khi gọi antiCheat.init() ─────────────
+        // antiCheat.init() gọi cleanup() bên trong → cleanup() xóa key này.
+        // Thiết kế mới: _ac_f5_violation = { violations, ts }
+        //   violations = tổng vi phạm tại lúc F5 (đã +1 bởi inline script)
+        //   Không cần tính toán lại — dùng trực tiếp.
+        let f5Violation = null;
+        const f5Raw = sessionStorage.getItem('_ac_f5_violation');
+        if (f5Raw) {
+          sessionStorage.removeItem('_ac_f5_violation'); // xóa TRƯỚC init()
+          try {
+            const f5Data = JSON.parse(f5Raw);
+            if (f5Data && f5Data.violations >= 1 && f5Data.ts > 0) {
+              f5Violation = f5Data;
+            }
+          } catch(e) {}
+        }
 
         App.screen.show('exam');
         App.exam.startTimer();
-        App.exam.antiCheat.init();
+        App.exam.antiCheat.init(); // cleanup() bên trong — key đã xóa rồi nên an toàn
 
-        // ── Áp dụng vi phạm F5 sau khi init() đã chạy xong ──
-        if (totalViolations >= 1 && f5Ts > 0) {
+        // ── Áp vi phạm F5 SAU KHI init() đã chạy xong ──────────────────────
+        // init() set violationCount = 0 (hoặc resume từ snapshot đóng tab).
+        // Sau init(), override bằng giá trị F5 nếu có.
+        if (f5Violation) {
           const ac = App.exam.antiCheat;
-          ac.violationCount    = totalViolations;
-          ac.f5ViolationCount  = f5Count; // ghi nhớ số lần F5 để beforeunload tính đúng
-          if (totalViolations >= 3) {
+          ac.violationCount = f5Violation.violations;
+          if (ac.violationCount >= 3) {
             ac.showFinalOverlay();
           } else {
             setTimeout(function() { ac.showOverlay('reload'); }, 600);
@@ -4468,13 +4457,35 @@ const App = {
     },
 
     antiCheat: {
-      violationCount: 0,    // tổng vi phạm (tab/blur + F5)
-      f5ViolationCount: 0,  // chỉ đếm số lần F5 (để beforeunload lưu riêng)
+      // ══════════════════════════════════════════════════════════════════════
+      // THIẾT KẾ MỚI — 1 nguồn sự thật duy nhất: _ac_snapshot
+      //
+      // beforeunload  → ghi _ac_snapshot = { violations, attemptId, empId, ts }
+      // inline script → (nếu F5) đọc snapshot, xóa ngay, ghi _ac_f5_violation,
+      //                 gửi cancel lên Edge Function
+      // antiCheat.init()  → đọc _ac_snapshot nếu còn (đóng tab → resume)
+      //                     KHÔNG đọc _ac_f5_violation (exam.start() xử lý)
+      // exam.start()  → đọc _ac_f5_violation sau init(), áp vi phạm
+      //
+      // Luồng F5:
+      //   beforeunload → ghi snapshot → inline script: xóa snapshot, ghi f5_violation,
+      //   gửi cancel → App.init() → employee screen → "Tiếp tục thi" → exam.start():
+      //     đọc f5_violation TRƯỚC init() → init() → áp violations SAU init()
+      //
+      // Luồng đóng tab:
+      //   beforeunload → ghi snapshot → (không reload) → lần sau mở lại: App.init()
+      //   → employee screen → "Tiếp tục thi" → exam.start() → init():
+      //     đọc snapshot còn nguyên → khôi phục violationCount im lặng
+      //
+      // Luồng thi mới:
+      //   exam.start() → init() → không có snapshot, không có f5_violation → count = 0
+      // ══════════════════════════════════════════════════════════════════════
+
+      violationCount: 0,
       overlayEl: null,
       timerWasPaused: false,
       _active: false,
       _violationDebounceTimer: null,
-      // Store bound function refs so removeEventListener always removes the exact same function
       _boundVisChange: null,
       _boundBlur: null,
       _boundContextMenu: null,
@@ -4483,178 +4494,126 @@ const App = {
       init() {
         const ac = App.exam.antiCheat;
 
-        // ══════════════════════════════════════════════════════════════════
-        // THIẾT KẾ 2 KEY RIÊNG BIỆT — không bao giờ nhầm lẫn F5 vs tắt máy
-        //
-        // KEY: _ac_saved_v / _ac_saved_ts
-        //   → Ghi bởi beforeunload (violationCount tại thời điểm đó, chưa +1)
-        //   → F5: App.init() phát hiện navType='reload', đọc key này, +1, lưu vào
-        //          _ac_f5_pending_v, xóa _ac_saved_v ngay → antiCheat.init() không thấy
-        //   → Đóng tab: _ac_saved_v còn nguyên → antiCheat.init() đọc → khôi phục im lặng
-        //
-        // KẾT QUẢ:
-        //   F5 trong khi thi  → App.init() detect → _ac_f5_pending_v → exam.start() +1 ✅
-        //   Đóng tab/tắt máy → _ac_saved_v còn → antiCheat.init() khôi phục im lặng ✅
-        //   F5 vs đóng tab   → không thể nhầm (App.init() chạy NGAY lúc page load) ✅
-        // ══════════════════════════════════════════════════════════════════
+        // ── Bước 1: cleanup listener cũ trước khi thêm mới ──────────────────
+        ac.cleanup(); // reset _active = false, remove listeners, clear debounce
 
-        // ── BƯỚC 1: Xác định navigation type TRƯỚC KHI làm bất cứ điều gì ──
-        const navEntry       = performance.getEntriesByType?.('navigation')?.[0];
-        const navType        = navEntry?.type ?? (performance.navigation?.type === 1 ? 'reload' : 'navigate');
-        const isActualReload = navType === 'reload';
-
-        // ── BƯỚC 2: Đọc saved state, xóa ngay để tránh dùng nhầm ──
-        // _ac_saved_v chỉ có giá trị khi navigate (đóng tab → mở lại).
-        // Nếu F5: App.init() đã xóa _ac_saved_v và chuyển sang _ac_f5_pending_v rồi.
-        const savedStored    = parseInt(sessionStorage.getItem('_ac_saved_v')  ?? '-1');
-        const savedTs        = parseInt(sessionStorage.getItem('_ac_saved_ts') || '0');
-        // Đọc pending keys TRƯỚC KHI xóa — dùng ở BƯỚC 4 để gửi cancel khi F5
-        const pendingAttempt = sessionStorage.getItem('_ac_pending_attempt');
-        const pendingEmp     = sessionStorage.getItem('_ac_pending_emp');
-        // Xóa tất cả ngay
-        sessionStorage.removeItem('_ac_saved_v');
-        sessionStorage.removeItem('_ac_saved_ts');
-        sessionStorage.removeItem('_ac_pending_attempt');
-        sessionStorage.removeItem('_ac_pending_emp');
-
-        // ── BƯỚC 3: cleanup listener cũ TRƯỚC KHI thêm listener mới ──
-        ac.cleanup();
-
-        ac.violationCount = 0;
-        ac.f5ViolationCount = 0;
         ac._active = true;
         ac.timerWasPaused = false;
+        // violationCount được set bởi exam.start() SAU KHI init() chạy xong
+        // (trường hợp F5). Với resume sau đóng tab: đọc từ snapshot bên dưới.
+        // Với thi mới: giữ nguyên 0.
 
-        // ── beforeunload: ghi _ac_saved_v + gửi fetch keepalive "pending submit" ──
-        // _ac_saved_v: App.init() đọc nếu F5 (navType=reload), antiCheat.init() đọc nếu navigate
-        // fetch keepalive: gửi lên Edge Function submit-on-close với action='pending'
-        //   → Nếu F5: trang load lại → gửi cancel ngay → Edge Function không submit
-        //   → Nếu đóng tab: không có cancel → Edge Function submit sau 6 giây
+        // ── Bước 2: Resume vi phạm sau đóng tab (navigate) ──────────────────
+        // Nếu là F5: inline script đã xóa _ac_snapshot → không còn gì để đọc.
+        // Nếu đóng tab → mở lại: _ac_snapshot còn nguyên → khôi phục im lặng.
+        // Nếu thi mới: không có snapshot → violations = 0.
+        const snapRaw = sessionStorage.getItem('_ac_snapshot');
+        if (snapRaw) {
+          sessionStorage.removeItem('_ac_snapshot'); // luôn xóa sau khi đọc
+          try {
+            const snap = JSON.parse(snapRaw);
+            if (snap && snap.violations >= 0 && snap.ts > 0) {
+              ac.violationCount = snap.violations; // khôi phục im lặng
+            }
+          } catch(e) {}
+        }
+
+        // ── Bước 3: Đăng ký beforeunload ────────────────────────────────────
+        // SUBMIT-ON-CLOSE v4: gửi POST đến Edge Function "auto-submit" ngay lập tức.
+        //
+        // Khi đóng tab/trình duyệt:
+        //   sendBeacon POST {action:"submit"} → Edge Function (service_role)
+        //   → PATCH attempt submitted + assignment completed → DB cập nhật ngay
+        //
+        // Khi F5:
+        //   beforeunload → sendBeacon POST {action:"submit"} (gửi đi)
+        //   → trang reload → inline script → sendBeacon POST {action:"cancel"} (undo)
+        //   → nhân viên tiếp tục thi bình thường, bị tính vi phạm F5
+        //
+        // sendBeacon text/plain = "simple request" = không cần CORS preflight
+        // → browser cho phép gửi ngay cả khi tab đang đóng
         ac._boundBeforeUnload = function(e) {
           if (!ac._active || !App.state.examState?.attempt) return;
           e.preventDefault();
           e.returnValue = '';
 
-          // ── SESSION: backup token cho F5, xóa token thật để block đóng tab ──
-          // Kịch bản F5: beforeunload xóa emp_token → inline script (navType=reload)
-          //   đọc _ac_tok_backup → khôi phục lại emp_token → App.init() resume bình thường.
-          // Kịch bản đóng tab: beforeunload xóa emp_token → không có reload → không khôi phục
-          //   → App.init() (navigate) không thấy emp_token → buộc login lại bằng PIN ✅
+          const attemptId  = App.state.examState.attempt.id;
+          const employeeId = App.state.employee?.id;
+          const testId     = App.state.examState.test?.id || '';
+          if (!attemptId || !employeeId) return '';
+
+          // SESSION BACKUP: F5 → inline script restore; đóng tab → buộc login lại
           const currentTok = sessionStorage.getItem('Employee Assessment_emp_token');
           const currentEmp = sessionStorage.getItem('Employee Assessment_employee');
-          // Luôn backup cả hai key cùng lúc — inline script restore theo cặp.
-          // Ghi empBackup NGAY CẢ KHI currentTok null để không bao giờ thiếu 1 trong 2.
           if (currentTok) sessionStorage.setItem('_ac_tok_backup', currentTok);
           sessionStorage.setItem('_ac_emp_backup', currentEmp || '');
           sessionStorage.removeItem('Employee Assessment_emp_token');
 
-          // ── ANTI-CHEAT: Lưu riêng tab/blur count và f5Count ──
-          const tabBlurCount = ac.violationCount - ac.f5ViolationCount;
-          const v  = String(Math.max(0, tabBlurCount));
-          const ts = String(Date.now());
-          sessionStorage.setItem('_ac_saved_v',   v);
-          sessionStorage.setItem('_ac_saved_ts',  ts);
-          sessionStorage.setItem('_ac_f5_count',  String(ac.f5ViolationCount));
+          // SNAPSHOT: inline script F5 đọc để gửi cancel + ghi vi phạm
+          sessionStorage.setItem('_ac_snapshot', JSON.stringify({
+            violations: ac.violationCount,
+            attemptId:  attemptId,
+            empId:      employeeId,
+            testId:     testId,
+            ts:         Date.now(),
+          }));
 
-          // fetch keepalive: hỗ trợ custom headers (apikey) + đảm bảo gửi dù tab đóng
-          // sendBeacon KHÔNG hỗ trợ custom headers → Supabase từ chối silently
-          const attemptId  = App.state.examState.attempt.id;
-          const employeeId = App.state.employee?.id;
-          if (attemptId && employeeId) {
-            sessionStorage.setItem('_ac_pending_attempt', attemptId);
-            sessionStorage.setItem('_ac_pending_emp',     employeeId);
-            try {
-              fetch(SUPABASE_URL + '/functions/v1/submit-on-close', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'apikey': SUPABASE_ANON_KEY,
-                  'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-                },
-                body: JSON.stringify({
-                  action: 'pending',
-                  attempt_id:  attemptId,
-                  employee_id: employeeId,
-                  timestamp:   ts,
-                }),
-                keepalive: true,
-              }).catch(function(){});
-            } catch(e) {
-              // keepalive body > 64KB sẽ throw — fallback sendBeacon (không có header)
-              navigator.sendBeacon(
-                SUPABASE_URL + '/functions/v1/submit-on-close',
-                new Blob([JSON.stringify({
-                  action: 'pending',
-                  attempt_id:  attemptId,
-                  employee_id: employeeId,
-                  timestamp:   ts,
-                })], { type: 'application/json' })
-              );
-            }
-          }
+          // ── GỬI action:"submit" đến Edge Function ────────────────────────
+          const AS_URL  = SUPABASE_URL + '/functions/v1/auto-submit';
+          const payload = JSON.stringify({
+            action:      'submit',
+            attempt_id:  attemptId,
+            employee_id: employeeId,
+            test_id:     testId,
+          });
+
+          // Channel 1: sendBeacon text/plain — hoạt động khi tab đang đóng
+          try {
+            navigator.sendBeacon(AS_URL, new Blob([payload], { type: 'text/plain' }));
+          } catch(_e) {}
+
+          // Channel 2: fetch keepalive — fallback cho trình duyệt cũ
+          try {
+            fetch(AS_URL, {
+              method:    'POST',
+              headers:   {
+                'Content-Type': 'application/json',
+                'apikey':       SUPABASE_ANON_KEY,
+              },
+              body:      payload,
+              keepalive: true,
+            }).catch(function(){});
+          } catch(_e) {}
+
           return '';
         };
         window.addEventListener('beforeunload', ac._boundBeforeUnload);
 
-        // ── BƯỚC 4: Xử lý phục hồi theo navigation type ──
-        // LƯU Ý: antiCheat.init() KHÔNG BAO GIỜ được gọi trực tiếp sau F5.
-        // Sau F5, user phải qua màn hình employee rồi click "Tiếp tục thi" → lúc đó
-        // navigation.type đã là 'navigate', không còn là 'reload' nữa.
-        // Vi phạm F5 được xử lý bởi App.init() → _ac_f5_pending_v → exam.start().
-        //
-        // init() chỉ được gọi trong 2 trường hợp:
-        //   1. Bài thi mới (confirm rules) → navigate → không có reload/resume key
-        //   2. Resume sau đóng tab → navigate → KEY 2 có giá trị → khôi phục im lặng
-        //
-        // KHÔNG gửi cancel ở đây nữa — cancel đã được gửi bởi inline script <head>
-        // ngay khi navType=reload (< 5ms). Gửi thêm lần 2 ở đây là THỪA và nguy hiểm:
-        //   - Nếu inline script gửi cancel (đúng), cancel này thừa → vô hại nhưng lãng phí
-        //   - Nếu đây là navigate bình thường (không phải F5), pendingAttempt sẽ là null → OK
-        //   - Nếu pendingAttempt còn sót (edge case), việc gửi cancel ở đây sẽ "tiêu hao"
-        //     cancel cho lần F5 TIẾP THEO nếu server đang dùng pre-cancel guard → BUG ❌
-        //
-        // Server-side đã có pre-cancel guard (TTL 3s) để xử lý race condition
-        // cancel-đến-trước-pending. Client không cần gửi cancel thứ 2 nữa.
-        // (pendingAttempt/pendingEmp đã bị xóa ở BƯỚC 2 → đoạn này không có tác dụng gì
-        //  trong thực tế, nhưng giữ nguyên comment để giải thích rõ thiết kế.)
-
-        // Resume sau đóng tab (navigate) → _ac_saved_v còn nguyên → khôi phục im lặng
-        // Nếu F5: App.init() đã xóa _ac_saved_v → savedStored = -1 → không vào đây
-        if (savedStored >= 0 && savedTs > 0) {
-          // _ac_saved_v chỉ chứa tabBlur count; _ac_f5_count chứa số lần F5 tích lũy
-          const resumedF5Count = parseInt(sessionStorage.getItem('_ac_f5_count') || '0');
-          ac.f5ViolationCount = resumedF5Count;
-          ac.violationCount   = savedStored + resumedF5Count;
-        }
-
-        // DEBOUNCED VIOLATION
-        // Both visibilitychange AND blur fire together on every tab-switch.
-        // The debounce ensures only ONE violation is counted per user action,
-        // no matter how many events fire or in what order.
+        // ── Bước 4: Đăng ký visibilitychange + blur (debounced) ─────────────
+        // visibilitychange và blur cùng fire khi chuyển tab → debounce 100ms
+        // đảm bảo chỉ 1 vi phạm được tính cho mỗi hành động của user.
         ac._triggerViolation = function(type) {
           if (!ac._active || !App.state.examState?.attempt) return;
-          if (ac._violationDebounceTimer) return; // already pending — drop duplicate
+          if (ac._violationDebounceTimer) return; // đang chờ — bỏ qua duplicate
           ac._violationDebounceTimer = setTimeout(function() {
             ac._violationDebounceTimer = null;
-            if (!ac._active || !App.state.examState?.attempt) return; // re-check after delay
+            if (!ac._active || !App.state.examState?.attempt) return;
             var bestType = document.hidden ? 'tab' : type;
             ac.handleViolation(bestType);
           }, 100);
         };
 
-        // visibilitychange: fires when switching tabs
         ac._boundVisChange = function() {
           if (document.hidden) ac._triggerViolation('tab');
         };
         document.addEventListener('visibilitychange', ac._boundVisChange);
 
-        // blur: fires on Alt+Tab, dual-monitor switch, clicking another app
         ac._boundBlur = function() {
           ac._triggerViolation('focus');
         };
         window.addEventListener('blur', ac._boundBlur);
 
-        // Disable right-click during exam
+        // Vô hiệu hóa chuột phải khi thi
         ac._boundContextMenu = function(e) {
           if (ac._active && App.state.examState?.attempt) e.preventDefault();
         };
@@ -4665,27 +4624,29 @@ const App = {
         const ac = App.exam.antiCheat;
         ac._active = false;
 
-        // Clear any pending debounce so no phantom violation fires after cleanup
         if (ac._violationDebounceTimer) {
           clearTimeout(ac._violationDebounceTimer);
           ac._violationDebounceTimer = null;
         }
 
-        // Remove using the exact bound references that were added — prevents stale listeners
         if (ac._boundBeforeUnload) { window.removeEventListener('beforeunload', ac._boundBeforeUnload); ac._boundBeforeUnload = null; }
         if (ac._boundVisChange)   { document.removeEventListener('visibilitychange', ac._boundVisChange); ac._boundVisChange = null; }
         if (ac._boundBlur)        { window.removeEventListener('blur', ac._boundBlur); ac._boundBlur = null; }
         if (ac._boundContextMenu) { document.removeEventListener('contextmenu', ac._boundContextMenu); ac._boundContextMenu = null; }
 
-        sessionStorage.removeItem('_ac_saved_v');
-        sessionStorage.removeItem('_ac_saved_ts');
-        sessionStorage.removeItem('_ac_pending_attempt');
-        sessionStorage.removeItem('_ac_pending_emp');
-        sessionStorage.removeItem('_ac_f5_pending_v');
-        sessionStorage.removeItem('_ac_f5_pending_ts');
-        sessionStorage.removeItem('_ac_f5_count');
+        // Xóa toàn bộ các key cũ lẫn mới để không bao giờ sót state
+        sessionStorage.removeItem('_ac_snapshot');
+        sessionStorage.removeItem('_ac_f5_violation');
         sessionStorage.removeItem('_ac_tok_backup');
         sessionStorage.removeItem('_ac_emp_backup');
+        // Xóa các key từ thiết kế cũ (backward compatibility)
+        sessionStorage.removeItem('_ac_saved_v');
+        sessionStorage.removeItem('_ac_saved_ts');
+        sessionStorage.removeItem('_ac_f5_count');
+        sessionStorage.removeItem('_ac_f5_pending_v');
+        sessionStorage.removeItem('_ac_f5_pending_ts');
+        sessionStorage.removeItem('_ac_pending_attempt');
+        sessionStorage.removeItem('_ac_pending_emp');
       },
 
       handleViolation(type) {
