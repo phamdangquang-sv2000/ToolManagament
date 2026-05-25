@@ -1827,6 +1827,29 @@ const App = {
      ========================================================= */
   async init() {
     App.screen.show('loading');
+
+    // ── DETECT F5 NGAY KHI PAGE LOAD ──
+    // Phải làm ở đây vì navigation.type chỉ là 'reload' ngay lúc page load.
+    // Sau khi user click "Tiếp tục thi" thì navigation.type đã là 'navigate' rồi.
+    (function() {
+      try {
+        const navEntry = performance.getEntriesByType?.('navigation')?.[0];
+        const navType  = navEntry?.type ?? (performance.navigation?.type === 1 ? 'reload' : 'navigate');
+        if (navType === 'reload') {
+          const stored = parseInt(sessionStorage.getItem('_ac_saved_v') ?? '-1');
+          const ts     = parseInt(sessionStorage.getItem('_ac_saved_ts') || '0');
+          if (stored >= 0 && ts > 0) {
+            // Lưu vào key bền hơn để exam.start() đọc sau khi user click Tiếp tục thi
+            sessionStorage.setItem('_ac_f5_pending_v',  String(stored + 1));
+            sessionStorage.setItem('_ac_f5_pending_ts', String(ts));
+          }
+          // Xóa ngay để antiCheat.init() không đọc nhầm là "resume sau đóng tab"
+          sessionStorage.removeItem('_ac_saved_v');
+          sessionStorage.removeItem('_ac_saved_ts');
+        }
+      } catch(e) {}
+    })();
+
     try {
       // Check if admin auth exists
       const { data: authRows } = await db.from('exam_admin_auth').select('id').limit(1);
@@ -4107,6 +4130,23 @@ const App = {
         App.screen.show('exam');
         App.exam.startTimer();
         App.exam.antiCheat.init();
+
+        // ── Áp dụng vi phạm F5 đã được detect ở App.init() ──
+        // _ac_f5_pending_v được ghi khi page load với navType='reload'
+        // antiCheat.init() đã reset violationCount=0 nên ta set lại sau
+        const f5V  = parseInt(sessionStorage.getItem('_ac_f5_pending_v')  ?? '-1');
+        const f5Ts = parseInt(sessionStorage.getItem('_ac_f5_pending_ts') || '0');
+        sessionStorage.removeItem('_ac_f5_pending_v');
+        sessionStorage.removeItem('_ac_f5_pending_ts');
+        if (f5V >= 1 && f5Ts > 0) {
+          const ac = App.exam.antiCheat;
+          ac.violationCount = f5V;
+          if (f5V >= 3) {
+            ac.showFinalOverlay();
+          } else {
+            setTimeout(function() { ac.showOverlay('reload'); }, 600);
+          }
+        }
       } else {
         // New attempt → show rules screen first, timer starts only after confirmation
         App.exam.rules.show(test.name);
@@ -4329,26 +4369,16 @@ const App = {
         // ══════════════════════════════════════════════════════════════════
         // THIẾT KẾ 2 KEY RIÊNG BIỆT — không bao giờ nhầm lẫn F5 vs tắt máy
         //
-        // KEY 1: _ac_reload_v / _ac_reload_ts
-        //   → Chỉ được ghi bởi beforeunload
-        //   → Chỉ được đọc khi navigation.type === 'reload' (F5/Ctrl+R)
-        //   → Nếu đọc bằng navigate → bỏ qua hoàn toàn (không nhập vào violationCount)
+        // KEY: _ac_saved_v / _ac_saved_ts
+        //   → Ghi bởi beforeunload (violationCount tại thời điểm đó, chưa +1)
+        //   → F5: App.init() phát hiện navType='reload', đọc key này, +1, lưu vào
+        //          _ac_f5_pending_v, xóa _ac_saved_v ngay → antiCheat.init() không thấy
+        //   → Đóng tab: _ac_saved_v còn nguyên → antiCheat.init() đọc → khôi phục im lặng
         //
-        // KEY 2: _ac_resume_v / _ac_resume_ts
-        //   → Chỉ được ghi bởi beforeunload
-        //   → Chỉ được đọc khi navigation.type === 'navigate' (đóng tab/tắt máy rồi mở lại)
-        //   → Nếu đọc bằng reload → bỏ qua hoàn toàn
-        //
-        // LUỒNG:
-        //   beforeunload:  ghi CÙNG LÚC cả 2 key (violationCount hiện tại, chưa +1)
-        //   init() reload: đọc KEY 1, +1 vi phạm, xóa KEY 1, bỏ KEY 2
-        //   init() navigate: đọc KEY 2, khôi phục im lặng, bỏ KEY 1
-        //
-        // KẾT QUẢ ĐẢM BẢO:
-        //   F5 trong khi thi       → reload  → KEY 1 có giá trị → +1 vi phạm ✅
-        //   Tắt máy/đóng tab       → navigate → KEY 2 có giá trị → khôi phục im lặng ✅
-        //   F5 sai tưởng tắt máy  → KHÔNG THỂ XẢY RA (2 key hoàn toàn tách biệt) ✅
-        //   Tắt máy sai tưởng F5  → KHÔNG THỂ XẢY RA ✅
+        // KẾT QUẢ:
+        //   F5 trong khi thi  → App.init() detect → _ac_f5_pending_v → exam.start() +1 ✅
+        //   Đóng tab/tắt máy → _ac_saved_v còn → antiCheat.init() khôi phục im lặng ✅
+        //   F5 vs đóng tab   → không thể nhầm (App.init() chạy NGAY lúc page load) ✅
         // ══════════════════════════════════════════════════════════════════
 
         // ── BƯỚC 1: Xác định navigation type TRƯỚC KHI làm bất cứ điều gì ──
@@ -4356,19 +4386,17 @@ const App = {
         const navType        = navEntry?.type ?? (performance.navigation?.type === 1 ? 'reload' : 'navigate');
         const isActualReload = navType === 'reload';
 
-        // ── BƯỚC 2: Đọc đúng key theo navigation type, XÓA cả 2 key ngay lập tức ──
-        const reloadStored   = parseInt(sessionStorage.getItem('_ac_reload_v')  ?? '-1');
-        const reloadTs       = parseInt(sessionStorage.getItem('_ac_reload_ts') || '0');
-        const resumeStored   = parseInt(sessionStorage.getItem('_ac_resume_v')  ?? '-1');
-        const resumeTs       = parseInt(sessionStorage.getItem('_ac_resume_ts') || '0');
+        // ── BƯỚC 2: Đọc saved state, xóa ngay để tránh dùng nhầm ──
+        // _ac_saved_v chỉ có giá trị khi navigate (đóng tab → mở lại).
+        // Nếu F5: App.init() đã xóa _ac_saved_v và chuyển sang _ac_f5_pending_v rồi.
+        const savedStored    = parseInt(sessionStorage.getItem('_ac_saved_v')  ?? '-1');
+        const savedTs        = parseInt(sessionStorage.getItem('_ac_saved_ts') || '0');
         // Đọc pending keys TRƯỚC KHI xóa — dùng ở BƯỚC 4 để gửi cancel khi F5
         const pendingAttempt = sessionStorage.getItem('_ac_pending_attempt');
         const pendingEmp     = sessionStorage.getItem('_ac_pending_emp');
-        // Xóa cả 2 key ngay — tránh key cũ bị dùng nhầm ở lần tiếp theo
-        sessionStorage.removeItem('_ac_reload_v');
-        sessionStorage.removeItem('_ac_reload_ts');
-        sessionStorage.removeItem('_ac_resume_v');
-        sessionStorage.removeItem('_ac_resume_ts');
+        // Xóa tất cả ngay
+        sessionStorage.removeItem('_ac_saved_v');
+        sessionStorage.removeItem('_ac_saved_ts');
         sessionStorage.removeItem('_ac_pending_attempt');
         sessionStorage.removeItem('_ac_pending_emp');
 
@@ -4379,10 +4407,9 @@ const App = {
         ac._active = true;
         ac.timerWasPaused = false;
 
-        // ── beforeunload: ghi 2 KEY riêng + gửi sendBeacon "pending submit" ──
-        // KEY 1 (_ac_reload_v): dành cho F5 → đọc khi navigation.type = 'reload'
-        // KEY 2 (_ac_resume_v): dành cho đóng tab → đọc khi navigation.type = 'navigate'
-        // sendBeacon: gửi lên Edge Function submit-on-close với action='pending'
+        // ── beforeunload: ghi _ac_saved_v + gửi fetch keepalive "pending submit" ──
+        // _ac_saved_v: App.init() đọc nếu F5 (navType=reload), antiCheat.init() đọc nếu navigate
+        // fetch keepalive: gửi lên Edge Function submit-on-close với action='pending'
         //   → Nếu F5: trang load lại → gửi cancel ngay → Edge Function không submit
         //   → Nếu đóng tab: không có cancel → Edge Function submit sau 6 giây
         ac._boundBeforeUnload = function(e) {
@@ -4391,10 +4418,9 @@ const App = {
           e.returnValue = '';
           const v  = String(ac.violationCount);
           const ts = String(Date.now());
-          sessionStorage.setItem('_ac_reload_v',  v);    // KEY 1: F5
-          sessionStorage.setItem('_ac_reload_ts', ts);
-          sessionStorage.setItem('_ac_resume_v',  v);    // KEY 2: đóng tab
-          sessionStorage.setItem('_ac_resume_ts', ts);
+          // Ghi 1 key duy nhất — App.init() sẽ phân biệt F5 vs đóng tab bằng navType
+          sessionStorage.setItem('_ac_saved_v',  v);
+          sessionStorage.setItem('_ac_saved_ts', ts);
 
           // fetch keepalive: hỗ trợ custom headers (apikey) + đảm bảo gửi dù tab đóng
           // sendBeacon KHÔNG hỗ trợ custom headers → Supabase từ chối silently
@@ -4437,38 +4463,33 @@ const App = {
         window.addEventListener('beforeunload', ac._boundBeforeUnload);
 
         // ── BƯỚC 4: Xử lý phục hồi theo navigation type ──
-        if (isActualReload) {
-          // F5/Ctrl+R → gửi CANCEL beacon ngay để Edge Function không submit bài
-          if (pendingAttempt && pendingEmp) {
-            fetch(SUPABASE_URL + '/functions/v1/submit-on-close', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'apikey': SUPABASE_ANON_KEY,
-                'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-              },
-              body: JSON.stringify({ action: 'cancel', attempt_id: pendingAttempt, employee_id: pendingEmp }),
-              keepalive: true,
-            }).catch(function(){});
-          }
+        // LƯU Ý: antiCheat.init() KHÔNG BAO GIỜ được gọi trực tiếp sau F5.
+        // Sau F5, user phải qua màn hình employee rồi click "Tiếp tục thi" → lúc đó
+        // navigation.type đã là 'navigate', không còn là 'reload' nữa.
+        // Vi phạm F5 được xử lý bởi App.init() → _ac_f5_pending_v → exam.start().
+        //
+        // init() chỉ được gọi trong 2 trường hợp:
+        //   1. Bài thi mới (confirm rules) → navigate → không có reload/resume key
+        //   2. Resume sau đóng tab → navigate → KEY 2 có giá trị → khôi phục im lặng
+        // Gửi cancel nếu có pending (F5 case — _ac_saved_v đã bị App.init() xóa rồi nên
+        // antiCheat.init() sẽ không thấy _ac_saved_v; nhưng _ac_pending_* vẫn còn)
+        if (pendingAttempt && pendingEmp) {
+          fetch(SUPABASE_URL + '/functions/v1/submit-on-close', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': SUPABASE_ANON_KEY,
+              'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+            },
+            body: JSON.stringify({ action: 'cancel', attempt_id: pendingAttempt, employee_id: pendingEmp }),
+            keepalive: true,
+          }).catch(function(){});
+        }
 
-          // Đọc KEY 1 → tính vi phạm F5
-          if (reloadStored >= 0 && reloadTs > 0) {
-            ac.violationCount = reloadStored + 1; // vi phạm thật → +1
-            if (ac.violationCount >= 3) {
-              ac.showFinalOverlay();
-              return;
-            }
-            setTimeout(function() { ac.showOverlay('reload'); }, 600);
-          }
-        } else {
-          // navigate → đóng tab/trình duyệt → pending đã gửi, không cần cancel
-          // (pending keys đã được xóa ở BƯỚC 2)
-
-          // Đọc KEY 2 → khôi phục vi phạm cũ im lặng (không +1)
-          if (resumeStored >= 0 && resumeTs > 0) {
-            ac.violationCount = resumeStored;
-          }
+        // Resume sau đóng tab (navigate) → _ac_saved_v còn nguyên → khôi phục im lặng
+        // Nếu F5: App.init() đã xóa _ac_saved_v → savedStored = -1 → không vào đây
+        if (savedStored >= 0 && savedTs > 0) {
+          ac.violationCount = savedStored;
         }
 
         // DEBOUNCED VIOLATION
@@ -4521,12 +4542,12 @@ const App = {
         if (ac._boundBlur)        { window.removeEventListener('blur', ac._boundBlur); ac._boundBlur = null; }
         if (ac._boundContextMenu) { document.removeEventListener('contextmenu', ac._boundContextMenu); ac._boundContextMenu = null; }
 
-        sessionStorage.removeItem('_ac_reload_v');
-        sessionStorage.removeItem('_ac_reload_ts');
-        sessionStorage.removeItem('_ac_resume_v');
-        sessionStorage.removeItem('_ac_resume_ts');
+        sessionStorage.removeItem('_ac_saved_v');
+        sessionStorage.removeItem('_ac_saved_ts');
         sessionStorage.removeItem('_ac_pending_attempt');
         sessionStorage.removeItem('_ac_pending_emp');
+        sessionStorage.removeItem('_ac_f5_pending_v');
+        sessionStorage.removeItem('_ac_f5_pending_ts');
       },
 
       handleViolation(type) {
