@@ -1426,11 +1426,31 @@
 
       <div style="height:1px;background:rgba(255,255,255,0.07);margin-bottom:24px;"></div>
 
+      <!-- Section: Đóng tab / Đóng trình duyệt -->
+      <div style="margin-bottom:24px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(248,87,166,0.15);border:1px solid rgba(248,87,166,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="16" height="16" fill="none" stroke="#f857a6" stroke-width="2.2" viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+          </div>
+          <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#f857a6;">Không đóng tab hoặc trình duyệt</span>
+        </div>
+        <div style="background:rgba(248,87,166,0.08);border:1px solid rgba(248,87,166,0.25);border-radius:12px;padding:16px 18px;margin-bottom:12px;">
+          <p style="font-size:13.5px;color:#ffb3d9;line-height:1.7;margin:0;font-weight:500;">Nếu bạn <strong>đóng tab</strong> hoặc <strong>tắt trình duyệt</strong> trong khi đang thi, hệ thống sẽ tự động nộp bài sau <strong>3 giây</strong> không nhận được phản hồi.</p>
+        </div>
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;">
+          <li style="display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--text-secondary);line-height:1.6;"><span style="color:#f857a6;flex-shrink:0;margin-top:2px;">▸</span>Bài thi sẽ được <strong style="color:#f0f2ff;">nộp tự động với các câu đã trả lời</strong> tại thời điểm đóng.</li>
+          <li style="display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--text-secondary);line-height:1.6;"><span style="color:#f857a6;flex-shrink:0;margin-top:2px;">▸</span>Ghi chú <strong style="color:#f857a6;">"tự động nộp do đóng tab"</strong> sẽ được lưu vào kết quả và báo cáo lên quản lý.</li>
+          <li style="display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--text-secondary);line-height:1.6;"><span style="color:#f857a6;flex-shrink:0;margin-top:2px;">▸</span>Nếu gặp sự cố kỹ thuật ngoài ý muốn, hãy liên hệ ngay với người giám sát.</li>
+        </ul>
+      </div>
+
+      <div style="height:1px;background:rgba(255,255,255,0.07);margin-bottom:24px;"></div>
+
       <!-- Section: Làm bài trung thực -->
       <div>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
           <div style="width:32px;height:32px;border-radius:8px;background:rgba(104,211,145,0.15);border:1px solid rgba(104,211,145,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <svg width="16" height="16" fill="none" stroke="#68d391" stroke-width="2.2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            <svg width="16" height="16" fill="none" stroke="#68d391" stroke-width="2.2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2h11"/></svg>
           </div>
           <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;color:#68d391;">Làm bài trung thực</span>
         </div>
@@ -4127,17 +4147,19 @@ const App = {
 
       // If resuming an existing attempt → skip rules screen, go straight to exam
       if (existing) {
-        App.screen.show('exam');
-        App.exam.startTimer();
-        App.exam.antiCheat.init();
-
-        // ── Áp dụng vi phạm F5 đã được detect ở App.init() ──
-        // _ac_f5_pending_v được ghi khi page load với navType='reload'
-        // antiCheat.init() đã reset violationCount=0 nên ta set lại sau
+        // ── Đọc _ac_f5_pending_v TRƯỚC khi gọi antiCheat.init() ──
+        // antiCheat.init() gọi cleanup() bên trong → cleanup() xóa _ac_f5_pending_v
+        // Nếu đọc sau init() thì key đã bị xóa → không bao giờ thấy vi phạm F5
         const f5V  = parseInt(sessionStorage.getItem('_ac_f5_pending_v')  ?? '-1');
         const f5Ts = parseInt(sessionStorage.getItem('_ac_f5_pending_ts') || '0');
         sessionStorage.removeItem('_ac_f5_pending_v');
         sessionStorage.removeItem('_ac_f5_pending_ts');
+
+        App.screen.show('exam');
+        App.exam.startTimer();
+        App.exam.antiCheat.init();
+
+        // ── Áp dụng vi phạm F5 sau khi init() đã chạy xong ──
         if (f5V >= 1 && f5Ts > 0) {
           const ac = App.exam.antiCheat;
           ac.violationCount = f5V;
