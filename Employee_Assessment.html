@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
@@ -929,9 +929,24 @@
       border-radius: 10px; padding: 8px;
       background: rgba(255,255,255,0.03);
     }
-    .checkbox-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; cursor: pointer; transition: background 0.15s; }
-    .checkbox-item:hover { background: rgba(255,255,255,0.05); }
-    .checkbox-item input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px; }
+    .checkbox-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; cursor: pointer; transition: all 0.18s; border: 1.5px solid transparent; }
+    .checkbox-item:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.08); }
+    .checkbox-item input[type="checkbox"] { accent-color: var(--accent); width: 18px; height: 18px; flex-shrink: 0; cursor: pointer; }
+    /* Checked state — newly selected */
+    .checkbox-item:has(input:checked:not(:disabled)) {
+      background: rgba(124,106,247,0.14);
+      border-color: rgba(124,106,247,0.40);
+      box-shadow: inset 0 0 0 1px rgba(124,106,247,0.18);
+    }
+    .checkbox-item:has(input:checked:not(:disabled)) span { color: #fff; font-weight: 600; }
+    /* Disabled (already assigned) state */
+    .checkbox-item:has(input:disabled) {
+      background: rgba(67,233,123,0.10);
+      border-color: rgba(67,233,123,0.35);
+      box-shadow: inset 0 0 0 1px rgba(67,233,123,0.15);
+      cursor: default;
+    }
+    .checkbox-item:has(input:disabled) span { color: #43e97b; font-weight: 700; }
 
     /* =====================================================
        EMPTY STATE
@@ -1123,27 +1138,51 @@
         <div class="form-group">
           <label>Nhập mã PIN mới (6 chữ số)</label>
           <div style="position:relative;">
-            <input type="password" id="emp-pin-new" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="••••••" autocomplete="new-password"
-              style="letter-spacing:8px;font-size:22px;text-align:center;padding:12px 40px 12px 14px;"
+            <!-- Hidden real input for capturing keystrokes -->
+            <input type="password" id="emp-pin-new" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="new-password"
+              style="position:absolute;opacity:0;width:100%;height:100%;top:0;left:0;z-index:2;cursor:pointer;"
               oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6);App.auth._pinDots('emp-pin-new-dots',this.value.length)"
               onkeydown="if(event.key==='Enter')App.auth.confirmCreatePin()">
-            <button type="button" onclick="App.auth._togglePinVis('emp-pin-new',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);padding:4px;cursor:pointer;font-size:16px;">👁</button>
-          </div>
-          <div id="emp-pin-new-dots" style="display:flex;gap:8px;justify-content:center;margin-top:8px;">
-            <div data-idx="0" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="1" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="2" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="3" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="4" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="5" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div>
+            <!-- Visual PIN field: dots inside box -->
+            <div id="emp-pin-new-dots" onclick="document.getElementById('emp-pin-new').focus()"
+              style="display:flex;gap:10px;justify-content:center;align-items:center;
+                     padding:14px 48px 14px 14px;
+                     background:rgba(255,255,255,0.05);
+                     border:1.5px solid rgba(255,255,255,0.08);
+                     border-radius:10px;cursor:text;min-height:52px;
+                     transition:border-color 0.2s,box-shadow 0.2s;">
+              <div data-idx="0" style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.15s;flex-shrink:0;"></div>
+              <div data-idx="1" style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.15s;flex-shrink:0;"></div>
+              <div data-idx="2" style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.15s;flex-shrink:0;"></div>
+              <div data-idx="3" style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.15s;flex-shrink:0;"></div>
+              <div data-idx="4" style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.15s;flex-shrink:0;"></div>
+              <div data-idx="5" style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.15s;flex-shrink:0;"></div>
+            </div>
+            <button type="button" onclick="App.auth._togglePinVis('emp-pin-new',this,'emp-pin-new-dots')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);padding:4px;cursor:pointer;font-size:16px;z-index:3;">👁</button>
           </div>
         </div>
         <div class="form-group">
           <label>Xác nhận mã PIN</label>
           <div style="position:relative;">
-            <input type="password" id="emp-pin-confirm" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="••••••" autocomplete="new-password"
-              style="letter-spacing:8px;font-size:22px;text-align:center;padding:12px 40px 12px 14px;"
+            <input type="password" id="emp-pin-confirm" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="new-password"
+              style="position:absolute;opacity:0;width:100%;height:100%;top:0;left:0;z-index:2;cursor:pointer;"
               oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6);App.auth._pinDots('emp-pin-confirm-dots',this.value.length)"
               onkeydown="if(event.key==='Enter')App.auth.confirmCreatePin()">
-            <button type="button" onclick="App.auth._togglePinVis('emp-pin-confirm',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);padding:4px;cursor:pointer;font-size:16px;">👁</button>
-          </div>
-          <div id="emp-pin-confirm-dots" style="display:flex;gap:8px;justify-content:center;margin-top:8px;">
-            <div data-idx="0" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="1" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="2" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="3" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="4" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="5" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div>
+            <div id="emp-pin-confirm-dots" onclick="document.getElementById('emp-pin-confirm').focus()"
+              style="display:flex;gap:10px;justify-content:center;align-items:center;
+                     padding:14px 48px 14px 14px;
+                     background:rgba(255,255,255,0.05);
+                     border:1.5px solid rgba(255,255,255,0.08);
+                     border-radius:10px;cursor:text;min-height:52px;
+                     transition:border-color 0.2s,box-shadow 0.2s;">
+              <div data-idx="0" style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.15s;flex-shrink:0;"></div>
+              <div data-idx="1" style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.15s;flex-shrink:0;"></div>
+              <div data-idx="2" style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.15s;flex-shrink:0;"></div>
+              <div data-idx="3" style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.15s;flex-shrink:0;"></div>
+              <div data-idx="4" style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.15s;flex-shrink:0;"></div>
+              <div data-idx="5" style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.15s;flex-shrink:0;"></div>
+            </div>
+            <button type="button" onclick="App.auth._togglePinVis('emp-pin-confirm',this,'emp-pin-confirm-dots')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);padding:4px;cursor:pointer;font-size:16px;z-index:3;">👁</button>
           </div>
         </div>
         <button class="btn btn-primary w-full" id="emp-create-pin-btn" onclick="App.auth.confirmCreatePin()">Tạo mã PIN & Đăng nhập</button>
@@ -1160,14 +1199,25 @@
         <div class="form-group">
           <label>Mã PIN của bạn</label>
           <div style="position:relative;">
-            <input type="password" id="emp-pin-input" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="••••••" autocomplete="current-password"
-              style="letter-spacing:8px;font-size:22px;text-align:center;padding:12px 40px 12px 14px;"
+            <input type="password" id="emp-pin-input" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="current-password"
+              style="position:absolute;opacity:0;width:100%;height:100%;top:0;left:0;z-index:2;cursor:pointer;"
               oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6);App.auth._pinDots('emp-pin-enter-dots',this.value.length)"
               onkeydown="if(event.key==='Enter')App.auth.verifyPin()">
-            <button type="button" onclick="App.auth._togglePinVis('emp-pin-input',this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);padding:4px;cursor:pointer;font-size:16px;">👁</button>
-          </div>
-          <div id="emp-pin-enter-dots" style="display:flex;gap:8px;justify-content:center;margin-top:8px;">
-            <div data-idx="0" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="1" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="2" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="3" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="4" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div><div data-idx="5" style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.2s;"></div>
+            <div id="emp-pin-enter-dots" onclick="document.getElementById('emp-pin-input').focus()"
+              style="display:flex;gap:10px;justify-content:center;align-items:center;
+                     padding:14px 48px 14px 14px;
+                     background:rgba(255,255,255,0.05);
+                     border:1.5px solid rgba(255,255,255,0.08);
+                     border-radius:10px;cursor:text;min-height:52px;
+                     transition:border-color 0.2s,box-shadow 0.2s;">
+              <div data-idx="0" style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.15s;flex-shrink:0;"></div>
+              <div data-idx="1" style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.15s;flex-shrink:0;"></div>
+              <div data-idx="2" style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.15s;flex-shrink:0;"></div>
+              <div data-idx="3" style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.15s;flex-shrink:0;"></div>
+              <div data-idx="4" style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.15s;flex-shrink:0;"></div>
+              <div data-idx="5" style="width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,0.12);transition:all 0.15s;flex-shrink:0;"></div>
+            </div>
+            <button type="button" onclick="App.auth._togglePinVis('emp-pin-input',this,'emp-pin-enter-dots')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);padding:4px;cursor:pointer;font-size:16px;z-index:3;">👁</button>
           </div>
           <div id="emp-pin-attempts" style="text-align:center;margin-top:8px;font-size:12px;color:var(--text-muted);"></div>
         </div>
@@ -2065,10 +2115,13 @@ const App = {
       // Reset fields
       ['emp-pin-new','emp-pin-confirm'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.value = '';
+        if (el) { el.value = ''; el._pinVisible = false; }
       });
       App.auth._pinDots('emp-pin-new-dots', 0);
       App.auth._pinDots('emp-pin-confirm-dots', 0);
+      // Attach focus/blur styling to dot boxes
+      App.auth._attachPinFocus('emp-pin-new', 'emp-pin-new-dots');
+      App.auth._attachPinFocus('emp-pin-confirm', 'emp-pin-confirm-dots');
       setTimeout(() => document.getElementById('emp-pin-new')?.focus(), 100);
     },
 
@@ -2082,10 +2135,23 @@ const App = {
       const attemptsEl = document.getElementById('emp-pin-attempts');
       if (attemptsEl) attemptsEl.textContent = '';
       const pinInput = document.getElementById('emp-pin-input');
-      if (pinInput) pinInput.value = '';
+      if (pinInput) { pinInput.value = ''; pinInput._pinVisible = false; }
       App.auth._pinDots('emp-pin-enter-dots', 0);
+      App.auth._attachPinFocus('emp-pin-input', 'emp-pin-enter-dots');
       App.auth._pinFailCount = 0;
       setTimeout(() => pinInput?.focus(), 100);
+    },
+
+    _attachPinFocus(inputId, dotsId) {
+      const input = document.getElementById(inputId);
+      const box = document.getElementById(dotsId);
+      if (!input || !box) return;
+      // Remove old listeners to prevent duplicates
+      if (input._focusHandler) { input.removeEventListener('focus', input._focusHandler); input.removeEventListener('blur', input._blurHandler); }
+      input._focusHandler = () => { box.style.borderColor = 'var(--accent)'; box.style.boxShadow = 'var(--shadow-glow)'; box.style.background = 'rgba(124,106,247,0.06)'; };
+      input._blurHandler = () => { box.style.borderColor = 'rgba(255,255,255,0.08)'; box.style.boxShadow = 'none'; box.style.background = 'rgba(255,255,255,0.05)'; };
+      input.addEventListener('focus', input._focusHandler);
+      input.addEventListener('blur', input._blurHandler);
     },
 
     _backToEmail() {
@@ -2100,25 +2166,54 @@ const App = {
     },
 
     _pinDots(containerId, count) {
-      const dots = document.querySelectorAll(`#${containerId} [data-idx]`);
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const dots = container.querySelectorAll('[data-idx]');
+      // If showing text (toggle visible mode), skip dot coloring
+      if (container._showText) return;
       dots.forEach((dot, i) => {
         if (i < count) {
           dot.style.background = 'var(--accent)';
           dot.style.transform = 'scale(1.25)';
           dot.style.boxShadow = '0 0 8px rgba(124,106,247,0.6)';
+          dot.style.width = '12px';
+          dot.style.height = '12px';
         } else {
           dot.style.background = 'rgba(255,255,255,0.12)';
           dot.style.transform = 'scale(1)';
           dot.style.boxShadow = 'none';
+          dot.style.width = '12px';
+          dot.style.height = '12px';
         }
       });
     },
 
-    _togglePinVis(inputId, btn) {
+    _togglePinVis(inputId, btn, dotsId) {
       const el = document.getElementById(inputId);
+      const dotsContainer = dotsId ? document.getElementById(dotsId) : null;
       if (!el) return;
-      el.type = el.type === 'password' ? 'text' : 'password';
-      btn.textContent = el.type === 'password' ? '👁' : '🙈';
+      const showing = el._pinVisible;
+      if (!showing) {
+        // Show actual digits as text inside the dots box
+        el._pinVisible = true;
+        btn.textContent = '🙈';
+        if (dotsContainer) {
+          dotsContainer._showText = true;
+          // Show digits directly in the box (replace dots with styled text)
+          const val = el.value || '';
+          dotsContainer.innerHTML = `<span style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;letter-spacing:10px;color:var(--text-primary);padding-left:6px;">${val || '——————'}</span>`;
+        }
+      } else {
+        // Back to dot mode
+        el._pinVisible = false;
+        btn.textContent = '👁';
+        if (dotsContainer) {
+          dotsContainer._showText = false;
+          const count = el.value.length;
+          // Re-render dots
+          dotsContainer.innerHTML = Array.from({length:6}).map((_, i) => `<div data-idx="${i}" style="width:12px;height:12px;border-radius:50%;background:${i<count?'var(--accent)':'rgba(255,255,255,0.12)'};transition:all 0.15s;flex-shrink:0;${i<count?'transform:scale(1.25);box-shadow:0 0 8px rgba(124,106,247,0.6);':''}"></div>`).join('');
+        }
+      }
     },
 
     _pinFailCount: 0,
@@ -3125,15 +3220,42 @@ const App = {
     _renderEmployeeList(employees, alreadyAssigned) {
       const list = document.getElementById('assign-employees-list');
       if (!employees.length) { list.innerHTML = '<div style="padding:12px;color:var(--text-muted);">Không có nhân viên active nào.</div>'; return; }
-      list.innerHTML = employees.map(e => `
-        <label class="checkbox-item">
-          <input type="checkbox" value="${e.id}" ${alreadyAssigned?.has(e.id)?'checked disabled':''}>
-          <span>${e.name||'—'} <span style="color:var(--text-muted);font-size:12px;">${e.email}</span></span>
-        </label>
-      `).join('');
+      list.innerHTML = employees.map(e => {
+        const isAssigned = alreadyAssigned?.has(e.id);
+        return `
+        <label class="checkbox-item${isAssigned ? ' is-assigned' : ''}">
+          <input type="checkbox" value="${e.id}" ${isAssigned ? 'checked disabled' : ''}
+            onchange="App.assignments._onCheckChange(this)">
+          <span>
+            ${e.name||'—'}
+            <span style="font-size:12px;margin-left:4px;${isAssigned ? 'color:rgba(67,233,123,0.75)' : 'color:var(--text-muted)'};">${e.email}</span>
+          </span>
+          ${isAssigned ? '<span style="margin-left:auto;flex-shrink:0;font-size:11px;font-weight:700;color:#43e97b;background:rgba(67,233,123,0.12);border:1px solid rgba(67,233,123,0.25);border-radius:100px;padding:2px 8px;">Đã chỉ định</span>' : ''}
+        </label>`;
+      }).join('');
+    },
+    _onCheckChange(input) {
+      const label = input.closest('.checkbox-item');
+      if (!label) return;
+      if (input.checked) {
+        label.style.background = 'rgba(124,106,247,0.14)';
+        label.style.borderColor = 'rgba(124,106,247,0.40)';
+        label.style.boxShadow = 'inset 0 0 0 1px rgba(124,106,247,0.18)';
+        const nameSpan = label.querySelector('span');
+        if (nameSpan) { nameSpan.style.color='#fff'; nameSpan.style.fontWeight='600'; }
+      } else {
+        label.style.background = '';
+        label.style.borderColor = '';
+        label.style.boxShadow = '';
+        const nameSpan = label.querySelector('span');
+        if (nameSpan) { nameSpan.style.color=''; nameSpan.style.fontWeight=''; }
+      }
     },
     selectAll() {
-      document.querySelectorAll('#assign-employees-list input[type="checkbox"]:not(:disabled)').forEach(c => c.checked = true);
+      document.querySelectorAll('#assign-employees-list input[type="checkbox"]:not(:disabled)').forEach(c => {
+        c.checked = true;
+        App.assignments._onCheckChange(c);
+      });
     },
     async save() {
       const testId = document.getElementById('assign-test-id').value;
@@ -4193,80 +4315,234 @@ const App = {
       violationCount: 0,
       overlayEl: null,
       timerWasPaused: false,
+      _active: false,
+      _violationDebounceTimer: null,
+      // Store bound function refs so removeEventListener always removes the exact same function
+      _boundVisChange: null,
+      _boundBlur: null,
+      _boundContextMenu: null,
+      _boundBeforeUnload: null,
 
       init() {
         const ac = App.exam.antiCheat;
+
+        // ══════════════════════════════════════════════════════════════════
+        // THIẾT KẾ 2 KEY RIÊNG BIỆT — không bao giờ nhầm lẫn F5 vs tắt máy
+        //
+        // KEY 1: _ac_reload_v / _ac_reload_ts
+        //   → Chỉ được ghi bởi beforeunload
+        //   → Chỉ được đọc khi navigation.type === 'reload' (F5/Ctrl+R)
+        //   → Nếu đọc bằng navigate → bỏ qua hoàn toàn (không nhập vào violationCount)
+        //
+        // KEY 2: _ac_resume_v / _ac_resume_ts
+        //   → Chỉ được ghi bởi beforeunload
+        //   → Chỉ được đọc khi navigation.type === 'navigate' (đóng tab/tắt máy rồi mở lại)
+        //   → Nếu đọc bằng reload → bỏ qua hoàn toàn
+        //
+        // LUỒNG:
+        //   beforeunload:  ghi CÙNG LÚC cả 2 key (violationCount hiện tại, chưa +1)
+        //   init() reload: đọc KEY 1, +1 vi phạm, xóa KEY 1, bỏ KEY 2
+        //   init() navigate: đọc KEY 2, khôi phục im lặng, bỏ KEY 1
+        //
+        // KẾT QUẢ ĐẢM BẢO:
+        //   F5 trong khi thi       → reload  → KEY 1 có giá trị → +1 vi phạm ✅
+        //   Tắt máy/đóng tab       → navigate → KEY 2 có giá trị → khôi phục im lặng ✅
+        //   F5 sai tưởng tắt máy  → KHÔNG THỂ XẢY RA (2 key hoàn toàn tách biệt) ✅
+        //   Tắt máy sai tưởng F5  → KHÔNG THỂ XẢY RA ✅
+        // ══════════════════════════════════════════════════════════════════
+
+        // ── BƯỚC 1: Xác định navigation type TRƯỚC KHI làm bất cứ điều gì ──
+        const navEntry       = performance.getEntriesByType?.('navigation')?.[0];
+        const navType        = navEntry?.type ?? (performance.navigation?.type === 1 ? 'reload' : 'navigate');
+        const isActualReload = navType === 'reload';
+
+        // ── BƯỚC 2: Đọc đúng key theo navigation type, XÓA cả 2 key ngay lập tức ──
+        const reloadStored   = parseInt(sessionStorage.getItem('_ac_reload_v')  ?? '-1');
+        const reloadTs       = parseInt(sessionStorage.getItem('_ac_reload_ts') || '0');
+        const resumeStored   = parseInt(sessionStorage.getItem('_ac_resume_v')  ?? '-1');
+        const resumeTs       = parseInt(sessionStorage.getItem('_ac_resume_ts') || '0');
+        // Đọc pending keys TRƯỚC KHI xóa — dùng ở BƯỚC 4 để gửi cancel khi F5
+        const pendingAttempt = sessionStorage.getItem('_ac_pending_attempt');
+        const pendingEmp     = sessionStorage.getItem('_ac_pending_emp');
+        // Xóa cả 2 key ngay — tránh key cũ bị dùng nhầm ở lần tiếp theo
+        sessionStorage.removeItem('_ac_reload_v');
+        sessionStorage.removeItem('_ac_reload_ts');
+        sessionStorage.removeItem('_ac_resume_v');
+        sessionStorage.removeItem('_ac_resume_ts');
+        sessionStorage.removeItem('_ac_pending_attempt');
+        sessionStorage.removeItem('_ac_pending_emp');
+
+        // ── BƯỚC 3: cleanup listener cũ TRƯỚC KHI thêm listener mới ──
+        ac.cleanup();
+
         ac.violationCount = 0;
-        ac._lastViolationTs = 0;
-        // Intercept beforeunload (F5 / refresh / close tab)
-        window._acBeforeUnload = function(e) {
-          if (!App.state.examState?.attempt) return;
+        ac._active = true;
+        ac.timerWasPaused = false;
+
+        // ── beforeunload: ghi 2 KEY riêng + gửi sendBeacon "pending submit" ──
+        // KEY 1 (_ac_reload_v): dành cho F5 → đọc khi navigation.type = 'reload'
+        // KEY 2 (_ac_resume_v): dành cho đóng tab → đọc khi navigation.type = 'navigate'
+        // sendBeacon: gửi lên Edge Function submit-on-close với action='pending'
+        //   → Nếu F5: trang load lại → gửi cancel ngay → Edge Function không submit
+        //   → Nếu đóng tab: không có cancel → Edge Function submit sau 6 giây
+        ac._boundBeforeUnload = function(e) {
+          if (!ac._active || !App.state.examState?.attempt) return;
           e.preventDefault();
           e.returnValue = '';
-          // On next load we mark 1 refresh violation (never accumulate across multiple F5 before page loads)
-          sessionStorage.setItem('_ac_v', '1');
+          const v  = String(ac.violationCount);
+          const ts = String(Date.now());
+          sessionStorage.setItem('_ac_reload_v',  v);    // KEY 1: F5
+          sessionStorage.setItem('_ac_reload_ts', ts);
+          sessionStorage.setItem('_ac_resume_v',  v);    // KEY 2: đóng tab
+          sessionStorage.setItem('_ac_resume_ts', ts);
+
+          // fetch keepalive: hỗ trợ custom headers (apikey) + đảm bảo gửi dù tab đóng
+          // sendBeacon KHÔNG hỗ trợ custom headers → Supabase từ chối silently
+          const attemptId  = App.state.examState.attempt.id;
+          const employeeId = App.state.employee?.id;
+          if (attemptId && employeeId) {
+            sessionStorage.setItem('_ac_pending_attempt', attemptId);
+            sessionStorage.setItem('_ac_pending_emp',     employeeId);
+            try {
+              fetch(SUPABASE_URL + '/functions/v1/submit-on-close', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'apikey': SUPABASE_ANON_KEY,
+                  'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+                },
+                body: JSON.stringify({
+                  action: 'pending',
+                  attempt_id:  attemptId,
+                  employee_id: employeeId,
+                  timestamp:   ts,
+                }),
+                keepalive: true,
+              }).catch(function(){});
+            } catch(e) {
+              // keepalive body > 64KB sẽ throw — fallback sendBeacon (không có header)
+              navigator.sendBeacon(
+                SUPABASE_URL + '/functions/v1/submit-on-close',
+                new Blob([JSON.stringify({
+                  action: 'pending',
+                  attempt_id:  attemptId,
+                  employee_id: employeeId,
+                  timestamp:   ts,
+                })], { type: 'application/json' })
+              );
+            }
+          }
           return '';
         };
-        window.addEventListener('beforeunload', window._acBeforeUnload);
+        window.addEventListener('beforeunload', ac._boundBeforeUnload);
 
-        // Check if returning from a refresh — add 1 violation (each refresh = 1 violation regardless of how many F5 before page loaded)
-        const stored = parseInt(sessionStorage.getItem('_ac_v') || '0');
-        if (stored > 0) {
-          sessionStorage.removeItem('_ac_v');
-          ac.violationCount = ac.violationCount + 1; // always +1, never jump to arbitrary stored value
-          if (ac.violationCount >= 3) {
-            // Auto-submit immediately
-            setTimeout(() => App.exam.submit(true, true), 800);
-            return;
+        // ── BƯỚC 4: Xử lý phục hồi theo navigation type ──
+        if (isActualReload) {
+          // F5/Ctrl+R → gửi CANCEL beacon ngay để Edge Function không submit bài
+          if (pendingAttempt && pendingEmp) {
+            fetch(SUPABASE_URL + '/functions/v1/submit-on-close', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+              },
+              body: JSON.stringify({ action: 'cancel', attempt_id: pendingAttempt, employee_id: pendingEmp }),
+              keepalive: true,
+            }).catch(function(){});
           }
-          // Show warning on load
-          setTimeout(() => ac.showOverlay(), 600);
+
+          // Đọc KEY 1 → tính vi phạm F5
+          if (reloadStored >= 0 && reloadTs > 0) {
+            ac.violationCount = reloadStored + 1; // vi phạm thật → +1
+            if (ac.violationCount >= 3) {
+              ac.showFinalOverlay();
+              return;
+            }
+            setTimeout(function() { ac.showOverlay('reload'); }, 600);
+          }
+        } else {
+          // navigate → đóng tab/trình duyệt → pending đã gửi, không cần cancel
+          // (pending keys đã được xóa ở BƯỚC 2)
+
+          // Đọc KEY 2 → khôi phục vi phạm cũ im lặng (không +1)
+          if (resumeStored >= 0 && resumeTs > 0) {
+            ac.violationCount = resumeStored;
+          }
         }
 
-        // Tab visibility detection
-        window._acVisChange = function() {
-          if (document.hidden && App.state.examState?.attempt) {
-            ac._lastViolationTs = Date.now();
-            ac.handleViolation('tab');
-          }
+        // DEBOUNCED VIOLATION
+        // Both visibilitychange AND blur fire together on every tab-switch.
+        // The debounce ensures only ONE violation is counted per user action,
+        // no matter how many events fire or in what order.
+        ac._triggerViolation = function(type) {
+          if (!ac._active || !App.state.examState?.attempt) return;
+          if (ac._violationDebounceTimer) return; // already pending — drop duplicate
+          ac._violationDebounceTimer = setTimeout(function() {
+            ac._violationDebounceTimer = null;
+            if (!ac._active || !App.state.examState?.attempt) return; // re-check after delay
+            var bestType = document.hidden ? 'tab' : type;
+            ac.handleViolation(bestType);
+          }, 100);
         };
-        document.addEventListener('visibilitychange', window._acVisChange);
 
-        // Dual-monitor / window focus loss detection
-        // Guard: skip if visibilitychange already fired within 200ms (same tab-switch event)
-        window._acBlur = function() {
-          if (App.state.examState?.attempt) {
-            const now = Date.now();
-            if (ac._lastViolationTs && now - ac._lastViolationTs < 200) return;
-            ac._lastViolationTs = now;
-            ac.handleViolation('focus');
-          }
+        // visibilitychange: fires when switching tabs
+        ac._boundVisChange = function() {
+          if (document.hidden) ac._triggerViolation('tab');
         };
-        window.addEventListener('blur', window._acBlur);
+        document.addEventListener('visibilitychange', ac._boundVisChange);
 
-        // Right-click disable during exam
-        window._acContextMenu = function(e) {
-          if (App.state.examState?.attempt) e.preventDefault();
+        // blur: fires on Alt+Tab, dual-monitor switch, clicking another app
+        ac._boundBlur = function() {
+          ac._triggerViolation('focus');
         };
-        document.addEventListener('contextmenu', window._acContextMenu);
+        window.addEventListener('blur', ac._boundBlur);
+
+        // Disable right-click during exam
+        ac._boundContextMenu = function(e) {
+          if (ac._active && App.state.examState?.attempt) e.preventDefault();
+        };
+        document.addEventListener('contextmenu', ac._boundContextMenu);
       },
 
       cleanup() {
-        window.removeEventListener('beforeunload', window._acBeforeUnload);
-        document.removeEventListener('visibilitychange', window._acVisChange);
-        document.removeEventListener('contextmenu', window._acContextMenu);
-        window.removeEventListener('blur', window._acBlur);
-        sessionStorage.removeItem('_ac_v');
+        const ac = App.exam.antiCheat;
+        ac._active = false;
+
+        // Clear any pending debounce so no phantom violation fires after cleanup
+        if (ac._violationDebounceTimer) {
+          clearTimeout(ac._violationDebounceTimer);
+          ac._violationDebounceTimer = null;
+        }
+
+        // Remove using the exact bound references that were added — prevents stale listeners
+        if (ac._boundBeforeUnload) { window.removeEventListener('beforeunload', ac._boundBeforeUnload); ac._boundBeforeUnload = null; }
+        if (ac._boundVisChange)   { document.removeEventListener('visibilitychange', ac._boundVisChange); ac._boundVisChange = null; }
+        if (ac._boundBlur)        { window.removeEventListener('blur', ac._boundBlur); ac._boundBlur = null; }
+        if (ac._boundContextMenu) { document.removeEventListener('contextmenu', ac._boundContextMenu); ac._boundContextMenu = null; }
+
+        sessionStorage.removeItem('_ac_reload_v');
+        sessionStorage.removeItem('_ac_reload_ts');
+        sessionStorage.removeItem('_ac_resume_v');
+        sessionStorage.removeItem('_ac_resume_ts');
+        sessionStorage.removeItem('_ac_pending_attempt');
+        sessionStorage.removeItem('_ac_pending_emp');
       },
 
       handleViolation(type) {
         const ac = App.exam.antiCheat;
+        // Re-check active state — could have been deactivated while debounce was pending
+        if (!ac._active || !App.state.examState?.attempt) return;
+
         ac.violationCount++;
-        // Pause timer
+
+        // Pause timer while overlay is visible
         if (App.state.examState?.timerInterval) {
           clearInterval(App.state.examState.timerInterval);
+          App.state.examState.timerInterval = null;
           ac.timerWasPaused = true;
         }
+
         if (ac.violationCount >= 3) {
           ac.showFinalOverlay();
         } else {
@@ -4279,13 +4555,15 @@ const App = {
         const existing = document.getElementById('anticheat-overlay');
         if (existing) existing.remove();
 
-        const isTab = type === 'tab';
-        const isFocus = type === 'focus';
+        const isTab    = type === 'tab';
+        const isFocus  = type === 'focus';
+        const isReload = type === 'reload';
         let violationDesc = '';
         let icon = '⚠️';
-        if (isTab) { icon = '🔍'; violationDesc = 'Hệ thống phát hiện bạn <strong>chuyển sang tab/cửa sổ khác</strong> trong khi thi.'; }
-        else if (isFocus) { icon = '🖥️'; violationDesc = 'Hệ thống phát hiện bạn <strong>chuyển sang cửa sổ/màn hình khác</strong> (2 màn hình hoặc Alt+Tab) trong khi thi.'; }
-        else { violationDesc = 'Hệ thống phát hiện bạn <strong>tải lại trang (F5/Refresh)</strong> trong khi thi.'; }
+        if (isTab)    { icon = '🔍'; violationDesc = 'Hệ thống phát hiện bạn <strong>chuyển sang tab/cửa sổ khác</strong> trong khi thi.'; }
+        else if (isFocus)  { icon = '🖥️'; violationDesc = 'Hệ thống phát hiện bạn <strong>chuyển sang cửa sổ/màn hình khác</strong> (2 màn hình hoặc Alt+Tab) trong khi thi.'; }
+        else if (isReload) { icon = '🔄'; violationDesc = 'Hệ thống phát hiện bạn <strong>tải lại trang (F5 / Ctrl+R / nút Refresh)</strong> trong khi thi.'; }
+        else { violationDesc = 'Hệ thống phát hiện hành vi <strong>rời khỏi trang thi</strong>.'; }
 
         const overlay = document.createElement('div');
         overlay.id = 'anticheat-overlay';
