@@ -1,16 +1,40 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hệ Thống Đánh Giá Nhân Viên</title>
+
+  <!-- ╔═══════════════════════════════════════════════════════════════════╗
+       ║  SUBMIT-ON-CLOSE v4 + ANTI-CHEAT (inline, chạy trước CDN)        ║
+       ║                                                                   ║
+       ║  THIẾT KẾ v4 — Edge Function "auto-submit" nhận POST đơn giản:  ║
+       ║    sendBeacon POST {action, attempt_id, employee_id, test_id}    ║
+       ║    → Edge Function dùng service_role PATCH DB ngay lập tức       ║
+       ║    → Không cần pg_cron, không cần chờ                           ║
+       ║                                                                   ║
+       ║  2 NHIỆM VỤ của inline script (chạy cả khi navigate + reload):  ║
+       ║    1. Restore session token (F5 hợp lệ, không bị block)          ║
+       ║    2. Nếu F5: gửi action=cancel để undo submit, ghi vi phạm      ║
+       ╚═══════════════════════════════════════════════════════════════════╝ -->
   <script>
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SUBMIT-ON-CLOSE v4 — INLINE SCRIPT (chạy trước mọi CDN)
+  //
+  // Edge Function "auto-submit" nhận POST đơn giản (text/plain body):
+  //   action="submit" → PATCH attempt submitted + assignment completed NGAY
+  //   action="cancel" → PATCH attempt in_progress (undo khi F5)
+  // Dùng sendBeacon (hoạt động khi tab đóng) + fetch keepalive (fallback).
+  // ═══════════════════════════════════════════════════════════════════════════
   (function() {
     'use strict';
     try {
       var SUPA_URL = 'https://edsowiramriosgwfuewg.supabase.co';
       var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkc293aXJhbXJpb3Nnd2Z1ZXdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNDMzMDgsImV4cCI6MjA5MzgxOTMwOH0.aocvFLnJrl5LFPdxDf9zbhvT6HT7NpCEMFtiUr_M3gM';
       var AS_URL   = SUPA_URL + '/functions/v1/auto-submit';
+
+      // sendBeacon text/plain = "simple request" = không cần CORS preflight
+      // → gửi được ngay cả khi tab đang đóng/browser đang tắt
       function sendAction(payload) {
         var bodyStr = JSON.stringify(payload);
         try { navigator.sendBeacon(AS_URL, new Blob([bodyStr], { type: 'text/plain' })); } catch(e) {}
@@ -51,7 +75,7 @@
 
       if (isReload) {
         // F5: gửi cancel để Edge Function undo submit (PATCH in_progress)
-        sendAction({ action: 'cancel', attempt_id: snap.attemptId, employee_id: snap.empId, test_id: snap.testId || '' });
+        sendAction({ action: 'cancel', attempt_id: snap.attemptId, employee_id: snap.empId, test_id: snap.testId || '', session_token: snap.sessionToken || '' });
         // Ghi vi phạm F5 để exam.start() áp dụng
         sessionStorage.setItem('_ac_f5_violation', JSON.stringify({
           violations: (snap.violations || 0) + 1,
@@ -4551,11 +4575,12 @@ const App = {
 
           // SNAPSHOT: inline script F5 đọc để gửi cancel + ghi vi phạm
           sessionStorage.setItem('_ac_snapshot', JSON.stringify({
-            violations: ac.violationCount,
-            attemptId:  attemptId,
-            empId:      employeeId,
-            testId:     testId,
-            ts:         Date.now(),
+            violations:    ac.violationCount,
+            attemptId:     attemptId,
+            empId:         employeeId,
+            testId:        testId,
+            sessionToken:  sessionStorage.getItem('_ac_tok_backup') || '',
+            ts:            Date.now(),
           }));
 
           // ── GỬI action:"submit" đến Edge Function ────────────────────────
