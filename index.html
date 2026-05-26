@@ -1492,9 +1492,11 @@ function renderDropdown() {
 
   apps.forEach((app, i) => {
     const color = getColor(app.color);
+    const enabled = app.enabled !== false;
     const item = document.createElement('div');
-    item.className = 'dropdown-item' + (current === i ? ' active-item' : '');
+    item.className = 'dropdown-item' + (current === i ? ' active-item' : '') + (enabled ? '' : ' di-disabled');
     item.id = 'di-' + app.id;
+    item.style.cssText = enabled ? '' : 'opacity:.45;cursor:not-allowed;';
     const diIconInner = SVG_ICONS[app.emoji]
       ? `<span style="color:${color.hex};display:flex;align-items:center;justify-content:center;">${SVG_ICONS[app.emoji]}</span>`
       : `<span style="font-size:16px;line-height:1;">${app.emoji}</span>`;
@@ -1504,10 +1506,15 @@ function renderDropdown() {
       </div>
       <div class="di-info">
         <div class="di-name">${esc(app.name)}</div>
-        ${app.badge ? `<span class="di-badge">${esc(app.badge)}</span>` : ''}
+        ${enabled
+          ? (app.badge ? `<span class="di-badge">${esc(app.badge)}</span>` : '')
+          : `<span class="di-badge" style="background:rgba(252,129,129,.15);color:#fc8181;border-color:rgba(252,129,129,.3)">🔧 Bảo trì</span>`}
       </div>
     `;
-    item.onclick = () => { openApp(i); closeDropdown(); };
+    item.onclick = () => {
+      if (!enabled) return;
+      openApp(i); closeDropdown();
+    };
     grid.appendChild(item);
   });
 
@@ -1794,6 +1801,9 @@ function showHome() {
 function openApp(idx) {
   if (idx < 0 || idx >= apps.length) { showHome(); return; }
   const app = apps[idx];
+
+  // Block access if app is under maintenance (non-admin users)
+  if (app.enabled === false && !isAdmin) return;
 
   document.getElementById('home').classList.remove('active');
   document.querySelectorAll('#appPanes .pane').forEach(p => p.classList.remove('active'));
