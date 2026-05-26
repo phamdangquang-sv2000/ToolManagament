@@ -713,7 +713,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
 
 /* Mobile "more" drawer */
 #mob-drawer{
-  display:block;
+  display:none;
   position:fixed;bottom:0;left:0;right:0;z-index:50;
   background:var(--surface);
   border-top:1px solid var(--border);
@@ -721,12 +721,11 @@ tr:hover td{background:rgba(13,148,136,.03)}
   padding:1rem;
   padding-bottom:calc(1rem + env(safe-area-inset-bottom));
   box-shadow:0 -8px 32px rgba(0,0,0,.12);
-  transform:translateY(105%);
+  transform:translateY(100%);
   transition:transform .3s cubic-bezier(.4,0,.2,1);
-  visibility:hidden;
 }
 .dark #mob-drawer{background:var(--surface2);}
-#mob-drawer.open{transform:translateY(0);visibility:visible;}
+#mob-drawer.open{transform:translateY(0);}
 #mob-drawer-backdrop{
   display:none;
   position:fixed;inset:0;z-index:49;
@@ -1046,10 +1045,6 @@ tr:hover td{background:rgba(13,148,136,.03)}
     <button onclick="toggleDark()" class="btn btn-secondary btn-sm" style="padding:.3rem .5rem;">
       <span id="mob-dm-ico">🌙</span>
     </button>
-    <button onclick="doLogout()" class="btn btn-sm" style="padding:.3rem .6rem;background:#fef2f2;border:1px solid #fecaca;color:#ef4444;font-size:.75rem;font-weight:700;border-radius:.45rem;display:flex;align-items:center;gap:.25rem;">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Thoát
-    </button>
   </div>
 </div>
 
@@ -1076,11 +1071,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
       <span>Lịch làm</span>
       <div class="mob-nav-dot"></div>
     </button>
-    <button class="mob-nav-btn" id="mnb-more" onclick="openMobDrawer()">
-      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>
-      <span>Thêm</span>
-      <div class="mob-nav-dot"></div>
-    </button>
+
   </div>
 </div>
 
@@ -1598,7 +1589,7 @@ CREATE TABLE hr_leave_requests (<br>
       <div class="card p-0 overflow-hidden mob-table-hide">
         <div class="tw">
           <table>
-            <thead><tr><th>#</th><th>Nhân viên</th><th>Loại</th><th>Ngày</th><th>Lần</th><th>Trạng thái</th><th style="min-width:120px;max-width:200px">Ghi chú</th><th id="th-att-action" style="display:none">Thao tác</th></tr></thead>
+            <thead><tr><th>#</th><th>Nhân viên</th><th>Loại</th><th>Ngày</th><th>Lần</th><th>Trạng thái</th><th id="th-att-action" style="display:none">Thao tác</th></tr></thead>
             <tbody id="att-body"></tbody>
           </table>
         </div>
@@ -1838,10 +1829,6 @@ CREATE TABLE hr_leave_requests (<br>
           <option value="approved">Approved (có xin phép)</option>
           <option value="pending">Không xin phép</option>
         </select>
-      </div>
-      <div>
-        <label class="label">Ghi chú <span style="color:var(--text-3);font-weight:400;font-size:.75rem">(vd: đi trễ 15 phút, về sớm 30 phút...)</span></label>
-        <input id="ma-note" type="text" class="input" placeholder="vd: Đi trễ 15 phút do kẹt xe" maxlength="200">
       </div>
     </div>
     <div class="flex gap-2.5 mt-6 justify-end">
@@ -3472,10 +3459,9 @@ function renderAtt() {
       <td style="color:var(--text-2)">${a.event_date ? fmtD(a.event_date) : '—'}</td>
       <td style="color:var(--text-2)">Lần ${a.occurrence || 1}</td>
       <td>${sb}</td>
-      <td style="color:var(--text-2);font-size:.8rem;max-width:180px;word-break:break-word;white-space:normal">${a.note ? `<span title="${a.note.replace(/"/g,'&quot;')}">${a.note}</span>` : '<span style="color:var(--text-3)">—</span>'}</td>
       ${actionCell}
     </tr>`;
-  }).join('') : emptyRow(S.isAdmin ? 8 : 7);
+  }).join('') : emptyRow(S.isAdmin ? 7 : 6);
   renderGenericPager('att-pager', totalItems, _attPage, 'gotoAttPage', 'sự kiện');
 
   // Mobile card list
@@ -3486,27 +3472,14 @@ function renderAtt() {
       const sb = a.status === 'approved' ? '<span class="badge bg-green">Approved</span>' : '<span class="badge bg-red">Không xin phép</span>';
       const actions = S.isAdmin ? `<div class="mob-row-card-actions"><button class="btn btn-secondary btn-sm edit-att-btn" data-id="${a.id}">✏️ Sửa</button><button class="btn btn-danger btn-sm del-att-btn" data-id="${a.id}">🗑️ Xóa</button></div>` : '';
       return `<div class="mob-row-card">
-        <!-- Row 1: tên + badges riêng dòng -->
-        <div style="margin-bottom:.5rem">
-          <div class="mob-row-card-name" style="white-space:normal;overflow:visible;text-overflow:unset;margin-bottom:.35rem">${a.employee_name || eName(a.employee_id)}</div>
-          <div style="display:flex;gap:.3rem;flex-wrap:wrap">${tb}${sb}</div>
+        <div class="mob-row-card-header">
+          <div class="mob-row-card-name">${a.employee_name || eName(a.employee_id)}</div>
+          <div style="display:flex;gap:.3rem;align-items:center">${tb}${sb}</div>
         </div>
-        <!-- Row 2: meta info hàng ngang -->
-        <div style="display:flex;gap:1rem;flex-wrap:wrap;font-size:.75rem;margin-bottom:${a.note ? '.5rem' : '0'}">
-          <div style="display:flex;flex-direction:column;gap:.1rem">
-            <span style="font-size:.62rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em">Ngày</span>
-            <span style="font-weight:600;color:var(--text-1)">${a.event_date ? fmtD(a.event_date) : '—'}</span>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:.1rem">
-            <span style="font-size:.62rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em">Lần</span>
-            <span style="font-weight:600;color:var(--text-1)">Lần ${a.occurrence || 1}</span>
-          </div>
+        <div class="mob-row-card-body">
+          <div class="mob-row-card-field"><span class="mob-row-card-label">Ngày</span><span class="mob-row-card-val">${a.event_date ? fmtD(a.event_date) : '—'}</span></div>
+          <div class="mob-row-card-field"><span class="mob-row-card-label">Lần</span><span class="mob-row-card-val">Lần ${a.occurrence || 1}</span></div>
         </div>
-        <!-- Row 3: ghi chú nếu có -->
-        ${a.note ? `<div style="background:var(--surface2,#f4f6f8);border-left:3px solid var(--primary,#0d9488);border-radius:0 .4rem .4rem 0;padding:.35rem .6rem;margin-bottom:.4rem">
-          <div style="font-size:.62rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.15rem">Ghi chú</div>
-          <div style="font-size:.8rem;color:var(--text-2);word-break:break-word;line-height:1.45">${a.note}</div>
-        </div>` : ''}
         ${actions}
       </div>`;
     }).join('') : `<div style="text-align:center;padding:2rem;color:var(--text-3);font-size:.85rem;font-weight:500">Không có dữ liệu</div>`;
@@ -3521,7 +3494,6 @@ function openAttModal(id) {
   document.getElementById('ma-date').value = a?.event_date || '';
   document.getElementById('ma-occ').value = a?.occurrence || 1;
   document.getElementById('ma-status').value = a?.status || 'approved';
-  document.getElementById('ma-note').value = a?.note || '';
   openModal('m-att');
 }
 
@@ -3538,7 +3510,7 @@ async function saveAtt() {
     event_date: date,
     occurrence: parseInt(document.getElementById('ma-occ').value) || 1,
     status: document.getElementById('ma-status').value,
-    note: document.getElementById('ma-note').value.trim() || null,
+    note: null,
   };
   const { error } = id
     ? await db.from('hr_attendance_events').update(data).eq('id', id)
