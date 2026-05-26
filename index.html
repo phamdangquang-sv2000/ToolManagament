@@ -566,6 +566,32 @@
   .card-edit-btn:hover  { background: rgba(232,187,80,.3); transform: scale(1.1); }
   .card-delete-btn { background: rgba(252,129,129,.12); color: var(--red); }
   .card-delete-btn:hover { background: rgba(252,129,129,.25); transform: scale(1.1); }
+  .card-toggle-btn { background: rgba(74,222,128,.12); color: #4ade80; font-size: 13px; }
+  .card-toggle-btn:hover { background: rgba(74,222,128,.28); transform: scale(1.1); }
+  .card-toggle-btn.off { background: rgba(252,129,129,.12); color: var(--red); }
+  .card-toggle-btn.off:hover { background: rgba(252,129,129,.25); transform: scale(1.1); }
+
+  /* Maintenance overlay */
+  .card-maintenance {
+    position: absolute; inset: 0; border-radius: 18px; z-index: 5;
+    background: rgba(10,12,20,.82);
+    backdrop-filter: blur(3px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    pointer-events: none;
+    opacity: 0; transition: opacity .25s;
+  }
+  .card.disabled .card-maintenance { opacity: 1; pointer-events: auto; }
+  .card.disabled { cursor: not-allowed; }
+  .card.disabled:hover { transform: none; box-shadow: none; }
+  .card.disabled .card-admin-bar { pointer-events: auto; z-index: 10; }
+  .maintenance-icon { font-size: 26px; }
+  .maintenance-text {
+    font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: rgba(255,255,255,.55);
+  }
+  .maintenance-sub {
+    font-size: 11px; color: rgba(255,255,255,.3); font-family: var(--mono);
+  }
 
   /* Add card */
   .card-add {
@@ -1548,8 +1574,9 @@ function renderCards() {
   grid.innerHTML = '';
   apps.forEach((app, i) => {
     const color = getColor(app.color);
+    const enabled = app.enabled !== false; // default true if not set
     const card = document.createElement('div');
-    card.className = 'card card-new';
+    card.className = 'card card-new' + (enabled ? '' : ' disabled');
     card.id = 'card-' + app.id;
     card.style.cssText = `
       --card-accent:${color.hex};
@@ -1561,8 +1588,16 @@ function renderCards() {
     card.innerHTML = `
       <div class="card-stripe"></div>
       <div class="card-admin-bar">
+        <button class="card-admin-btn card-toggle-btn ${enabled ? '' : 'off'}" onclick="event.stopPropagation();toggleApp('${app.id}')" title="${enabled ? 'Tắt (bảo trì)' : 'Bật'}">
+          ${enabled ? '🟢' : '🔴'}
+        </button>
         <button class="card-admin-btn card-edit-btn" onclick="event.stopPropagation();openEdit('${app.id}')" title="Sửa">✏️</button>
         <button class="card-admin-btn card-delete-btn" onclick="event.stopPropagation();confirmDelete('${app.id}')" title="Xóa">🗑️</button>
+      </div>
+      <div class="card-maintenance">
+        <div class="maintenance-icon">🔧</div>
+        <div class="maintenance-text">Đang bảo trì</div>
+        <div class="maintenance-sub">Vui lòng quay lại sau</div>
       </div>
       <div class="card-icon" style="background:${color.iconBg};box-shadow:0 4px 12px ${color.iconShadow}, 0 2px 0 rgba(0,0,0,.06)">${getAppIcon(app.emoji || '📁', color.hex)}</div>
       <div class="card-title">${esc(app.name)}</div>
@@ -1572,7 +1607,7 @@ function renderCards() {
         <span class="card-arrow">→</span>
       </div>
     `;
-    card.onclick = () => openApp(i);
+    card.onclick = () => { if (enabled) openApp(i); };
     grid.appendChild(card);
   });
 
@@ -1909,6 +1944,19 @@ function switchSource(mode) {
 // ════════════════════════════════════════
 // DELETE
 // ════════════════════════════════════════
+async function toggleApp(id) {
+  const app = apps.find(a => a.id === id);
+  if (!app) return;
+  app.enabled = app.enabled === false ? true : false;
+  await upsertApp(app);
+  render();
+  showToast({
+    title: app.enabled ? `✅ Đã bật "${app.name}"` : `🔧 Đã tắt "${app.name}"`,
+    sub: app.enabled ? 'Nhân viên có thể sử dụng' : 'Hiển thị trạng thái bảo trì',
+    type: app.enabled ? 'success' : 'loading'
+  });
+}
+
 function confirmDelete(id) {
   const app = apps.find(a => a.id === id);
   if (!app) return;
