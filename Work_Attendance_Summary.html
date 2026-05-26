@@ -1974,12 +1974,22 @@ async function checkAndShowLogin() {
   const loginBtn = document.getElementById('login-btn');
   if (loginBtn) loginBtn.disabled = true;
   try {
-    const { data } = await db.from('hr_admin_security').select('id').limit(1);
+    const { data, error } = await db.from('hr_admin_security').select('id').limit(1);
+    if (error) {
+      // Hiện lỗi Supabase rõ ràng thay vì nuốt im lặng
+      console.error('[Supabase Error]', error);
+      showLoginErr('Lỗi kết nối Supabase: ' + (error.message || JSON.stringify(error)) + '. Kiểm tra Supabase URL Configuration.');
+      if (loginBtn) loginBtn.disabled = false;
+      return;
+    }
     if (!data || !data.length) {
       document.getElementById('form-admin').classList.add('hidden');
       document.getElementById('form-setup').classList.remove('hidden');
     }
-  } catch(e) {}
+  } catch(e) {
+    console.error('[checkAndShowLogin Error]', e);
+    showLoginErr('Không thể kết nối Supabase: ' + e.message + '. Hãy kiểm tra Allowed Origins trong Supabase Dashboard.');
+  }
   if (loginBtn) loginBtn.disabled = false;
 }
 
