@@ -268,7 +268,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 
 /* Header */
 .login-header {
-  text-align: center; padding: 40px 32px 32px;
+  text-align: center; padding: 28px 28px 20px;
   background: linear-gradient(175deg, #f0fdfa 0%, rgba(240,253,250,.4) 60%, #fff 100%);
   position: relative;
   border-bottom: 1px solid rgba(13,148,136,.08);
@@ -279,11 +279,10 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   background: linear-gradient(90deg, transparent, var(--teal-mid), transparent);
 }
 
-.login-logo-wrap { position: relative; display: inline-block; margin-bottom: 20px; }
+.login-logo-wrap { position: relative; display: inline-block; margin-bottom: 20px; animation: floatOrb 4s ease-in-out infinite; }
 .login-logo-ring {
   position: absolute; inset: -6px; border-radius: 26px;
   border: 1.5px solid rgba(13,148,136,.2);
-  animation: floatOrb 4s ease-in-out infinite;
 }
 .login-logo-icon {
   width: 64px; height: 64px; border-radius: 20px;
@@ -321,7 +320,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 }
 
 /* Body */
-.login-body { padding: 32px 32px 28px; }
+.login-body { padding: 20px 28px 20px; }
 
 /* Back link */
 .back-link {
@@ -335,7 +334,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 /* ===== PIN KEYPAD — REDESIGNED ===== */
 @keyframes pinShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
 
-.pin-dots { display: flex; gap: 16px; justify-content: center; margin-bottom: 32px; }
+.pin-dots { display: flex; gap: 14px; justify-content: center; margin-bottom: 18px; }
 .pin-dot {
   width: 15px; height: 15px; border-radius: 50%;
   border: 2px solid #d1d5db; transition: all var(--transition-spring);
@@ -350,15 +349,15 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 .pin-dot.shake { animation: pinShake .45s ease; }
 
 .keypad {
-  display: grid; grid-template-columns: repeat(3, 72px); grid-template-rows: repeat(4, 72px);
-  gap: 12px; margin: 0 auto; width: fit-content;
+  display: grid; grid-template-columns: repeat(3, 62px); grid-template-rows: repeat(4, 62px);
+  gap: 10px; margin: 0 auto; width: fit-content;
 }
 
 .key {
-  width: 72px; height: 72px; border-radius: 50%;
+  width: 62px; height: 62px; border-radius: 50%;
   border: none;
   background: #f1f5f9;
-  font-size: 22px; font-weight: 600;
+  font-size: 20px; font-weight: 600;
   color: var(--text); transition: all var(--transition-spring);
   box-shadow: 0 2px 6px rgba(0,0,0,.08);
   font-family: var(--font-display);
@@ -1059,7 +1058,7 @@ select {
         <div id="step-email" class="space-y">
           <div>
             <label for="inp-email">Email</label>
-            <input type="email" id="inp-email" placeholder="tên@công-ty.com" autocomplete="email" />
+            <input type="email" id="inp-email" placeholder="shrvnxxx@heiway.net" autocomplete="email" />
           </div>
           <button class="btn btn-primary" id="btn-email-next" onclick="handleEmailNext()">
             Tiếp tục
@@ -1649,36 +1648,7 @@ function buildKeypad(containerId, dotPrefix, onOk) {
   currentPin = '';
   updateDots(dotPrefix);
 
-  // Desktop: ô input text thay vì keypad trên mobile
-  const isMobile = window.innerWidth < 640;
-  if (!isMobile) {
-    const inputWrap = document.createElement('div');
-    inputWrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:14px;width:100%';
-    const inp = document.createElement('input');
-    inp.type = 'password';
-    inp.maxLength = PIN_LEN;
-    inp.placeholder = '••••••';
-    inp.autocomplete = 'off';
-    inp.className = 'pin-input-desktop';
-    inp.oninput = () => {
-      currentPin = inp.value.replace(/\D/g,'').slice(0, PIN_LEN);
-      inp.value = currentPin;
-      updateDots(dotPrefix);
-    };
-    inp.onkeydown = (e) => { if (e.key === 'Enter') onOk(); };
-    const okBtn = document.createElement('button');
-    okBtn.className = 'btn btn-primary';
-    okBtn.style.cssText = 'width:200px;margin-top:4px';
-    okBtn.textContent = 'Xác nhận';
-    okBtn.onclick = onOk;
-    inputWrap.appendChild(inp);
-    inputWrap.appendChild(okBtn);
-    wrap.appendChild(inputWrap);
-    setTimeout(() => inp.focus(), 100);
-    return;
-  }
-
-  // Mobile: keypad tròn đẹp
+  // Keypad tròn cho tất cả thiết bị
   [1,2,3,4,5,6,7,8,9].forEach(n => {
     const b = document.createElement('button');
     b.className = 'key'; b.textContent = n;
