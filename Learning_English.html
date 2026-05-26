@@ -240,63 +240,97 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 #view-login {
   min-height: 100dvh; display: flex; align-items: center; justify-content: center;
   padding: 20px; position: relative; overflow: hidden;
-  background: linear-gradient(145deg, #f0fdfa 0%, #f8fafc 50%, #eef2ff 100%);
+  background: linear-gradient(145deg, #ecfdf5 0%, #f8fafc 40%, #eff6ff 100%);
 }
 
-/* Decorative background orbs */
 #view-login::before, #view-login::after {
   content: ''; position: absolute; border-radius: 50%; pointer-events: none;
 }
 #view-login::before {
-  width: 420px; height: 420px;
-  background: radial-gradient(circle, rgba(13,148,136,.12) 0%, transparent 70%);
-  top: -80px; right: -100px; animation: floatOrb 8s ease-in-out infinite;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(13,148,136,.13) 0%, transparent 65%);
+  top: -120px; right: -130px; animation: floatOrb 9s ease-in-out infinite;
 }
 #view-login::after {
-  width: 300px; height: 300px;
-  background: radial-gradient(circle, rgba(79,70,229,.1) 0%, transparent 70%);
-  bottom: -60px; left: -80px; animation: floatOrb 10s ease-in-out infinite reverse;
+  width: 380px; height: 380px;
+  background: radial-gradient(circle, rgba(99,102,241,.1) 0%, transparent 65%);
+  bottom: -80px; left: -100px; animation: floatOrb 12s ease-in-out infinite reverse;
 }
 
-.login-card { width: 100%; max-width: 420px; z-index: 1; animation: slideUp .5s ease; }
+/* Login card */
+.login-card { width: 100%; max-width: 440px; z-index: 1; animation: slideUp .55s cubic-bezier(.34,1.1,.64,1); }
 
 .login-card .card {
-  border: 1px solid rgba(13,148,136,.15);
-  box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255,255,255,.8) inset;
-  overflow: hidden;
+  border: 1.5px solid rgba(13,148,136,.13);
+  box-shadow: 0 24px 80px rgba(13,148,136,.12), 0 8px 24px rgba(0,0,0,.06), 0 0 0 1px rgba(255,255,255,.9) inset;
+  overflow: hidden; border-radius: 24px;
 }
 
+/* Header */
 .login-header {
-  text-align: center; padding: 36px 28px 28px;
-  border-bottom: 1px solid var(--border-light);
-  background: linear-gradient(180deg, var(--teal-light) 0%, #fff 100%);
+  text-align: center; padding: 40px 32px 32px;
+  background: linear-gradient(175deg, #f0fdfa 0%, rgba(240,253,250,.4) 60%, #fff 100%);
+  position: relative;
+  border-bottom: 1px solid rgba(13,148,136,.08);
+}
+.login-header::after {
+  content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 60px; height: 2px; border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--teal-mid), transparent);
+}
+
+.login-logo-wrap { position: relative; display: inline-block; margin-bottom: 20px; }
+.login-logo-ring {
+  position: absolute; inset: -6px; border-radius: 26px;
+  border: 1.5px solid rgba(13,148,136,.2);
+  animation: floatOrb 4s ease-in-out infinite;
+}
+.login-logo-icon {
+  width: 64px; height: 64px; border-radius: 20px;
+  background: linear-gradient(140deg, var(--teal) 0%, #0891b2 100%);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 12px 32px rgba(13,148,136,.38), 0 2px 6px rgba(0,0,0,.1);
   position: relative;
 }
 
-.login-logo-icon {
-  width: 56px; height: 56px; border-radius: 16px;
-  background: linear-gradient(135deg, var(--teal) 0%, var(--teal-mid) 100%);
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 16px;
-  box-shadow: 0 8px 24px rgba(13,148,136,.3);
-}
-
 .login-header h1 {
-  font-size: 28px; font-weight: 800; color: var(--text);
-  font-family: var(--font-display); letter-spacing: -.05em;
+  font-size: 30px; font-weight: 800; color: var(--text);
+  font-family: var(--font-display); letter-spacing: -.06em; margin-bottom: 6px;
 }
 .login-header h1 span { color: var(--teal); }
-.login-header p { color: var(--text-muted); font-size: 14px; margin-top: 6px; font-weight: 400; }
+.login-header p {
+  color: var(--text-muted); font-size: 14px; font-weight: 400; line-height: 1.5;
+}
 
-.login-body { padding: 32px 28px 28px; }
+/* Step labels */
+.login-step-label {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; color: var(--teal);
+  background: rgba(13,148,136,.08); padding: 4px 12px; border-radius: 20px;
+  margin-top: 14px; border: 1px solid rgba(13,148,136,.15);
+  letter-spacing: .02em;
+}
 
 .admin-shield {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: 11px; font-weight: 700; color: var(--indigo);
   background: var(--indigo-light); padding: 5px 14px; border-radius: 20px;
-  margin-top: 10px; border: 1px solid rgba(79,70,229,.2);
+  margin-top: 12px; border: 1px solid rgba(79,70,229,.2);
   letter-spacing: .04em; text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(79,70,229,.12);
 }
+
+/* Body */
+.login-body { padding: 32px 32px 28px; }
+
+/* Back link */
+.back-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--text-muted); font-size: 14px; font-weight: 500;
+  background: none; border: none; cursor: pointer; padding: 8px 14px;
+  border-radius: 10px; transition: all .2s; width: auto;
+}
+.back-link:hover { background: var(--bg-2); color: var(--text); }
 
 /* ===== PIN KEYPAD — REDESIGNED ===== */
 @keyframes pinShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
@@ -540,7 +574,7 @@ audio { width: 100%; }
    ADMIN VIEW
 ===================================================== */
 #view-admin { display: none; flex-direction: column; min-height: 100dvh; }
-.admin-main { flex: 1; max-width: 1100px; margin: 0 auto; width: 100%; padding: 28px 20px; }
+.admin-main { flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; padding: 28px 20px; }
 
 .admin-hero {
   background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4f46e5 100%);
@@ -699,18 +733,294 @@ select {
 .vocab-word {
   font-size: 17px; font-weight: 700; color: var(--text);
   font-family: var(--font-display); letter-spacing: -.02em;
-  text-align: center; line-height: 1.3;
+  text-align: center; line-height: 1.25;
+}
+.vocab-phonetic {
+  margin-top: 4px;
+  font-size: 12px; font-weight: 500; color: var(--teal-dark);
+  font-family: 'DM Sans', sans-serif; letter-spacing: .01em;
+  text-align: center; opacity: .9;
 }
 .vocab-meaning {
   font-size: 15px; font-weight: 600; color: #fff;
   text-align: center; line-height: 1.4;
 }
+.vocab-back .vocab-phonetic { color: rgba(255,255,255,.85); margin-top: 6px; }
+
+/* Done state for cards (flipped + listened) */
+.vocab-card.done .vocab-front {
+  border-color: var(--teal);
+  background: linear-gradient(180deg, #ffffff 0%, var(--teal-light) 100%);
+}
+.vocab-card.done .vocab-num { color: var(--teal); }
+.vocab-check {
+  position: absolute; bottom: 8px; right: 10px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--teal); color: #fff;
+  display: none; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800;
+  box-shadow: 0 2px 6px rgba(13,148,136,.35);
+}
+.vocab-card.done .vocab-check { display: flex; }
+
+/* Lesson progress bar */
+.vocab-progress-wrap {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 14px;
+}
+.vocab-progress-track {
+  flex: 1; height: 8px; background: var(--bg-2);
+  border-radius: 999px; overflow: hidden;
+}
+.vocab-progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--teal) 0%, var(--teal-bright) 100%);
+  width: 0%; transition: width .35s cubic-bezier(.4,0,.2,1);
+  border-radius: 999px;
+}
+.vocab-progress-label {
+  font-size: 12px; font-weight: 700; color: var(--text-muted);
+  min-width: 64px; text-align: right;
+}
+.vocab-criteria-hint {
+  font-size: 12px; color: var(--text-sub); margin-bottom: 12px;
+}
+.btn-primary:disabled {
+  opacity: .55; cursor: not-allowed; filter: grayscale(.2);
+}
+
+/* ===== MONTHLY ATTENDANCE GRID ===== */
+.att-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.att-table th, .att-table td { border: 1px solid var(--border-light); text-align: center; white-space: nowrap; }
+.att-table thead th {
+  background: var(--bg); padding: 6px 4px;
+  font-size: 10px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: .04em;
+  border-bottom: 2px solid var(--border);
+}
+.att-table thead th.th-name { text-align: left; padding: 6px 14px; min-width: 140px; position: sticky; left: 0; background: var(--bg); z-index: 2; }
+.att-table thead th.th-day { min-width: 38px; }
+.att-table thead th.th-day.weekend { background: #fff7ed; color: #c2410c; }
+.att-table thead th.th-day.today-col { background: var(--teal-light); color: var(--teal); }
+.att-table tbody td { padding: 0; height: 34px; vertical-align: middle; }
+.att-table tbody td.td-name {
+  text-align: left; padding: 0 14px; font-weight: 600; font-size: 13px;
+  border-right: 2px solid var(--border); position: sticky; left: 0; background: #fff; z-index: 1;
+}
+.att-table tbody tr:hover td.td-name { background: var(--teal-glass); }
+.att-cell {
+  display: flex; align-items: center; justify-content: center; height: 34px;
+  font-size: 11px; font-weight: 700; cursor: default;
+}
+.att-cell.done    { background: #dcfce7; color: #15803d; }
+.att-cell.partial { background: #fff7ed; color: #c2410c; }
+.att-cell.noclass { background: var(--bg); color: var(--text-sub); font-weight: 400; }
+.att-cell.future  { background: #f8fafc; color: transparent; }
+.att-cell.weekend { background: #fff7ed; color: var(--text-sub); }
+.att-table tbody tr:hover .att-cell.done    { background: #bbf7d0; }
+.att-table tbody tr:hover .att-cell.partial { background: #fed7aa; }
 
 /* Loading skeleton */
 .skeleton {
   background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
   background-size: 200% auto; animation: shimmer 1.5s ease infinite;
   border-radius: 8px;
+}
+
+/* ===== DAY SCHEDULE TIMELINE ===== */
+.day-group {
+  margin-bottom: 28px;
+}
+.day-header {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 14px;
+}
+.day-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  flex-shrink: 0;
+}
+.day-dot.today  { background: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.2); }
+.day-dot.past   { background: var(--green); }
+.day-dot.future { background: var(--border); }
+.day-dot.locked { background: #cbd5e1; }
+
+.day-label {
+  font-size: 13px; font-weight: 700; color: var(--text);
+  letter-spacing: -.01em;
+}
+.day-label .day-badge {
+  display: inline-block; margin-left: 8px;
+  padding: 2px 9px; border-radius: 20px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+}
+.day-badge.today-badge  { background: var(--teal-light); color: var(--teal); }
+.day-badge.done-badge   { background: var(--green-light); color: var(--green); }
+.day-badge.locked-badge { background: var(--bg-2); color: var(--text-sub); }
+.day-badge.future-badge { background: var(--indigo-light); color: var(--indigo); }
+
+.day-line {
+  flex: 1; height: 1px; background: var(--border-light);
+}
+
+/* Locked lesson card */
+.lesson-card.locked {
+  opacity: .6; position: relative; overflow: hidden;
+  background: var(--bg-2);
+  border: 1.5px dashed var(--border);
+  box-shadow: none;
+}
+.lesson-card.locked::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 8px,
+    rgba(0,0,0,.02) 8px,
+    rgba(0,0,0,.02) 16px
+  );
+  pointer-events: none;
+}
+.lesson-card.locked .lesson-title { color: var(--text-muted); }
+
+.lock-reason {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 500; color: var(--text-sub);
+  background: var(--bg-2); border-radius: 8px;
+  padding: 8px 12px; margin-top: 4px;
+  border: 1px solid var(--border-light);
+}
+
+.btn-locked {
+  background: linear-gradient(135deg, #94a3b8, #cbd5e1) !important;
+  box-shadow: none !important; cursor: not-allowed !important;
+  pointer-events: none;
+}
+
+/* completed lesson card */
+.lesson-card.completed {
+  border: 1.5px solid rgba(22,163,74,.25);
+  background: linear-gradient(135deg, #f0fdf4 0%, #fff 100%);
+}
+.lesson-completed-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 700; color: var(--green);
+  background: var(--green-light); padding: 4px 10px; border-radius: 20px;
+  margin-top: 6px;
+}
+
+/* ===== VOCAB MINI-TEST ===== */
+.mini-test-wrap {
+  animation: fadeIn .35s ease;
+}
+.mini-test-header {
+  text-align: center; padding: 16px 0 20px;
+}
+.mini-test-phase-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: linear-gradient(135deg, var(--indigo) 0%, #6d5ff6 100%);
+  color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; padding: 5px 14px; border-radius: 20px;
+  margin-bottom: 12px; box-shadow: 0 4px 12px rgba(79,70,229,.3);
+}
+.mini-test-progress-wrap {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 8px;
+}
+.mini-test-progress-track {
+  flex: 1; background: var(--bg-2); border-radius: 99px; height: 7px; overflow: hidden;
+}
+.mini-test-progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--indigo) 0%, #818cf8 100%);
+  border-radius: 99px; transition: width .4s cubic-bezier(.4,0,.2,1);
+}
+.mini-test-progress-label {
+  font-size: 12px; font-weight: 700; color: var(--text-muted); min-width: 48px; text-align: right;
+}
+.mini-test-queue-note {
+  font-size: 12px; color: var(--text-sub); margin-top: 4px;
+}
+.mini-test-card {
+  background: var(--card); border-radius: var(--radius);
+  border: 1.5px solid var(--border-light); box-shadow: var(--shadow);
+  padding: 28px 24px 24px; text-align: center; margin-bottom: 20px;
+  animation: fadeInScale .3s ease;
+}
+.mini-test-word {
+  font-size: 26px; font-weight: 800; color: var(--text);
+  font-family: var(--font-display); letter-spacing: -.04em; margin-bottom: 6px;
+}
+.mini-test-phonetic {
+  font-size: 14px; color: var(--text-muted); margin-bottom: 4px;
+}
+.mini-test-instruction {
+  font-size: 12px; color: var(--text-sub); margin-top: 8px;
+}
+.mini-test-options {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+.mini-test-option {
+  padding: 14px 12px; border-radius: 12px; font-size: 14px; font-weight: 600;
+  border: 2px solid var(--border); background: #fff; color: var(--text);
+  cursor: pointer; transition: all var(--transition); text-align: left;
+  min-height: 52px; display: flex; align-items: center;
+  line-height: 1.4;
+}
+.mini-test-option:hover {
+  border-color: var(--indigo); background: var(--indigo-light); color: var(--indigo);
+  transform: translateY(-1px); box-shadow: var(--shadow-sm);
+}
+.mini-test-option.correct {
+  border-color: var(--green); background: var(--green-light); color: var(--green);
+  pointer-events: none;
+}
+.mini-test-option.wrong {
+  border-color: var(--red); background: var(--red-light); color: var(--red);
+  pointer-events: none;
+}
+.mini-test-option.reveal-correct {
+  border-color: var(--green); background: var(--green-light); color: var(--green);
+  pointer-events: none;
+}
+.mini-test-feedback {
+  padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 600;
+  margin-top: 12px; text-align: center; animation: fadeIn .25s ease;
+}
+.mini-test-feedback.correct { background: var(--green-light); color: var(--green); }
+.mini-test-feedback.wrong   { background: var(--red-light); color: var(--red); }
+
+/* ===== TYPING MINI-TEST ===== */
+.mt-type-card {
+  background: linear-gradient(145deg, var(--teal) 0%, #0891b2 100%) !important;
+  border-color: transparent !important; box-shadow: var(--shadow-teal) !important;
+  color: #fff;
+}
+.mt-type-instruction {
+  font-size: 12px; font-weight: 600; color: rgba(255,255,255,.75);
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px;
+}
+.mt-type-meaning {
+  font-size: 30px; font-weight: 800; color: #fff;
+  font-family: var(--font-display); letter-spacing: -.04em; margin-bottom: 6px;
+}
+.mt-type-card .mini-test-phonetic { color: rgba(255,255,255,.7); }
+.mt-type-hint {
+  font-size: 12px; color: rgba(255,255,255,.65); margin-top: 10px;
+  background: rgba(255,255,255,.12); display: inline-block;
+  padding: 4px 12px; border-radius: 20px;
+}
+.mt-type-input-wrap {
+  display: flex; gap: 10px; align-items: stretch; margin-bottom: 4px;
+}
+.mt-type-input {
+  flex: 1; padding: 14px 18px; border-radius: 12px;
+  border: 2px solid var(--border); font-size: 16px; font-weight: 600;
+  font-family: var(--font-display); color: var(--text); background: #fff;
+  outline: none; transition: all .2s; box-shadow: var(--shadow-sm);
+  letter-spacing: .01em;
+}
+.mt-type-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.15); }
+.mt-type-submit {
+  width: auto; padding: 14px 22px; border-radius: 12px; flex-shrink: 0;
+  font-size: 14px; white-space: nowrap;
 }
 </style>
 </head>
@@ -726,14 +1036,21 @@ select {
   <div class="login-card">
     <div class="card">
       <div class="login-header">
-        <div class="login-logo-icon">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        <div class="login-logo-wrap">
+          <div class="login-logo-ring"></div>
+          <div class="login-logo-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          </div>
         </div>
         <h1>Eng<span>Learn</span></h1>
-        <p id="login-subtitle">Đăng nhập bằng email công ty</p>
+        <p id="login-subtitle">Nền tảng học tiếng Anh cho nhân viên</p>
         <div id="admin-shield" class="admin-shield hidden">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           Tài khoản quản trị
+        </div>
+        <div id="login-step-badge" class="login-step-label hidden">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span id="login-step-text"></span>
         </div>
       </div>
       <div class="login-body">
@@ -904,9 +1221,12 @@ select {
           </div>
           <h2 id="modal-title" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></h2>
         </div>
-        <div class="text-center" style="flex-shrink:0">
-          <div class="timer-chip" id="modal-timer">0:00</div>
-          <div class="text-xs mt-2" style="color:var(--text-muted);font-weight:500">⏱ Đang học</div>
+        <div class="text-center" style="flex-shrink:0;display:flex;align-items:center;gap:12px">
+          <div>
+            <div class="timer-chip" id="modal-timer">0:00</div>
+            <div class="text-xs mt-2" style="color:var(--text-muted);font-weight:500">⏱ Đang học</div>
+          </div>
+          <button id="btn-close-lesson" onclick="tryCloseLessonModal()" title="Đóng bài học" style="width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg);color:var(--text-muted);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;line-height:1;transition:all .15s" onmouseover="this.style.background='var(--bg-2)'" onmouseout="this.style.background='var(--bg)'">×</button>
         </div>
       </div>
     </div>
@@ -916,10 +1236,13 @@ select {
       </div>
       <div class="lesson-content" id="modal-content"></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary" id="btn-end-lesson" onclick="endLesson()">
+    <div class="modal-footer" style="flex-direction:column;align-items:stretch;gap:8px">
+      <div id="lesson-completion-hint" class="vocab-criteria-hint hidden" style="text-align:center;margin:0">
+        🎯 Lật và nghe phát âm tất cả các từ để hoàn thành bài học (giống Duolingo)
+      </div>
+      <button class="btn btn-primary" id="btn-end-lesson" onclick="endLesson()" disabled>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        Kết thúc bài học
+        <span id="btn-end-lesson-label">Hoàn thành bài học</span>
       </button>
     </div>
   </div>
@@ -977,12 +1300,25 @@ select {
         <div class="stat-value" id="stat-total">—</div>
       </div>
       <div class="stat-card green">
-        <div class="stat-label">Đạt mục tiêu 15p</div>
+        <div class="stat-label">Điểm danh hôm nay</div>
         <div class="stat-value green" id="stat-done">—</div>
       </div>
       <div class="stat-card red">
-        <div class="stat-label">Chưa đạt</div>
+        <div class="stat-label">Chưa điểm danh</div>
         <div class="stat-value red" id="stat-pending">—</div>
+      </div>
+    </div>
+
+    <!-- Monthly Attendance Grid -->
+    <div class="table-section-header" style="margin-top:28px;display:flex;align-items:center;justify-content:space-between">
+      <h2>📅 Bảng điểm danh tháng</h2>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input type="month" id="attendance-month-filter" style="padding:6px 12px;border-radius:8px;border:1.5px solid var(--border);font-size:13px;background:#fff;color:#1e293b;outline:none;cursor:pointer" onchange="loadMonthlyAttendance(this.value)">
+      </div>
+    </div>
+    <div id="monthly-attendance-wrap" style="background:#fff;border-radius:var(--radius);border:1px solid var(--border-light);box-shadow:var(--shadow-sm);overflow:hidden;overflow-x:auto;margin-bottom:28px">
+      <div id="monthly-attendance-grid">
+        <div style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px">Đang tải...</div>
       </div>
     </div>
 
@@ -1061,14 +1397,14 @@ select {
           <div id="lm-vocab-section">
             <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Danh sách từ vựng</label>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-              <span style="font-size:12px;color:var(--text-sub)">Mỗi dòng: <code style="background:var(--bg-2);padding:2px 6px;border-radius:4px;font-size:11px">từ | nghĩa</code></span>
+              <span style="font-size:12px;color:var(--text-sub)">Mỗi dòng: <code style="background:var(--bg-2);padding:2px 6px;border-radius:4px;font-size:11px">từ | phiên âm | nghĩa</code></span>
               <button type="button" onclick="document.getElementById('lm-excel-input').click()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:8px;border:1.5px solid #16a34a;background:#f0fdf4;color:#16a34a;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);transition:all .2s" onmouseover="this.style.background='#dcfce7'" onmouseout="this.style.background='#f0fdf4'">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                 Import Excel
               </button>
               <input type="file" id="lm-excel-input" accept=".xlsx,.xls" class="hidden" onchange="importVocabFromExcel(this)">
             </div>
-            <textarea id="lm-vocab-input" rows="10" placeholder="apple | quả táo&#10;banana | quả chuối&#10;book | cuốn sách&#10;..." style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:14px;background:var(--bg-2);font-family:var(--font-body);resize:vertical;line-height:1.7"></textarea>
+            <textarea id="lm-vocab-input" rows="10" placeholder="father (n) | /ˈfɑːðər/ | cha, bố&#10;mother (n) | /ˈmʌðər/ | mẹ&#10;(có thể bỏ phiên âm: word | nghĩa)&#10;..." style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:14px;background:var(--bg-2);font-family:var(--font-body);resize:vertical;line-height:1.7"></textarea>
             <div id="lm-vocab-preview" style="margin-top:8px;font-size:12px;color:var(--text-muted)"></div>
           </div>
 
@@ -1174,6 +1510,25 @@ select {
 const SB_URL=window.__cfg(0),SB_KEY=window.__cfg(1);
 const sb = supabase.createClient(SB_URL, SB_KEY);
 
+/*
+  ╔══════════════════════════════════════════════════════╗
+  ║  MIGRATION: Chạy SQL này trong Supabase SQL Editor  ║
+  ╠══════════════════════════════════════════════════════╣
+  ║  CREATE TABLE IF NOT EXISTS lesson_completions (     ║
+  ║    id SERIAL PRIMARY KEY,                            ║
+  ║    user_id UUID NOT NULL,                            ║
+  ║    lesson_id INTEGER NOT NULL,                       ║
+  ║    date DATE NOT NULL,                               ║
+  ║    completed_at TIMESTAMPTZ DEFAULT NOW(),           ║
+  ║    UNIQUE(user_id, lesson_id, date)                  ║
+  ║  );                                                  ║
+  ║  ALTER TABLE lesson_completions                      ║
+  ║    ENABLE ROW LEVEL SECURITY;                        ║
+  ║  CREATE POLICY "all_access" ON lesson_completions    ║
+  ║    FOR ALL USING (true) WITH CHECK (true);           ║
+  ╚══════════════════════════════════════════════════════╝
+*/
+
 /* ── Supabase B: bảng nhan_su (HR system) ── */
 const SB_HR_URL=window.__cfg(2),SB_HR_KEY=window.__cfg(3);
 // sbHR được tạo lazy trong syncNhanSu() để tránh crash khi chưa điền credentials
@@ -1183,6 +1538,7 @@ let currentUserRec = null;
 let currentPin = '';
 let newPinTemp  = '';
 let allLessons  = [];
+let allScheduleDays = null;
 let currentTab  = 'ALL';
 let activeSession = null;
 let timerInterval = null;
@@ -1416,18 +1772,34 @@ function showLoginStep(step) {
       el.classList.add('hidden');
     } else {
       el.classList.remove('hidden');
-      // PIN steps use flex layout
       if (s.startsWith('pin')) el.style.display = 'flex';
     }
   });
+  // Update step badge in header
+  const badge = document.getElementById('login-step-badge');
+  const badgeText = document.getElementById('login-step-text');
+  const stepLabels = {
+    'email': '',
+    'password': 'Bước 2: Mật khẩu',
+    'pin-entry': 'Bước 2: Nhập PIN',
+    'pin-create': 'Bước 2: Tạo PIN mới',
+    'pin-confirm': 'Bước 3: Xác nhận PIN',
+  };
+  if (step === 'email') {
+    badge.classList.add('hidden');
+  } else {
+    badge.classList.remove('hidden');
+    badgeText.textContent = stepLabels[step] || '';
+  }
 }
 
 function resetLoginForm() {
   document.getElementById('inp-email').value = '';
   document.getElementById('inp-password').value = '';
-  document.getElementById('login-subtitle').textContent = 'Đăng nhập bằng email công ty';
+  document.getElementById('login-subtitle').textContent = 'Nền tảng học tiếng Anh cho nhân viên';
   document.getElementById('admin-shield').classList.add('hidden');
   document.getElementById('login-back').classList.add('hidden');
+  document.getElementById('login-step-badge').classList.add('hidden');
   currentPin = ''; newPinTemp = ''; currentUserRec = null;
   showLoginStep('email');
 }
@@ -1445,19 +1817,113 @@ async function loadEmployeeData() {
 }
 
 async function loadLessons() {
-  // Ưu tiên bài được phân công hôm nay, nếu không có thì load tất cả
   const today = todayStr();
-  const { data: assigned } = await sb.from('lesson_schedules')
-    .select('lesson_id, lessons(*)')
-    .eq('date', today)
-    .or(`user_id.eq.${currentUser.id},user_id.is.null`);
 
-  if (assigned && assigned.length) {
-    allLessons = assigned.map(a => a.lessons).filter(Boolean);
-  } else {
+  // Fetch schedules (lesson_id + date only, no JOIN to avoid RLS issues),
+  // sessions, and completions all in parallel
+  const [{ data: rawSchedules }, { data: allSessions }, { data: allCompletions }] = await Promise.all([
+    sb.from('lesson_schedules')
+      .select('lesson_id, date')
+      .or(`user_id.eq.${currentUser.id},user_id.is.null`)
+      .order('date', { ascending: true }),
+    sb.from('learning_sessions')
+      .select('lesson_id, date, duration_seconds, ended_at')
+      .eq('user_id', currentUser.id),
+    sb.from('lesson_completions')
+      .select('lesson_id, date')
+      .eq('user_id', currentUser.id)
+  ]);
+
+  const sessions = allSessions || [];
+  // completionMap: "lesson_id:date" → true
+  const completionSet = new Set((allCompletions || []).map(c => `${c.lesson_id}:${c.date}`));
+
+  // Collect all unique lesson IDs from schedules so we can fetch lesson details
+  const uniqueLessonIds = [...new Set((rawSchedules || []).map(s => s.lesson_id))];
+
+  // Fetch lesson details separately (avoids JOIN/RLS issues)
+  let lessonDetailMap = {};
+  if (uniqueLessonIds.length) {
+    const { data: lessonDetails } = await sb.from('lessons')
+      .select('*')
+      .in('id', uniqueLessonIds);
+    for (const l of (lessonDetails || [])) lessonDetailMap[l.id] = l;
+  }
+
+  // Nhóm schedules theo ngày, enriching with lesson details
+  const dayMap = {};
+  for (const s of (rawSchedules || [])) {
+    const lessonDetail = lessonDetailMap[s.lesson_id];
+    if (!lessonDetail) continue; // lesson not found or no access
+    if (!dayMap[s.date]) dayMap[s.date] = [];
+    // Avoid duplicates if same lesson is assigned globally + individually
+    if (!dayMap[s.date].some(l => l.id === lessonDetail.id)) {
+      dayMap[s.date].push(lessonDetail);
+    }
+  }
+
+  const sortedDates = Object.keys(dayMap).sort();
+
+  // Tính xem ngày nào đã hoàn thành: ≥15 phút HỌC VÀ hoàn thành TẤT CẢ bài được giao
+  const completedDates = new Set();
+  for (const date of sortedDates) {
+    const daySessions = sessions.filter(s => s.date === date);
+    const totalSec = daySessions.reduce((a, s) => a + (s.duration_seconds || 0), 0);
+    const dayLessons = dayMap[date] || [];
+    const dayCompletedIds = new Set(
+      [...completionSet]
+        .filter(key => key.endsWith(':' + date))
+        .map(key => parseInt(key.split(':')[0]))
+    );
+    const allLessonsDone = dayLessons.length > 0 && dayLessons.every(l => dayCompletedIds.has(l.id));
+    if (totalSec >= 15 * 60 && allLessonsDone) completedDates.add(date);
+  }
+
+  // Tính lesson IDs đã hoàn thành (dùng bảng lesson_completions để lưu bền vững)
+  // Không bị reset khi bấm "Học lại"
+  const todaySessions = sessions.filter(s => s.date === today);
+  const completedLessonIds = new Set(
+    [...completionSet]
+      .filter(key => key.endsWith(':' + today))
+      .map(key => parseInt(key.split(':')[0]))
+  );
+
+  allScheduleDays = sortedDates.map((date, idx) => {
+    const prevDate = idx > 0 ? sortedDates[idx - 1] : null;
+    const prevDone = prevDate ? completedDates.has(prevDate) : true; // nếu không có ngày trước thì coi như đã xong
+    const isToday  = date === today;
+    const isPast   = date < today;
+
+    // Unlock: (là ngày hôm nay HOẶC đã qua) VÀ ngày trước đã hoàn thành
+    const unlocked = (isToday || isPast) && prevDone;
+
+    return {
+      date,
+      lessons: dayMap[date],
+      isToday,
+      isPast,
+      isFuture: date > today,
+      isDone: completedDates.has(date),
+      unlocked,
+      prevDate,
+      prevDone,
+      completedLessonIds: isToday ? completedLessonIds : new Set(
+        [...completionSet]
+          .filter(key => key.endsWith(':' + date))
+          .map(key => parseInt(key.split(':')[0]))
+      ),
+    };
+  });
+
+  // Nếu không có schedule nào, fallback load tất cả bài học (không nhóm theo ngày)
+  if (!allScheduleDays.length) {
     const { data } = await sb.from('lessons').select('*').order('created_at', { ascending: false });
     allLessons = data || [];
+    allScheduleDays = null; // flag để renderLessons biết dùng mode cũ
+  } else {
+    allLessons = allScheduleDays.flatMap(d => d.lessons);
   }
+
   renderLessons();
 }
 
@@ -1499,39 +1965,156 @@ function switchTab(btn) {
   renderLessons();
 }
 
+function formatDateVi(dateStr) {
+  const [y, m, d] = dateStr.split('-');
+  const date = new Date(+y, +m - 1, +d);
+  const days = ['Chủ nhật','Thứ 2','Thứ 3','Thứ 4','Thứ 5','Thứ 6','Thứ 7'];
+  return `${days[date.getDay()]}, ${d}/${m}/${y}`;
+}
+
 function renderLessons() {
   const grid = document.getElementById('lesson-grid');
-  const filtered = currentTab === 'ALL' ? allLessons : allLessons.filter(l => l.type === currentTab);
+  const typeEmoji = { READING:'📖', LISTENING:'🎧', VOCAB:'📝', GRAMMAR:'⚙️' };
 
+  // Fallback mode: không có schedule, hiển thị tất cả bài học như cũ
+  if (!allScheduleDays) {
+    const filtered = currentTab === 'ALL' ? allLessons : allLessons.filter(l => l.type === currentTab);
+    const countBadge = document.getElementById('lesson-count-badge');
+    if (countBadge) countBadge.textContent = filtered.length + ' bài';
+    if (!filtered.length) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:56px 20px;color:var(--text-muted)"><div style="font-size:40px;margin-bottom:12px">📭</div><div style="font-weight:600;font-size:15px">Chưa có bài học nào</div></div>';
+      return;
+    }
+    grid.innerHTML = filtered.map(l => `
+      <div class="lesson-card">
+        <div class="lesson-meta">
+          <span class="badge badge-${l.type.toLowerCase()}">${typeEmoji[l.type]||''} ${l.type}</span>
+          <span class="lesson-duration"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${l.duration_estimate} phút</span>
+        </div>
+        <div class="lesson-title">${esc(l.title)}</div>
+        <button class="btn btn-primary" onclick="startLesson(${l.id})">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+          Bắt đầu học
+        </button>
+      </div>
+    `).join('');
+    return;
+  }
+
+  // Timeline mode: nhóm theo ngày
+  const today = todayStr();
+
+  // Lọc theo tab nếu cần
+  let days = allScheduleDays;
+  if (currentTab !== 'ALL') {
+    days = days.map(d => ({ ...d, lessons: d.lessons.filter(l => l.type === currentTab) }))
+               .filter(d => d.lessons.length > 0);
+  }
+
+  const totalLessons = days.reduce((a, d) => a + d.lessons.length, 0);
   const countBadge = document.getElementById('lesson-count-badge');
-  if (countBadge) countBadge.textContent = filtered.length + ' bài';
+  if (countBadge) countBadge.textContent = totalLessons + ' bài';
 
-  if (!filtered.length) {
+  if (!days.length) {
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:56px 20px;color:var(--text-muted)"><div style="font-size:40px;margin-bottom:12px">📭</div><div style="font-weight:600;font-size:15px">Chưa có bài học nào</div><div style="font-size:13px;margin-top:4px">Thể loại này chưa có nội dung</div></div>';
     return;
   }
 
-  const typeEmoji = { READING:'📖', LISTENING:'🎧', VOCAB:'📝', GRAMMAR:'⚙️' };
-  grid.innerHTML = filtered.map(l => `
-    <div class="lesson-card">
-      <div class="lesson-meta">
-        <span class="badge badge-${l.type.toLowerCase()}">${typeEmoji[l.type] || ''} ${l.type}</span>
-        <span class="lesson-duration">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          ${l.duration_estimate} phút
-        </span>
-      </div>
-      <div class="lesson-title">${esc(l.title)}</div>
-      <button class="btn btn-primary" onclick="startLesson(${l.id})">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-        Bắt đầu học
-      </button>
-    </div>
-  `).join('');
+  grid.innerHTML = days.map(day => {
+    // Day header badge
+    let dotClass = 'locked', badgeHtml = '';
+    if (day.isToday && day.isDone) {
+      dotClass = 'past';
+      badgeHtml = `<span class="day-badge done-badge">✅ Hôm nay · Đã hoàn thành</span>`;
+    } else if (day.isToday) {
+      dotClass = 'today';
+      badgeHtml = `<span class="day-badge today-badge">📅 Hôm nay</span>`;
+    } else if (day.isPast && day.isDone) {
+      dotClass = 'past';
+      badgeHtml = `<span class="day-badge done-badge">✅ Đã hoàn thành</span>`;
+    } else if (day.isPast && !day.isDone) {
+      dotClass = 'locked';
+      badgeHtml = `<span class="day-badge locked-badge">⚠️ Chưa hoàn thành</span>`;
+    } else {
+      dotClass = 'future';
+      badgeHtml = `<span class="day-badge future-badge">🔒 Chưa tới</span>`;
+    }
+
+    const lessonCards = day.lessons.map(l => {
+      const isCompleted = day.completedLessonIds && day.completedLessonIds.has(l.id);
+      const isLocked    = !day.unlocked;
+
+      if (isLocked) {
+        // Xác định lý do khóa
+        let lockMsg = '';
+        if (day.isFuture) {
+          lockMsg = `Bài học sẽ mở vào ${formatDateVi(day.date)}`;
+        } else if (!day.prevDone && day.prevDate) {
+          lockMsg = `Cần hoàn thành bài học ngày ${formatDateVi(day.prevDate)} trước`;
+        } else {
+          lockMsg = 'Bài học chưa được mở khóa';
+        }
+        return `
+          <div class="lesson-card locked">
+            <div class="lesson-meta">
+              <span class="badge badge-${l.type.toLowerCase()}">${typeEmoji[l.type]||''} ${l.type}</span>
+              <span class="lesson-duration"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${l.duration_estimate} phút</span>
+            </div>
+            <div class="lesson-title">${esc(l.title)}</div>
+            <div class="lock-reason">🔒 ${esc(lockMsg)}</div>
+            <button class="btn btn-primary btn-locked" disabled style="margin-top:10px">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Chưa mở khóa
+            </button>
+          </div>`;
+      }
+
+      if (isCompleted) {
+        return `
+          <div class="lesson-card completed">
+            <div class="lesson-meta">
+              <span class="badge badge-${l.type.toLowerCase()}">${typeEmoji[l.type]||''} ${l.type}</span>
+              <span class="lesson-duration"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${l.duration_estimate} phút</span>
+            </div>
+            <div class="lesson-title">${esc(l.title)}</div>
+            <div class="lesson-completed-tag">✅ Đã hoàn thành</div>
+            <button class="btn btn-primary" onclick="startLesson(${l.id}, true)" style="margin-top:10px;background:linear-gradient(135deg,var(--green),#22c55e)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+              Học lại
+            </button>
+          </div>`;
+      }
+
+      return `
+        <div class="lesson-card">
+          <div class="lesson-meta">
+            <span class="badge badge-${l.type.toLowerCase()}">${typeEmoji[l.type]||''} ${l.type}</span>
+            <span class="lesson-duration"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${l.duration_estimate} phút</span>
+          </div>
+          <div class="lesson-title">${esc(l.title)}</div>
+          <button class="btn btn-primary" onclick="startLesson(${l.id})">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+            Bắt đầu học
+          </button>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="day-group" style="grid-column:1/-1">
+        <div class="day-header">
+          <div class="day-dot ${dotClass}"></div>
+          <div class="day-label">${formatDateVi(day.date)}${badgeHtml}</div>
+          <div class="day-line"></div>
+        </div>
+        <div class="lesson-grid" style="margin-bottom:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
+          ${lessonCards}
+        </div>
+      </div>`;
+  }).join('');
 }
 
 /* EMPLOYEE: LESSON SESSION */
-async function startLesson(lessonId) {
+async function startLesson(lessonId, alreadyCompleted) {
   const lesson = allLessons.find(l => l.id === lessonId);
   if (!lesson) return;
 
@@ -1543,11 +2126,25 @@ async function startLesson(lessonId) {
 
   activeSession = { id: data.id, lesson };
   elapsedSecs   = 0;
-  openLessonModal(lesson);
+  openLessonModal(lesson, !!alreadyCompleted);
   startTimer();
 }
 
-function openLessonModal(lesson) {
+function openLessonModal(lesson, alreadyCompleted) {
+  currentLessonCompleted = !!alreadyCompleted;
+  // Update close button appearance based on completion status
+  const closeBtn = document.getElementById('btn-close-lesson');
+  if (closeBtn) {
+    if (currentLessonCompleted) {
+      closeBtn.title = 'Đóng bài học';
+      closeBtn.style.opacity = '1';
+      closeBtn.style.color = 'var(--text-muted)';
+    } else {
+      closeBtn.title = 'Phải hoàn thành bài học trước khi đóng';
+      closeBtn.style.opacity = '0.4';
+      closeBtn.style.color = '#ef4444';
+    }
+  }
   document.getElementById('modal-badge').className   = 'badge badge-' + lesson.type.toLowerCase();
   document.getElementById('modal-badge').textContent = lesson.type;
   document.getElementById('modal-title').textContent = lesson.title;
@@ -1555,35 +2152,62 @@ function openLessonModal(lesson) {
 
   // Render content
   const contentEl = document.getElementById('modal-content');
+  const hintEl    = document.getElementById('lesson-completion-hint');
+  const endBtn    = document.getElementById('btn-end-lesson');
+  const endLabel  = document.getElementById('btn-end-lesson-label');
+  // Reset completion tracker
+  window.vocabProgress = null;
+  window.miniTest = null;
   if (lesson.type === 'VOCAB') {
     try {
       const words = JSON.parse(lesson.content || '[]');
+      window.vocabProgress = {
+        total: words.length,
+        words,  // lưu lại để dùng cho mini-test
+        flipped: new Array(words.length).fill(false),
+        listened: new Array(words.length).fill(false),
+      };
       contentEl.innerHTML = `
-        <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
-          <span style="font-size:13px;color:var(--text-muted);font-weight:500">📝 ${words.length} từ vựng cần học</span>
-          <span style="font-size:12px;color:var(--text-sub)">Nhấn thẻ để xem nghĩa · 🔊 nghe phát âm</span>
+        <div class="vocab-progress-wrap">
+          <div class="vocab-progress-track"><div class="vocab-progress-fill" id="vocab-progress-fill"></div></div>
+          <div class="vocab-progress-label" id="vocab-progress-label">0 / ${words.length}</div>
+        </div>
+        <div class="vocab-criteria-hint">
+          ✅ Lật thẻ để xem nghĩa &nbsp;·&nbsp; Nhấn 🔊 để nghe phát âm &nbsp;·&nbsp; Hoàn thành cả 2 cho mỗi từ
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">
           ${words.map((w,i) => `
-            <div class="vocab-card" onclick="flipVocabCard(event,this,'${esc(w.word)}')" title="Nhấn để xem nghĩa & nghe phát âm" style="animation-delay:${i*0.04}s">
+            <div class="vocab-card" data-idx="${i}" onclick="flipVocabCard(event,this,'${esc(w.word)}',${i})" title="Nhấn để xem nghĩa" style="animation-delay:${i*0.04}s">
               <div class="vocab-card-inner">
                 <div class="vocab-front">
                   <span class="vocab-num">${i+1}</span>
                   <div class="vocab-word">${esc(w.word)}</div>
-                  <button class="vocab-speak-btn" onclick="event.stopPropagation();speakWord('${esc(w.word)}',this)" title="Nghe phát âm">🔊</button>
+                  ${w.phonetic ? `<div class="vocab-phonetic">${esc(w.phonetic)}</div>` : ''}
+                  <button class="vocab-speak-btn" onclick="event.stopPropagation();speakWord('${esc(w.word)}',this,${i})" title="Nghe phát âm">🔊</button>
+                  <div class="vocab-check" title="Đã hoàn thành">✓</div>
                 </div>
                 <div class="vocab-back">
                   <div class="vocab-meaning">${esc(w.meaning)}</div>
+                  ${w.phonetic ? `<div class="vocab-phonetic">${esc(w.phonetic)}</div>` : ''}
                 </div>
               </div>
             </div>
           `).join('')}
         </div>`;
+      hintEl.classList.remove('hidden');
+      endBtn.disabled = true;
+      endLabel.textContent = `Hoàn thành bài học (0/${words.length})`;
     } catch {
       contentEl.innerHTML = lesson.content || '';
+      hintEl.classList.add('hidden');
+      endBtn.disabled = false;
+      endLabel.textContent = 'Kết thúc bài học';
     }
   } else {
     contentEl.innerHTML = lesson.content || '';
+    hintEl.classList.add('hidden');
+    endBtn.disabled = false;
+    endLabel.textContent = 'Kết thúc bài học';
   }
 
   const audioWrap = document.getElementById('modal-audio');
@@ -1598,32 +2222,334 @@ function openLessonModal(lesson) {
   document.body.style.overflow = 'hidden';
 }
 
+let currentLessonCompleted = false; // set to true when this lesson was already in lesson_completions
+
 function closeLessonModal() {
   document.getElementById('lesson-overlay').classList.add('hidden');
   document.body.style.overflow = '';
 }
 
+function tryCloseLessonModal() {
+  if (currentLessonCompleted) {
+    // Bài đã hoàn thành trước rồi (Học lại) → tắt ngay, không cần kiểm tra vocab
+    stopTimer();
+    if (activeSession) {
+      sb.from('learning_sessions').update({
+        ended_at: new Date().toISOString(), duration_seconds: elapsedSecs
+      }).eq('id', activeSession.id).then(() => {});
+      activeSession = null;
+    }
+    window.vocabProgress = null;
+    window.miniTest = null;
+    closeLessonModal();
+  } else {
+    toast('Hãy hoàn thành bài học trước khi đóng!', 'error');
+  }
+}
+
 function handleOverlayClick(e) {
-  if (e.target === document.getElementById('lesson-overlay')) endLesson();
+  if (e.target === document.getElementById('lesson-overlay')) {
+    if (currentLessonCompleted) {
+      stopTimer();
+      if (activeSession) {
+        sb.from('learning_sessions').update({
+          ended_at: new Date().toISOString(), duration_seconds: elapsedSecs
+        }).eq('id', activeSession.id).then(() => {});
+        activeSession = null;
+      }
+      window.vocabProgress = null;
+      window.miniTest = null;
+      closeLessonModal();
+    } else {
+      toast('Hãy hoàn thành bài học trước khi đóng!', 'error');
+    }
+  }
 }
 
 async function endLesson() {
   if (!activeSession) return;
+
+  // Duolingo-style completion check: must flip + listen to every vocab card
+  const vp = window.vocabProgress;
+  if (vp && vp.total > 0) {
+    const done = vp.flipped.reduce((a,f,i) => a + (f && vp.listened[i] ? 1 : 0), 0);
+    if (done < vp.total) {
+      const missing = vp.total - done;
+      toast(`Còn ${missing} từ chưa hoàn thành. Hãy lật thẻ và nghe phát âm để hoàn thành bài học!`, 'error');
+      // Briefly highlight the first incomplete card
+      const idx = vp.flipped.findIndex((f,i) => !(f && vp.listened[i]));
+      if (idx >= 0) {
+        const card = document.querySelector(`.vocab-card[data-idx="${idx}"]`);
+        if (card) card.scrollIntoView({behavior:'smooth', block:'center'});
+      }
+      return;
+    }
+    // Nếu mini-test vẫn đang chạy → chưa được kết thúc
+    if (window.miniTest && window.miniTest.queue.length > 0) {
+      toast(`Hãy hoàn thành mini-test trước! Còn ${window.miniTest.queue.length} câu trong hàng đợi.`, 'error');
+      return;
+    }
+  }
+
   stopTimer();
   const btn = document.getElementById('btn-end-lesson');
   btn.disabled = true;
   btn.innerHTML = '<div class="spinner"></div>';
 
+  const lessonId = activeSession.lesson.id;
+  const dateStr  = todayStr();
+
+  // 1. Cập nhật learning_sessions
   await sb.from('learning_sessions').update({
     ended_at: new Date().toISOString(), duration_seconds: elapsedSecs
   }).eq('id', activeSession.id);
 
+  // 2. Ghi nhận hoàn thành bài học — dùng insert thay vì upsert để tránh lỗi constraint
+  const { error: compErr } = await sb.from('lesson_completions').insert({
+    user_id: currentUser.id, lesson_id: lessonId, date: dateStr,
+    completed_at: new Date().toISOString()
+  });
+  // Bỏ qua lỗi duplicate (đã hoàn thành rồi bấm Học lại thêm lần nữa)
+  if (compErr && compErr.code !== '23505') {
+    console.error('[lesson_completions] insert error:', compErr.code, compErr.message);
+  }
+
   closeLessonModal();
   btn.disabled = false;
-  btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Kết thúc bài học`;
+  btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> <span id="btn-end-lesson-label">Hoàn thành bài học</span>`;
   activeSession = null;
+  window.vocabProgress = null;
+  window.miniTest = null;
   toast('🎉 Tuyệt vời! Bạn đã hoàn thành bài học.', 'success');
   await loadTodaySessions();
+  await loadLessons(); // refresh trạng thái mở khóa
+}
+
+// Update vocab progress UI + khi xong hết thẻ thì chuyển sang mini-test
+function updateVocabProgressUI() {
+  const vp = window.vocabProgress;
+  if (!vp) return;
+  const done = vp.flipped.reduce((a,f,i) => a + (f && vp.listened[i] ? 1 : 0), 0);
+  const fill  = document.getElementById('vocab-progress-fill');
+  const label = document.getElementById('vocab-progress-label');
+  const btn   = document.getElementById('btn-end-lesson');
+  const lab2  = document.getElementById('btn-end-lesson-label');
+  if (fill)  fill.style.width = (vp.total ? (done/vp.total*100) : 0) + '%';
+  if (label) label.textContent = `${done} / ${vp.total}`;
+  // Mark per-card done state
+  vp.flipped.forEach((f,i) => {
+    const c = document.querySelector(`.vocab-card[data-idx="${i}"]`);
+    if (!c) return;
+    c.classList.toggle('done', f && vp.listened[i]);
+  });
+  if (btn && lab2) {
+    if (done >= vp.total && vp.total > 0 && !window.miniTest) {
+      // Tất cả thẻ đã học xong → chuyển sang giai đoạn mini-test
+      btn.disabled = true;
+      lab2.textContent = 'Đang vào mini-test...';
+      setTimeout(() => startVocabMiniTest(vp.words), 600);
+    } else if (!window.miniTest) {
+      btn.disabled = true;
+      lab2.textContent = `Hoàn thành bài học (${done}/${vp.total})`;
+    }
+  }
+}
+
+/* ===== VOCAB MINI-TEST ===== */
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startVocabMiniTest(words) {
+  // Each word randomly gets qtype: 'choice' or 'type'
+  const queue = shuffle([...words]).map(w => ({
+    ...w,
+    qtype: Math.random() < 0.5 ? 'choice' : 'type'
+  }));
+  window.miniTest = {
+    words,
+    queue,
+    total: words.length,
+    correct: 0,
+    answered: 0,
+  };
+
+  const contentEl = document.getElementById('modal-content');
+  const hintEl    = document.getElementById('lesson-completion-hint');
+  const btn       = document.getElementById('btn-end-lesson');
+  const lab2      = document.getElementById('btn-end-lesson-label');
+
+  hintEl.classList.add('hidden');
+  btn.disabled = true;
+  lab2.textContent = `Mini-test (0/${window.miniTest.total})`;
+
+  renderMiniTestQuestion();
+}
+
+function renderMiniTestQuestion() {
+  const mt = window.miniTest;
+  if (!mt) return;
+
+  const contentEl = document.getElementById('modal-content');
+
+  if (mt.queue.length === 0) {
+    contentEl.innerHTML = `
+      <div class="mini-test-wrap" style="text-align:center;padding:40px 16px">
+        <div style="font-size:52px;margin-bottom:16px">🎉</div>
+        <div style="font-size:22px;font-weight:800;font-family:var(--font-display);letter-spacing:-.04em;margin-bottom:8px">Xuất sắc!</div>
+        <div style="font-size:14px;color:var(--text-muted)">Bạn đã hoàn thành tất cả ${mt.total} từ vựng.</div>
+      </div>`;
+    const btn  = document.getElementById('btn-end-lesson');
+    const lab2 = document.getElementById('btn-end-lesson-label');
+    btn.disabled = false;
+    lab2.textContent = 'Hoàn thành bài học 🎉';
+    return;
+  }
+
+  const current = mt.queue[0];
+  const answered = mt.total - mt.queue.length;
+  const pct = Math.round((answered / mt.total) * 100);
+  const progressHeader = `
+    <div class="mini-test-header">
+      <div><span class="mini-test-phase-badge">${current.qtype === 'type' ? '⌨️ Điền từ' : '📝 Trắc nghiệm'}</span></div>
+      <div class="mini-test-progress-wrap">
+        <div class="mini-test-progress-track">
+          <div class="mini-test-progress-fill" style="width:${pct}%"></div>
+        </div>
+        <div class="mini-test-progress-label">${answered}/${mt.total}</div>
+      </div>
+      ${mt.queue.length < mt.total ? `<div class="mini-test-queue-note">Còn ${mt.queue.length} câu</div>` : ''}
+    </div>`;
+
+  if (current.qtype === 'type') {
+    // Typing question: show Vietnamese meaning → type English word
+    contentEl.innerHTML = `
+      <div class="mini-test-wrap">
+        ${progressHeader}
+        <div class="mini-test-card mt-type-card">
+          <div class="mt-type-instruction">Nghĩa của từ tiếng Anh này là gì?</div>
+          <div class="mt-type-meaning">${esc(current.meaning)}</div>
+          ${current.phonetic ? `<div class="mini-test-phonetic">/ ${esc(current.phonetic)} /</div>` : ''}
+          <div class="mt-type-hint">Gợi ý: ${current.word.length} chữ cái</div>
+        </div>
+        <div class="mt-type-input-wrap">
+          <input type="text" id="mt-type-input" class="mt-type-input" placeholder="Nhập từ tiếng Anh..."
+            autocomplete="off" autocapitalize="none" spellcheck="false"
+            onkeydown="if(event.key==='Enter')submitTypingAnswer()" />
+          <button class="btn btn-primary mt-type-submit" onclick="submitTypingAnswer()">
+            Xác nhận
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+        <div id="mini-test-feedback" style="display:none" class="mini-test-feedback"></div>
+      </div>`;
+    setTimeout(() => {
+      const inp = document.getElementById('mt-type-input');
+      if (inp) inp.focus();
+    }, 100);
+  } else {
+    // Multiple choice: show English word → pick Vietnamese meaning
+    const distractors = shuffle(
+      mt.words.filter(w => w.word !== current.word)
+    ).slice(0, 3);
+    const options = shuffle([current, ...distractors]);
+
+    contentEl.innerHTML = `
+      <div class="mini-test-wrap">
+        ${progressHeader}
+        <div class="mini-test-card">
+          <div class="mini-test-word">${esc(current.word)}</div>
+          ${current.phonetic ? `<div class="mini-test-phonetic">/ ${esc(current.phonetic)} /</div>` : ''}
+          <div class="mini-test-instruction">Chọn nghĩa đúng của từ trên</div>
+        </div>
+        <div class="mini-test-options">
+          ${options.map(opt => `
+            <button class="mini-test-option" onclick="handleMiniTestAnswer(this,'${esc(opt.meaning)}','${esc(current.meaning)}')">
+              ${esc(opt.meaning)}
+            </button>
+          `).join('')}
+        </div>
+        <div id="mini-test-feedback" style="display:none" class="mini-test-feedback"></div>
+      </div>`;
+  }
+}
+
+function submitTypingAnswer() {
+  const mt = window.miniTest;
+  if (!mt || mt.queue[0].qtype !== 'type') return;
+  const inp = document.getElementById('mt-type-input');
+  if (!inp) return;
+  const current = mt.queue[0];
+  const typed = inp.value.trim().toLowerCase();
+  const correct = current.word.replace(/\s*\([^)]*\)\s*/g, '').trim().toLowerCase();
+  const isCorrect = typed === correct;
+  const feedbackEl = document.getElementById('mini-test-feedback');
+  inp.disabled = true;
+  document.querySelector('.mt-type-submit').disabled = true;
+
+  if (isCorrect) {
+    inp.style.borderColor = 'var(--green)';
+    inp.style.boxShadow = '0 0 0 3px rgba(22,163,74,.15)';
+    feedbackEl.className = 'mini-test-feedback correct';
+    feedbackEl.textContent = '✓ Chính xác!';
+    feedbackEl.style.display = 'block';
+    mt.queue.shift();
+    mt.correct++;
+    mt.answered++;
+    const lab2 = document.getElementById('btn-end-lesson-label');
+    if (lab2) lab2.textContent = `Mini-test (${mt.total - mt.queue.length}/${mt.total})`;
+    setTimeout(renderMiniTestQuestion, 900);
+  } else {
+    inp.style.borderColor = 'var(--red)';
+    inp.style.boxShadow = '0 0 0 3px rgba(239,68,68,.15)';
+    feedbackEl.className = 'mini-test-feedback wrong';
+    feedbackEl.innerHTML = `✗ Sai rồi! Đáp án đúng: <strong>"${esc(current.word)}"</strong> — lật thẻ để ghi nhớ.`;
+    feedbackEl.style.display = 'block';
+    // Re-queue at end, change to 'choice' so next attempt is multiple-choice (easier)
+    const wrongWord = mt.queue.shift();
+    mt.queue.push({ ...wrongWord, qtype: 'choice' });
+    setTimeout(renderMiniTestQuestion, 1800);
+  }
+}
+
+function handleMiniTestAnswer(btn, chosen, correct) {
+  const mt = window.miniTest;
+  if (!mt) return;
+
+  const isCorrect = chosen === correct;
+  const allOptions = document.querySelectorAll('.mini-test-option');
+  const feedbackEl = document.getElementById('mini-test-feedback');
+
+  allOptions.forEach(opt => {
+    opt.style.pointerEvents = 'none';
+    if (opt.textContent.trim() === correct) opt.classList.add('reveal-correct');
+  });
+
+  if (isCorrect) {
+    btn.classList.add('correct');
+    feedbackEl.className = 'mini-test-feedback correct';
+    feedbackEl.textContent = '✓ Chính xác!';
+    feedbackEl.style.display = 'block';
+    mt.queue.shift();
+    mt.correct++;
+    mt.answered++;
+    const lab2 = document.getElementById('btn-end-lesson-label');
+    if (lab2) lab2.textContent = `Mini-test (${mt.total - mt.queue.length}/${mt.total})`;
+    setTimeout(renderMiniTestQuestion, 900);
+  } else {
+    btn.classList.add('wrong');
+    feedbackEl.className = 'mini-test-feedback wrong';
+    feedbackEl.textContent = `✗ Sai rồi! Đáp án đúng: "${correct}"`;
+    feedbackEl.style.display = 'block';
+    const wrongWord = mt.queue.shift();
+    mt.queue.push({ ...wrongWord, qtype: 'choice' });
+    setTimeout(renderMiniTestQuestion, 1400);
+  }
 }
 
 // Autosave mỗi 10 giây khi đang học dở
@@ -1678,24 +2604,53 @@ async function loadAdminData() {
   if (pdFilter && !pdFilter.value) { pdFilter.value = todayStr(); }
   if (pdFilter) loadProgressByDate(pdFilter.value);
 
-  const [{ data: users }, sessRes] = await Promise.all([
+  // Init monthly attendance
+  const maFilter = document.getElementById('attendance-month-filter');
+  if (maFilter && !maFilter.value) {
+    const now = new Date();
+    maFilter.value = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+  }
+  if (maFilter) loadMonthlyAttendance(maFilter.value);
+
+  const today = todayStr();
+  const [{ data: users }, sessRes, { data: todaySchedules }, { data: todayCompletions }] = await Promise.all([
     sb.from('users').select('*').eq('role', 'EMPLOYEE'),
     filter === 'today'
-      ? sb.from('learning_sessions').select('*').eq('date', todayStr())
-      : sb.from('learning_sessions').select('*')
+      ? sb.from('learning_sessions').select('*').eq('date', today)
+      : sb.from('learning_sessions').select('*'),
+    sb.from('lesson_schedules').select('lesson_id,user_id').eq('date', today),
+    sb.from('lesson_completions').select('user_id,lesson_id').eq('date', today)
   ]);
 
   const sessions  = sessRes.data || [];
   const employees = users || [];
+  const allTodaySchedules = todaySchedules || [];
+  // Build completions map: user_id → Set of completed lesson_ids today
+  const completionsByUser = {};
+  for (const c of (todayCompletions || [])) {
+    if (!completionsByUser[c.user_id]) completionsByUser[c.user_id] = new Set();
+    completionsByUser[c.user_id].add(c.lesson_id);
+  }
 
   adminRows = employees.map(u => {
     const mine   = sessions.filter(s => s.user_id === u.id);
     const totalS = mine.reduce((a,s) => a + (s.duration_seconds || 0), 0);
     const mins   = Math.floor(totalS / 60);
-    const done   = mins >= 15;
+    const timeOk = mins >= 15;
+    // Lessons assigned to this employee = globally assigned (user_id null) + user-specific
+    const scheduledLessonIds = [...new Set(
+      allTodaySchedules
+        .filter(s => s.user_id === null || s.user_id === u.id)
+        .map(s => s.lesson_id)
+    )];
+    // Check if ALL scheduled lessons are completed
+    const userCompletions = completionsByUser[u.id] || new Set();
+    const allLessonsDone = scheduledLessonIds.length > 0
+      && scheduledLessonIds.every(lid => userCompletions.has(lid));
+    const done = timeOk && allLessonsDone;
     const last   = mine.length
       ? new Date(Math.max(...mine.map(s => new Date(s.started_at).getTime()))) : null;
-    return { id: u.id, name: u.name, email: u.email, mins, done, last };
+    return { id: u.id, name: u.name, email: u.email, mins, timeOk, allLessonsDone, done, last };
   });
 
   const total = adminRows.length;
@@ -1796,9 +2751,11 @@ async function loadProgressByDate(dateStr) {
   if (!grid) return;
   grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--text-muted);font-size:13px">Đang tải...</div>';
 
-  const [{ data: users }, { data: sessions }] = await Promise.all([
+  const [{ data: users }, { data: sessions }, { data: schedules }, { data: completions }] = await Promise.all([
     sb.from('users').select('id,name').eq('role','EMPLOYEE'),
-    sb.from('learning_sessions').select('*,lessons(title)').eq('date', dateStr)
+    sb.from('learning_sessions').select('*,lessons(title)').eq('date', dateStr),
+    sb.from('lesson_schedules').select('lesson_id,user_id').eq('date', dateStr),
+    sb.from('lesson_completions').select('user_id,lesson_id').eq('date', dateStr)
   ]);
 
   if (!users || !users.length) {
@@ -1806,22 +2763,47 @@ async function loadProgressByDate(dateStr) {
     return;
   }
 
+  const allDaySchedules = schedules || [];
+  const completionsByUser = {};
+  for (const c of (completions || [])) {
+    if (!completionsByUser[c.user_id]) completionsByUser[c.user_id] = new Set();
+    completionsByUser[c.user_id].add(c.lesson_id);
+  }
+
   grid.innerHTML = users.map(u => {
     const mine   = (sessions || []).filter(s => s.user_id === u.id);
     const totalS = mine.reduce((a,s) => a + (s.duration_seconds||0), 0);
     const mins   = Math.floor(totalS / 60);
     const pct    = Math.min(100, Math.round((totalS / 900) * 100));
-    const done   = mins >= 15;
+    const timeOk = mins >= 15;
+    const userComp = completionsByUser[u.id] || new Set();
+    // Per-employee scheduled lessons = global (null) + user-specific
+    const scheduledIds = [...new Set(
+      allDaySchedules.filter(s => s.user_id === null || s.user_id === u.id).map(s => s.lesson_id)
+    )];
+    const completedCount = scheduledIds.filter(lid => userComp.has(lid)).length;
+    const allLessonsDone = scheduledIds.length > 0 && completedCount === scheduledIds.length;
+    const done = timeOk && allLessonsDone;
     const lessons = [...new Set(mine.map(s => s.lessons?.title).filter(Boolean))];
+
+    let statusBadge = '';
+    if (done) {
+      statusBadge = '<span style="font-size:11px;font-weight:700;color:var(--green);background:var(--green-light);padding:2px 8px;border-radius:99px">✅ Điểm danh</span>';
+    } else if (timeOk && scheduledIds.length > 0) {
+      statusBadge = `<span style="font-size:11px;font-weight:700;color:#c2410c;background:#fff7ed;padding:2px 8px;border-radius:99px">📚 ${completedCount}/${scheduledIds.length} bài</span>`;
+    } else if (allLessonsDone && !timeOk) {
+      statusBadge = '<span style="font-size:11px;font-weight:700;color:#c2410c;background:#fff7ed;padding:2px 8px;border-radius:99px">⏱ Chưa đủ 15p</span>';
+    }
+
     return `
       <div style="background:var(--card);border-radius:14px;padding:16px;border:1.5px solid ${done ? 'rgba(22,163,74,.25)' : 'var(--border-light)'};box-shadow:var(--shadow-sm);transition:all .2s">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
           <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal-bright));display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0">${esc((u.name[0]||'?').toUpperCase())}</div>
           <div style="flex:1;min-width:0">
             <div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(u.name)}</div>
-            <div style="font-size:11px;color:var(--text-muted)">${mins} / 15 phút</div>
+            <div style="font-size:11px;color:var(--text-muted)">${mins} / 15 phút · ${scheduledIds.length > 0 ? completedCount + '/' + scheduledIds.length + ' bài' : 'Không có bài'}</div>
           </div>
-          ${done ? '<span style="font-size:11px;font-weight:700;color:var(--green);background:var(--green-light);padding:2px 8px;border-radius:99px">✓ Đạt</span>' : ''}
+          ${statusBadge}
         </div>
         <div style="background:var(--bg-2);border-radius:99px;height:6px;overflow:hidden;margin-bottom:8px">
           <div style="height:100%;width:${pct}%;background:${done ? 'linear-gradient(90deg,var(--teal),var(--teal-bright))' : 'linear-gradient(90deg,#f59e0b,#fbbf24)'};border-radius:99px;transition:width .4s"></div>
@@ -1830,6 +2812,129 @@ async function loadProgressByDate(dateStr) {
       </div>
     `;
   }).join('');
+}
+
+/* ADMIN: MONTHLY ATTENDANCE GRID */
+async function loadMonthlyAttendance(monthStr) {
+  const grid = document.getElementById('monthly-attendance-grid');
+  if (!grid || !monthStr) return;
+  grid.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px"><div class="spinner spinner-teal" style="margin:0 auto 10px;width:22px;height:22px;border-width:2.5px"></div>Đang tải...</div>';
+
+  const [year, month] = monthStr.split('-').map(Number);
+  const daysInMonth   = new Date(year, month, 0).getDate();
+  const firstDay      = `${monthStr}-01`;
+  const lastDay       = `${monthStr}-${String(daysInMonth).padStart(2,'0')}`;
+  const today         = todayStr();
+
+  const dayNames = ['CN','T2','T3','T4','T5','T6','T7'];
+
+  const [{ data: users }, { data: schedules }, { data: sessions }, { data: completions }] = await Promise.all([
+    sb.from('users').select('id,name').eq('role','EMPLOYEE').order('name'),
+    // Fetch ALL schedules (both global user_id=null and user-specific) for the month
+    sb.from('lesson_schedules').select('lesson_id,date,user_id').gte('date', firstDay).lte('date', lastDay),
+    sb.from('learning_sessions').select('user_id,date,duration_seconds').gte('date', firstDay).lte('date', lastDay),
+    sb.from('lesson_completions').select('user_id,lesson_id,date').gte('date', firstDay).lte('date', lastDay)
+  ]);
+
+  if (!users || !users.length) {
+    grid.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-muted)">Chưa có nhân viên nào.</div>';
+    return;
+  }
+
+  const allSchedules = schedules || [];
+
+  // Build sessions time map: user_id+date → total seconds
+  const sessionMap = {};
+  for (const s of (sessions || [])) {
+    const key = s.user_id + ':' + s.date;
+    sessionMap[key] = (sessionMap[key] || 0) + (s.duration_seconds || 0);
+  }
+
+  // Build completions map: user_id+date → Set of lesson_ids
+  const compMap = {};
+  for (const c of (completions || [])) {
+    const key = c.user_id + ':' + c.date;
+    if (!compMap[key]) compMap[key] = new Set();
+    compMap[key].add(c.lesson_id);
+  }
+
+  // Build header — all days of the month
+  const days = [];
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${monthStr}-${String(d).padStart(2,'0')}`;
+    const dow = new Date(year, month - 1, d).getDay(); // 0=Sun,6=Sat
+    days.push({ d, dateStr, dow, dayName: dayNames[dow] });
+  }
+
+  const headerCols = days.map(({ d, dateStr, dow, dayName }) => {
+    const isWeekend = dow === 0 || dow === 6;
+    const isToday   = dateStr === today;
+    const cls = isToday ? 'th-day today-col' : isWeekend ? 'th-day weekend' : 'th-day';
+    return `<th class="${cls}"><div style="font-size:10px">${d}</div><div style="font-size:9px;font-weight:500;opacity:.7">${dayName}</div></th>`;
+  }).join('');
+
+  const rows = users.map(u => {
+    const cells = days.map(({ d, dateStr, dow }) => {
+      const isWeekend = dow === 0 || dow === 6;
+      const isFuture  = dateStr > today;
+
+      // Per-employee scheduled lessons = global (null) + user-specific
+      const scheduled = [...new Set(
+        allSchedules
+          .filter(s => s.date === dateStr && (s.user_id === null || s.user_id === u.id))
+          .map(s => s.lesson_id)
+      )];
+      const hasClass  = scheduled.length > 0;
+
+      const totalSec  = sessionMap[u.id + ':' + dateStr] || 0;
+      const timeOk    = totalSec >= 15 * 60;
+      const userComp  = compMap[u.id + ':' + dateStr] || new Set();
+      const allDone   = hasClass && scheduled.every(lid => userComp.has(lid));
+      const attended  = timeOk && allDone;
+      const partial   = !attended && hasClass && (timeOk || userComp.size > 0);
+
+      if (isWeekend && !hasClass) {
+        return `<td><div class="att-cell weekend"></div></td>`;
+      }
+      if (isFuture) {
+        return `<td><div class="att-cell future">·</div></td>`;
+      }
+      if (!hasClass) {
+        return `<td><div class="att-cell noclass" title="Không có bài">&mdash;</div></td>`;
+      }
+      if (attended) {
+        return `<td><div class="att-cell done" title="Điểm danh: ≥15p + hoàn thành tất cả bài">✓</div></td>`;
+      }
+      if (partial) {
+        const mins = Math.floor(totalSec / 60);
+        return `<td><div class="att-cell partial" title="${mins}p · ${userComp.size}/${scheduled.length} bài">○</div></td>`;
+      }
+      return `<td><div class="att-cell" style="background:var(--bg-2);color:var(--text-sub)" title="Chưa học"></div></td>`;
+    }).join('');
+
+    return `<tr><td class="td-name">${esc(u.name)}</td>${cells}</tr>`;
+  }).join('');
+
+  grid.innerHTML = `
+    <table class="att-table">
+      <thead>
+        <tr>
+          <th class="th-name">Nhân viên</th>
+          ${headerCols}
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div style="display:flex;align-items:center;gap:16px;padding:10px 14px;border-top:1px solid var(--border-light);font-size:11px;color:var(--text-muted)">
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;border-radius:3px;background:#dcfce7;display:inline-block;border:1px solid #bbf7d0"></span> ✓ Điểm danh (15p + tất cả bài)</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;border-radius:3px;background:#fff7ed;display:inline-block;border:1px solid #fed7aa"></span> ○ Học chưa đủ</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;border-radius:3px;background:var(--bg-2);display:inline-block;border:1px solid var(--border)"></span> — Không có bài</span>
+    </div>
+  `;
+
+  // Reset scroll to the beginning (day 1) so all columns are visible from left
+  const wrap = document.getElementById('monthly-attendance-wrap');
+  if (wrap) wrap.scrollLeft = 0;
 }
 
 function closeAssignModal() {
@@ -2083,7 +3188,7 @@ function getBestEnglishVoice() {
       || voices.find(v => v.lang.startsWith('en'));
 }
 
-function speakWord(word, btn) {
+function speakWord(word, btn, idx) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   const clean = word.replace(/\s*\([^)]*\)\s*/g, '').trim();
@@ -2108,13 +3213,21 @@ function speakWord(word, btn) {
   } else {
     window.speechSynthesis.onvoiceschanged = () => { trySpeak(); };
   }
+
+  // Duolingo-style: mark this word as "listened"
+  if (typeof idx === 'number' && window.vocabProgress) {
+    window.vocabProgress.listened[idx] = true;
+    updateVocabProgressUI();
+  }
 }
 
-function flipVocabCard(e, card, word) {
-  const wasFlipped = card.classList.contains('flipped');
+function flipVocabCard(e, card, word, idx) {
   card.classList.toggle('flipped');
-  // Speak when flipping TO front (showing the word) - always handy
-  if (!wasFlipped) speakWord(word, null);
+  // Only mark as flipped/seen — do NOT auto-play audio. Employee must press 🔊 to listen.
+  if (typeof idx === 'number' && window.vocabProgress) {
+    window.vocabProgress.flipped[idx] = true;
+    updateVocabProgressUI();
+  }
 }
 
 async function importVocabFromExcel(input) {
@@ -2138,12 +3251,16 @@ async function importVocabFromExcel(input) {
 
     const lines = [];
     for (const row of rows) {
-      // Accept rows where at least col 0 (word) is non-empty
-      const word    = String(row[0] || '').trim();
-      // Meaning: prefer col 2 (Nghĩa) if it exists, else col 1
-      const meaning = String(row[2] || row[1] || '').trim();
-      if (word && meaning && word.toLowerCase() !== 'từ vựng' && word.toLowerCase() !== 'word') {
-        lines.push(`${word} | ${meaning}`);
+      const word     = String(row[0] || '').trim();
+      // If row has 3 cols, treat as: word | phonetic | meaning. Else word | meaning.
+      const phonetic = String(row[1] || '').trim();
+      const meaning  = String(row[2] || '').trim() || phonetic;
+      const realPhonetic = String(row[2] || '').trim() ? phonetic : '';
+      const wl = word.toLowerCase();
+      if (word && meaning && wl !== 'từ vựng' && wl !== 'word') {
+        lines.push(realPhonetic
+          ? `${word} | ${realPhonetic} | ${meaning}`
+          : `${word} | ${meaning}`);
       }
     }
 
@@ -2196,7 +3313,7 @@ function openLessonMgmtModal(id) {
     if (l.type === 'VOCAB') {
       try {
         const words = JSON.parse(l.content || '[]');
-        document.getElementById('lm-vocab-input').value = words.map(w => `${w.word} | ${w.meaning}`).join('\n');
+        document.getElementById('lm-vocab-input').value = words.map(w => w.phonetic ? `${w.word} | ${w.phonetic} | ${w.meaning}` : `${w.word} | ${w.meaning}`).join('\n');
       } catch {
         document.getElementById('lm-vocab-input').value = '';
       }
@@ -2236,8 +3353,12 @@ async function saveLessonMgmt() {
       .split('\n').map(l => l.trim()).filter(l => l && l.includes('|'));
     if (!lines.length) { toast('Vui lòng nhập ít nhất một từ vựng!', 'error'); return; }
     const words = lines.map(l => {
-      const [word, ...rest] = l.split('|');
-      return { word: word.trim(), meaning: rest.join('|').trim() };
+      const parts = l.split('|').map(s => s.trim());
+      if (parts.length >= 3) {
+        // word | phonetic | meaning (meaning may contain '|')
+        return { word: parts[0], phonetic: parts[1], meaning: parts.slice(2).join(' | ') };
+      }
+      return { word: parts[0], phonetic: '', meaning: parts.slice(1).join(' | ') };
     });
     content = JSON.stringify(words);
   } else {
