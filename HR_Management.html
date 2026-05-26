@@ -2453,6 +2453,16 @@ function confirmCancel() {
   confirmCallback = null;
 }
 
+function showConfirm(title, name, callback) {
+  document.getElementById("confirm-icon").textContent = "🗑";
+  document.getElementById("confirm-title").textContent = title;
+  document.getElementById("confirm-msg").textContent = name
+    ? `Bạn có chắc muốn xóa "${name}"? Hành động này không thể hoàn tác.`
+    : `Hành động này không thể hoàn tác.`;
+  confirmCallback = callback;
+  document.getElementById("confirm-overlay").classList.add("show");
+}
+
 function setBtnLoading(id, loading) {
   const btn = document.getElementById(id);
   if (!btn) return;
