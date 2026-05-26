@@ -742,7 +742,7 @@ select {
         <div id="step-email" class="space-y">
           <div>
             <label for="inp-email">Email</label>
-            <input type="email" id="inp-email" placeholder="shrvnxxx@heiway.net" autocomplete="email" />
+            <input type="email" id="inp-email" placeholder="tên@công-ty.com" autocomplete="email" />
           </div>
           <button class="btn btn-primary" id="btn-email-next" onclick="handleEmailNext()">
             Tiếp tục
@@ -997,7 +997,6 @@ select {
           <tr>
             <th>Ngày học</th>
             <th>Bài học</th>
-            <th>Nhân viên</th>
             <th>Thao tác</th>
           </tr>
         </thead>
@@ -1018,18 +1017,9 @@ select {
           </div>
           <div>
             <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Bài học <span style="color:var(--teal)">(chọn nhiều)</span></label>
-            <div id="assign-lessons-list" style="margin-top:8px;display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto;padding:4px 0"></div>
+            <div id="assign-lessons-list" style="margin-top:8px;display:flex;flex-direction:column;gap:6px;max-height:240px;overflow-y:auto;padding:4px 0"></div>
           </div>
-          <div>
-            <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Nhân viên <span style="color:var(--teal)">(chọn nhiều)</span></label>
-            <div style="margin-top:8px">
-              <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;background:var(--teal-light);border:1px solid rgba(13,148,136,.2);margin-bottom:8px">
-                <input type="checkbox" id="assign-all-users" onchange="toggleAllUsers(this)" style="width:16px;height:16px;accent-color:var(--teal)">
-                Tất cả nhân viên
-              </label>
-              <div id="assign-users-list" style="display:flex;flex-direction:column;gap:6px;max-height:140px;overflow-y:auto;padding:4px 0"></div>
-            </div>
-          </div>
+          <p style="font-size:12px;color:var(--text-muted);background:var(--teal-glass);padding:8px 12px;border-radius:8px">📢 Bài học sẽ được phân công cho <strong>tất cả nhân viên</strong></p>
         </div>
         <div style="display:flex;gap:10px;margin-top:22px">
           <button class="btn btn-outline btn-sm" style="flex:1" onclick="closeAssignModal()">Huỷ</button>
@@ -1125,25 +1115,37 @@ select {
 
     <!-- Table -->
     <div class="table-section-header" style="margin-top:28px">
-      <h2>👥 Danh sách nhân viên</h2>
+      <h2 style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px" onclick="toggleEmpTable()">
+        👥 Danh sách nhân viên
+        <span id="emp-table-arrow" style="font-size:12px;color:var(--text-muted);transition:transform .2s;display:inline-block">▼</span>
+      </h2>
       <button class="btn btn-primary btn-sm" onclick="openEmpModal()">+ Thêm nhân viên</button>
     </div>
-    <div class="table-wrap">
+    <div id="emp-table-wrap" class="table-wrap">
       <table>
         <thead>
           <tr>
             <th>Nhân viên</th>
-            <th>Thời gian học</th>
-            <th>Trạng thái</th>
-            <th>Hoạt động cuối</th>
+            <th>Đăng nhập cuối</th>
             <th>Thao tác</th>
           </tr>
         </thead>
         <tbody id="admin-tbody">
-          <tr class="empty-row"><td colspan="5">Đang tải dữ liệu...</td></tr>
+          <tr class="empty-row"><td colspan="3">Đang tải dữ liệu...</td></tr>
         </tbody>
       </table>
     </div>
+    <!-- Daily Progress Section -->
+    <div class="table-section-header" style="margin-top:36px;display:flex;align-items:center;justify-content:space-between">
+      <h2>📊 Tiến độ học theo ngày</h2>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input type="date" id="progress-date-filter" style="padding:6px 12px;border-radius:8px;border:1.5px solid var(--border);font-size:13px;background:var(--bg-2);color:var(--text)" onchange="loadProgressByDate(this.value)">
+      </div>
+    </div>
+    <div id="progress-day-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:28px">
+      <div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text-muted);font-size:13px">Đang tải...</div>
+    </div>
+
     <!-- Lesson Management Section -->
     <div class="table-section-header" style="margin-top:36px">
       <h2>📘 Quản lý bài học</h2>
@@ -1168,14 +1170,12 @@ select {
   </main>
 </div>
 <script>
-const SB_URL = 'https://dubvrtthmopdlyvxjhbw.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1YnZydHRobW9wZGx5dnhqaGJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMDY3MDIsImV4cCI6MjA5Mzg4MjcwMn0.BhcoFCaPCvrcfdTG6_g0qfysRr5LDtSjZHz0vzioLl8';
-
+(function(){var _k=63;var _x=function(a){return a.map(function(c){return String.fromCharCode(c^_k)}).join("")};var _a=[87,75,75,79,76,5,16,16,91,74,93,73,77,75,75,87,82,80,79,91,83,70,73,71,85,87,93,72,17,76,74,79,94,93,94,76,90,17,92,80];var _b=[90,70,117,87,93,120,92,86,112,86,117,118,106,69,118,14,113,86,118,76,118,81,109,10,92,124,118,9,118,84,79,103,105,124,117,6,17,90,70,117,79,92,12,114,86,112,86,117,69,91,103,125,87,102,82,121,69,101,108,118,76,118,81,117,83,101,86,118,9,118,82,109,14,102,81,101,70,91,119,109,80,93,104,6,72,101,120,71,10,91,81,87,78,94,120,117,12,118,86,72,86,92,82,6,76,101,108,118,9,118,82,121,74,93,13,11,86,115,124,117,79,102,103,110,86,112,85,122,12,113,69,88,69,114,123,102,12,114,123,118,76,118,82,105,11,92,124,118,9,114,85,126,10,114,69,88,11,114,85,92,72,114,81,15,17,125,87,92,80,121,124,94,111,124,73,77,92,89,91,107,120,9,96,88,15,78,89,70,76,109,77,10,115,123,75,108,85,101,119,69,15,73,69,86,80,115,83,7];var _c=[87,75,75,79,76,5,16,16,77,81,76,85,86,78,93,93,90,70,72,88,93,81,78,76,80,85,92,90,17,76,74,79,94,93,94,76,90,17,92,80];var _d=[90,70,117,87,93,120,92,86,112,86,117,118,106,69,118,14,113,86,118,76,118,81,109,10,92,124,118,9,118,84,79,103,105,124,117,6,17,90,70,117,79,92,12,114,86,112,86,117,69,91,103,125,87,102,82,121,69,101,108,118,76,118,81,117,83,101,86,118,9,118,81,117,74,92,13,79,79,92,104,117,86,101,103,83,12,101,13,117,74,92,103,113,73,94,82,113,83,118,86,72,86,92,82,6,76,101,108,118,9,118,82,121,74,93,13,11,86,115,124,117,79,102,103,110,86,112,85,122,12,113,69,92,15,112,107,122,71,113,85,126,76,118,82,105,11,92,124,118,9,114,85,126,10,114,69,126,13,113,69,122,13,114,119,15,17,14,125,77,83,108,96,96,120,113,126,114,121,93,125,82,74,91,83,9,88,106,117,72,117,6,85,96,69,80,123,91,126,85,6,77,75,89,87,125,84,87,91,84];window.__cfg=function(i){return _x([_a,_b,_c,_d][i])};})();
+const SB_URL=window.__cfg(0),SB_KEY=window.__cfg(1);
 const sb = supabase.createClient(SB_URL, SB_KEY);
 
 /* ── Supabase B: bảng nhan_su (HR system) ── */
-const SB_HR_URL = 'https://rnsjiqbbeywgbnqsojce.supabase.co';
-const SB_HR_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuc2ppcWJiZXl3Z2JucXNvamNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0OTExNjAsImV4cCI6MjA5MzA2NzE2MH0.1BrlS__GNAMFbBmudl6gUJwJ9j_zoDdAj9rtfhBkhdk';
+const SB_HR_URL=window.__cfg(2),SB_HR_KEY=window.__cfg(3);
 // sbHR được tạo lazy trong syncNhanSu() để tránh crash khi chưa điền credentials
 
 let currentUser = null;
@@ -1671,7 +1671,12 @@ window.addEventListener('beforeunload', () => {
 async function loadAdminData() {
   const filter = document.getElementById('admin-date-filter').value;
   const tbody  = document.getElementById('admin-tbody');
-  tbody.innerHTML = '<tr class="empty-row"><td colspan="4"><div style="display:flex;align-items:center;justify-content:center;gap:10px"><div class="spinner spinner-teal"></div> Đang tải dữ liệu...</div></td></tr>';
+  tbody.innerHTML = '<tr class="empty-row"><td colspan="3"><div style="display:flex;align-items:center;justify-content:center;gap:10px"><div class="spinner spinner-teal"></div> Đang tải dữ liệu...</div></td></tr>';
+
+  // Init progress date filter to today if not set
+  const pdFilter = document.getElementById('progress-date-filter');
+  if (pdFilter && !pdFilter.value) { pdFilter.value = todayStr(); }
+  if (pdFilter) loadProgressByDate(pdFilter.value);
 
   const [{ data: users }, sessRes] = await Promise.all([
     sb.from('users').select('*').eq('role', 'EMPLOYEE'),
@@ -1711,15 +1716,7 @@ async function loadAdminData() {
           <div><div class="td-name">${esc(r.name)}</div><div class="td-email">${esc(r.email)}</div></div>
         </div>
       </td>
-      <td>
-        <span style="font-family:var(--font-display);font-weight:800;font-size:16px;color:var(--text)">${r.mins}</span>
-        <span style="color:var(--text-muted);font-size:13px"> phút</span>
-      </td>
-      <td>${r.done
-        ? '<span class="badge badge-done"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Hoàn thành</span>'
-        : '<span class="badge badge-pending"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Chưa hoàn thành</span>'
-      }</td>
-      <td style="color:var(--text-muted);font-size:13px">${r.last ? r.last.toLocaleTimeString('vi-VN') : '—'}</td>
+      <td style="color:var(--text-muted);font-size:13px">${r.last ? r.last.toLocaleString('vi-VN') : '—'}</td>
       <td>
         <div style="display:flex;gap:6px">
           <button onclick="editEmployee('${r.id}')" style="background:var(--indigo-light);color:var(--indigo);border:none;cursor:pointer;font-size:12px;padding:5px 10px;border-radius:7px;font-weight:600;transition:all .2s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">✏️ Sửa</button>
@@ -1760,7 +1757,6 @@ async function loadAssignData() {
     <tr>
       <td style="font-weight:600">${s.date}</td>
       <td>${esc(s.lessons?.title || '—')}</td>
-      <td>${s.user_id ? esc(allUsersAdmin.find(u=>u.id===s.user_id)?.name||'—') : 'Tất cả'}</td>
       <td>
         <button onclick="deleteAssign(${s.id})" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:12px;padding:4px 8px;border-radius:6px;transition:all .2s" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--text-muted)'">🗑 Xoá</button>
       </td>
@@ -1770,7 +1766,6 @@ async function loadAssignData() {
 
 function openAssignModal() {
   document.getElementById('assign-date').value = todayStr();
-  document.getElementById('assign-all-users').checked = false;
 
   // Render lessons as checkboxes
   const lList = document.getElementById('assign-lessons-list');
@@ -1782,20 +1777,59 @@ function openAssignModal() {
     </label>
   `).join('');
 
-  // Render users as checkboxes
-  const uList = document.getElementById('assign-users-list');
-  uList.innerHTML = allUsersAdmin.map(u => `
-    <label class="assign-user-lbl" style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:14px;border:1px solid var(--border-light);background:#fff;transition:background .15s" onmouseover="this.style.background='var(--teal-light)'" onmouseout="this.style.background='#fff'">
-      <input type="checkbox" value="${u.id}" class="assign-user-cb" style="width:16px;height:16px;accent-color:var(--teal)">
-      ${esc(u.name)}
-    </label>
-  `).join('');
-
   document.getElementById('assign-modal').classList.remove('hidden');
 }
 
-function toggleAllUsers(cb) {
-  document.querySelectorAll('.assign-user-cb').forEach(c => c.checked = cb.checked);
+/* EMPLOYEE TABLE COLLAPSE */
+let empTableOpen = true;
+function toggleEmpTable() {
+  empTableOpen = !empTableOpen;
+  const wrap  = document.getElementById('emp-table-wrap');
+  const arrow = document.getElementById('emp-table-arrow');
+  wrap.style.display  = empTableOpen ? '' : 'none';
+  arrow.style.transform = empTableOpen ? '' : 'rotate(-90deg)';
+}
+
+/* ADMIN: DAILY PROGRESS */
+async function loadProgressByDate(dateStr) {
+  const grid = document.getElementById('progress-day-grid');
+  if (!grid) return;
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--text-muted);font-size:13px">Đang tải...</div>';
+
+  const [{ data: users }, { data: sessions }] = await Promise.all([
+    sb.from('users').select('id,name').eq('role','EMPLOYEE'),
+    sb.from('learning_sessions').select('*,lessons(title)').eq('date', dateStr)
+  ]);
+
+  if (!users || !users.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--text-muted)">Chưa có nhân viên nào.</div>';
+    return;
+  }
+
+  grid.innerHTML = users.map(u => {
+    const mine   = (sessions || []).filter(s => s.user_id === u.id);
+    const totalS = mine.reduce((a,s) => a + (s.duration_seconds||0), 0);
+    const mins   = Math.floor(totalS / 60);
+    const pct    = Math.min(100, Math.round((totalS / 900) * 100));
+    const done   = mins >= 15;
+    const lessons = [...new Set(mine.map(s => s.lessons?.title).filter(Boolean))];
+    return `
+      <div style="background:var(--card);border-radius:14px;padding:16px;border:1.5px solid ${done ? 'rgba(22,163,74,.25)' : 'var(--border-light)'};box-shadow:var(--shadow-sm);transition:all .2s">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal-bright));display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0">${esc((u.name[0]||'?').toUpperCase())}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(u.name)}</div>
+            <div style="font-size:11px;color:var(--text-muted)">${mins} / 15 phút</div>
+          </div>
+          ${done ? '<span style="font-size:11px;font-weight:700;color:var(--green);background:var(--green-light);padding:2px 8px;border-radius:99px">✓ Đạt</span>' : ''}
+        </div>
+        <div style="background:var(--bg-2);border-radius:99px;height:6px;overflow:hidden;margin-bottom:8px">
+          <div style="height:100%;width:${pct}%;background:${done ? 'linear-gradient(90deg,var(--teal),var(--teal-bright))' : 'linear-gradient(90deg,#f59e0b,#fbbf24)'};border-radius:99px;transition:width .4s"></div>
+        </div>
+        ${lessons.length ? `<div style="font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📚 ${lessons.join(', ')}</div>` : '<div style="font-size:11px;color:var(--text-sub)">Chưa học bài nào</div>'}
+      </div>
+    `;
+  }).join('');
 }
 
 function closeAssignModal() {
@@ -1809,21 +1843,13 @@ async function saveAssign() {
   const selectedLessons = [...document.querySelectorAll('.assign-lesson-cb:checked')].map(c => parseInt(c.value));
   if (!selectedLessons.length) { toast('Vui lòng chọn ít nhất một bài học!', 'error'); return; }
 
-  const allUsers = document.getElementById('assign-all-users').checked;
-  const selectedUsers = allUsers ? [null] : [...document.querySelectorAll('.assign-user-cb:checked')].map(c => c.value);
-  if (!selectedUsers.length) { toast('Vui lòng chọn ít nhất một nhân viên!', 'error'); return; }
-
-  const rows = [];
-  for (const lid of selectedLessons) {
-    for (const uid of selectedUsers) {
-      rows.push({ date, lesson_id: lid, user_id: uid });
-    }
-  }
+  // Always assign to all employees (user_id = null means everyone)
+  const rows = selectedLessons.map(lid => ({ date, lesson_id: lid, user_id: null }));
 
   const { error } = await sb.from('lesson_schedules').insert(rows);
   if (error) { toast('Lỗi lưu phân công: ' + error.message, 'error'); return; }
 
-  toast(`✅ Đã phân công ${rows.length} mục thành công!`, 'success');
+  toast(`✅ Đã phân công ${rows.length} bài học cho tất cả nhân viên!`, 'success');
   closeAssignModal();
   await loadAssignData();
 }
