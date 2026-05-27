@@ -322,6 +322,13 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 /* Body */
 .login-body { padding: 20px 28px 20px; }
 
+/* Desktop: thu gọn chiều cao thừa khi hiển thị PIN (không có keypad) */
+@media (min-width: 640px) {
+  [id^="step-pin-"] { padding: 8px 0 !important; min-height: 0 !important; }
+  .login-body { padding: 20px 28px 8px; }
+  #login-back { margin-top: 4px !important; }
+}
+
 /* Back link */
 .back-link {
   display: inline-flex; align-items: center; gap: 6px;
@@ -393,6 +400,34 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 .pin-input-desktop:focus {
   border-color: var(--teal);
   box-shadow: 0 0 0 4px rgba(13,148,136,.12);
+}
+
+/* Desktop hint - ẩn trên mobile, hiện trên desktop */
+.pin-keyboard-hint {
+  display: none;
+  font-size: 13px; color: var(--text-sub); font-weight: 500;
+  margin: 10px 0 4px; letter-spacing: .01em;
+}
+@media (min-width: 640px) {
+  .pin-keyboard-hint { display: block; }
+}
+
+/* keypad-inner: hiện mobile, ẩn desktop */
+.keypad-inner {
+  display: grid;
+  grid-template-columns: repeat(3, 62px);
+  grid-template-rows: repeat(4, 62px);
+  gap: 10px; margin: 0 auto; width: fit-content;
+}
+@media (min-width: 640px) {
+  .keypad-inner { display: none !important; }
+  .pin-keyboard-hint { display: block; }
+}
+
+/* pin-desktop-wrap: ẩn mobile, hiện desktop */
+.pin-desktop-wrap { display: none; }
+@media (min-width: 640px) {
+  .pin-desktop-wrap { display: block; }
 }
 
 /* =====================================================
@@ -1091,6 +1126,7 @@ select {
             <div class="pin-dot" id="d4"></div>
             <div class="pin-dot" id="d5"></div>
           </div>
+          <p class="pin-keyboard-hint">&#x2328;&#xFE0F; G&#245; m&atilde; PIN t&#7915; b&agrave;n ph&iacute;m</p>
           <div class="keypad" id="keypad-entry"></div>
         </div>
 
@@ -1104,6 +1140,7 @@ select {
             <div class="pin-dot" id="c4"></div>
             <div class="pin-dot" id="c5"></div>
           </div>
+          <p class="pin-keyboard-hint">&#x2328;&#xFE0F; G&#245; m&atilde; PIN t&#7915; b&agrave;n ph&iacute;m</p>
           <div class="keypad" id="keypad-create"></div>
         </div>
 
@@ -1117,6 +1154,7 @@ select {
             <div class="pin-dot" id="f4"></div>
             <div class="pin-dot" id="f5"></div>
           </div>
+          <p class="pin-keyboard-hint">&#x2328;&#xFE0F; G&#245; m&atilde; PIN t&#7915; b&agrave;n ph&iacute;m</p>
           <div class="keypad" id="keypad-confirm"></div>
         </div>
 
@@ -1648,25 +1686,60 @@ function buildKeypad(containerId, dotPrefix, onOk) {
   currentPin = '';
   updateDots(dotPrefix);
 
-  // Keypad tròn cho tất cả thiết bị
+  // ── Desktop: hidden input bắt phím bàn phím vật lý ──────────────
+  const desktopWrap = document.createElement('div');
+  desktopWrap.className = 'pin-desktop-wrap'; // hiện trên desktop, ẩn mobile (CSS)
+
+  const inp = document.createElement('input');
+  inp.type = 'password';
+  inp.inputMode = 'numeric';
+  inp.maxLength = PIN_LEN;
+  inp.autocomplete = 'one-time-code';
+  inp.style.cssText = 'position:fixed;opacity:0;width:1px;height:1px;pointer-events:none;top:0;left:0';
+  inp.addEventListener('input', () => {
+    const val = inp.value.replace(/\D/g, '').slice(0, PIN_LEN);
+    inp.value = val;
+    currentPin = val;
+    updateDots(dotPrefix);
+    if (val.length === PIN_LEN) setTimeout(onOk, 180);
+  });
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && currentPin.length === PIN_LEN) onOk();
+  });
+  desktopWrap.appendChild(inp);
+  wrap.appendChild(desktopWrap);
+
+  // Re-focus khi click vùng login card
+  const card = document.querySelector('.login-card');
+  if (card && !card._pinFocusAttached) {
+    card._pinFocusAttached = true;
+    card.addEventListener('click', () => { if (inp.isConnected) inp.focus(); });
+  }
+  setTimeout(() => inp.focus(), 80);
+
+  // ── Mobile: keypad tròn ──────────────────────────────────────────
+  const keypadWrap = document.createElement('div');
+  keypadWrap.className = 'keypad-inner'; // hiện mobile, ẩn desktop (CSS)
+
   [1,2,3,4,5,6,7,8,9].forEach(n => {
     const b = document.createElement('button');
     b.className = 'key'; b.textContent = n;
     b.onclick = () => appendPin(n.toString(), dotPrefix);
-    wrap.appendChild(b);
+    keypadWrap.appendChild(b);
   });
   const del = document.createElement('button');
   del.className = 'key key-del'; del.innerHTML = '&#x232B;';
   del.onclick = () => { currentPin = currentPin.slice(0,-1); updateDots(dotPrefix); };
-  wrap.appendChild(del);
+  keypadWrap.appendChild(del);
   const zero = document.createElement('button');
   zero.className = 'key'; zero.textContent = '0';
   zero.onclick = () => appendPin('0', dotPrefix);
-  wrap.appendChild(zero);
+  keypadWrap.appendChild(zero);
   const ok = document.createElement('button');
   ok.className = 'key key-ok'; ok.textContent = 'OK'; ok.id = dotPrefix + '-ok';
   ok.onclick = onOk;
-  wrap.appendChild(ok);
+  keypadWrap.appendChild(ok);
+  wrap.appendChild(keypadWrap);
 }
 
 function appendPin(digit, dotPrefix) {
