@@ -1379,7 +1379,14 @@ tr:hover td{background:rgba(13,148,136,.03)}
           <option value="ok">AL đủ (>3)</option>
         </select>
         <select id="f-emp-year" class="input" style="max-width:220px" onchange="onLeaveYearChange()" title="Kỳ phép theo năm tài chính Tháng 4–Tháng 3"></select>
-        <button id="btn-add-emp" onclick="openEmpModal(null)" class="btn btn-primary ml-auto" style="display:none">+ Thêm nhân viên</button>
+        <div class="ml-auto" style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
+          <span id="sync-nhansu-status" style="font-size:11.5px;color:#6b7280"></span>
+          <button id="btn-sync-nhansu" onclick="openSyncNhanSuModal()" style="display:flex;align-items:center;gap:.4rem;font-size:13px;padding:.4rem .9rem;border:1.5px solid #d1d5db;background:#f9fafb;color:#374151;border-radius:.6rem;font-weight:600;cursor:pointer;white-space:nowrap">
+            <svg id="sync-nhansu-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Sync nhân sự
+          </button>
+          <button id="btn-add-emp" onclick="openEmpModal(null)" class="btn btn-primary" style="display:none">+ Thêm nhân viên</button>
+        </div>
       </div>
       <!-- Desktop table -->
       <div class="card p-0 overflow-hidden">
@@ -4413,3 +4420,178 @@ document.addEventListener('DOMContentLoaded', async () => {
 </script>
 </body>
 </html>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SYNC NHÂN SỰ — hardcoded source, no config needed
+     ═══════════════════════════════════════════════════ -->
+
+<!-- Modal preview/confirm -->
+<div id="modal-sync-nhansu" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.45);backdrop-filter:blur(3px);align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:1rem;width:min(500px,95vw);box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden">
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#059669,#10b981);padding:1.1rem 1.4rem;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;gap:.5rem">
+          <svg width="15" height="15" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Sync nhân sự
+        </div>
+        <div style="color:rgba(255,255,255,.8);font-size:11.5px;margin-top:1px">
+          <code style="background:rgba(255,255,255,.2);padding:1px 5px;border-radius:4px">nhan_su</code>
+          →
+          <code style="background:rgba(255,255,255,.2);padding:1px 5px;border-radius:4px">hr_employees</code>
+        </div>
+      </div>
+      <button onclick="closeSyncModal()" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:26px;height:26px;border-radius:50%;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+
+    <!-- Body -->
+    <div style="padding:1.25rem 1.4rem">
+      <div id="sync-loading" style="text-align:center;padding:1.5rem 0;color:#6b7280;font-size:13px">
+        <div style="display:inline-block;width:28px;height:28px;border:3px solid #e5e7eb;border-top-color:#10b981;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:.6rem"></div>
+        <div>Đang đọc dữ liệu từ nguồn...</div>
+      </div>
+      <div id="sync-result" style="display:none">
+        <div id="sync-result-text" style="font-size:13px;margin-bottom:1rem"></div>
+        <div id="sync-new-list" style="max-height:180px;overflow-y:auto;background:#f0fdf4;border:1.5px solid #a7f3d0;border-radius:.65rem;padding:.75rem;font-size:12.5px;color:#065f46;display:none"></div>
+        <div id="sync-error-box" style="display:none;background:#fef2f2;border:1.5px solid #fca5a5;border-radius:.65rem;padding:.75rem;font-size:13px;color:#dc2626"></div>
+      </div>
+      <div style="display:flex;gap:.6rem;justify-content:flex-end;padding-top:.9rem;border-top:1px solid #f3f4f6;margin-top:.5rem">
+        <button onclick="closeSyncModal()" style="padding:.45rem 1rem;border:1.5px solid #d1d5db;background:#fff;border-radius:.6rem;font-size:13px;font-weight:600;cursor:pointer;color:#374151">Đóng</button>
+        <button id="sync-confirm-btn" onclick="syncNhanSuRun()" style="padding:.45rem 1.2rem;border:none;background:linear-gradient(135deg,#059669,#10b981);color:#fff;border-radius:.6rem;font-size:13px;font-weight:700;cursor:pointer;display:none"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Config nguồn (hardcoded) ──────────────────────────────────────────
+const NS_URL = 'https://rnsjiqbbeywgbnqsojce.supabase.co';
+const NS_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuc2ppcWJiZXl3Z2JucXNvamNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0OTExNjAsImV4cCI6MjA5MzA2NzE2MH0.1BrlS__GNAMFbBmudl6gUJwJ9j_zoDdAj9rtfhBkhdk';
+
+// Mapping cột nhan_su → hr_employees
+// ho_ten      → name
+// tai_khoan   → email  (SHRVN... account)
+// ngay_vao    → start_date (dd/MM/yyyy)
+// trang_thai  → is_active (Active/Probation=true, Inactive=false)
+
+let _syncRows = []; // cache rows từ nguồn
+
+function closeSyncModal() {
+  document.getElementById('modal-sync-nhansu').style.display = 'none';
+}
+
+async function openSyncNhanSuModal() {
+  // Reset UI
+  document.getElementById('sync-loading').style.display = 'block';
+  document.getElementById('sync-result').style.display = 'none';
+  document.getElementById('sync-confirm-btn').style.display = 'none';
+  document.getElementById('modal-sync-nhansu').style.display = 'flex';
+  _syncRows = [];
+
+  try {
+    // Fetch toàn bộ nhan_su
+    const res = await fetch(`${NS_URL}/rest/v1/nhan_su?select=ho_ten,tai_khoan,ngay_vao,trang_thai&bo_phan=eq.L2&limit=1000`, {
+      headers: { 'apikey': NS_KEY, 'Authorization': 'Bearer ' + NS_KEY, 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const rows = await res.json();
+
+    // So sánh với hr_employees hiện tại theo email (tai_khoan)
+    const existingEmails = new Set((S.employees || []).map(e => (e.email || '').toLowerCase()).filter(Boolean));
+    const existingNames  = new Set((S.employees || []).map(e => (e.name  || '').toLowerCase()));
+
+    const newRows = rows.filter(r => {
+      const email = (r.tai_khoan || '').toLowerCase();
+      const name  = (r.ho_ten || '').toLowerCase();
+      return email ? !existingEmails.has(email) : !existingNames.has(name);
+    });
+
+    _syncRows = newRows;
+
+    // Render result
+    document.getElementById('sync-loading').style.display = 'none';
+    document.getElementById('sync-result').style.display = 'block';
+    const errBox = document.getElementById('sync-error-box');
+    errBox.style.display = 'none';
+
+    const resultTxt = document.getElementById('sync-result-text');
+    const listEl    = document.getElementById('sync-new-list');
+    const confirmBtn = document.getElementById('sync-confirm-btn');
+
+    if (newRows.length === 0) {
+      resultTxt.innerHTML = `<div style="display:flex;align-items:center;gap:.5rem;color:#059669;font-weight:600"><span style="font-size:18px">✓</span> Đã đồng bộ — không có nhân viên mới (${rows.length} người trong nguồn).</div>`;
+      listEl.style.display = 'none';
+    } else {
+      resultTxt.innerHTML = `
+        <div style="color:#374151;font-size:13.5px">Tìm thấy <b style="color:#059669;font-size:16px">${newRows.length}</b> nhân viên mới chưa có trong hệ thống:</div>
+      `;
+      listEl.innerHTML = newRows.map(r =>
+        `<div style="padding:.2rem 0;border-bottom:1px solid #d1fae5;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-weight:600">${r.ho_ten || '—'}</span>
+          <span style="color:#6b7280;font-size:11.5px">${r.tai_khoan || ''}</span>
+        </div>`
+      ).join('');
+      listEl.style.display = 'block';
+      confirmBtn.textContent = `⚡ Thêm ${newRows.length} nhân viên`;
+      confirmBtn.style.display = 'inline-flex';
+    }
+  } catch(e) {
+    document.getElementById('sync-loading').style.display = 'none';
+    document.getElementById('sync-result').style.display = 'block';
+    document.getElementById('sync-error-box').innerHTML = '✕ Lỗi kết nối nguồn: ' + e.message;
+    document.getElementById('sync-error-box').style.display = 'block';
+  }
+}
+
+async function syncNhanSuRun() {
+  if (!_syncRows.length) return;
+  const btn = document.getElementById('sync-confirm-btn');
+  const statusEl = document.getElementById('sync-nhansu-status');
+  btn.disabled = true;
+  btn.textContent = 'Đang thêm...';
+
+  try {
+    // Parse ngày dd/MM/yyyy → yyyy-MM-dd
+    function parseDate(str) {
+      if (!str) return null;
+      const m = str.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      return m ? `${m[3]}-${m[2]}-${m[1]}` : null;
+    }
+
+    const toInsert = _syncRows.map(r => ({
+      name:       (r.ho_ten || '').trim(),
+      email:      (r.tai_khoan || '').trim() || null,
+      start_date: parseDate(r.ngay_vao),
+      is_active:  r.trang_thai !== 'Inactive',
+    })).filter(r => r.name);
+
+    // Insert theo batch 50
+    const BATCH = 50;
+    let inserted = 0;
+    for (let i = 0; i < toInsert.length; i += BATCH) {
+      const { error } = await db.from('hr_employees').insert(toInsert.slice(i, i + BATCH));
+      if (error) throw new Error(error.message);
+      inserted += toInsert.slice(i, i + BATCH).length;
+    }
+
+    const now = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    if (statusEl) statusEl.innerHTML = `<span style="color:#059669">+${inserted} · ${now}</span>`;
+    toast(`✓ Đã thêm ${inserted} nhân viên mới vào hệ thống!`, 'success');
+    closeSyncModal();
+    await loadAll();
+    renderEmp();
+    if (document.getElementById('s-dashboard').classList.contains('active')) renderDash();
+  } catch(e) {
+    document.getElementById('sync-error-box').innerHTML = '✕ Lỗi ghi dữ liệu: ' + e.message;
+    document.getElementById('sync-error-box').style.display = 'block';
+    toast('Sync thất bại: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.textContent = `⚡ Thêm ${_syncRows.length} nhân viên`;
+  }
+}
+
+document.getElementById('modal-sync-nhansu').addEventListener('click', function(e) {
+  if (e.target === this) closeSyncModal();
+});
+</script>
