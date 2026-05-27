@@ -530,17 +530,21 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 /* Tabs */
 .tabs-section { margin-bottom: 20px; animation: fadeIn .5s .1s both; }
 .tabs-section-label { font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 12px; }
-.tabs-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; scrollbar-width: none; }
-.tabs-wrap::-webkit-scrollbar { display: none; }
+.tabs-wrap {
+  padding-left: 1px; padding-right: 1px; margin: 0 -1px;
+}
 .tabs {
-  display: inline-flex; gap: 6px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
   background: var(--bg-2); padding: 5px; border-radius: 14px;
   border: 1px solid var(--border-light);
 }
 .tab {
-  padding: 9px 18px; border-radius: 10px; font-size: 13px; font-weight: 600;
+  padding: 9px 6px; border-radius: 10px; font-size: 12px; font-weight: 600;
   background: none; border: none; color: var(--text-muted); white-space: nowrap;
   transition: all var(--transition); letter-spacing: -.01em;
+  text-align: center; overflow: hidden; text-overflow: ellipsis;
 }
 .tab.active {
   background: #fff; color: var(--teal);
@@ -708,6 +712,40 @@ select {
   .progress-circle-wrap { display: none; }
   .header-user-chip span { display: none; }
   .app-header-inner { height: 54px; padding: 0 14px; }
+
+  /* Tabs: scroll ngang đầy đủ */
+  .tabs-section { overflow: visible; }
+  .tabs-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* Tables: chuyển sang card layout trên mobile */
+  .table-wrap { overflow: visible; box-shadow: none; background: transparent; border: none; }
+  .table-wrap table { display: block; min-width: 0; }
+  .table-wrap thead { display: none; }
+  .table-wrap tbody { display: flex; flex-direction: column; gap: 10px; }
+  .table-wrap tbody tr {
+    display: flex; flex-direction: column; gap: 6px;
+    background: #fff; border-radius: 14px; padding: 14px 16px;
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
+  }
+  .table-wrap tbody tr:hover { background: var(--teal-glass); }
+  .table-wrap tbody td {
+    display: flex; align-items: center; gap: 8px;
+    padding: 4px 0; border: none; font-size: 13px;
+  }
+  .table-wrap tbody td::before {
+    content: attr(data-label);
+    font-size: 10px; font-weight: 700; color: var(--text-sub);
+    text-transform: uppercase; letter-spacing: .06em;
+    min-width: 80px; flex-shrink: 0;
+  }
+  .table-wrap tbody .empty-row { display: block; text-align: center; background: #fff; }
+  .table-wrap tbody .empty-row td { justify-content: center; }
+  .table-wrap tbody .empty-row td::before { display: none; }
+
+  /* Monthly attendance table: giữ scroll ngang (quá nhiều cột) */
+  #monthly-attendance-wrap { overflow-x: auto !important; }
+  #monthly-attendance-wrap .att-table { min-width: 600px; }
 }
 
 @media (min-width: 641px) and (max-width: 900px) {
@@ -1056,12 +1094,127 @@ select {
   width: auto; padding: 14px 22px; border-radius: 12px; flex-shrink: 0;
   font-size: 14px; white-space: nowrap;
 }
+
+/* Review card khi trả lời sai */
+.mt-review-wrap {
+  animation: fadeIn .3s ease;
+}
+
+/* ===== CONFIRM DIALOG ===== */
+#confirm-overlay {
+  position: fixed; inset: 0; background: rgba(15,23,42,.55);
+  z-index: 9000; display: flex; align-items: center; justify-content: center;
+  padding: 20px; backdrop-filter: blur(6px);
+  animation: fadeIn .18s ease;
+}
+#confirm-overlay.hidden { display: none; }
+#confirm-box {
+  background: #fff; border-radius: 22px;
+  width: 100%; max-width: 360px;
+  box-shadow: 0 24px 64px rgba(0,0,0,.18), 0 4px 16px rgba(0,0,0,.08);
+  overflow: hidden; animation: fadeInScale .25s cubic-bezier(.34,1.3,.64,1);
+}
+.confirm-icon-wrap {
+  display: flex; justify-content: center; padding: 28px 24px 0;
+}
+.confirm-icon {
+  width: 60px; height: 60px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+}
+.confirm-icon.danger  { background: #fef2f2; }
+.confirm-icon.warning { background: #fff7ed; }
+.confirm-icon.info    { background: var(--teal-light); }
+.confirm-body {
+  padding: 16px 24px 22px; text-align: center;
+}
+.confirm-title {
+  font-size: 17px; font-weight: 700; color: var(--text);
+  font-family: var(--font-display); letter-spacing: -.03em;
+  margin-bottom: 7px;
+}
+.confirm-message {
+  font-size: 14px; color: var(--text-muted); line-height: 1.55; font-weight: 400;
+}
+.confirm-actions {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; padding: 0 20px 20px;
+}
+.confirm-cancel {
+  padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 600;
+  background: var(--bg-2); color: var(--text-muted); border: 1.5px solid var(--border);
+  cursor: pointer; transition: all var(--transition); font-family: var(--font-body);
+}
+.confirm-cancel:hover { background: var(--border); color: var(--text); }
+.confirm-ok {
+  padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 600;
+  color: #fff; border: none; cursor: pointer; transition: all var(--transition);
+  font-family: var(--font-body);
+}
+.confirm-ok.danger  { background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 4px 14px rgba(239,68,68,.35); }
+.confirm-ok.warning { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 4px 14px rgba(245,158,11,.35); }
+.confirm-ok.info    { background: linear-gradient(135deg, var(--teal), var(--teal-mid)); box-shadow: var(--shadow-teal); }
+.confirm-ok:hover   { transform: translateY(-1px); filter: brightness(1.08); }
+.confirm-ok:active  { transform: scale(.97); }
+.mt-review-card {
+  background: #fff; border-radius: var(--radius);
+  border: 2px solid var(--red-light); box-shadow: var(--shadow);
+  padding: 20px 20px 16px; margin-bottom: 16px;
+  perspective: 800px;
+}
+.mt-review-card-inner {
+  width: 100%; position: relative;
+  transform-style: preserve-3d;
+  transition: transform .45s cubic-bezier(.4,0,.2,1);
+  border-radius: 12px; min-height: 160px;
+}
+.mt-review-card.flipped .mt-review-card-inner { transform: rotateY(180deg); }
+.mt-review-front, .mt-review-back {
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  border-radius: 12px; padding: 20px; text-align: center;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+}
+.mt-review-back { position: absolute; inset: 0; transform: rotateY(180deg);
+  background: linear-gradient(135deg, var(--teal), var(--teal-mid)); color: #fff; }
+.mt-review-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text-sub); margin-bottom: 4px; }
+.mt-review-word { font-size: 22px; font-weight: 800; font-family: var(--font-display); letter-spacing: -.04em; color: var(--text); }
+.mt-review-phonetic { font-size: 13px; color: var(--text-muted); }
+.mt-review-back .mt-review-label { color: rgba(255,255,255,.75); }
+.mt-review-back .mt-review-word { color: #fff; }
+.mt-review-back .mt-review-phonetic { color: rgba(255,255,255,.8); }
+.mt-review-tap-hint { font-size: 12px; color: var(--text-sub); margin-top: 8px; text-align: center; }
+.mt-review-confirm {
+  width: 100%; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 700;
+  background: linear-gradient(135deg, var(--teal), var(--teal-mid)); color: #fff;
+  border: none; cursor: pointer; transition: all .2s; box-shadow: var(--shadow-teal);
+  display: none; /* hiện sau khi lật */
+}
+.mt-review-confirm:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(13,148,136,.35); }
 </style>
 </head>
 <body>
 
 <!-- TOAST -->
 <div id="toast"></div>
+
+<!-- ============================
+     CONFIRM DIALOG
+============================= -->
+<div id="confirm-overlay" class="hidden">
+  <div id="confirm-box">
+    <div class="confirm-icon-wrap">
+      <div class="confirm-icon danger" id="confirm-icon">🗑️</div>
+    </div>
+    <div class="confirm-body">
+      <div class="confirm-title" id="confirm-title">Xác nhận xoá</div>
+      <div class="confirm-message" id="confirm-message">Bạn có chắc muốn thực hiện thao tác này?</div>
+    </div>
+    <div class="confirm-actions">
+      <button class="confirm-cancel" id="confirm-cancel-btn">Huỷ</button>
+      <button class="confirm-ok danger" id="confirm-ok-btn">Đồng ý</button>
+    </div>
+  </div>
+</div>
 
 <!-- ============================
      LOGIN VIEW
@@ -1625,6 +1778,40 @@ function toast(msg, type = '') {
   toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
 }
 
+
+/* CONFIRM DIALOG */
+let _confirmResolve = null;
+function showConfirm({ title = 'Xác nhận', message = '', icon = '🗑️', iconType = 'danger', okText = 'Đồng ý', cancelText = 'Huỷ' } = {}) {
+  return new Promise(resolve => {
+    _confirmResolve = resolve;
+    document.getElementById('confirm-title').textContent   = title;
+    document.getElementById('confirm-message').textContent = message;
+    document.getElementById('confirm-icon').textContent    = icon;
+    document.getElementById('confirm-icon').className      = 'confirm-icon ' + iconType;
+    document.getElementById('confirm-ok-btn').textContent  = okText;
+    document.getElementById('confirm-ok-btn').className    = 'confirm-ok ' + iconType;
+    document.getElementById('confirm-cancel-btn').textContent = cancelText;
+    document.getElementById('confirm-overlay').classList.remove('hidden');
+    document.getElementById('confirm-ok-btn').focus();
+  });
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('confirm-ok-btn').addEventListener('click', () => {
+    document.getElementById('confirm-overlay').classList.add('hidden');
+    if (_confirmResolve) { _confirmResolve(true); _confirmResolve = null; }
+  });
+  document.getElementById('confirm-cancel-btn').addEventListener('click', () => {
+    document.getElementById('confirm-overlay').classList.add('hidden');
+    if (_confirmResolve) { _confirmResolve(false); _confirmResolve = null; }
+  });
+  document.getElementById('confirm-overlay').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('confirm-overlay')) {
+      document.getElementById('confirm-overlay').classList.add('hidden');
+      if (_confirmResolve) { _confirmResolve(false); _confirmResolve = null; }
+    }
+  });
+});
+
 /* LOGIN: EMAIL STEP */
 async function handleEmailNext() {
   const email = document.getElementById('inp-email').value.trim();
@@ -1958,14 +2145,8 @@ async function loadLessons() {
     };
   });
 
-  // Nếu không có schedule nào, fallback load tất cả bài học (không nhóm theo ngày)
-  if (!allScheduleDays.length) {
-    const { data } = await sb.from('lessons').select('*').order('created_at', { ascending: false });
-    allLessons = data || [];
-    allScheduleDays = null; // flag để renderLessons biết dùng mode cũ
-  } else {
-    allLessons = allScheduleDays.flatMap(d => d.lessons);
-  }
+  // Chỉ hiển thị bài học đã được phân công — không fallback load tất cả
+  allLessons = allScheduleDays.flatMap(d => d.lessons);
 
   renderLessons();
 }
@@ -2019,31 +2200,6 @@ function renderLessons() {
   const grid = document.getElementById('lesson-grid');
   const typeEmoji = { READING:'📖', LISTENING:'🎧', VOCAB:'📝', GRAMMAR:'⚙️' };
 
-  // Fallback mode: không có schedule, hiển thị tất cả bài học như cũ
-  if (!allScheduleDays) {
-    const filtered = currentTab === 'ALL' ? allLessons : allLessons.filter(l => l.type === currentTab);
-    const countBadge = document.getElementById('lesson-count-badge');
-    if (countBadge) countBadge.textContent = filtered.length + ' bài';
-    if (!filtered.length) {
-      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:56px 20px;color:var(--text-muted)"><div style="font-size:40px;margin-bottom:12px">📭</div><div style="font-weight:600;font-size:15px">Chưa có bài học nào</div></div>';
-      return;
-    }
-    grid.innerHTML = filtered.map(l => `
-      <div class="lesson-card">
-        <div class="lesson-meta">
-          <span class="badge badge-${l.type.toLowerCase()}">${typeEmoji[l.type]||''} ${l.type}</span>
-          <span class="lesson-duration"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${l.duration_estimate} phút</span>
-        </div>
-        <div class="lesson-title">${esc(l.title)}</div>
-        <button class="btn btn-primary" onclick="startLesson(${l.id})">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-          Bắt đầu học
-        </button>
-      </div>
-    `).join('');
-    return;
-  }
-
   // Timeline mode: nhóm theo ngày
   const today = todayStr();
 
@@ -2059,7 +2215,14 @@ function renderLessons() {
   if (countBadge) countBadge.textContent = totalLessons + ' bài';
 
   if (!days.length) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:56px 20px;color:var(--text-muted)"><div style="font-size:40px;margin-bottom:12px">📭</div><div style="font-weight:600;font-size:15px">Chưa có bài học nào</div><div style="font-size:13px;margin-top:4px">Thể loại này chưa có nội dung</div></div>';
+    const emptyMsg = allScheduleDays.length === 0
+      ? `<div style="font-size:40px;margin-bottom:14px">📭</div>
+         <div style="font-weight:700;font-size:15px;color:var(--text)">Chưa có bài học nào được phân công</div>
+         <div style="font-size:13px;margin-top:6px;color:var(--text-muted)">Quản trị viên chưa phân công bài học cho hôm nay</div>`
+      : `<div style="font-size:40px;margin-bottom:14px">🔍</div>
+         <div style="font-weight:700;font-size:15px;color:var(--text)">Không có bài học ở danh mục này</div>
+         <div style="font-size:13px;margin-top:6px;color:var(--text-muted)">Thử chọn danh mục khác</div>`;
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:56px 20px">${emptyMsg}</div>`;
     return;
   }
 
@@ -2216,7 +2379,7 @@ function openLessonModal(lesson, alreadyCompleted) {
           <div class="vocab-progress-label" id="vocab-progress-label">0 / ${words.length}</div>
         </div>
         <div class="vocab-criteria-hint">
-          ✅ Lật thẻ để xem nghĩa &nbsp;·&nbsp; Nhấn 🔊 để nghe phát âm &nbsp;·&nbsp; Hoàn thành cả 2 cho mỗi từ
+          ✅ Lật tất cả thẻ để xem nghĩa — sau đó sẽ vào mini-test
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">
           ${words.map((w,i) => `
@@ -2312,15 +2475,14 @@ function handleOverlayClick(e) {
 async function endLesson() {
   if (!activeSession) return;
 
-  // Duolingo-style completion check: must flip + listen to every vocab card
+  // Completion check: must flip every vocab card, then complete mini-test
   const vp = window.vocabProgress;
   if (vp && vp.total > 0) {
-    const done = vp.flipped.reduce((a,f,i) => a + (f && vp.listened[i] ? 1 : 0), 0);
+    const done = vp.flipped.filter(Boolean).length;
     if (done < vp.total) {
       const missing = vp.total - done;
-      toast(`Còn ${missing} từ chưa hoàn thành. Hãy lật thẻ và nghe phát âm để hoàn thành bài học!`, 'error');
-      // Briefly highlight the first incomplete card
-      const idx = vp.flipped.findIndex((f,i) => !(f && vp.listened[i]));
+      toast(`Còn ${missing} thẻ chưa lật. Hãy lật tất cả thẻ để hoàn thành bài học!`, 'error');
+      const idx = vp.flipped.findIndex(f => !f);
       if (idx >= 0) {
         const card = document.querySelector(`.vocab-card[data-idx="${idx}"]`);
         if (card) card.scrollIntoView({behavior:'smooth', block:'center'});
@@ -2372,7 +2534,7 @@ async function endLesson() {
 function updateVocabProgressUI() {
   const vp = window.vocabProgress;
   if (!vp) return;
-  const done = vp.flipped.reduce((a,f,i) => a + (f && vp.listened[i] ? 1 : 0), 0);
+  const done = vp.flipped.filter(Boolean).length;
   const fill  = document.getElementById('vocab-progress-fill');
   const label = document.getElementById('vocab-progress-label');
   const btn   = document.getElementById('btn-end-lesson');
@@ -2383,11 +2545,11 @@ function updateVocabProgressUI() {
   vp.flipped.forEach((f,i) => {
     const c = document.querySelector(`.vocab-card[data-idx="${i}"]`);
     if (!c) return;
-    c.classList.toggle('done', f && vp.listened[i]);
+    c.classList.toggle('done', f);
   });
   if (btn && lab2) {
     if (done >= vp.total && vp.total > 0 && !window.miniTest) {
-      // Tất cả thẻ đã học xong → chuyển sang giai đoạn mini-test
+      // Tất cả thẻ đã lật xong → chuyển sang giai đoạn mini-test
       btn.disabled = true;
       lab2.textContent = 'Đang vào mini-test...';
       setTimeout(() => startVocabMiniTest(vp.words), 600);
@@ -2548,15 +2710,11 @@ function submitTypingAnswer() {
     if (lab2) lab2.textContent = `Mini-test (${mt.total - mt.queue.length}/${mt.total})`;
     setTimeout(renderMiniTestQuestion, 900);
   } else {
-    inp.style.borderColor = 'var(--red)';
-    inp.style.boxShadow = '0 0 0 3px rgba(239,68,68,.15)';
-    feedbackEl.className = 'mini-test-feedback wrong';
-    feedbackEl.innerHTML = `✗ Sai rồi! Đáp án đúng: <strong>"${esc(current.word)}"</strong> — lật thẻ để ghi nhớ.`;
-    feedbackEl.style.display = 'block';
-    // Re-queue at end, change to 'choice' so next attempt is multiple-choice (easier)
+    // Đưa câu sai về cuối hàng chờ, đổi sang choice
     const wrongWord = mt.queue.shift();
     mt.queue.push({ ...wrongWord, qtype: 'choice' });
-    setTimeout(renderMiniTestQuestion, 1800);
+    // Hiện review card để lật thẻ
+    showWrongReview(wrongWord, feedbackEl);
   }
 }
 
@@ -2586,13 +2744,61 @@ function handleMiniTestAnswer(btn, chosen, correct) {
     setTimeout(renderMiniTestQuestion, 900);
   } else {
     btn.classList.add('wrong');
-    feedbackEl.className = 'mini-test-feedback wrong';
-    feedbackEl.textContent = `✗ Sai rồi! Đáp án đúng: "${correct}"`;
-    feedbackEl.style.display = 'block';
+    // Đưa câu sai về cuối hàng chờ
     const wrongWord = mt.queue.shift();
     mt.queue.push({ ...wrongWord, qtype: 'choice' });
-    setTimeout(renderMiniTestQuestion, 1400);
+    // Hiện review card
+    showWrongReview(wrongWord, feedbackEl);
   }
+}
+
+// Hiện thẻ vocab để user lật xem rồi xác nhận "Đã nhớ rồi"
+function showWrongReview(word, feedbackEl) {
+  const contentEl = document.getElementById('modal-content');
+  if (!contentEl) return;
+
+  contentEl.innerHTML = `
+    <div class="mt-review-wrap">
+      <div class="mini-test-feedback wrong" style="display:block;margin-bottom:16px">
+        ✗ Sai rồi! Lật thẻ để ghi nhớ từ này, rồi bấm <strong>Đã nhớ rồi</strong> để tiếp tục.
+      </div>
+      <div class="mt-review-card" id="mt-review-card" onclick="flipReviewCard()" style="cursor:pointer">
+        <div class="mt-review-card-inner">
+          <div class="mt-review-front">
+            <div class="mt-review-label">Từ tiếng Anh</div>
+            <div class="mt-review-word">${esc(word.word)}</div>
+            ${word.phonetic ? `<div class="mt-review-phonetic">/ ${esc(word.phonetic)} /</div>` : ''}
+            <button class="vocab-speak-btn" style="position:static;margin-top:8px;font-size:18px" onclick="event.stopPropagation();speakWord('${esc(word.word)}',this)" title="Nghe phát âm">🔊</button>
+            <div class="mt-review-tap-hint" style="margin-top:6px">👆 Nhấn thẻ để xem nghĩa</div>
+          </div>
+          <div class="mt-review-back">
+            <div class="mt-review-label">Nghĩa tiếng Việt</div>
+            <div class="mt-review-word">${esc(word.meaning)}</div>
+            ${word.phonetic ? `<div class="mt-review-phonetic">/ ${esc(word.phonetic)} /</div>` : ''}
+            <button class="vocab-speak-btn" style="position:static;margin-top:8px;font-size:18px;color:rgba(255,255,255,.85)" onclick="event.stopPropagation();speakWord('${esc(word.word)}',this)" title="Nghe phát âm">🔊</button>
+          </div>
+        </div>
+      </div>
+      <p class="mt-review-tap-hint" style="margin-bottom:10px">Từ này sẽ xuất hiện lại ở cuối để kiểm tra lại.</p>
+      <button class="mt-review-confirm" id="mt-review-confirm" onclick="confirmReview()">
+        ✓ Đã nhớ rồi — tiếp tục
+      </button>
+    </div>`;
+}
+
+function flipReviewCard() {
+  const card = document.getElementById('mt-review-card');
+  if (!card) return;
+  card.classList.toggle('flipped');
+  // Hiện nút "Đã nhớ rồi" sau khi lật
+  if (card.classList.contains('flipped')) {
+    const btn = document.getElementById('mt-review-confirm');
+    if (btn) { btn.style.display = 'block'; btn.style.animation = 'fadeIn .3s ease'; }
+  }
+}
+
+function confirmReview() {
+  renderMiniTestQuestion();
 }
 
 // Autosave mỗi 10 giây khi đang học dở
@@ -2708,14 +2914,14 @@ async function loadAdminData() {
 
   tbody.innerHTML = adminRows.map(r => `
     <tr>
-      <td>
+      <td data-label="Nhân viên">
         <div style="display:flex;align-items:center;gap:10px">
           <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal-bright));display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;flex-shrink:0">${esc(r.name[0]||'?').toUpperCase()}</div>
           <div><div class="td-name">${esc(r.name)}</div><div class="td-email">${esc(r.email)}</div></div>
         </div>
       </td>
-      <td style="color:var(--text-muted);font-size:13px">${r.last ? r.last.toLocaleString('vi-VN') : '—'}</td>
-      <td>
+      <td data-label="Đăng nhập cuối" style="color:var(--text-muted);font-size:13px">${r.last ? r.last.toLocaleString('vi-VN') : '—'}</td>
+      <td data-label="Thao tác">
         <div style="display:flex;gap:6px">
           <button onclick="editEmployee('${r.id}')" style="background:var(--indigo-light);color:var(--indigo);border:none;cursor:pointer;font-size:12px;padding:5px 10px;border-radius:7px;font-weight:600;transition:all .2s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">✏️ Sửa</button>
           <button onclick="deleteEmployee('${r.id}','${esc(r.name)}')" style="background:var(--red-light);color:var(--red);border:none;cursor:pointer;font-size:12px;padding:5px 10px;border-radius:7px;font-weight:600;transition:all .2s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">🗑 Xoá</button>
@@ -2753,9 +2959,9 @@ async function loadAssignData() {
   }
   tbody.innerHTML = schedules.map(s => `
     <tr>
-      <td style="font-weight:600">${s.date}</td>
-      <td>${esc(s.lessons?.title || '—')}</td>
-      <td>
+      <td data-label="Ngày học" style="font-weight:600">${s.date}</td>
+      <td data-label="Bài học">${esc(s.lessons?.title || '—')}</td>
+      <td data-label="Thao tác">
         <button onclick="deleteAssign(${s.id})" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:12px;padding:4px 8px;border-radius:6px;transition:all .2s" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--text-muted)'">🗑 Xoá</button>
       </td>
     </tr>
@@ -3003,8 +3209,10 @@ async function saveAssign() {
 }
 
 async function deleteAssign(id) {
-  if (!confirm('Xoá phân công này?')) return;
-  await sb.from('lesson_schedules').delete().eq('id', id);
+  const ok1 = await showConfirm({ title: 'Xoá phân công', message: 'Bạn có chắc muốn xoá phân công bài học này?', icon: '🗑️', iconType: 'danger' });
+  if (!ok1) return;
+  const { error } = await sb.from('lesson_schedules').delete().eq('id', id);
+  if (error) { toast('Lỗi xoá phân công: ' + error.message, 'error'); return; }
   toast('Đã xoá phân công.', 'success');
   await loadAssignData();
 }
@@ -3154,7 +3362,8 @@ async function saveEmployee() {
 function editEmployee(id) { openEmpModal(id); }
 
 async function deleteEmployee(id, name) {
-  if (!confirm(`Xoá nhân viên "${name}"? Thao tác này không thể hoàn tác.`)) return;
+  const ok2 = await showConfirm({ title: 'Xoá nhân viên', message: `Bạn có chắc muốn xoá nhân viên "${name}"? Thao tác này không thể hoàn tác.`, icon: '👤', iconType: 'danger' });
+  if (!ok2) return;
   const { error } = await sb.from('users').delete().eq('id', id);
   if (error) { toast('Lỗi xoá nhân viên: ' + error.message, 'error'); return; }
   toast('Đã xoá nhân viên.', 'success');
@@ -3192,11 +3401,11 @@ async function loadLessonsMgmt() {
     }
     return `
     <tr>
-      <td style="font-weight:600;max-width:200px">${esc(l.title)}</td>
-      <td><span class="badge ${typeBadge[l.type]||''}">${typeEmoji[l.type]||''} ${l.type}</span></td>
-      <td style="color:var(--text-muted);font-size:13px">${l.duration_estimate} phút</td>
-      <td style="color:var(--text-muted);font-size:13px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(preview)}</td>
-      <td>
+      <td data-label="Tiêu đề" style="font-weight:600;max-width:200px">${esc(l.title)}</td>
+      <td data-label="Loại"><span class="badge ${typeBadge[l.type]||''}">${typeEmoji[l.type]||''} ${l.type}</span></td>
+      <td data-label="Thời lượng" style="color:var(--text-muted);font-size:13px">${l.duration_estimate} phút</td>
+      <td data-label="Nội dung" style="color:var(--text-muted);font-size:13px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(preview)}</td>
+      <td data-label="Thao tác">
         <div style="display:flex;gap:6px">
           <button onclick="openLessonMgmtModal(${l.id})" style="background:var(--indigo-light);color:var(--indigo);border:none;cursor:pointer;font-size:12px;padding:5px 10px;border-radius:7px;font-weight:600;transition:opacity .2s" onmouseover="this.style.opacity='.75'" onmouseout="this.style.opacity='1'">✏️ Sửa</button>
           <button onclick="deleteLessonMgmt(${l.id},'${esc(l.title)}')" style="background:var(--red-light);color:var(--red);border:none;cursor:pointer;font-size:12px;padding:5px 10px;border-radius:7px;font-weight:600;transition:opacity .2s" onmouseover="this.style.opacity='.75'" onmouseout="this.style.opacity='1'">🗑 Xoá</button>
@@ -3426,7 +3635,8 @@ async function saveLessonMgmt() {
 }
 
 async function deleteLessonMgmt(id, title) {
-  if (!confirm(`Xoá bài học "${title}"? Thao tác này không thể hoàn tác.`)) return;
+  const ok3 = await showConfirm({ title: 'Xoá bài học', message: `Bạn có chắc muốn xoá bài học "${title}"? Thao tác này không thể hoàn tác.`, icon: '📘', iconType: 'danger' });
+  if (!ok3) return;
   const { error } = await sb.from('lessons').delete().eq('id', id);
   if (error) { toast('Lỗi xoá bài học: ' + error.message, 'error'); return; }
   toast('Đã xoá bài học.', 'success');
