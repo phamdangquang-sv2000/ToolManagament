@@ -1779,6 +1779,21 @@ function toast(msg, type = '') {
 }
 
 
+/* SOUND EFFECTS — Supabase Storage */
+const _sfx = {
+  correct: new Audio('https://dubvrtthmopdlyvxjhbw.supabase.co/storage/v1/object/public/sound_englearn/correct.mp3'),
+  wrong:   new Audio('https://dubvrtthmopdlyvxjhbw.supabase.co/storage/v1/object/public/sound_englearn/wrong.mp3'),
+};
+_sfx.correct.volume = 0.8;
+_sfx.wrong.volume   = 0.8;
+
+function playCorrectSound() {
+  try { _sfx.correct.currentTime = 0; _sfx.correct.play().catch(()=>{}); } catch(e) {}
+}
+function playWrongSound() {
+  try { _sfx.wrong.currentTime = 0; _sfx.wrong.play().catch(()=>{}); } catch(e) {}
+}
+
 /* CONFIRM DIALOG */
 let _confirmResolve = null;
 function showConfirm({ title = 'Xác nhận', message = '', icon = '🗑️', iconType = 'danger', okText = 'Đồng ý', cancelText = 'Huỷ' } = {}) {
@@ -2706,6 +2721,7 @@ function submitTypingAnswer() {
     mt.queue.shift();
     mt.correct++;
     mt.answered++;
+    playCorrectSound();
     const lab2 = document.getElementById('btn-end-lesson-label');
     if (lab2) lab2.textContent = `Mini-test (${mt.total - mt.queue.length}/${mt.total})`;
     setTimeout(renderMiniTestQuestion, 900);
@@ -2713,6 +2729,7 @@ function submitTypingAnswer() {
     // Đưa câu sai về cuối hàng chờ, đổi sang choice
     const wrongWord = mt.queue.shift();
     mt.queue.push({ ...wrongWord, qtype: 'choice' });
+    playWrongSound();
     // Hiện review card để lật thẻ
     showWrongReview(wrongWord, feedbackEl);
   }
@@ -2739,6 +2756,7 @@ function handleMiniTestAnswer(btn, chosen, correct) {
     mt.queue.shift();
     mt.correct++;
     mt.answered++;
+    playCorrectSound();
     const lab2 = document.getElementById('btn-end-lesson-label');
     if (lab2) lab2.textContent = `Mini-test (${mt.total - mt.queue.length}/${mt.total})`;
     setTimeout(renderMiniTestQuestion, 900);
@@ -2747,6 +2765,7 @@ function handleMiniTestAnswer(btn, chosen, correct) {
     // Đưa câu sai về cuối hàng chờ
     const wrongWord = mt.queue.shift();
     mt.queue.push({ ...wrongWord, qtype: 'choice' });
+    playWrongSound();
     // Hiện review card
     showWrongReview(wrongWord, feedbackEl);
   }
