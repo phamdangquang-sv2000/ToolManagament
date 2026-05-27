@@ -207,13 +207,17 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   box-shadow: var(--shadow-lg);
 }
 @media (min-width: 640px) {
-  .modal { border-radius: var(--radius); max-width: 720px; max-height: 86vh; animation: fadeInScale .3s ease; }
+  .modal { border-radius: var(--radius); max-width: 860px; max-height: 92vh; animation: fadeInScale .3s ease; }
+}
+@media (min-width: 1024px) {
+  .modal { max-width: 960px; }
 }
 .modal-header {
   padding: 20px 24px; border-bottom: 1px solid var(--border-light);
   flex-shrink: 0; background: #fff;
 }
-.modal-body { flex: 1; overflow-y: auto; padding: 24px; }
+.modal-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 24px; max-width: 100%; }
+.modal-body * { max-width: 100%; box-sizing: border-box; }
 .modal-footer {
   padding: 16px 24px; border-top: 1px solid var(--border-light);
   flex-shrink: 0; background: #fff;
@@ -603,9 +607,302 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 .lesson-content p { margin: 0 0 16px; }
 .lesson-content ul,.lesson-content ol { padding-left: 22px; margin: 10px 0 16px; }
 .lesson-content li { margin: 8px 0; }
-.lesson-content table { width: 100%; border-collapse: collapse; margin: 16px 0; border-radius: 10px; overflow: hidden; }
-.lesson-content th,.lesson-content td { border: 1px solid var(--border); padding: 10px 14px; text-align: left; }
+.lesson-content .table-wrap,
+.lesson-content table {
+  display: block; width: 100%; overflow-x: auto;
+  -webkit-overflow-scrolling: touch; margin: 16px 0;
+}
+.lesson-content table {
+  border-collapse: collapse; min-width: 100%; width: max-content; max-width: none;
+  table-layout: auto;
+}
+.lesson-content thead, .lesson-content tbody,
+.lesson-content tr { display: table-row-group; width: auto; }
+.lesson-content thead { display: table-header-group; }
+.lesson-content tr { display: table-row; }
+.lesson-content th, .lesson-content td {
+  border: 1px solid var(--border); padding: 9px 12px; text-align: left;
+  white-space: nowrap; font-size: 13px; display: table-cell;
+}
 .lesson-content th { background: var(--bg-2); font-weight: 600; }
+
+/* ===== BLOCK EDITOR (Admin) ===== */
+.be-wrap { border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden; background: #fff; }
+.be-toolbar {
+  display: flex; align-items: center; gap: 6px; padding: 10px 14px;
+  background: var(--bg-2); border-bottom: 1px solid var(--border); flex-wrap: wrap;
+}
+.be-add-btn {
+  display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px;
+  border-radius: 9px; border: 1.5px solid var(--border); background: #fff;
+  color: var(--text); font-size: 12px; font-weight: 600; cursor: pointer;
+  font-family: var(--font-body); transition: all .15s;
+}
+.be-add-btn:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
+.be-blocks { padding: 14px; display: flex; flex-direction: column; gap: 10px; min-height: 120px; }
+.be-block {
+  border: 1.5px solid var(--border); border-radius: 10px; background: #fff;
+  overflow: hidden; transition: border-color .15s; position: relative;
+}
+.be-block:hover { border-color: var(--teal-mid); }
+.be-block-header {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  background: var(--bg-2); border-bottom: 1px solid var(--border-light);
+  font-size: 11px; font-weight: 700; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: .05em;
+}
+.be-block-header .be-icon { font-size: 14px; }
+.be-block-actions { margin-left: auto; display: flex; gap: 4px; }
+.be-block-del {
+  width: 24px; height: 24px; border-radius: 6px; border: none;
+  background: var(--red-light); color: var(--red); cursor: pointer;
+  font-size: 13px; display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.be-block-del:hover { background: var(--red); color: #fff; }
+.be-block-move {
+  width: 24px; height: 24px; border-radius: 6px; border: none;
+  background: var(--bg-2); color: var(--text-muted); cursor: pointer;
+  font-size: 13px; display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.be-block-move:hover { background: var(--border); color: var(--text); }
+.be-block-body { padding: 10px 12px; }
+.be-text-input {
+  width: 100%; border: none; outline: none; font-size: 14px; line-height: 1.8;
+  font-family: var(--font-body); color: var(--text); background: transparent;
+  resize: vertical; min-height: 60px; padding: 4px 0;
+}
+.be-text-input::placeholder { color: var(--text-sub); }
+.be-callout-input {
+  width: 100%; border: none; outline: none; font-size: 14px; line-height: 1.7;
+  font-family: var(--font-body); color: var(--teal-dark); background: transparent;
+  resize: vertical; min-height: 48px; padding: 4px 0; font-style: italic;
+}
+.be-block.type-callout { border-color: rgba(13,148,136,.3); }
+.be-block.type-callout .be-block-header { background: linear-gradient(90deg, var(--teal-light), #e0f2fe); color: var(--teal-dark); border-bottom-color: rgba(13,148,136,.15); }
+.be-block.type-callout .be-block-body { background: linear-gradient(135deg, #f0fdfa, #e0f2fe); }
+/* Table block */
+.be-table-editor { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.be-table { border-collapse: collapse; min-width: 100%; width: max-content; font-size: 13px; }
+.be-table th, .be-table td { border: 1.5px solid var(--border); padding: 0; min-width: 80px; }
+.be-table th { background: linear-gradient(135deg, var(--teal-dark), var(--teal)); }
+.be-table th input {
+  width: 100%; padding: 9px 11px; border: none; outline: none;
+  background: transparent; font-size: 12px; font-weight: 700; color: #fff;
+  font-family: var(--font-body); text-transform: uppercase; letter-spacing: .04em;
+  min-width: 80px;
+}
+.be-table th input::placeholder { color: rgba(255,255,255,.55); }
+.be-table td input {
+  width: 100%; padding: 8px 11px; border: none; outline: none;
+  background: transparent; font-size: 13px; color: var(--text);
+  font-family: var(--font-body); min-width: 80px;
+}
+.be-table td input:focus { background: rgba(13,148,136,.06); }
+.be-table tr:nth-child(even) td { background: var(--bg-2); }
+.be-table tr:nth-child(even) td input { background: transparent; }
+.be-table-controls { display: flex; gap: 6px; padding: 8px 0 0; flex-wrap: wrap; }
+.be-tc-btn {
+  padding: 4px 10px; border-radius: 7px; border: 1.5px solid var(--border);
+  background: #fff; font-size: 11px; font-weight: 600; cursor: pointer;
+  font-family: var(--font-body); color: var(--text-muted); transition: all .15s;
+}
+.be-tc-btn:hover { border-color: var(--teal); color: var(--teal); }
+/* Image block */
+.be-img-drop {
+  border: 2px dashed var(--border); border-radius: 10px; padding: 20px;
+  text-align: center; cursor: pointer; transition: all .2s; background: var(--bg-2);
+}
+.be-img-drop:hover { border-color: var(--teal); background: var(--teal-light); }
+.be-img-drop .be-img-icon { font-size: 28px; margin-bottom: 6px; }
+.be-img-drop p { font-size: 12px; color: var(--text-muted); margin: 0; }
+.be-img-preview { position: relative; }
+.be-img-preview img { max-width: 100%; border-radius: 8px; display: block; }
+.be-img-replace {
+  position: absolute; top: 8px; right: 8px; padding: 4px 10px;
+  border-radius: 7px; border: none; background: rgba(0,0,0,.55); color: #fff;
+  font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font-body);
+}
+/* YouTube block */
+.be-yt-input-row { display: flex; gap: 8px; align-items: center; }
+.be-yt-input {
+  flex: 1; padding: 9px 13px; border-radius: 9px; border: 1.5px solid var(--border);
+  font-size: 13px; font-family: var(--font-body); background: var(--bg-2); color: var(--text);
+  outline: none; transition: border-color .2s;
+}
+.be-yt-input:focus { border-color: var(--teal); }
+.be-yt-confirm {
+  padding: 9px 16px; border-radius: 9px; border: none;
+  background: var(--red); color: #fff; font-size: 12px; font-weight: 700;
+  cursor: pointer; font-family: var(--font-body); white-space: nowrap;
+}
+.be-yt-preview { background: var(--bg-2); border-radius: 10px; padding: 12px; display: flex; align-items: center; gap: 10px; }
+.be-yt-preview-thumb { width: 80px; height: 54px; border-radius: 7px; object-fit: cover; }
+.be-yt-preview-label { font-size: 13px; font-weight: 600; color: var(--text); flex: 1; word-break: break-all; }
+.be-yt-change {
+  padding: 4px 10px; border-radius: 7px; border: 1.5px solid var(--border);
+  background: #fff; font-size: 11px; font-weight: 600; cursor: pointer;
+  font-family: var(--font-body); color: var(--text-muted);
+}
+/* Heading block */
+.be-heading-input {
+  width: 100%; border: none; outline: none; font-size: 17px; font-weight: 800;
+  font-family: var(--font-display); color: var(--teal-dark); background: transparent;
+  padding: 4px 0; letter-spacing: -.03em;
+}
+.be-heading-input::placeholder { color: var(--text-sub); }
+/* empty state */
+.be-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 32px; color: var(--text-sub); font-size: 13px; gap: 8px;
+  border: 2px dashed var(--border); border-radius: 10px; margin: 4px;
+}
+.be-empty .be-empty-icon { font-size: 28px; }
+
+/* Grammar Exercise Builder */
+.ge-ex-block { background: var(--bg-2); border: 1.5px solid var(--border); border-radius: 10px; padding: 14px; margin-top: 16px; }
+.ge-ex-title { font-size: 13px; font-weight: 700; color: var(--teal); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.ge-ex-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.ge-ex-row input { flex: 1; padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; background: #fff; font-family: var(--font-body); }
+.ge-ex-row input:focus { border-color: var(--teal); outline: none; }
+.ge-ex-del { width: 28px; height: 28px; border-radius: 6px; border: none; background: var(--red-light); color: var(--red); cursor: pointer; font-size: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.ge-ex-add { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 8px; border: 1.5px dashed var(--teal); background: var(--teal-light); color: var(--teal); font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font-body); transition: all .15s; }
+.ge-ex-add:hover { background: rgba(13,148,136,.15); }
+.ge-ex-hint { font-size: 11px; color: var(--text-sub); margin-top: 4px; }
+.ge-ex-instruction { width: 100%; padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; background: #fff; font-family: var(--font-body); margin-bottom: 10px; }
+
+
+
+/* ===== GRAMMAR LESSON — EMPLOYEE VIEW ===== */
+.grammar-lesson-content {
+  font-size: 15px; line-height: 1.9; color: var(--text);
+}
+.grammar-lesson-content h2 {
+  font-size: 17px; font-weight: 800; color: var(--teal-dark);
+  border-left: 4px solid var(--teal); padding-left: 12px;
+  margin: 24px 0 10px; font-family: var(--font-display); letter-spacing: -.03em;
+  background: linear-gradient(90deg, rgba(13,148,136,.06) 0%, transparent 100%);
+  padding: 8px 12px; border-radius: 0 8px 8px 0;
+}
+.grammar-lesson-content h3 {
+  font-size: 15px; font-weight: 700; color: var(--teal-dark);
+  margin: 20px 0 8px; font-family: var(--font-display);
+  display: flex; align-items: center; gap: 8px;
+}
+.grammar-lesson-content h3::before {
+  content: ''; display: inline-block; width: 8px; height: 8px;
+  background: var(--teal); border-radius: 50%; flex-shrink: 0;
+}
+.grammar-lesson-content p { margin: 0 0 14px; }
+.grammar-lesson-content ul { list-style: none; padding: 0; margin: 10px 0 16px; }
+.grammar-lesson-content ul li {
+  padding: 10px 14px 10px 40px; position: relative;
+  background: var(--bg-2); border-radius: 10px; margin-bottom: 8px;
+  border-left: 3px solid var(--teal-bright); font-size: 14px;
+  word-break: break-word; overflow-wrap: break-word;
+  box-sizing: border-box; max-width: 100%;
+}
+.grammar-lesson-content ul li::before {
+  content: '✦'; position: absolute; left: 14px; top: 10px;
+  color: var(--teal); font-size: 11px;
+}
+.grammar-lesson-content ol { padding-left: 20px; margin: 10px 0 16px; }
+.grammar-lesson-content ol li { margin-bottom: 8px; padding: 4px 0; }
+.grammar-lesson-content strong { color: var(--teal-dark); font-weight: 700; }
+.grammar-lesson-content em { color: var(--text-muted); font-style: italic; }
+.grammar-lesson-content blockquote {
+  background: linear-gradient(135deg, var(--teal-light), #e0f2fe);
+  border-left: 4px solid var(--teal); border-radius: 0 12px 12px 0;
+  padding: 14px 18px; margin: 16px 0; color: var(--teal-dark);
+  font-style: italic; font-size: 14px; line-height: 1.7;
+}
+.grammar-lesson-content .table-wrap,
+.grammar-lesson-content table {
+  display: block; width: 100%; overflow-x: auto;
+  -webkit-overflow-scrolling: touch; margin: 16px 0;
+  border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.06);
+}
+.grammar-lesson-content table {
+  border-collapse: collapse; min-width: 100%; width: max-content; max-width: none;
+  table-layout: auto; border-radius: 12px; overflow: hidden;
+}
+.grammar-lesson-content thead, .grammar-lesson-content tbody,
+.grammar-lesson-content tr { display: table-row-group; width: auto; }
+.grammar-lesson-content thead { display: table-header-group; }
+.grammar-lesson-content tr { display: table-row; }
+.grammar-lesson-content th {
+  background: linear-gradient(135deg, var(--teal-dark), var(--teal));
+  color: #fff; font-weight: 700; font-size: 12px;
+  text-transform: uppercase; letter-spacing: .05em;
+  padding: 12px 14px; text-align: left;
+  white-space: nowrap; display: table-cell;
+}
+.grammar-lesson-content td {
+  border-bottom: 1px solid var(--border-light); padding: 10px 12px;
+  font-size: 13px; vertical-align: top; display: table-cell;
+  white-space: nowrap;
+}
+.grammar-lesson-content tr:nth-child(even) td { background: var(--bg-2); }
+.grammar-lesson-content tr:last-child td { border-bottom: none; }
+.grammar-lesson-content img {
+  max-width: 100%; width: auto; border-radius: 12px; margin: 12px 0;
+  box-shadow: 0 4px 16px rgba(0,0,0,.1);
+  display: block; height: auto;
+}
+.lesson-content img { max-width: 100%; height: auto; border-radius: 8px; }
+
+/* Grammar exercise - employee */
+.grammar-ex-wrap {
+  background: linear-gradient(135deg, #f0fdfa, #fff);
+  border: 1.5px solid rgba(13,148,136,.2);
+  border-radius: 16px; padding: 20px; margin-top: 24px;
+  box-shadow: 0 4px 16px rgba(13,148,136,.08);
+}
+.grammar-ex-title {
+  font-size: 15px; font-weight: 800; color: var(--teal-dark);
+  margin-bottom: 4px; font-family: var(--font-display);
+  display: flex; align-items: center; gap: 8px;
+}
+.grammar-ex-instruction {
+  font-size: 13px; color: var(--text-muted); margin-bottom: 18px;
+  padding: 10px 14px; background: rgba(13,148,136,.07);
+  border-radius: 8px; font-style: italic;
+}
+.grammar-ex-item {
+  display: flex; align-items: baseline; gap: 6px; margin-bottom: 16px;
+  font-size: 14px; line-height: 2; flex-wrap: wrap;
+  padding: 10px 14px; background: #fff; border-radius: 10px;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+}
+.grammar-ex-num {
+  font-weight: 800; color: var(--teal); min-width: 24px;
+  font-family: var(--font-display);
+}
+.grammar-ex-hint {
+  color: var(--text-sub); font-size: 12px; font-style: italic;
+  background: var(--bg-2); padding: 2px 8px; border-radius: 6px;
+}
+.grammar-ex-input {
+  border: none; border-bottom: 2.5px solid var(--teal);
+  background: rgba(13,148,136,.07); border-radius: 6px 6px 0 0;
+  padding: 4px 12px; font-size: 14px; font-family: var(--font-body);
+  color: var(--text); outline: none; min-width: 90px;
+  text-align: center; transition: all .2s;
+}
+.grammar-ex-input:focus {
+  background: rgba(13,148,136,.14);
+  box-shadow: 0 2px 0 var(--teal);
+}
+.grammar-ex-input.correct {
+  border-bottom-color: var(--green); background: var(--green-light);
+  color: var(--green); font-weight: 700;
+}
+.grammar-ex-input.wrong {
+  border-bottom-color: var(--red); background: var(--red-light);
+  color: var(--red);
+}
 
 /* Reading article styling */
 .reading-article { }
@@ -1902,7 +2199,7 @@ select {
 
     <!-- Modal quản lý bài học -->
     <div id="lesson-mgmt-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto">
-      <div style="background:var(--bg);border-radius:18px;padding:28px;width:100%;max-width:600px;box-shadow:0 24px 64px rgba(0,0,0,.2);max-height:92vh;overflow-y:auto;margin:auto">
+      <div style="background:var(--bg);border-radius:18px;padding:32px;width:100%;max-width:860px;box-shadow:0 24px 64px rgba(0,0,0,.2);max-height:95vh;overflow-y:auto;margin:auto">
         <h3 style="font-size:17px;font-weight:700;margin-bottom:20px" id="lesson-mgmt-title">📘 Thêm bài học</h3>
         <div style="display:flex;flex-direction:column;gap:16px">
 
@@ -1944,10 +2241,46 @@ select {
             <div id="lm-vocab-preview" style="margin-top:8px;font-size:12px;color:var(--text-muted)"></div>
           </div>
 
-          <!-- READING / GRAMMAR / LISTENING section -->
+          <!-- READING / GRAMMAR section -->
           <div id="lm-content-section" class="hidden">
-            <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Nội dung bài học <span style="font-weight:400;text-transform:none;letter-spacing:0">(hỗ trợ HTML)</span></label>
-            <textarea id="lm-content-input" rows="12" placeholder="<h3>Tiêu đề</h3>&#10;<p>Nội dung...</p>&#10;<ul><li>Điểm 1</li></ul>" style="width:100%;margin-top:6px;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:13px;background:var(--bg-2);font-family:monospace;resize:vertical;line-height:1.6"></textarea>
+            <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Nội dung bài học</label>
+
+            <!-- Block Editor -->
+            <div id="lm-block-editor-wrap" class="be-wrap" style="margin-top:8px">
+              <div class="be-toolbar">
+                <button type="button" class="be-add-btn" onclick="beAddBlock('text')">✦ Đoạn văn</button>
+                <button type="button" class="be-add-btn" onclick="beAddBlock('heading')">🔤 Tiêu đề</button>
+                <button type="button" class="be-add-btn" onclick="beAddBlock('callout')">💡 Callout</button>
+                <button type="button" class="be-add-btn" onclick="beAddBlock('table')">⊞ Bảng</button>
+                <button type="button" class="be-add-btn" onclick="beAddBlock('image')">🖼 Ảnh</button>
+                <button type="button" class="be-add-btn" onclick="beAddBlock('youtube')">▶️ YouTube</button>
+              </div>
+              <div id="be-blocks-container" class="be-blocks">
+                <div class="be-empty" id="be-empty-state">
+                  <div class="be-empty-icon">📝</div>
+                  <div>Nhấn các nút trên để thêm nội dung</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Grammar Exercise Builder -->
+            <div id="lm-grammar-ex-section" class="hidden" style="margin-top:14px">
+              <div class="ge-ex-block">
+                <div class="ge-ex-title">✏️ Bài tập điền từ (nhân viên sẽ làm)</div>
+                <input type="text" id="ge-ex-instruction" class="ge-ex-instruction" placeholder="Hướng dẫn bài tập. VD: Chia đúng dạng động từ trong ngoặc để hoàn thành câu.">
+                <div id="ge-ex-rows" style="margin-top:6px"></div>
+                <button type="button" class="ge-ex-add" onclick="geAddExRow()">+ Thêm câu</button>
+                <div class="ge-ex-hint" style="margin-top:10px">💡 Mỗi câu: điền phần trước chỗ trống | đáp án | phần sau chỗ trống | gợi ý từ gốc (tùy chọn). VD: <code>She usually | goes | for a walk. | (go)</code></div>
+              </div>
+            </div>
+            <div style="margin-top:8px;display:flex;gap:8px">
+              <button type="button" id="lm-toggle-ex-btn" onclick="geToggleExercise()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;border:1.5px solid var(--teal);background:var(--teal-light);color:var(--teal);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);transition:all .15s" onmouseover="this.style.background='rgba(13,148,136,.15)'" onmouseout="this.style.background='var(--teal-light)'">
+                ✏️ Thêm bài tập
+              </button>
+            </div>
+
+            <!-- Hidden textarea to hold serialized content (sent to DB) -->
+            <textarea id="lm-content-input" class="hidden"></textarea>
           </div>
 
           <!-- READING QUIZ BUILDER -->
@@ -2466,6 +2799,8 @@ function showWelcomeAnimation(name, onDone) {
   };
 
   if (ctaBtn) ctaBtn.addEventListener('click', dismiss);
+  // Auto-dismiss after 6 s if user doesn't tap
+  setTimeout(dismiss, 6000);
 }
 
 function showLoginStep(step) {
@@ -2891,6 +3226,40 @@ function openLessonModal(lesson, alreadyCompleted) {
   } else {
     // Smart render: nếu content là plain text (không có HTML tags) thì auto-format đẹp
     const raw = lesson.content || '';
+    // GRAMMAR type: parse JSON {html, exercise}
+    if (lesson.type === 'GRAMMAR') {
+      let grammarHtml = '';
+      let grammarExercise = null;
+      try {
+        const parsed = JSON.parse(raw);
+        grammarHtml = parsed.html || raw;
+        grammarExercise = parsed.exercise || null;
+      } catch {
+        grammarHtml = raw;
+      }
+      // Render Grammar content beautifully
+      contentEl.innerHTML = `<div class="grammar-lesson-content lesson-content">${wrapTables(renderYTEmbeds(grammarHtml))}</div>`;
+      // Render exercise if present AND lock end button until done
+      if (grammarExercise && grammarExercise.items && grammarExercise.items.length > 0) {
+        hintEl.classList.remove('hidden');
+        hintEl.textContent = '✏️ Đọc lý thuyết xong, hãy làm bài tập bên dưới để hoàn thành!';
+        endBtn.disabled = true;
+        endLabel.textContent = 'Làm bài tập trước';
+        setTimeout(() => renderGrammarExercise(grammarExercise), 100);
+      } else {
+        // No exercise → still require scrolling through content before finishing
+        hintEl.classList.add('hidden');
+        endBtn.disabled = false;
+        endLabel.textContent = 'Kết thúc bài học';
+      }
+      // *** CRITICAL: return here so READING code below doesn't overwrite ***
+      document.getElementById('modal-audio').classList.add('hidden');
+      document.getElementById('modal-audio-inner').innerHTML = '';
+      document.getElementById('lesson-overlay').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      return;
+    }
+
     let readingText = raw;
     let readingQuestions = [];
     if (lesson.type === 'READING') {
@@ -2905,28 +3274,22 @@ function openLessonModal(lesson, alreadyCompleted) {
 
     const isHtml = /<[a-z][\s\S]*>/i.test(readingText);
 
-    if (!isHtml && (lesson.type === 'READING' || lesson.type === 'GRAMMAR')) {
+    if (!isHtml && lesson.type === 'READING') {
       // Auto-format plain text thành bài đọc đẹp
       const paragraphs = readingText.split(/\n{2,}|\n/).map(s => s.trim()).filter(Boolean);
       const wordCount  = readingText.trim().split(/\s+/).length;
       const readMins   = Math.max(1, Math.round(wordCount / 200));
-
-      // Tách câu nổi bật (câu dài nhất ở đoạn giữa) làm pull-quote
       const midIdx = Math.floor(paragraphs.length / 2);
       const longestNearMid = paragraphs
         .slice(Math.max(0, midIdx - 1), midIdx + 2)
         .reduce((a, b) => a.length > b.length ? a : b, '');
-      // Lấy 1 câu từ đoạn đó làm highlight
       const highlightSentence = longestNearMid.match(/[^.!?]+[.!?]/)?.[1] || '';
-
       const renderedParas = paragraphs.map((p, i) => {
-        // Chèn pull-quote sau đoạn giữa
         if (i === midIdx && highlightSentence.length > 40) {
           return `<p>${esc(p)}</p><div class="reading-highlight">"${esc(highlightSentence.trim())}"</div>`;
         }
         return `<p>${esc(p)}</p>`;
       }).join('');
-
       contentEl.innerHTML = `
         <div class="reading-article">
           <div class="reading-meta">
@@ -2937,7 +3300,7 @@ function openLessonModal(lesson, alreadyCompleted) {
           <div class="reading-body lesson-content">${renderedParas}</div>
         </div>`;
     } else {
-      contentEl.innerHTML = readingText;
+      contentEl.innerHTML = `<div class="lesson-content">${wrapTables(renderYTEmbeds(readingText))}</div>`;
     }
 
     // Render reading quiz if present
@@ -2946,7 +3309,6 @@ function openLessonModal(lesson, alreadyCompleted) {
       hintEl.textContent = '📝 Đọc xong hãy trả lời đúng tất cả câu hỏi bên dưới để hoàn thành bài học!';
       endBtn.disabled = true;
       endLabel.textContent = `Trả lời câu hỏi (0/${readingQuestions.length})`;
-      // Render quiz after reading content
       setTimeout(() => renderReadingQuiz(readingQuestions), 100);
     } else {
       hintEl.classList.add('hidden');
@@ -4167,6 +4529,12 @@ function onLessonTypeChange() {
   document.getElementById('lm-content-section').classList.toggle('hidden', type === 'VOCAB' || type === 'LISTENING');
   document.getElementById('lm-audio-section').classList.toggle('hidden', type !== 'LISTENING');
   document.getElementById('lm-quiz-section').classList.toggle('hidden', type !== 'READING');
+  const isGrammar = type === 'GRAMMAR';
+  const isReading = type === 'READING';
+  const exSection = document.getElementById('lm-grammar-ex-section');
+  const toggleBtn = document.getElementById('lm-toggle-ex-btn');
+  if (exSection && !isGrammar) exSection.classList.add('hidden');
+  if (toggleBtn) toggleBtn.classList.toggle('hidden', !isGrammar);
 }
 
 // Live preview đếm số từ
@@ -4217,14 +4585,14 @@ function openLessonMgmtModal(id) {
       try {
         const parsed = JSON.parse(l.content || '{}');
         if (parsed.text !== undefined) {
-          document.getElementById('lm-content-input').value = parsed.text || '';
+          geSetContent(parsed.text || '');
           loadQuizQuestionsIntoBuilder(parsed.questions || []);
         } else {
-          document.getElementById('lm-content-input').value = l.content || '';
+          geSetContent(l.content || '');
           loadQuizQuestionsIntoBuilder([]);
         }
       } catch {
-        document.getElementById('lm-content-input').value = l.content || '';
+        geSetContent(l.content || '');
         loadQuizQuestionsIntoBuilder([]);
       }
     } else if (l.type === 'LISTENING') {
@@ -4243,7 +4611,15 @@ function openLessonMgmtModal(id) {
         hideFillBlankPreview();
       }
     } else {
-      document.getElementById('lm-content-input').value = l.content || '';
+      // GRAMMAR: load into rich editor + exercise
+      try {
+        const parsed = JSON.parse(l.content || '{}');
+        geSetContent(parsed.html || '');
+        geLoadExercise(parsed.exercise || null);
+      } catch {
+        geSetContent(l.content || '');
+        geLoadExercise(null);
+      }
     }
   } else {
     document.getElementById('lm-title').value         = '';
@@ -4253,6 +4629,8 @@ function openLessonMgmtModal(id) {
     document.getElementById('lm-content-input').value = '';
     document.getElementById('lm-audio-url').value     = '';
     document.getElementById('lm-transcript-input').value = '';
+    geSetContent('');
+    geLoadExercise(null);
     hideFillBlankPreview();
     clearQuizBuilder();
   }
@@ -4265,6 +4643,12 @@ function openLessonMgmtModal(id) {
 function closeLessonMgmtModal() {
   document.getElementById('lesson-mgmt-modal').classList.add('hidden');
   editingLessonId = null;
+  beSetBlocks([]);
+  _geExRows = [];
+  document.getElementById('ge-ex-rows').innerHTML = '';
+  document.getElementById('lm-grammar-ex-section')?.classList.add('hidden');
+  const btn = document.getElementById('lm-toggle-ex-btn');
+  if (btn) btn.textContent = '✏️ Thêm bài tập';
 }
 
 async function saveLessonMgmt() {
@@ -4292,11 +4676,15 @@ async function saveLessonMgmt() {
     });
     content = JSON.stringify(words);
   } else if (type === 'READING') {
-    const text = document.getElementById('lm-content-input').value;
+    const html = geGetContent();
     const questions = collectQuizQuestions();
     if (questions === null) return; // validation failed
-    // Store as JSON with text + questions
-    content = JSON.stringify({ text, questions });
+    content = JSON.stringify({ text: html, questions });
+  } else if (type === 'GRAMMAR') {
+    const html = geGetContent();
+    if (!html.trim()) { toast('Vui lòng nhập nội dung bài Grammar!', 'error'); return; }
+    const exercise = geCollectExercise();
+    content = JSON.stringify({ html, exercise });
   } else if (type === 'LISTENING') {
     const transcript = document.getElementById('lm-transcript-input').value.trim();
     if (!transcript) { toast('Vui lòng nhập transcript cho bài nghe!', 'error'); return; }
@@ -4305,8 +4693,6 @@ async function saveLessonMgmt() {
     } else {
       content = JSON.stringify({ transcript, blanks: [] });
     }
-  } else {
-    content = document.getElementById('lm-content-input').value;
   }
 
   const row = { title, type, content, duration_estimate: duration, audio_url: finalAudioUrl || null };
@@ -4994,6 +5380,588 @@ function checkFillBlank() {
 }
 
 /* HELPERS */
+/* ===== BLOCK EDITOR ENGINE ===== */
+/*
+  Block format (stored in JSON array):
+  { type: 'text'|'heading'|'callout'|'table'|'image'|'youtube', data: {...} }
+  
+  text:    { content: "..." }
+  heading: { content: "..." }
+  callout: { content: "..." }
+  table:   { headers: [...], rows: [[...]] }
+  image:   { src: "data:..." }
+  youtube: { ytId: "...", url: "..." }
+*/
+
+let _beBlocks = [];
+
+function beGetBlocks() { return _beBlocks; }
+
+function beSetBlocks(blocks) {
+  _beBlocks = Array.isArray(blocks) ? blocks : [];
+  beRenderAll();
+}
+
+function beAddBlock(type, data, insertAfterIdx) {
+  const defaults = {
+    text:    { content: '' },
+    heading: { content: '' },
+    callout: { content: '' },
+    table:   { headers: ['Cột 1', 'Cột 2', 'Cột 3'], rows: [['', '', ''], ['', '', ''], ['', '', '']] },
+    image:   { src: '' },
+    youtube: { ytId: '', url: '' },
+  };
+  const block = { type, data: data || { ...defaults[type] }, id: Date.now() + Math.random() };
+  if (insertAfterIdx !== undefined && insertAfterIdx >= 0) {
+    _beBlocks.splice(insertAfterIdx + 1, 0, block);
+  } else {
+    _beBlocks.push(block);
+  }
+  beRenderAll();
+  // Focus new block after render
+  setTimeout(() => {
+    const idx = insertAfterIdx !== undefined ? insertAfterIdx + 1 : _beBlocks.length - 1;
+    const container = document.getElementById('be-blocks-container');
+    const blockEls = container.querySelectorAll('.be-block');
+    const target = blockEls[idx];
+    if (target) {
+      const inp = target.querySelector('textarea, input[type=text]');
+      if (inp) inp.focus();
+    }
+  }, 50);
+}
+
+function beDeleteBlock(idx) {
+  _beBlocks.splice(idx, 1);
+  beRenderAll();
+}
+
+function beMoveBlock(idx, dir) {
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= _beBlocks.length) return;
+  const tmp = _beBlocks[idx];
+  _beBlocks[idx] = _beBlocks[newIdx];
+  _beBlocks[newIdx] = tmp;
+  beRenderAll();
+}
+
+function beUpdateBlockData(idx, field, value) {
+  if (_beBlocks[idx]) _beBlocks[idx].data[field] = value;
+}
+
+function beUpdateTableCell(blockIdx, row, col, value, isHeader) {
+  const b = _beBlocks[blockIdx];
+  if (!b) return;
+  if (isHeader) { b.data.headers[col] = value; }
+  else { b.data.rows[row][col] = value; }
+}
+
+function beTableAddRow(blockIdx) {
+  const b = _beBlocks[blockIdx];
+  if (!b) return;
+  b.data.rows.push(new Array(b.data.headers.length).fill(''));
+  beRenderAll();
+}
+
+function beTableAddCol(blockIdx) {
+  const b = _beBlocks[blockIdx];
+  if (!b) return;
+  b.data.headers.push(`Cột ${b.data.headers.length + 1}`);
+  b.data.rows = b.data.rows.map(r => [...r, '']);
+  beRenderAll();
+}
+
+function beTableDelRow(blockIdx) {
+  const b = _beBlocks[blockIdx];
+  if (!b || b.data.rows.length <= 1) return;
+  b.data.rows.pop();
+  beRenderAll();
+}
+
+function beTableDelCol(blockIdx) {
+  const b = _beBlocks[blockIdx];
+  if (!b || b.data.headers.length <= 1) return;
+  b.data.headers.pop();
+  b.data.rows = b.data.rows.map(r => r.slice(0, -1));
+  beRenderAll();
+}
+
+function beRenderAll() {
+  const container = document.getElementById('be-blocks-container');
+  if (!container) return;
+  const emptyState = document.getElementById('be-empty-state');
+  if (emptyState) emptyState.remove();
+
+  // Save focus info before re-render
+  const focused = document.activeElement;
+  let focusKey = null;
+  if (focused && focused.dataset.beKey) focusKey = focused.dataset.beKey;
+  const focusSel = focused && focused.tagName === 'INPUT' ? { start: focused.selectionStart, end: focused.selectionEnd } : null;
+
+  container.innerHTML = '';
+
+  if (_beBlocks.length === 0) {
+    container.innerHTML = '<div class="be-empty" id="be-empty-state"><div class="be-empty-icon">📝</div><div>Nhấn các nút trên để thêm nội dung</div></div>';
+    return;
+  }
+
+  _beBlocks.forEach((block, idx) => {
+    const el = document.createElement('div');
+    el.className = `be-block type-${block.type}`;
+    const typeLabels = { text: '✦ Đoạn văn', heading: '🔤 Tiêu đề', callout: '💡 Callout', table: '⊞ Bảng', image: '🖼 Ảnh', youtube: '▶️ YouTube' };
+    const header = `<div class="be-block-header">
+      <span class="be-icon">${typeLabels[block.type] || block.type}</span>
+      <div class="be-block-actions">
+        ${idx > 0 ? `<button type="button" class="be-block-move" onclick="beMoveBlock(${idx},-1)" title="Lên">↑</button>` : ''}
+        ${idx < _beBlocks.length - 1 ? `<button type="button" class="be-block-move" onclick="beMoveBlock(${idx},1)" title="Xuống">↓</button>` : ''}
+        <button type="button" class="be-block-del" onclick="beDeleteBlock(${idx})" title="Xoá">×</button>
+      </div>
+    </div>`;
+
+    let body = '';
+    const key = `${block.id || idx}`;
+
+    if (block.type === 'text') {
+      body = `<div class="be-block-body">
+        <textarea class="be-text-input" data-be-key="${key}-text" placeholder="Nhập nội dung đoạn văn..." oninput="beUpdateBlockData(${idx},'content',this.value)">${esc(block.data.content || '')}</textarea>
+      </div>`;
+    } else if (block.type === 'heading') {
+      body = `<div class="be-block-body">
+        <input type="text" class="be-heading-input" data-be-key="${key}-h" placeholder="Nhập tiêu đề..." value="${esc(block.data.content || '')}" oninput="beUpdateBlockData(${idx},'content',this.value)">
+      </div>`;
+    } else if (block.type === 'callout') {
+      body = `<div class="be-block-body">
+        <textarea class="be-callout-input" data-be-key="${key}-callout" placeholder="Nhập nội dung callout / ghi chú quan trọng..." oninput="beUpdateBlockData(${idx},'content',this.value)">${esc(block.data.content || '')}</textarea>
+      </div>`;
+    } else if (block.type === 'table') {
+      const hdrs = block.data.headers || [];
+      const rows = block.data.rows || [];
+      let tbl = `<div class="be-block-body"><div class="be-table-editor"><table class="be-table"><thead><tr>`;
+      hdrs.forEach((h, c) => {
+        tbl += `<th><input type="text" value="${esc(h)}" placeholder="Cột ${c+1}" data-be-key="${key}-h${c}" oninput="beUpdateTableCell(${idx},-1,${c},this.value,true)"></th>`;
+      });
+      tbl += '</tr></thead><tbody>';
+      rows.forEach((row, r) => {
+        tbl += '<tr>';
+        row.forEach((cell, c) => {
+          tbl += `<td><input type="text" value="${esc(cell)}" placeholder="..." data-be-key="${key}-r${r}c${c}" oninput="beUpdateTableCell(${idx},${r},${c},this.value,false)"></td>`;
+        });
+        tbl += '</tr>';
+      });
+      tbl += `</tbody></table></div>
+        <div class="be-table-controls">
+          <button type="button" class="be-tc-btn" onclick="beTableAddRow(${idx})">+ Thêm hàng</button>
+          <button type="button" class="be-tc-btn" onclick="beTableAddCol(${idx})">+ Thêm cột</button>
+          <button type="button" class="be-tc-btn" style="color:var(--red)" onclick="beTableDelRow(${idx})">− Xoá hàng cuối</button>
+          <button type="button" class="be-tc-btn" style="color:var(--red)" onclick="beTableDelCol(${idx})">− Xoá cột cuối</button>
+        </div>
+      </div>`;
+      body = tbl;
+    } else if (block.type === 'image') {
+      if (block.data.src) {
+        body = `<div class="be-block-body">
+          <div class="be-img-preview">
+            <img src="${block.data.src}" alt="block image">
+            <button type="button" class="be-img-replace" onclick="beTriggerImagePicker(${idx})">🔄 Đổi ảnh</button>
+          </div>
+        </div>`;
+      } else {
+        body = `<div class="be-block-body">
+          <div class="be-img-drop" onclick="beTriggerImagePicker(${idx})">
+            <div class="be-img-icon">🖼</div>
+            <p>Nhấn để chọn ảnh hoặc paste ảnh từ clipboard</p>
+          </div>
+        </div>`;
+      }
+    } else if (block.type === 'youtube') {
+      if (block.data.ytId) {
+        body = `<div class="be-block-body">
+          <div class="be-yt-preview">
+            <img class="be-yt-preview-thumb" src="https://img.youtube.com/vi/${esc(block.data.ytId)}/mqdefault.jpg" alt="yt thumb">
+            <span class="be-yt-preview-label">${esc(block.data.url || block.data.ytId)}</span>
+            <button type="button" class="be-yt-change" onclick="beChangeYT(${idx})">Đổi</button>
+          </div>
+        </div>`;
+      } else {
+        body = `<div class="be-block-body">
+          <div class="be-yt-input-row">
+            <input type="text" class="be-yt-input" data-be-key="${key}-yt" placeholder="Dán link YouTube: https://www.youtube.com/watch?v=...">
+            <button type="button" class="be-yt-confirm" onclick="beConfirmYT(${idx},this.previousElementSibling.value)">Xác nhận</button>
+          </div>
+        </div>`;
+      }
+    }
+
+    el.innerHTML = header + body;
+
+    // Hidden file input for image blocks
+    if (block.type === 'image') {
+      const inp = document.createElement('input');
+      inp.type = 'file'; inp.accept = 'image/*'; inp.className = 'hidden';
+      inp.id = `be-img-input-${idx}`;
+      inp.onchange = (e) => beHandleImageFile(idx, e.target.files[0]);
+      el.appendChild(inp);
+    }
+
+    container.appendChild(el);
+  });
+
+  // Restore focus
+  if (focusKey) {
+    const restored = container.querySelector(`[data-be-key="${focusKey}"]`);
+    if (restored) {
+      restored.focus();
+      if (focusSel && restored.tagName === 'INPUT') {
+        try { restored.setSelectionRange(focusSel.start, focusSel.end); } catch {}
+      }
+    }
+  }
+}
+
+function beTriggerImagePicker(idx) {
+  const inp = document.getElementById(`be-img-input-${idx}`);
+  if (inp) inp.click();
+}
+
+function beHandleImageFile(idx, file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    if (_beBlocks[idx]) _beBlocks[idx].data.src = e.target.result;
+    beRenderAll();
+  };
+  reader.readAsDataURL(file);
+}
+
+function beConfirmYT(idx, url) {
+  const ytId = extractYouTubeId(url.trim());
+  if (!ytId) { toast('URL YouTube không hợp lệ!', 'error'); return; }
+  if (_beBlocks[idx]) { _beBlocks[idx].data.ytId = ytId; _beBlocks[idx].data.url = url.trim(); }
+  beRenderAll();
+}
+
+function beChangeYT(idx) {
+  if (_beBlocks[idx]) { _beBlocks[idx].data.ytId = ''; _beBlocks[idx].data.url = ''; }
+  beRenderAll();
+}
+
+// Paste image into image blocks
+document.addEventListener('paste', function(e) {
+  const items = e.clipboardData?.items;
+  if (!items) return;
+  for (const item of items) {
+    if (item.type.startsWith('image/')) {
+      // Find last image block or add one
+      let imgIdx = _beBlocks.map((b,i)=>b.type==='image'?i:-1).filter(i=>i>=0).pop();
+      if (imgIdx === undefined || _beBlocks[imgIdx]?.data.src) {
+        // Add new image block
+        beAddBlock('image');
+        imgIdx = _beBlocks.length - 1;
+      }
+      e.preventDefault();
+      const file = item.getAsFile();
+      beHandleImageFile(imgIdx, file);
+      break;
+    }
+  }
+});
+
+/* Serialize blocks to HTML for storage */
+function beBlocksToHtml(blocks) {
+  return (blocks || _beBlocks).map(b => {
+    if (b.type === 'text') {
+      // Convert newlines to <br> wrapped in <p>
+      const paras = (b.data.content || '').split(/\n\n+/).map(p => p.trim()).filter(Boolean);
+      if (!paras.length) return '';
+      return paras.map(p => `<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
+    }
+    if (b.type === 'heading') return `<h2>${esc(b.data.content || '')}</h2>`;
+    if (b.type === 'callout') return `<blockquote>${esc(b.data.content || '').replace(/\n/g,'<br>')}</blockquote>`;
+    if (b.type === 'table') {
+      const hdrs = (b.data.headers || []).map(h=>`<th>${esc(h)}</th>`).join('');
+      const rows = (b.data.rows || []).map(row=>`<tr>${row.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('');
+      return `<table><thead><tr>${hdrs}</tr></thead><tbody>${rows}</tbody></table>`;
+    }
+    if (b.type === 'image' && b.data.src) return `<img src="${b.data.src}" style="max-width:100%;border-radius:8px;margin:8px 0">`;
+    if (b.type === 'youtube' && b.data.ytId) {
+      return `<div class="yt-embed-wrap" data-ytid="${esc(b.data.ytId)}" contenteditable="false"><span>${esc(b.data.url||b.data.ytId)}</span></div>`;
+    }
+    return '';
+  }).join('\n');
+}
+
+/* Parse stored HTML back to blocks for editing */
+function beHtmlToBlocks(html) {
+  if (!html || !html.trim()) return [];
+  const blocks = [];
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(`<div>${html}</div>`, 'text/html');
+  const root = doc.querySelector('div');
+  if (!root) return [];
+
+  // Group consecutive <p>/<br> runs into text blocks, others as own blocks
+  let textBuf = [];
+
+  function flushText() {
+    if (!textBuf.length) return;
+    const content = textBuf.join('\n\n');
+    if (content.trim()) blocks.push({ type: 'text', data: { content }, id: Date.now() + Math.random() });
+    textBuf = [];
+  }
+
+  root.childNodes.forEach(node => {
+    if (node.nodeType === 3) { // text node
+      const t = node.textContent.trim();
+      if (t) textBuf.push(t);
+      return;
+    }
+    const tag = node.tagName?.toLowerCase();
+    if (!tag) return;
+
+    if (tag === 'p') {
+      textBuf.push(node.innerHTML.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g,''));
+    } else if (tag === 'h2' || tag === 'h3') {
+      flushText();
+      blocks.push({ type: 'heading', data: { content: node.textContent || '' }, id: Date.now() + Math.random() });
+    } else if (tag === 'blockquote') {
+      flushText();
+      blocks.push({ type: 'callout', data: { content: node.textContent?.replace(/<br>/gi,'\n') || '' }, id: Date.now() + Math.random() });
+    } else if (tag === 'table') {
+      flushText();
+      const headers = Array.from(node.querySelectorAll('thead th')).map(th=>th.textContent.trim());
+      const rows = Array.from(node.querySelectorAll('tbody tr')).map(tr=>Array.from(tr.querySelectorAll('td')).map(td=>td.textContent.trim()));
+      if (headers.length || rows.length) blocks.push({ type: 'table', data: { headers: headers.length ? headers : ['Cột 1'], rows }, id: Date.now() + Math.random() });
+    } else if (tag === 'div' && node.classList.contains('table-wrap')) {
+      flushText();
+      const tbl = node.querySelector('table');
+      if (tbl) {
+        const headers = Array.from(tbl.querySelectorAll('thead th')).map(th=>th.textContent.trim());
+        const rows = Array.from(tbl.querySelectorAll('tbody tr')).map(tr=>Array.from(tr.querySelectorAll('td')).map(td=>td.textContent.trim()));
+        if (headers.length || rows.length) blocks.push({ type: 'table', data: { headers: headers.length ? headers : ['Cột 1'], rows }, id: Date.now() + Math.random() });
+      }
+    } else if (tag === 'img') {
+      flushText();
+      blocks.push({ type: 'image', data: { src: node.src || node.getAttribute('src') || '' }, id: Date.now() + Math.random() });
+    } else if (tag === 'div' && node.dataset.ytid) {
+      flushText();
+      const ytId = node.dataset.ytid;
+      blocks.push({ type: 'youtube', data: { ytId, url: ytId }, id: Date.now() + Math.random() });
+    } else if (tag === 'div') {
+      // Check for youtube embed iframe wrapper
+      const iframe = node.querySelector('iframe');
+      if (iframe) {
+        const m = (iframe.src||'').match(/embed\/([^?&]+)/);
+        if (m) { flushText(); blocks.push({ type: 'youtube', data: { ytId: m[1], url: m[1] }, id: Date.now() + Math.random() }); return; }
+      }
+      const inner = node.textContent.trim();
+      if (inner) textBuf.push(inner);
+    } else {
+      const t = node.textContent.trim();
+      if (t) textBuf.push(t);
+    }
+  });
+  flushText();
+  return blocks;
+}
+
+/* geGetContent / geSetContent — now proxy to block editor */
+function geGetContent() { return beBlocksToHtml(); }
+
+function geSetContent(html) {
+  const blocks = beHtmlToBlocks(html || '');
+  beSetBlocks(blocks);
+}
+
+/* Old stubs — no longer used but kept to avoid undefined errors */
+function geCmd() {}
+function geHighlight() {}
+function geFontSize() {}
+function geTriggerImageUpload() {}
+function geInsertImageFile() {}
+function geInsertYoutube() {}
+function geInsertTable() {}
+function geShowYTInput() {}
+function geConfirmYT() {}
+
+/* === Grammar Exercise Builder (Admin) === */
+let _geExRows = [];
+
+function geToggleExercise() {
+  const sec = document.getElementById('lm-grammar-ex-section');
+  const btn = document.getElementById('lm-toggle-ex-btn');
+  if (sec.classList.contains('hidden')) {
+    sec.classList.remove('hidden');
+    btn.textContent = '✕ Ẩn bài tập';
+    if (_geExRows.length === 0) geAddExRow();
+  } else {
+    sec.classList.add('hidden');
+    btn.textContent = '✏️ Thêm bài tập';
+  }
+}
+
+function geAddExRow(data) {
+  const container = document.getElementById('ge-ex-rows');
+  const idx = _geExRows.length;
+  const row = { before: data?.before || '', answer: data?.answer || '', after: data?.after || '', hint: data?.hint || '' };
+  _geExRows.push(row);
+  const div = document.createElement('div');
+  div.className = 'ge-ex-row';
+  div.dataset.idx = idx;
+  div.innerHTML = `
+    <span style="font-size:12px;font-weight:700;color:var(--text-muted);min-width:20px">${idx+1}.</span>
+    <input type="text" placeholder="Phần trước ___ " value="${esc(row.before)}" oninput="geExUpdate(${idx},'before',this.value)" style="flex:2">
+    <input type="text" placeholder="Đáp án*" value="${esc(row.answer)}" oninput="geExUpdate(${idx},'answer',this.value)" style="flex:1;border-color:var(--teal)">
+    <input type="text" placeholder="Phần sau" value="${esc(row.after)}" oninput="geExUpdate(${idx},'after',this.value)" style="flex:2">
+    <input type="text" placeholder="Gợi ý (VD: go)" value="${esc(row.hint)}" oninput="geExUpdate(${idx},'hint',this.value)" style="flex:1">
+    <button type="button" class="ge-ex-del" onclick="geDelExRow(${idx})" title="Xoá">×</button>`;
+  container.appendChild(div);
+}
+
+function geExUpdate(idx, field, val) {
+  if (_geExRows[idx]) _geExRows[idx][field] = val;
+}
+
+function geDelExRow(idx) {
+  _geExRows.splice(idx, 1);
+  renderGeExRows();
+}
+
+function renderGeExRows() {
+  const rows = [..._geExRows];
+  _geExRows = [];
+  document.getElementById('ge-ex-rows').innerHTML = '';
+  rows.forEach(r => geAddExRow(r));
+}
+
+function geCollectExercise() {
+  const sec = document.getElementById('lm-grammar-ex-section');
+  if (!sec || sec.classList.contains('hidden')) return null;
+  const instruction = document.getElementById('ge-ex-instruction')?.value?.trim() || '';
+  const items = _geExRows.filter(r => r.answer.trim());
+  if (!items.length) return null;
+  return { instruction, items };
+}
+
+function geLoadExercise(exercise) {
+  _geExRows = [];
+  document.getElementById('ge-ex-rows').innerHTML = '';
+  const sec = document.getElementById('lm-grammar-ex-section');
+  const btn = document.getElementById('lm-toggle-ex-btn');
+  if (!exercise || !exercise.items?.length) {
+    sec?.classList.add('hidden');
+    if (btn) btn.textContent = '✏️ Thêm bài tập';
+    return;
+  }
+  if (document.getElementById('ge-ex-instruction'))
+    document.getElementById('ge-ex-instruction').value = exercise.instruction || '';
+  exercise.items.forEach(r => geAddExRow(r));
+  sec?.classList.remove('hidden');
+  if (btn) btn.textContent = '✕ Ẩn bài tập';
+}
+
+/* === Render YouTube embeds for employee === */
+function wrapTables(html) {
+  // Wrap every <table> in a scrollable div to prevent horizontal overflow on mobile
+  return html.replace(/<table([^>]*)>/gi, '<div class="table-wrap"><table$1>').replace(/<\/table>/gi, '</table></div>');
+}
+
+function renderYTEmbeds(html) {
+  // Replace .yt-embed-wrap divs with real iframes
+  return html.replace(/<div[^>]*class="yt-embed-wrap"[^>]*data-ytid="([^"]+)"[^>]*>[\s\S]*?<\/div>/g, (match, ytId) => {
+    return `<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin:14px 0">
+      <iframe src="https://www.youtube.com/embed/${ytId}" frameborder="0" allowfullscreen
+        style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:12px"></iframe>
+    </div>`;
+  });
+}
+
+/* === Grammar Exercise — Employee render === */
+function renderGrammarExercise(exercise) {
+  const contentEl = document.getElementById('modal-content');
+  const items = exercise.items || [];
+  window._grammarExState = {
+    items,
+    userAnswers: new Array(items.length).fill(''),
+    checked: false
+  };
+
+  const rows = items.map((item, i) => {
+    const w = Math.max(80, (item.answer?.length || 4) * 13);
+    return `<div class="grammar-ex-item">
+      <span class="grammar-ex-num">${i+1}.</span>
+      <span>${esc(item.before || '')}</span>
+      <input type="text" class="grammar-ex-input" data-idx="${i}"
+        placeholder="..." autocomplete="off" autocapitalize="none" spellcheck="false"
+        style="width:${w}px"
+        oninput="onGrammarExInput(this,${i})">
+      <span>${esc(item.after || '')}</span>
+      ${item.hint ? `<span class="grammar-ex-hint">(${esc(item.hint)})</span>` : ''}
+    </div>`;
+  }).join('');
+
+  const exDiv = document.createElement('div');
+  exDiv.className = 'grammar-ex-wrap';
+  exDiv.innerHTML = `
+    <div class="grammar-ex-title">✏️ Bài tập</div>
+    <div class="grammar-ex-instruction">${esc(exercise.instruction || 'Điền vào chỗ trống cho đúng.')}</div>
+    <div id="grammar-ex-rows">${rows}</div>
+    <div id="grammar-ex-result" style="display:none;margin-top:12px"></div>
+    <div style="margin-top:12px">
+      <button class="btn btn-primary btn-sm grammar-ex-check-btn" id="grammar-ex-check-btn"
+        onclick="checkGrammarExercise()" disabled>✓ Kiểm tra đáp án</button>
+    </div>`;
+  contentEl.appendChild(exDiv);
+}
+
+function onGrammarExInput(input, idx) {
+  if (!window._grammarExState) return;
+  window._grammarExState.userAnswers[idx] = input.value.trim();
+  const allFilled = window._grammarExState.userAnswers.every(a => a.length > 0);
+  const btn = document.getElementById('grammar-ex-check-btn');
+  if (btn) btn.disabled = !allFilled;
+}
+
+function checkGrammarExercise() {
+  const st = window._grammarExState;
+  if (!st) return;
+  const inputs = document.querySelectorAll('.grammar-ex-input');
+  let correct = 0;
+  inputs.forEach((inp, i) => {
+    const user   = (inp.value || '').trim().toLowerCase().replace(/[.,!?;:'"]/g, '');
+    const answer = (st.items[i]?.answer || '').toLowerCase().replace(/[.,!?;:'"]/g, '');
+    const ok = user === answer;
+    if (ok) { correct++; inp.classList.add('correct'); inp.classList.remove('wrong'); inp.disabled = true; }
+    else { inp.classList.add('wrong'); inp.classList.remove('correct'); }
+  });
+  const total = st.items.length;
+  const resultEl = document.getElementById('grammar-ex-result');
+  resultEl.style.display = 'block';
+  if (correct === total) {
+    resultEl.innerHTML = `<div class="rq-result-banner"><div class="rq-result-emoji">🎉</div><div class="rq-result-title">Xuất sắc! Đúng tất cả ${total}/${total}!</div><div class="rq-result-sub">Bài học hoàn thành!</div></div>`;
+    inputs.forEach(inp => inp.disabled = true);
+    document.getElementById('grammar-ex-check-btn').style.display = 'none';
+    const endBtn = document.getElementById('btn-end-lesson');
+    const endLbl = document.getElementById('btn-end-lesson-label');
+    if (endBtn) endBtn.disabled = false;
+    if (endLbl) endLbl.textContent = 'Hoàn thành bài học 🎉';
+    st.passed = true;
+  } else {
+    const wrong = total - correct;
+    resultEl.innerHTML = `<div class="rq-result-banner" style="background:linear-gradient(135deg,var(--red-light),#fff7f7);border-color:rgba(239,68,68,.2)"><div class="rq-result-emoji">😅</div><div class="rq-result-title">Còn ${wrong} câu sai</div><div class="rq-result-sub">Đúng ${correct}/${total}. Sửa lại các ô đỏ.</div></div>`;
+    inputs.forEach((inp, i) => {
+      if (inp.classList.contains('wrong')) {
+        inp.disabled = false; inp.value = '';
+        inp.classList.remove('wrong');
+        st.userAnswers[i] = '';
+      }
+    });
+    const btn = document.getElementById('grammar-ex-check-btn');
+    if (btn) { btn.disabled = true; btn.textContent = '✓ Kiểm tra lại'; }
+    const firstWrong = document.querySelector('.grammar-ex-input:not([disabled])');
+    if (firstWrong) firstWrong.focus();
+  }
+}
+
 function todayStr() { return new Date().toISOString().split('T')[0]; }
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
