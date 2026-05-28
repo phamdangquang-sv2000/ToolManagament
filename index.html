@@ -522,7 +522,13 @@
     filter: drop-shadow(0 2px 4px rgba(0,0,0,.4));
     transition: transform .35s cubic-bezier(.17,.67,.35,1.4);
   }
+  .card-icon img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: cover; display: block; z-index: 1;
+    transition: none; transform: none !important;
+  }
   .card:hover .card-icon svg { transform: scale(1.15) translateY(-1px); }
+  .card:hover .card-icon img { transform: none !important; }
   .card:hover .card-icon {
     transform: translateZ(22px) translateY(-2px) scale(1.08);
     box-shadow: 0 8px 24px rgba(0,0,0,.5), 0 0 20px var(--card-glow, rgba(232,187,80,.3));
@@ -1782,7 +1788,7 @@ const SVG_ICONS = {
 
 function getAppIcon(emoji, colorHex) {
   if (emoji && (emoji.startsWith('http://') || emoji.startsWith('https://'))) {
-    return `<img src="${esc(emoji)}" alt="icon" style="width:64px;height:64px;object-fit:cover;border-radius:16px;display:block;position:absolute;inset:0;margin:auto;" onerror="this.style.display='none'"/>`;
+    return `<img src="${esc(emoji)}" alt="icon" style="width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0;" onerror="this.style.display='none'"/>`;
   }
   if (SVG_ICONS[emoji]) {
     return `<span style="color:${colorHex};display:flex;align-items:center;justify-content:center;">${SVG_ICONS[emoji]}</span>`;
