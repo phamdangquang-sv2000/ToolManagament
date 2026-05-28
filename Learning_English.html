@@ -2204,6 +2204,7 @@ select {
         </tbody>
       </table>
     </div>
+    <div id="assign-pagination"></div>
 
     <!-- Modal phân công -->
     <div id="assign-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px">
@@ -2403,14 +2404,16 @@ select {
           <tr>
             <th>Nhân viên</th>
             <th>Đăng nhập cuối</th>
+            <th>Mã PIN</th>
             <th>Thao tác</th>
           </tr>
         </thead>
         <tbody id="admin-tbody">
-          <tr class="empty-row"><td colspan="3">Đang tải dữ liệu...</td></tr>
+          <tr class="empty-row"><td colspan="4">Đang tải dữ liệu...</td></tr>
         </tbody>
       </table>
     </div>
+    <div id="emp-pagination"></div>
     <!-- Daily Progress Section -->
     <div class="table-section-header" style="margin-top:36px;display:flex;align-items:center;justify-content:space-between">
       <h2>📊 Tiến độ học theo ngày</h2>
@@ -2418,16 +2421,17 @@ select {
         <input type="date" id="progress-date-filter" style="padding:6px 12px;border-radius:8px;border:1.5px solid var(--border);font-size:13px;background:var(--bg-2);color:var(--text)" onchange="loadProgressByDate(this.value)">
       </div>
     </div>
-    <div id="progress-day-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:28px">
+    <div id="progress-day-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:0">
       <div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text-muted);font-size:13px">Đang tải...</div>
     </div>
+    <div id="progress-pagination" style="margin-bottom:28px"></div>
 
     <!-- Lesson Management Section -->
     <div class="table-section-header" style="margin-top:36px">
       <h2>📘 Quản lý bài học</h2>
       <button class="btn btn-primary btn-sm" onclick="openLessonMgmtModal()">+ Thêm bài học</button>
     </div>
-    <div class="table-wrap" style="margin-bottom:40px">
+    <div class="table-wrap" style="margin-bottom:0">
       <table>
         <thead>
           <tr>
@@ -2443,6 +2447,7 @@ select {
         </tbody>
       </table>
     </div>
+    <div id="lesson-pagination" style="margin-bottom:40px"></div>
   </main>
 </div>
 <script>
@@ -2485,6 +2490,38 @@ let timerInterval = null;
 let elapsedSecs   = 0;
 let adminRows     = [];
 let realtimeChannel = null;
+
+/* ── PAGINATION ── */
+const PAGE_SIZE = 7;
+let empPage = 1, assignPage = 1, progressPage = 1, lessonPage = 1;
+let allAssignSchedules = [];
+let allProgressSnapshot = null; // { users, sessions, schedules, completions }
+
+function renderPagination(containerId, total, currentPage, onGoto) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  if (totalPages <= 1) { container.innerHTML = ''; return; }
+  const start = (currentPage - 1) * PAGE_SIZE + 1;
+  const end   = Math.min(currentPage * PAGE_SIZE, total);
+  const s = containerId; // use as namespace key via data attr
+  container.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border:1px solid var(--border-light);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);background:#fff;font-size:13px;color:var(--text-muted)">
+      <span>${start}–${end} / ${total} mục</span>
+      <div style="display:flex;align-items:center;gap:6px">
+        <button onclick="window._pgGoto('${s}',${currentPage-1})" ${currentPage<=1?'disabled':''} style="padding:5px 13px;border-radius:8px;border:1.5px solid var(--border);background:${currentPage<=1?'var(--bg-2)':'#fff'};color:${currentPage<=1?'var(--text-sub)':'var(--text)'};font-size:13px;cursor:${currentPage<=1?'default':'pointer'};font-weight:500;transition:all .15s">← Trước</button>
+        <span style="padding:4px 12px;border-radius:8px;background:var(--teal);color:#fff;font-size:13px;font-weight:700">${currentPage} / ${totalPages}</span>
+        <button onclick="window._pgGoto('${s}',${currentPage+1})" ${currentPage>=totalPages?'disabled':''} style="padding:5px 13px;border-radius:8px;border:1.5px solid var(--border);background:${currentPage>=totalPages?'var(--bg-2)':'#fff'};color:${currentPage>=totalPages?'var(--text-sub)':'var(--text)'};font-size:13px;cursor:${currentPage>=totalPages?'default':'pointer'};font-weight:500;transition:all .15s">Tiếp →</button>
+      </div>
+    </div>`;
+}
+
+window._pgGoto = function(ns, p) {
+  if (ns === 'emp-pagination')      { empPage = p;      renderEmployeePage(); }
+  else if (ns === 'assign-pagination') { assignPage = p; renderAssignPage(); }
+  else if (ns === 'progress-pagination') { progressPage = p; renderProgressPage(); }
+  else if (ns === 'lesson-pagination')   { lessonPage = p;  renderLessonMgmtPage(); }
+};
 
 /* SESSION / AUTH */
 function saveUser(u) { localStorage.setItem('el_user', JSON.stringify(u)); currentUser = u; }
@@ -3948,7 +3985,7 @@ async function loadAdminData() {
     const done = timeOk && allLessonsDone;
     const last   = mine.length
       ? new Date(Math.max(...mine.map(s => new Date(s.started_at).getTime()))) : null;
-    return { id: u.id, name: u.name, email: u.email, mins, timeOk, allLessonsDone, done, last };
+    return { id: u.id, name: u.name, email: u.email, pin_code: u.pin_code || null, mins, timeOk, allLessonsDone, done, last };
   });
 
   const total = adminRows.length;
@@ -3957,29 +3994,65 @@ async function loadAdminData() {
   document.getElementById('stat-done').textContent    = doneN;
   document.getElementById('stat-pending').textContent = total - doneN;
 
-  if (!adminRows.length) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="4">Không có dữ liệu.</td></tr>'; return;
+  empPage = 1;
+  renderEmployeePage();
+
+  await loadAssignData();
+}
+
+function renderEmployeePage() {
+  const tbody = document.getElementById('admin-tbody');
+  if (!tbody) return;
+  const total = adminRows.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if (empPage > totalPages) empPage = totalPages;
+  if (empPage < 1) empPage = 1;
+  const slice = adminRows.slice((empPage - 1) * PAGE_SIZE, empPage * PAGE_SIZE);
+
+  if (!slice.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="4">Không có dữ liệu.</td></tr>';
+    document.getElementById('emp-pagination').innerHTML = '';
+    return;
   }
 
-  tbody.innerHTML = adminRows.map(r => `
+  tbody.innerHTML = slice.map(r => {
+    const pinDisplay = r.pin_code
+      ? `<span style="font-family:monospace;font-size:14px;font-weight:700;color:var(--teal);letter-spacing:2px">${esc(r.pin_code)}</span>`
+      : `<span style="color:var(--text-sub);font-style:italic;font-size:12px">Chưa tạo</span>`;
+    return `
     <tr>
       <td data-label="Nhân viên">
         <div style="display:flex;align-items:center;gap:10px">
-          <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal-bright));display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;flex-shrink:0">${esc(r.name[0]||'?').toUpperCase()}</div>
+          <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal-bright));display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;flex-shrink:0">${esc((r.name[0]||'?').toUpperCase())}</div>
           <div><div class="td-name">${esc(r.name)}</div><div class="td-email">${esc(r.email)}</div></div>
         </div>
       </td>
       <td data-label="Đăng nhập cuối" style="color:var(--text-muted);font-size:13px">${r.last ? r.last.toLocaleString('vi-VN') : '—'}</td>
+      <td data-label="Mã PIN">${pinDisplay}</td>
       <td data-label="Thao tác">
         <div style="display:flex;gap:6px">
-          <button onclick="editEmployee('${r.id}')" style="background:var(--indigo-light);color:var(--indigo);border:none;cursor:pointer;font-size:12px;padding:5px 10px;border-radius:7px;font-weight:600;transition:all .2s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">✏️ Sửa</button>
+          <button onclick="resetPinCode('${r.id}','${esc(r.name)}')" style="background:#fff7ed;color:#c2410c;border:none;cursor:pointer;font-size:12px;padding:5px 10px;border-radius:7px;font-weight:600;transition:all .2s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">🔄 Reset PIN</button>
           <button onclick="deleteEmployee('${r.id}','${esc(r.name)}')" style="background:var(--red-light);color:var(--red);border:none;cursor:pointer;font-size:12px;padding:5px 10px;border-radius:7px;font-weight:600;transition:all .2s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">🗑 Xoá</button>
         </div>
       </td>
-    </tr>
-  `).join('');
+    </tr>`;
+  }).join('');
 
-  await loadAssignData();
+  renderPagination('emp-pagination', total, empPage);
+}
+
+async function resetPinCode(id, name) {
+  const ok = await showConfirm({
+    title: 'Reset mã PIN',
+    message: `Xoá mã PIN của "${name}"? Nhân viên sẽ phải tạo mã PIN mới lần đăng nhập tiếp theo.`,
+    icon: '🔄',
+    iconType: 'warning'
+  });
+  if (!ok) return;
+  const { error } = await sb.from('users').update({ pin_code: null }).eq('id', id);
+  if (error) { toast('Lỗi reset PIN: ' + error.message, 'error'); return; }
+  toast('✅ Đã reset mã PIN!', 'success');
+  await loadAdminData();
 }
 
 /* ADMIN: ASSIGN LESSONS */
@@ -4001,18 +4074,30 @@ async function loadAssignData() {
   const lmTbody = document.getElementById('lessons-mgmt-tbody');
   if (lmTbody) loadLessonsMgmt();
 
+  allAssignSchedules = schedules || [];
+  assignPage = 1;
+  renderAssignPage();
+}
+
+function renderAssignPage() {
   const tbody = document.getElementById('assign-tbody');
-  if (!schedules || !schedules.length) {
+  if (!tbody) return;
+  if (!allAssignSchedules.length) {
     tbody.innerHTML = '<tr class="empty-row"><td colspan="4" style="text-align:center;color:var(--text-muted);padding:20px">Chưa có phân công nào</td></tr>';
+    document.getElementById('assign-pagination').innerHTML = '';
     return;
   }
   const typeBadge = t => {
     const map = { READING:'badge-reading', LISTENING:'badge-listening', VOCAB:'badge-vocab', GRAMMAR:'badge-grammar' };
     const label = { READING:'Reading', LISTENING:'Listening', VOCAB:'Vocabulary', GRAMMAR:'Grammar' };
-    const cls = map[t] || 'badge-admin';
-    return `<span class="badge ${cls}">${label[t] || (t||'—')}</span>`;
+    return `<span class="badge ${map[t]||'badge-admin'}">${label[t]||(t||'—')}</span>`;
   };
-  tbody.innerHTML = schedules.map(s => `
+  const total = allAssignSchedules.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if (assignPage > totalPages) assignPage = totalPages;
+  if (assignPage < 1) assignPage = 1;
+  const slice = allAssignSchedules.slice((assignPage - 1) * PAGE_SIZE, assignPage * PAGE_SIZE);
+  tbody.innerHTML = slice.map(s => `
     <tr>
       <td data-label="Ngày học" style="font-weight:600">${s.date}</td>
       <td data-label="Bài học">${esc(s.lessons?.title || '—')}</td>
@@ -4022,6 +4107,7 @@ async function loadAssignData() {
       </td>
     </tr>
   `).join('');
+  renderPagination('assign-pagination', total, assignPage);
 }
 
 function openAssignModal() {
@@ -4075,14 +4161,29 @@ async function loadProgressByDate(dateStr) {
     completionsByUser[c.user_id].add(c.lesson_id);
   }
 
-  grid.innerHTML = users.map(u => {
-    const mine   = (sessions || []).filter(s => s.user_id === u.id);
+  allProgressSnapshot = { users, sessions: sessions||[], schedules: allDaySchedules, completionsByUser };
+  progressPage = 1;
+  renderProgressPage();
+}
+
+function renderProgressPage() {
+  const grid = document.getElementById('progress-day-grid');
+  if (!grid || !allProgressSnapshot) return;
+  const { users, sessions, schedules: allDaySchedules, completionsByUser } = allProgressSnapshot;
+
+  if (!users || !users.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--text-muted)">Chưa có nhân viên nào.</div>';
+    document.getElementById('progress-pagination').innerHTML = '';
+    return;
+  }
+
+  const allCards = users.map(u => {
+    const mine   = sessions.filter(s => s.user_id === u.id);
     const totalS = mine.reduce((a,s) => a + (s.duration_seconds||0), 0);
     const mins   = Math.floor(totalS / 60);
     const pct    = Math.min(100, Math.round((totalS / 900) * 100));
     const timeOk = mins >= 15;
     const userComp = completionsByUser[u.id] || new Set();
-    // Per-employee scheduled lessons = global (null) + user-specific
     const scheduledIds = [...new Set(
       allDaySchedules.filter(s => s.user_id === null || s.user_id === u.id).map(s => s.lesson_id)
     )];
@@ -4100,6 +4201,16 @@ async function loadProgressByDate(dateStr) {
       statusBadge = '<span style="font-size:11px;font-weight:700;color:#c2410c;background:#fff7ed;padding:2px 8px;border-radius:99px">⏱ Chưa đủ 15p</span>';
     }
 
+    return { u, mins, pct, done, scheduledIds, completedCount, lessons, statusBadge };
+  });
+
+  const total = allCards.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if (progressPage > totalPages) progressPage = totalPages;
+  if (progressPage < 1) progressPage = 1;
+  const slice = allCards.slice((progressPage - 1) * PAGE_SIZE, progressPage * PAGE_SIZE);
+
+  grid.innerHTML = slice.map(({ u, mins, pct, done, scheduledIds, completedCount, lessons, statusBadge }) => {
     return `
       <div style="background:var(--card);border-radius:14px;padding:16px;border:1.5px solid ${done ? 'rgba(22,163,74,.25)' : 'var(--border-light)'};box-shadow:var(--shadow-sm);transition:all .2s">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
@@ -4114,9 +4225,10 @@ async function loadProgressByDate(dateStr) {
           <div style="height:100%;width:${pct}%;background:${done ? 'linear-gradient(90deg,var(--teal),var(--teal-bright))' : 'linear-gradient(90deg,#f59e0b,#fbbf24)'};border-radius:99px;transition:width .4s"></div>
         </div>
         ${lessons.length ? `<div style="font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📚 ${lessons.join(', ')}</div>` : '<div style="font-size:11px;color:var(--text-sub)">Chưa học bài nào</div>'}
-      </div>
-    `;
+      </div>`;
   }).join('');
+
+  renderPagination('progress-pagination', total, progressPage);
 }
 
 /* ADMIN: MONTHLY ATTENDANCE GRID */
@@ -4460,18 +4572,30 @@ let editingLessonId = null;
 async function loadLessonsMgmt() {
   const { data } = await sb.from('lessons').select('*').order('created_at', { ascending: false });
   allLessonsMgmt = data || [];
+  lessonPage = 1;
+  renderLessonMgmtPage();
+}
 
+function renderLessonMgmtPage() {
   const tbody = document.getElementById('lessons-mgmt-tbody');
+  if (!tbody) return;
+
   if (!allLessonsMgmt.length) {
     tbody.innerHTML = '<tr class="empty-row"><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px">Chưa có bài học nào</td></tr>';
+    document.getElementById('lesson-pagination').innerHTML = '';
     return;
   }
 
   const typeEmoji = { READING:'📖', LISTENING:'🎧', VOCAB:'📝', GRAMMAR:'⚙️' };
   const typeBadge = { READING:'badge-reading', LISTENING:'badge-listening', VOCAB:'badge-vocab', GRAMMAR:'badge-grammar' };
 
-  tbody.innerHTML = allLessonsMgmt.map(l => {
-    // Preview nội dung
+  const total = allLessonsMgmt.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if (lessonPage > totalPages) lessonPage = totalPages;
+  if (lessonPage < 1) lessonPage = 1;
+  const slice = allLessonsMgmt.slice((lessonPage - 1) * PAGE_SIZE, lessonPage * PAGE_SIZE);
+
+  tbody.innerHTML = slice.map(l => {
     let preview = '—';
     if (l.type === 'VOCAB' && l.content) {
       try {
@@ -4496,6 +4620,8 @@ async function loadLessonsMgmt() {
       </td>
     </tr>`;
   }).join('');
+
+  renderPagination('lesson-pagination', total, lessonPage);
 }
 
 function getBestEnglishVoice() {
