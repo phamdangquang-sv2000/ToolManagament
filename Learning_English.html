@@ -1859,7 +1859,12 @@ select {
 }
 #intro-video-el {
   width: 100%; height: 100%;
-  object-fit: cover;
+  object-fit: contain;   /* default: contain để không crop */
+  background: #000;
+}
+/* Desktop landscape: cover vừa khít đẹp hơn */
+@media (min-width: 640px) and (orientation: landscape) {
+  #intro-video-el { object-fit: cover; }
 }
 #intro-skip-btn {
   position: absolute; bottom: 32px; right: 24px;
