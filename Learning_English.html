@@ -3309,7 +3309,8 @@ async function loadLessons() {
   // completedDates (điểm danh): ≥15 phút HỌC ĐÚNG NGÀY ĐÓ VÀ hoàn thành TẤT CẢ bài được giao đúng ngày
   const completedDates = new Set();
   for (const date of sortedDates) {
-    const daySessions = sessions.filter(s => s.date === date);
+    // Chỉ tính sessions đã kết thúc (ended_at != null) để tránh tính thừa session đang mở
+    const daySessions = sessions.filter(s => s.date === date && s.ended_at);
     const totalSec = daySessions.reduce((a, s) => a + (s.duration_seconds || 0), 0);
     // Điểm danh: ≥15p học ĐÚNG ngày đó VÀ hoàn thành hết bài ĐÚNG ngày đó (scheduled_date = date)
     // → tránh trường hợp treo giờ ngày 27 nhưng bấm hoàn thành ngày 28
@@ -3340,8 +3341,8 @@ async function loadLessons() {
       ? completedLessonIds
       : completedIdsByDate[date] || new Set();
 
-    // Tính tổng thời gian học đúng ngày đó và trạng thái hoàn thành bài
-    const daySessions = sessions.filter(s => s.date === date);
+    // Tính tổng thời gian học đúng ngày đó (chỉ sessions đã kết thúc)
+    const daySessions = sessions.filter(s => s.date === date && s.ended_at);
     const totalSec = daySessions.reduce((a, s) => a + (s.duration_seconds || 0), 0);
     const dayCompletedIds = completedIdsByDate[date] || new Set();
     const dayLessons = dayMap[date] || [];
@@ -3918,8 +3919,8 @@ async function endLesson() {
   window.miniTest = null; window.readingQuiz = null; window._fillBlankState = null;
   toast('🎉 Tuyệt vời! Bạn đã hoàn thành bài học.', 'success');
   await loadTodaySessions();
-  await loadLessons(); // refresh trạng thái mở khóa
-  checkAndUpdateAttendance(); // điểm danh & tính streak (async, non-blocking)
+  await loadLessons(); // refresh trạng thái mở khóa + rebuild allScheduleDays với data mới nhất
+  await checkAndUpdateAttendance(); // điểm danh & tính streak — PHẢI await để allScheduleDays đã sẵn sàng
 }
 
 // Update vocab progress UI + khi xong hết thẻ thì chuyển sang mini-test
@@ -6572,12 +6573,66 @@ async function checkAndUpdateAttendance() {
   if (!isWeekday(today)) return;
 
   // Kiểm tra điều kiện điểm danh: ≥15 phút HỌC + hoàn thành TẤT CẢ bài được giao hôm nay
-  // (giống logic Admin: timeOk && allLessonsDone)
   const todayDay = allScheduleDays && allScheduleDays.find(d => d.date === today);
-  if (!todayDay) return; // không có bài được giao hôm nay → không điểm danh
 
-  const timeOk       = todayDay.totalSec >= 15 * 60;           // ≥15 phút
-  const allDone      = todayDay.allLessonsDone;                 // hoàn thành tất cả bài
+  // FALLBACK: nếu allScheduleDays chưa có today (race condition), query DB trực tiếp
+  let timeOk, allDone, totalMinutes, lessonsCompletedCount, lessonsTotal;
+
+  if (!todayDay) {
+    // Query trực tiếp từ DB để tránh race condition
+    const [
+      { data: schedRows },
+      { data: sessionRows },
+      { data: compRows },
+    ] = await Promise.all([
+      sb.from('lesson_schedules')
+        .select('lesson_id')
+        .or(`user_id.eq.${currentUser.id},user_id.is.null`)
+        .eq('date', today),
+      sb.from('learning_sessions')
+        .select('duration_seconds, ended_at')
+        .eq('user_id', currentUser.id)
+        .eq('date', today),
+      sb.from('lesson_completions')
+        .select('lesson_id')
+        .eq('user_id', currentUser.id)
+        .eq('scheduled_date', today),
+    ]);
+
+    const scheduledIds = new Set((schedRows || []).map(r => r.lesson_id));
+    if (scheduledIds.size === 0) return; // không có bài hôm nay
+
+    const totalSec = (sessionRows || [])
+      .filter(s => s.ended_at) // chỉ tính session đã kết thúc
+      .reduce((a, s) => a + (s.duration_seconds || 0), 0);
+
+    const completedIds = new Set((compRows || []).map(r => r.lesson_id));
+    const allLessonsDoneNow = scheduledIds.size > 0 && [...scheduledIds].every(id => completedIds.has(id));
+
+    timeOk = totalSec >= 15 * 60;
+    allDone = allLessonsDoneNow;
+    totalMinutes = Math.floor(totalSec / 60);
+    lessonsCompletedCount = [...scheduledIds].filter(id => completedIds.has(id)).length;
+    lessonsTotal = scheduledIds.size;
+  } else {
+    // Tính lại totalSec từ DB trực tiếp thay vì dùng cache — tránh race condition với session vừa kết thúc
+    const { data: freshSessions } = await sb.from('learning_sessions')
+      .select('duration_seconds, ended_at')
+      .eq('user_id', currentUser.id)
+      .eq('date', today);
+
+    const freshTotalSec = (freshSessions || [])
+      .filter(s => s.ended_at) // chỉ tính session đã kết thúc
+      .reduce((a, s) => a + (s.duration_seconds || 0), 0);
+
+    timeOk = freshTotalSec >= 15 * 60;
+    allDone = todayDay.allLessonsDone;
+    totalMinutes = Math.floor(freshTotalSec / 60);
+    const lessons = todayDay.lessons || [];
+    lessonsCompletedCount = lessons.filter(l => todayDay.completedLessonIds.has(l.id)).length;
+    lessonsTotal = lessons.length;
+  }
+
   if (!timeOk || !allDone) return; // chưa đủ điều kiện → không ghi
 
   // Đã điểm danh hôm nay rồi → chỉ refresh UI
@@ -6604,17 +6659,13 @@ async function checkAndUpdateAttendance() {
     ? (prev.streak_cycle || 1)
     : (prev ? (prev.streak_cycle || 1) + 1 : 1);
 
-  // Lấy số liệu thực tế để ghi vào DB
-  const lessons       = todayDay.lessons || [];
-  const totalMinutes  = Math.floor(todayDay.totalSec / 60);
-
   const { error } = await sb.from('daily_attendance').insert({
     user_id:           currentUser.id,
     date:              today,
     attended:          true,
     total_minutes:     totalMinutes,
-    lessons_completed: lessons.filter(l => todayDay.completedLessonIds.has(l.id)).length,
-    lessons_total:     lessons.length,
+    lessons_completed: lessonsCompletedCount,
+    lessons_total:     lessonsTotal,
     xp_earned:         10,
     streak_at_time:    newStreak,
     streak_cycle:      newCycle,
