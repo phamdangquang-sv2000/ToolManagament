@@ -3160,19 +3160,18 @@ function showWelcomeAnimation(name, onDone) {
   }
 
   // ── CTA button dismiss ────────────────────────────
-  const dismiss = () => {
+  const dismiss = async () => {
     if (ctaBtn) {
       ctaBtn.removeEventListener('click', dismiss);
       ctaBtn.disabled = true;
       ctaBtn.textContent = '⏳ Đang vào...';
     }
     overlay.classList.add('fade-out');
-    setTimeout(() => {
-      overlay.classList.add('hidden');
-      overlay.classList.remove('fade-out');
-      confWrap.innerHTML = '';
-      if (onDone) onDone();
-    }, 550);
+    await new Promise(r => setTimeout(r, 550));
+    overlay.classList.add('hidden');
+    overlay.classList.remove('fade-out');
+    confWrap.innerHTML = '';
+    if (onDone) await onDone(); // await để grantRegistrationXP chạy xong trước khi loadEmployeeData
   };
 
   if (ctaBtn) ctaBtn.addEventListener('click', dismiss);
@@ -6524,9 +6523,13 @@ async function grantRegistrationXP(userId) {
     user_id: userId,
     xp_amount: 10,
   });
-  if (error && error.code !== '23505') {
-    console.error('[registration XP]', error.message);
+  if (error) {
+    if (error.code === '23505') return; // đã grant rồi (admin reset PIN)
+    console.error('[registration XP] insert failed:', error.code, error.message);
+    toast('⚠️ Không thể ghi +10 XP: ' + error.message, 'error');
+    return;
   }
+  // Thành công
 }
 
 // ── Streak milestones config ─────────────────────────────────────────────
