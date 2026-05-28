@@ -4689,7 +4689,7 @@ async function saveAssign() {
 async function deleteAssign(id) {
   const ok1 = await showConfirm({
     title: 'Xoá phân công',
-    message: 'Bạn có chắc muốn xoá phân công này? Dữ liệu học (sessions) và trạng thái hoàn thành của nhân viên cho bài học này cũng sẽ bị xoá.',
+    message: 'Bạn có chắc muốn xoá phân công này? Dữ liệu học, trạng thái hoàn thành, điểm danh (streak) và XP của ngày đó cũng sẽ bị xoá.',
     icon: '🗑️', iconType: 'danger'
   });
   if (!ok1) return;
@@ -4714,11 +4714,21 @@ async function deleteAssign(id) {
     .eq('lesson_id', lesson_id)
     .eq('date', date);
 
-  // 4. Delete the schedule row itself
+  // 4. Delete daily_attendance for affected users on this date
+  await sb.from('daily_attendance')
+    .delete()
+    .eq('date', date);
+
+  // 5. Delete streak_rewards earned on this date
+  await sb.from('streak_rewards')
+    .delete()
+    .eq('awarded_at', date);
+
+  // 6. Delete the schedule row itself
   const { error } = await sb.from('lesson_schedules').delete().eq('id', id);
   if (error) { toast('Lỗi xoá phân công: ' + error.message, 'error'); return; }
 
-  toast('✅ Đã xoá phân công và dữ liệu học liên quan.', 'success');
+  toast('✅ Đã xoá phân công, dữ liệu học, streak và XP liên quan.', 'success');
   await loadAssignData();
 }
 
@@ -6561,6 +6571,15 @@ async function checkAndUpdateAttendance() {
   const today = todayStr();
   if (!isWeekday(today)) return;
 
+  // Kiểm tra điều kiện điểm danh: ≥15 phút HỌC + hoàn thành TẤT CẢ bài được giao hôm nay
+  // (giống logic Admin: timeOk && allLessonsDone)
+  const todayDay = allScheduleDays && allScheduleDays.find(d => d.date === today);
+  if (!todayDay) return; // không có bài được giao hôm nay → không điểm danh
+
+  const timeOk       = todayDay.totalSec >= 15 * 60;           // ≥15 phút
+  const allDone      = todayDay.allLessonsDone;                 // hoàn thành tất cả bài
+  if (!timeOk || !allDone) return; // chưa đủ điều kiện → không ghi
+
   // Đã điểm danh hôm nay rồi → chỉ refresh UI
   const { data: existing } = await sb.from('daily_attendance')
     .select('id')
@@ -6577,20 +6596,28 @@ async function checkAndUpdateAttendance() {
     .order('date', { ascending: false })
     .limit(1);
 
-  const prev        = prevRows && prevRows[0];
-  const prevWd      = getPrevWeekday(today);
-  const continues   = prev && prev.date === prevWd;   // streak tiếp diễn
-  const newStreak   = continues ? (prev.streak_at_time || 0) + 1 : 1;
-  const newCycle    = continues
-    ? (prev.streak_cycle || 1)           // cycle giữ nguyên
-    : (prev ? (prev.streak_cycle || 1) + 1 : 1); // streak broke → cycle++
+  const prev      = prevRows && prevRows[0];
+  const prevWd    = getPrevWeekday(today);
+  const continues = prev && prev.date === prevWd;
+  const newStreak = continues ? (prev.streak_at_time || 0) + 1 : 1;
+  const newCycle  = continues
+    ? (prev.streak_cycle || 1)
+    : (prev ? (prev.streak_cycle || 1) + 1 : 1);
+
+  // Lấy số liệu thực tế để ghi vào DB
+  const lessons       = todayDay.lessons || [];
+  const totalMinutes  = Math.floor(todayDay.totalSec / 60);
 
   const { error } = await sb.from('daily_attendance').insert({
-    user_id:       currentUser.id,
-    date:          today,
-    xp_earned:     10,
-    streak_at_time: newStreak,
-    streak_cycle:  newCycle,
+    user_id:           currentUser.id,
+    date:              today,
+    attended:          true,
+    total_minutes:     totalMinutes,
+    lessons_completed: lessons.filter(l => todayDay.completedLessonIds.has(l.id)).length,
+    lessons_total:     lessons.length,
+    xp_earned:         10,
+    streak_at_time:    newStreak,
+    streak_cycle:      newCycle,
   });
 
   if (error && error.code !== '23505') {
@@ -6598,7 +6625,7 @@ async function checkAndUpdateAttendance() {
     return;
   }
 
-  toast('📅 Điểm danh hôm nay! +10 XP', 'success');
+  toast('📅 Điểm danh hôm nay! +10 XP 🔥', 'success');
   await loadStreakAndXP();
 }
 
