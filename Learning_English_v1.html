@@ -3815,6 +3815,7 @@ function tryCloseLessonModal() {
     window.vocabProgress = null; window.readingQuiz = null; window._fillBlankState = null;
     window.miniTest = null; window.readingQuiz = null; window._fillBlankState = null;
     closeLessonModal();
+    loadTodaySessions();
   } else {
     toast('Hãy hoàn thành bài học trước khi đóng!', 'error');
   }
@@ -3833,6 +3834,7 @@ function handleOverlayClick(e) {
       window.vocabProgress = null; window.readingQuiz = null; window._fillBlankState = null;
       window.miniTest = null; window.readingQuiz = null; window._fillBlankState = null;
       closeLessonModal();
+      loadTodaySessions();
     } else {
       toast('Hãy hoàn thành bài học trước khi đóng!', 'error');
     }
@@ -4230,15 +4232,38 @@ function stopTimer() {
   clearInterval(autosaveInterval);
 }
 
-// Lưu khi user tắt tab / đóng trình duyệt
-window.addEventListener('beforeunload', () => {
-  if (activeSession && elapsedSecs > 0) {
-    // Dùng sendBeacon để đảm bảo request được gửi ngay cả khi đóng tab
-    const url = `${SB_URL}/rest/v1/learning_sessions?id=eq.${activeSession.id}`;
-    const body = JSON.stringify({ duration_seconds: elapsedSecs, ended_at: new Date().toISOString() });
-    navigator.sendBeacon && navigator.sendBeacon(url + '&apikey=' + SB_KEY, new Blob([body], { type: 'application/json' }));
+// Helper: flush session về DB bằng keepalive PATCH (không xóa activeSession)
+// sendBeacon chỉ hỗ trợ POST → Supabase REST cần PATCH → dùng fetch keepalive
+function _saveSession(andClose = false) {
+  if (!activeSession) return;
+  const url  = `${SB_URL}/rest/v1/learning_sessions?id=eq.${activeSession.id}`;
+  const patch = { duration_seconds: elapsedSecs };
+  if (andClose) patch.ended_at = new Date().toISOString();
+  const body = JSON.stringify(patch);
+  const hdrs = { 'Content-Type': 'application/json', 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Prefer': 'return=minimal' };
+  try { fetch(url, { method: 'PATCH', keepalive: true, headers: hdrs, body }).catch(() => {}); } catch(e) {}
+  if (andClose) activeSession = null;
+}
+
+// Lưu khi user tắt tab / đóng trình duyệt → đóng session hẳn
+window.addEventListener('beforeunload', () => { stopTimer(); _saveSession(true); });
+
+// Chuyển tab / app bị background → pause timer + lưu duration, GIỮ activeSession để resume
+// Quay lại tab → resume timer từ chỗ cũ
+document.addEventListener('visibilitychange', () => {
+  if (!activeSession) return;
+  if (document.hidden) {
+    // Tab bị ẩn: dừng timer, lưu duration hiện tại (chưa đóng session)
+    stopTimer();
+    _saveSession(false);
+  } else {
+    // Tab active trở lại: tiếp tục đếm từ elapsedSecs hiện tại
+    startTimer();
   }
 });
+
+// Fallback cho Safari iOS (pagehide = đóng hẳn)
+window.addEventListener('pagehide', () => { stopTimer(); _saveSession(true); });
 
 /* ADMIN: LOAD DATA */
 async function loadAdminData() {
