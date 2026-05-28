@@ -2840,8 +2840,38 @@ function handlePinEntry() {
   }
 }
 
+
+function isWeakPin(pin) {
+  // 1. Tất cả cùng 1 số: 111111, 222222...
+  if (/^(\d)\1+$/.test(pin)) return 'Mã PIN quá đơn giản (không dùng số lặp lại).';
+  // 2. Tăng dần liên tiếp: 123456, 234567...
+  const digits = pin.split('').map(Number);
+  const allAsc = digits.every((d, i) => i === 0 || d === digits[i-1] + 1);
+  if (allAsc) return 'Mã PIN quá đơn giản (không dùng dãy số tăng dần).';
+  // 3. Giảm dần liên tiếp: 654321, 987654...
+  const allDesc = digits.every((d, i) => i === 0 || d === digits[i-1] - 1);
+  if (allDesc) return 'Mã PIN quá đơn giản (không dùng dãy số giảm dần).';
+  // 4. Blacklist phổ biến
+  const blacklist = ['123456','654321','111111','222222','333333','444444',
+    '555555','666666','777777','888888','999999','000000',
+    '112233','123123','121212','696969','159159','123321','000123'];
+  if (blacklist.includes(pin)) return 'Mã PIN này quá phổ biến, vui lòng chọn mã khác.';
+  // 5. Chỉ có 2 chữ số xen kẽ: 121212, 010101...
+  if (new Set(digits).size <= 2) return 'Mã PIN quá đơn giản (cần ít nhất 3 chữ số khác nhau).';
+  return null; // hợp lệ
+}
+
 function handlePinCreate() {
   if (currentPin.length !== PIN_LEN) return;
+  const weakMsg = isWeakPin(currentPin);
+  if (weakMsg) {
+    toast(weakMsg, 'error');
+    currentPin = '';
+    updateDots('c');
+    const inp = document.querySelector('#keypad-create input');
+    if (inp) inp.value = '';
+    return;
+  }
   newPinTemp = currentPin; currentPin = '';
   document.getElementById('login-subtitle').textContent = 'Xác nhận mã PIN 6 số';
   showLoginStep('pin-confirm');
