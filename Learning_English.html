@@ -1878,6 +1878,108 @@ select {
   animation: fadeIn .4s .8s ease both;
 }
 #intro-skip-btn:hover { background: rgba(255,255,255,.3); transform: scale(1.04); }
+
+/* ===== STREAK / XP PANEL ===== */
+.streak-xp-bar {
+  display: flex; gap: 12px; margin: 0 0 18px;
+  flex-wrap: wrap;
+}
+.sxp-card {
+  flex: 1; min-width: 130px;
+  background: var(--bg-2); border: 1.5px solid var(--border);
+  border-radius: 16px; padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+}
+.sxp-icon { font-size: 26px; flex-shrink: 0; }
+.sxp-info { display: flex; flex-direction: column; }
+.sxp-val  { font-size: 20px; font-weight: 800; color: var(--text); font-family: var(--font-head); line-height: 1; }
+.sxp-lbl  { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; margin-top: 2px; }
+.sxp-card.streak-card { background: linear-gradient(135deg,#fff7ed,#fffbf5); border-color: #fed7aa; }
+.sxp-card.streak-card .sxp-val { color: #ea580c; }
+.sxp-card.xp-card { background: linear-gradient(135deg,#f0fdf4,#f7fffe); border-color: #bbf7d0; }
+.sxp-card.xp-card .sxp-val { color: var(--teal-dark); }
+.sxp-card.rank-card { background: linear-gradient(135deg,#fefce8,#fffdf5); border-color: #fde68a; cursor: pointer; }
+.sxp-card.rank-card .sxp-val { color: #b45309; }
+.streak-milestone-btn {
+  margin-left: auto; background: linear-gradient(135deg,#f97316,#fb923c);
+  color: #fff; border: none; border-radius: 99px; padding: 4px 12px;
+  font-size: 11px; font-weight: 700; cursor: pointer;
+  animation: pulseGlow 1.5s ease infinite;
+}
+@keyframes pulseGlow {
+  0%,100% { box-shadow: 0 0 0 0 rgba(249,115,22,.4); }
+  50%      { box-shadow: 0 0 0 6px rgba(249,115,22,0); }
+}
+
+/* ===== CLAIM REWARD MODAL ===== */
+#claim-reward-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.55);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.claim-modal {
+  background: #fff; border-radius: 24px; padding: 32px 28px;
+  max-width: 420px; width: 100%; text-align: center;
+  box-shadow: 0 24px 64px rgba(0,0,0,.18);
+  animation: scaleIn .3s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes scaleIn { from { transform: scale(.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.claim-modal-fire  { font-size: 56px; line-height: 1; margin-bottom: 8px; animation: wWiggle 1s ease infinite; }
+.claim-modal-title { font-size: 22px; font-weight: 800; color: var(--text); font-family: var(--font-head); margin-bottom: 6px; }
+.claim-modal-sub   { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
+.claim-milestones  { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.claim-milestone-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(135deg,#fff7ed,#fffbf5); border: 1.5px solid #fed7aa;
+  border-radius: 14px; padding: 12px 16px;
+}
+.claim-milestone-row.claimed { background: var(--bg-2); border-color: var(--border); opacity: .6; }
+.claim-m-left  { display: flex; align-items: center; gap: 10px; }
+.claim-m-badge { font-size: 20px; }
+.claim-m-info  { text-align: left; }
+.claim-m-name  { font-size: 13px; font-weight: 700; color: var(--text); }
+.claim-m-xp    { font-size: 11px; font-weight: 600; color: #ea580c; }
+.claim-m-btn   {
+  background: linear-gradient(135deg,#f97316,#fb923c); color: #fff;
+  border: none; border-radius: 99px; padding: 6px 16px;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  transition: transform .15s, opacity .15s;
+}
+.claim-m-btn:hover   { transform: scale(1.05); }
+.claim-m-btn:disabled { opacity: .5; cursor: default; transform: none; }
+.claim-m-done  { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+.claim-close-btn {
+  width: 100%; background: var(--bg-2); border: 1.5px solid var(--border);
+  color: var(--text); border-radius: 12px; padding: 12px;
+  font-size: 14px; font-weight: 600; cursor: pointer; font-family: var(--font-body);
+  transition: background .15s;
+}
+.claim-close-btn:hover { background: var(--border); }
+
+/* ===== LEADERBOARD MODAL ===== */
+#leaderboard-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.55);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.leaderboard-wrap { margin-top: 4px; }
+.lb-row {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--bg-2); border: 1.5px solid var(--border);
+  border-radius: 14px; padding: 12px 16px; margin-bottom: 8px;
+  transition: transform .15s;
+}
+.lb-row.lb-me { background: linear-gradient(135deg,#f0fdf4,#fffdf5); border-color: #bbf7d0; }
+.lb-rank   { font-size: 18px; font-weight: 800; width: 28px; text-align: center; flex-shrink: 0; }
+.lb-rank-1 { color: #f59e0b; }
+.lb-rank-2 { color: #9ca3af; }
+.lb-rank-3 { color: #b45309; }
+.lb-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--teal-glass); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--teal-dark); flex-shrink: 0; font-size: 15px; }
+.lb-info   { flex: 1; min-width: 0; }
+.lb-name   { font-size: 14px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lb-meta   { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+.lb-xp     { font-size: 16px; font-weight: 800; color: var(--teal-dark); flex-shrink: 0; }
+.lb-streak-badge { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 99px; padding: 2px 8px; font-size: 11px; font-weight: 700; color: #ea580c; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -2112,6 +2214,32 @@ select {
       </div>
     </div>
 
+    <!-- Streak / XP Stats Bar -->
+    <div class="streak-xp-bar" id="streak-xp-bar">
+      <div class="sxp-card streak-card">
+        <div class="sxp-icon">🔥</div>
+        <div class="sxp-info">
+          <div class="sxp-val" id="sxp-streak-val">—</div>
+          <div class="sxp-lbl">Ngày streak</div>
+        </div>
+        <button class="streak-milestone-btn hidden" id="sxp-claim-btn" onclick="openClaimRewardModal()">🎁 Nhận thưởng</button>
+      </div>
+      <div class="sxp-card xp-card">
+        <div class="sxp-icon">⭐</div>
+        <div class="sxp-info">
+          <div class="sxp-val" id="sxp-xp-val">—</div>
+          <div class="sxp-lbl">Tổng XP</div>
+        </div>
+      </div>
+      <div class="sxp-card rank-card" onclick="openLeaderboardModal()">
+        <div class="sxp-icon">🏆</div>
+        <div class="sxp-info">
+          <div class="sxp-val" id="sxp-rank-val">—</div>
+          <div class="sxp-lbl">Xếp hạng</div>
+        </div>
+      </div>
+    </div>
+
     <!-- Tabs Section -->
     <div class="tabs-section">
       <div class="tabs-label" style="font-size:11px;font-weight:700;color:var(--text-sub);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Danh mục bài học</div>
@@ -2138,6 +2266,36 @@ select {
       </div>
     </div>
   </main>
+</div>
+
+<!-- ============================
+     CLAIM REWARD MODAL
+============================= -->
+<div class="hidden" id="claim-reward-overlay">
+  <div class="claim-modal">
+    <div class="claim-modal-fire">🎁</div>
+    <div class="claim-modal-title">Streak Bonus!</div>
+    <div class="claim-modal-sub">Bạn đạt mốc streak — nhận thưởng XP ngay!</div>
+    <div class="claim-milestones" id="claim-milestones-list"></div>
+    <button class="claim-close-btn" onclick="closeClaimRewardModal()">Đóng</button>
+  </div>
+</div>
+
+<!-- ============================
+     LEADERBOARD MODAL
+============================= -->
+<div class="hidden" id="leaderboard-overlay" onclick="if(event.target===this)closeLeaderboardModal()">
+  <div style="background:#fff;border-radius:24px;padding:28px;max-width:480px;width:100%;max-height:80vh;overflow-y:auto;animation:scaleIn .3s cubic-bezier(.34,1.56,.64,1) both">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="font-size:20px;font-weight:800;color:var(--text);font-family:var(--font-head)">🏆 Bảng xếp hạng XP</div>
+      <button onclick="closeLeaderboardModal()" style="background:var(--bg-2);border:1.5px solid var(--border);border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;line-height:1">×</button>
+    </div>
+    <div class="leaderboard-wrap" id="leaderboard-list">
+      <div style="text-align:center;padding:32px;color:var(--text-muted)">
+        <div class="spinner spinner-teal" style="margin:0 auto 12px;width:24px;height:24px;border-width:3px"></div>Đang tải...
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ============================
@@ -2902,19 +3060,21 @@ async function handlePinConfirm() {
   finishLogin(currentUserRec, true); // first-time PIN → show welcome animation
 }
 
-function finishLogin(rec, isNewPin = false) {
+async function finishLogin(rec, isNewPin = false) {
   const u = { id: rec.id, name: rec.name, email: rec.email, role: rec.role };
   saveUser(u);
   resetLoginForm();
   if (isNewPin && u.role === 'EMPLOYEE') {
-    // Keep login view hidden behind overlays; show employee only after all animations done
-    // Show a blank black screen immediately so login disappears cleanly
     document.getElementById('view-login').style.display = 'none';
-    loadEmployeeData(); // load data in background while video/animation plays
     showIntroVideo(() => {
-      // Now show employee view UNDER the welcome overlay (invisible because overlay is on top)
-      showView('employee');
-      showWelcomeAnimation(u.name, () => {}); // welcome dismisses → employee visible
+      // Hiển thị welcome screen - user phải bấm "Bắt đầu học!" để tiếp tục
+      // Lúc đó mới grant +10 XP, load data rồi vào employee view
+      showWelcomeAnimation(u.name, async () => {
+        // onDone chỉ được gọi khi user BẤM nút "Bắt đầu học!"
+        await grantRegistrationXP(u.id);  // grant XP → insert registration_xp
+        showView('employee');
+        await loadEmployeeData();          // load sau khi XP đã được ghi → hiển thị đúng
+      });
     });
   } else {
     goTo(u.role);
@@ -3001,7 +3161,11 @@ function showWelcomeAnimation(name, onDone) {
 
   // ── CTA button dismiss ────────────────────────────
   const dismiss = () => {
-    if (ctaBtn) ctaBtn.removeEventListener('click', dismiss);
+    if (ctaBtn) {
+      ctaBtn.removeEventListener('click', dismiss);
+      ctaBtn.disabled = true;
+      ctaBtn.textContent = '⏳ Đang vào...';
+    }
     overlay.classList.add('fade-out');
     setTimeout(() => {
       overlay.classList.add('hidden');
@@ -3012,8 +3176,7 @@ function showWelcomeAnimation(name, onDone) {
   };
 
   if (ctaBtn) ctaBtn.addEventListener('click', dismiss);
-  // Auto-dismiss after 6 s if user doesn't tap
-  setTimeout(dismiss, 6000);
+  // Không auto-dismiss: user phải bấm "Bắt đầu học!" để tiếp tục
 }
 
 function showLoginStep(step) {
@@ -3065,6 +3228,7 @@ async function loadEmployeeData() {
   document.getElementById('header-name-label').textContent = nameParts[nameParts.length - 1] || name;
   document.getElementById('header-avatar').textContent = (name[0] || '?').toUpperCase();
   await Promise.all([loadLessons(), loadTodaySessions()]);
+  await loadStreakAndXP(); // await để đảm bảo XP luôn hiển thị đúng ngay lần đầu
 }
 
 async function loadLessons() {
@@ -3756,6 +3920,7 @@ async function endLesson() {
   toast('🎉 Tuyệt vời! Bạn đã hoàn thành bài học.', 'success');
   await loadTodaySessions();
   await loadLessons(); // refresh trạng thái mở khóa
+  checkAndUpdateAttendance(); // điểm danh & tính streak (async, non-blocking)
 }
 
 // Update vocab progress UI + khi xong hết thẻ thì chuyển sang mini-test
@@ -6347,6 +6512,329 @@ function getActiveStep() {
   if (!document.getElementById('step-email').classList.contains('hidden')) return 'email';
   if (!document.getElementById('step-password').classList.contains('hidden')) return 'password';
   return null;
+}
+
+/* ===== STREAK / XP / ATTENDANCE ===== */
+
+// ── Registration XP ──────────────────────────────────────────────────────
+// Bảng registration_xp có UNIQUE(user_id) → không thể grant 2 lần.
+// Admin reset PIN → user tạo lại → insert thất bại (23505) → bỏ qua lặng lẽ.
+async function grantRegistrationXP(userId) {
+  const { error } = await sb.from('registration_xp').insert({
+    user_id: userId,
+    xp_amount: 10,
+  });
+  if (error && error.code !== '23505') {
+    console.error('[registration XP]', error.message);
+  }
+}
+
+// ── Streak milestones config ─────────────────────────────────────────────
+const STREAK_MILESTONES = [
+  { days: 7,   xp: 20,  label: '7 ngày',   icon: '🥉' },
+  { days: 30,  xp: 50,  label: '30 ngày',  icon: '🥈' },
+  { days: 60,  xp: 100, label: '60 ngày',  icon: '🥇' },
+  { days: 120, xp: 200, label: '120 ngày', icon: '💎' },
+  { days: 240, xp: 400, label: '240 ngày', icon: '👑' },
+  { days: 480, xp: 800, label: '480 ngày', icon: '🌟' },
+];
+
+// ── Helpers ──────────────────────────────────────────────────────────────
+function isWeekday(dateStr) {
+  const dow = new Date(dateStr + 'T12:00:00').getDay(); // 0=Sun, 6=Sat
+  return dow >= 1 && dow <= 5;
+}
+
+function getPrevWeekday(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00');
+  do { d.setDate(d.getDate() - 1); } while (d.getDay() === 0 || d.getDay() === 6);
+  return d.toISOString().split('T')[0];
+}
+
+// ── Daily attendance ─────────────────────────────────────────────────────
+// Gọi sau khi hoàn thành bài học. T2–T6 only.
+async function checkAndUpdateAttendance() {
+  if (!currentUser) return;
+  const today = todayStr();
+  if (!isWeekday(today)) return;
+
+  // Đã điểm danh hôm nay rồi → chỉ refresh UI
+  const { data: existing } = await sb.from('daily_attendance')
+    .select('id')
+    .eq('user_id', currentUser.id)
+    .eq('date', today)
+    .maybeSingle();
+
+  if (existing) { await loadStreakAndXP(); return; }
+
+  // Lấy record gần nhất để tính streak & cycle
+  const { data: prevRows } = await sb.from('daily_attendance')
+    .select('date, streak_at_time, streak_cycle')
+    .eq('user_id', currentUser.id)
+    .order('date', { ascending: false })
+    .limit(1);
+
+  const prev        = prevRows && prevRows[0];
+  const prevWd      = getPrevWeekday(today);
+  const continues   = prev && prev.date === prevWd;   // streak tiếp diễn
+  const newStreak   = continues ? (prev.streak_at_time || 0) + 1 : 1;
+  const newCycle    = continues
+    ? (prev.streak_cycle || 1)           // cycle giữ nguyên
+    : (prev ? (prev.streak_cycle || 1) + 1 : 1); // streak broke → cycle++
+
+  const { error } = await sb.from('daily_attendance').insert({
+    user_id:       currentUser.id,
+    date:          today,
+    xp_earned:     10,
+    streak_at_time: newStreak,
+    streak_cycle:  newCycle,
+  });
+
+  if (error && error.code !== '23505') {
+    console.error('[attendance] insert error:', error.message);
+    return;
+  }
+
+  toast('📅 Điểm danh hôm nay! +10 XP', 'success');
+  await loadStreakAndXP();
+}
+
+// ── Load & display streak/XP ─────────────────────────────────────────────
+async function loadStreakAndXP() {
+  if (!currentUser) return;
+  const uid = currentUser.id;
+
+  const [
+    { data: attRows },
+    { data: rewardRows },
+    { data: regRow },
+  ] = await Promise.all([
+    sb.from('daily_attendance')
+      .select('date, xp_earned, streak_at_time, streak_cycle')
+      .eq('user_id', uid)
+      .order('date', { ascending: false }),
+    sb.from('streak_rewards')
+      .select('streak_milestone, streak_cycle, xp_awarded')
+      .eq('user_id', uid),
+    sb.from('registration_xp')
+      .select('xp_amount')
+      .eq('user_id', uid)
+      .maybeSingle(),
+  ]);
+
+  const attendance = attRows   || [];
+  const claimed    = rewardRows || [];
+
+  // Tổng XP: điểm danh + streak bonus + registration
+  const attendanceXP   = attendance.reduce((s, r) => s + (r.xp_earned   || 0), 0);
+  const bonusXP        = claimed.reduce((s, r)    => s + (r.xp_awarded  || 0), 0);
+  const registrationXP = regRow ? (regRow.xp_amount || 0) : 0;
+  const totalXP        = attendanceXP + bonusXP + registrationXP;
+
+  // Streak hiện tại (chỉ tính nếu record là hôm nay hoặc weekday hôm qua)
+  const today  = todayStr();
+  const prevWd = getPrevWeekday(today);
+  let currentStreak = 0;
+  let currentCycle  = 1;
+  if (attendance.length > 0) {
+    const latest = attendance[0]; // desc → mới nhất
+    if (latest.date === today || latest.date === prevWd) {
+      currentStreak = latest.streak_at_time || 0;
+      currentCycle  = latest.streak_cycle   || 1;
+    }
+  }
+
+  // Mốc nào đạt ngưỡng & chưa claim trong cycle hiện tại
+  const claimedThisCycle = new Set(
+    claimed
+      .filter(r => (r.streak_cycle || 1) === currentCycle)
+      .map(r => r.streak_milestone)
+  );
+  const claimable = STREAK_MILESTONES.filter(
+    m => currentStreak >= m.days && !claimedThisCycle.has(m.days)
+  );
+
+  // Cập nhật UI
+  const streakEl = document.getElementById('sxp-streak-val');
+  const xpEl     = document.getElementById('sxp-xp-val');
+  const claimBtn = document.getElementById('sxp-claim-btn');
+  if (streakEl) streakEl.textContent = currentStreak;
+  if (xpEl)     xpEl.textContent     = totalXP;
+  if (claimBtn) claimBtn.classList.toggle('hidden', claimable.length === 0);
+
+  window._streakState = { currentStreak, totalXP, claimable, claimed, currentCycle };
+  updateMyRank(uid, totalXP);
+}
+
+// ── Rank calculation ─────────────────────────────────────────────────────
+async function updateMyRank(uid, myXP) {
+  try {
+    const [{ data: att }, { data: rewards }, { data: reg }] = await Promise.all([
+      sb.from('daily_attendance').select('user_id, xp_earned'),
+      sb.from('streak_rewards').select('user_id, xp_awarded'),
+      sb.from('registration_xp').select('user_id, xp_amount'),
+    ]);
+    const xpMap = {};
+    for (const r of (att     || [])) xpMap[r.user_id] = (xpMap[r.user_id] || 0) + (r.xp_earned  || 0);
+    for (const r of (rewards || [])) xpMap[r.user_id] = (xpMap[r.user_id] || 0) + (r.xp_awarded || 0);
+    for (const r of (reg     || [])) xpMap[r.user_id] = (xpMap[r.user_id] || 0) + (r.xp_amount  || 0);
+    const sorted = Object.values(xpMap).sort((a, b) => b - a);
+    const rank   = sorted.findIndex(x => x <= myXP) + 1;
+    const el = document.getElementById('sxp-rank-val');
+    if (el) el.textContent = '#' + (rank || 1);
+  } catch {}
+}
+
+// ── Claim reward modal ───────────────────────────────────────────────────
+function openClaimRewardModal() {
+  const state = window._streakState;
+  if (!state) return;
+  const list = document.getElementById('claim-milestones-list');
+  if (!list) return;
+
+  const claimableHtml = state.claimable.map(m => `
+    <div class="claim-milestone-row" id="claim-row-${m.days}">
+      <div class="claim-m-left">
+        <div class="claim-m-badge">${m.icon}</div>
+        <div class="claim-m-info">
+          <div class="claim-m-name">Streak ${m.label}</div>
+          <div class="claim-m-xp">+${m.xp} XP</div>
+        </div>
+      </div>
+      <button class="claim-m-btn" id="claim-btn-${m.days}" onclick="claimMilestone(${m.days})">Nhận</button>
+    </div>`).join('');
+
+  const alreadyHtml = STREAK_MILESTONES
+    .filter(m => state.currentStreak >= m.days && !state.claimable.find(c => c.days === m.days))
+    .map(m => `
+    <div class="claim-milestone-row claimed">
+      <div class="claim-m-left">
+        <div class="claim-m-badge">${m.icon}</div>
+        <div class="claim-m-info">
+          <div class="claim-m-name">Streak ${m.label}</div>
+          <div class="claim-m-xp">+${m.xp} XP</div>
+        </div>
+      </div>
+      <div class="claim-m-done">✓ Đã nhận</div>
+    </div>`).join('');
+
+  list.innerHTML = claimableHtml + alreadyHtml;
+  document.getElementById('claim-reward-overlay')?.classList.remove('hidden');
+}
+
+function closeClaimRewardModal() {
+  document.getElementById('claim-reward-overlay')?.classList.add('hidden');
+}
+
+async function claimMilestone(milestoneDay) {
+  if (!currentUser) return;
+  const state = window._streakState;
+  const m     = STREAK_MILESTONES.find(x => x.days === milestoneDay);
+  if (!m || !state) return;
+
+  const btn = document.getElementById(`claim-btn-${milestoneDay}`);
+  if (btn) { btn.disabled = true; btn.textContent = '...'; }
+
+  const { error } = await sb.from('streak_rewards').insert({
+    user_id:          currentUser.id,
+    streak_milestone: milestoneDay,
+    streak_cycle:     state.currentCycle,
+    xp_awarded:       m.xp,              // ✓ đúng tên cột
+    awarded_at:       todayStr(),        // ✓ NOT NULL required
+  });
+
+  if (error && error.code !== '23505') {
+    toast('Lỗi nhận thưởng: ' + error.message, 'error');
+    if (btn) { btn.disabled = false; btn.textContent = 'Nhận'; }
+    return;
+  }
+
+  if (btn) btn.textContent = '✓ Đã nhận!';
+  document.getElementById(`claim-row-${milestoneDay}`)?.classList.add('claimed');
+  toast(`🎉 Nhận +${m.xp} XP cho streak ${m.label}!`, 'success');
+  await loadStreakAndXP();
+}
+
+// ── Leaderboard modal ────────────────────────────────────────────────────
+async function openLeaderboardModal() {
+  const overlay = document.getElementById('leaderboard-overlay');
+  if (!overlay) return;
+  overlay.classList.remove('hidden');
+  const list = document.getElementById('leaderboard-list');
+  if (!list) return;
+  list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-muted)"><div class="spinner spinner-teal" style="margin:0 auto 12px;width:24px;height:24px;border-width:3px"></div>Đang tải...</div>';
+
+  try {
+    const [
+      { data: attRows },
+      { data: rewardRows },
+      { data: regRows },
+      { data: usersRows },
+      { data: latestAtt },
+    ] = await Promise.all([
+      sb.from('daily_attendance').select('user_id, xp_earned'),
+      sb.from('streak_rewards').select('user_id, xp_awarded'),   // ✓ xp_awarded
+      sb.from('registration_xp').select('user_id, xp_amount'),   // ✓ registration bonus
+      sb.from('users').select('id, name'),
+      sb.from('daily_attendance')
+        .select('user_id, date, streak_at_time')
+        .order('date', { ascending: false }),
+    ]);
+
+    // Tổng XP per user
+    const xpMap = {};
+    for (const r of (attRows    || [])) xpMap[r.user_id] = (xpMap[r.user_id] || 0) + (r.xp_earned  || 0);
+    for (const r of (rewardRows || [])) xpMap[r.user_id] = (xpMap[r.user_id] || 0) + (r.xp_awarded || 0);
+    for (const r of (regRows    || [])) xpMap[r.user_id] = (xpMap[r.user_id] || 0) + (r.xp_amount  || 0);
+
+    // Streak mới nhất per user
+    const streakMap = {};
+    const seen = new Set();
+    for (const r of (latestAtt || [])) {
+      if (!seen.has(r.user_id)) {
+        streakMap[r.user_id] = r.streak_at_time || 0;
+        seen.add(r.user_id);
+      }
+    }
+
+    const usersMap = {};
+    for (const u of (usersRows || [])) usersMap[u.id] = u.name;
+
+    const allIds = new Set([...Object.keys(xpMap), ...Object.keys(usersMap)]);
+    const board = [...allIds]
+      .map(id => ({ uid: id, name: usersMap[id] || 'Ẩn danh', xp: xpMap[id] || 0, streak: streakMap[id] || 0 }))
+      .filter(u => u.xp > 0)
+      .sort((a, b) => b.xp - a.xp)
+      .slice(0, 20);
+
+    if (!board.length) {
+      list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-muted)">Chưa có dữ liệu xếp hạng</div>';
+      return;
+    }
+
+    const medals = ['🥇','🥈','🥉'];
+    list.innerHTML = board.map((u, i) => {
+      const isMe      = u.uid === currentUser.id;
+      const rankLabel = i < 3 ? medals[i] : `#${i + 1}`;
+      const rankClass = ['lb-rank-1','lb-rank-2','lb-rank-3'][i] || '';
+      return `<div class="lb-row ${isMe ? 'lb-me' : ''}">
+        <div class="lb-rank ${rankClass}">${rankLabel}</div>
+        <div class="lb-avatar">${esc((u.name[0] || '?').toUpperCase())}</div>
+        <div class="lb-info">
+          <div class="lb-name">${esc(u.name)}${isMe ? ' <span style="color:var(--teal);font-size:11px;font-weight:600">(bạn)</span>' : ''}</div>
+          <div class="lb-meta">🔥 ${u.streak} ngày streak</div>
+        </div>
+        ${u.streak > 0 ? `<div class="lb-streak-badge">🔥 ${u.streak}</div>` : ''}
+        <div class="lb-xp">${u.xp} XP</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--red)">Lỗi tải bảng xếp hạng</div>';
+  }
+}
+
+function closeLeaderboardModal() {
+  document.getElementById('leaderboard-overlay')?.classList.add('hidden');
 }
 
 /* BOOT */
