@@ -563,13 +563,16 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 
 .lesson-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px; margin-top: 0;
+}
+.day-lesson-grid {
+  margin-bottom: 0;
 }
 
 .lesson-card {
   background: #fff; border-radius: var(--radius); border: 1px solid var(--border-light);
-  padding: 20px; display: flex; flex-direction: column; gap: 14px;
+  padding: 24px; display: flex; flex-direction: column; gap: 16px;
   transition: all var(--transition); cursor: default;
   box-shadow: var(--shadow-sm);
   animation: fadeIn .4s ease both;
@@ -585,7 +588,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   transform: translateY(-3px);
   border-color: rgba(13,148,136,.2);
 }
-.lesson-title { font-size: 15px; font-weight: 600; line-height: 1.45; color: var(--text); letter-spacing: -.02em; }
+.lesson-title { font-size: 16px; font-weight: 600; line-height: 1.45; color: var(--text); letter-spacing: -.02em; }
 .lesson-meta { display: flex; align-items: center; justify-content: space-between; }
 .lesson-duration {
   font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 4px;
@@ -607,24 +610,27 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 .lesson-content p { margin: 0 0 16px; }
 .lesson-content ul,.lesson-content ol { padding-left: 22px; margin: 10px 0 16px; }
 .lesson-content li { margin: 8px 0; }
-.lesson-content .table-wrap,
-.lesson-content table {
+.lesson-content .table-wrap {
   display: block; width: 100%; overflow-x: auto;
   -webkit-overflow-scrolling: touch; margin: 16px 0;
 }
 .lesson-content table {
-  border-collapse: collapse; min-width: 100%; width: max-content; max-width: none;
-  table-layout: auto;
+  border-collapse: collapse; width: 100%; min-width: 0; max-width: 100%;
+  table-layout: fixed; display: table;
 }
-.lesson-content thead, .lesson-content tbody,
-.lesson-content tr { display: table-row-group; width: auto; }
 .lesson-content thead { display: table-header-group; }
+.lesson-content tbody { display: table-row-group; }
 .lesson-content tr { display: table-row; }
 .lesson-content th, .lesson-content td {
   border: 1px solid var(--border); padding: 9px 12px; text-align: left;
-  white-space: nowrap; font-size: 13px; display: table-cell;
+  white-space: normal; word-break: break-word; font-size: 13px; display: table-cell;
 }
 .lesson-content th { background: var(--bg-2); font-weight: 600; }
+@media (max-width: 639px) {
+  .lesson-content .table-wrap { overflow-x: auto; }
+  .lesson-content table { table-layout: auto; min-width: 360px; }
+  .lesson-content th, .lesson-content td { font-size: 12px; padding: 7px 9px; }
+}
 
 /* ===== BLOCK EDITOR (Admin) ===== */
 .be-wrap { border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden; background: #fff; }
@@ -817,31 +823,46 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   padding: 14px 18px; margin: 16px 0; color: var(--teal-dark);
   font-style: italic; font-size: 14px; line-height: 1.7;
 }
-.grammar-lesson-content .table-wrap,
-.grammar-lesson-content table {
+.grammar-lesson-content .table-wrap {
   display: block; width: 100%; overflow-x: auto;
   -webkit-overflow-scrolling: touch; margin: 16px 0;
   border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.06);
 }
 .grammar-lesson-content table {
-  border-collapse: collapse; min-width: 100%; width: max-content; max-width: none;
-  table-layout: auto; border-radius: 12px; overflow: hidden;
+  border-collapse: collapse; width: 100%; min-width: 0; max-width: 100%;
+  table-layout: fixed;
+  border-radius: 12px; overflow: hidden;
+  display: table;
 }
-.grammar-lesson-content thead, .grammar-lesson-content tbody,
-.grammar-lesson-content tr { display: table-row-group; width: auto; }
 .grammar-lesson-content thead { display: table-header-group; }
+.grammar-lesson-content tbody { display: table-row-group; }
 .grammar-lesson-content tr { display: table-row; }
 .grammar-lesson-content th {
   background: linear-gradient(135deg, var(--teal-dark), var(--teal));
   color: #fff; font-weight: 700; font-size: 12px;
   text-transform: uppercase; letter-spacing: .05em;
   padding: 12px 14px; text-align: left;
-  white-space: nowrap; display: table-cell;
+  white-space: normal; word-break: break-word; display: table-cell;
 }
 .grammar-lesson-content td {
   border-bottom: 1px solid var(--border-light); padding: 10px 12px;
   font-size: 13px; vertical-align: top; display: table-cell;
-  white-space: nowrap;
+  white-space: normal; word-break: break-word;
+}
+/* Trên mobile: nếu table quá nhiều cột thì cho phép scroll ngang */
+@media (max-width: 639px) {
+  .grammar-lesson-content .table-wrap {
+    overflow-x: auto;
+  }
+  .grammar-lesson-content table {
+    table-layout: auto;
+    min-width: 420px;
+  }
+  .grammar-lesson-content th,
+  .grammar-lesson-content td {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
 }
 .grammar-lesson-content tr:nth-child(even) td { background: var(--bg-2); }
 .grammar-lesson-content tr:last-child td { border-bottom: none; }
@@ -1177,8 +1198,16 @@ select {
   .lesson-grid { grid-template-columns: 1fr 1fr; }
 }
 
+@media (min-width: 901px) and (max-width: 1059px) {
+  .lesson-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
 @media (min-width: 1060px) {
   .lesson-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (min-width: 1200px) {
+  .lesson-grid { grid-template-columns: repeat(4, 1fr); }
 }
 
 /* ===== VOCAB FLASHCARDS ===== */
@@ -2166,6 +2195,7 @@ select {
           <tr>
             <th>Ngày học</th>
             <th>Bài học</th>
+            <th>Loại bài học</th>
             <th>Thao tác</th>
           </tr>
         </thead>
@@ -2868,13 +2898,19 @@ async function loadLessons() {
       .select('lesson_id, date, duration_seconds, ended_at')
       .eq('user_id', currentUser.id),
     sb.from('lesson_completions')
-      .select('lesson_id, date')
+      .select('lesson_id, date, scheduled_date, completed_at')
       .eq('user_id', currentUser.id)
   ]);
 
   const sessions = allSessions || [];
-  // completionMap: "lesson_id:date" → true
-  const completionSet = new Set((allCompletions || []).map(c => `${c.lesson_id}:${c.date}`));
+  // completionSet: "lesson_id:scheduled_date" — dùng scheduled_date để check đúng ngày bài được giao
+  // fallback về date cho record cũ chưa có scheduled_date
+  const completionSet = new Set((allCompletions || []).map(c => `${c.lesson_id}:${c.scheduled_date || c.date}`))
+  // completedAtMap: "lesson_id:scheduled_date" → completed_at (để hiện giờ hoàn thành trên card)
+  const completedAtMap = {};
+  for (const c of (allCompletions || [])) {
+    completedAtMap[`${c.lesson_id}:${c.scheduled_date || c.date}`] = c.completed_at;
+  }
 
   // Collect all unique lesson IDs from schedules so we can fetch lesson details
   const uniqueLessonIds = [...new Set((rawSchedules || []).map(s => s.lesson_id))];
@@ -2902,38 +2938,68 @@ async function loadLessons() {
 
   const sortedDates = Object.keys(dayMap).sort();
 
-  // Tính xem ngày nào đã hoàn thành: ≥15 phút HỌC VÀ hoàn thành TẤT CẢ bài được giao
+  // Map: date → Set of completed lesson IDs (theo scheduled_date — ngày bài được giao)
+  const completedIdsByDate = {};
+  for (const date of sortedDates) {
+    completedIdsByDate[date] = new Set(
+      (allCompletions || [])
+        .filter(c => (c.scheduled_date || c.date) === date)
+        .map(c => c.lesson_id)
+    );
+  }
+
+  // allLessonsDoneByDate: ngày nào đã hoàn thành TẤT CẢ bài được giao (không cần 15 phút)
+  // dùng completedIdsByDate để check theo scheduled_date chính xác
+  // VD: hoàn thành bài ngày 27 vào ngày 28, scheduled_date=27 → ngày 27 vẫn được tính → bài ngày 28 mở khóa
+  const allLessonsDoneByDate = new Set();
+  for (const date of sortedDates) {
+    const dayLessons = dayMap[date] || [];
+    const doneIds = completedIdsByDate[date] || new Set();
+    if (dayLessons.length > 0 && dayLessons.every(l => doneIds.has(l.id))) {
+      allLessonsDoneByDate.add(date);
+    }
+  }
+
+  // completedDates (điểm danh): ≥15 phút HỌC ĐÚNG NGÀY ĐÓ VÀ hoàn thành TẤT CẢ bài được giao đúng ngày
   const completedDates = new Set();
   for (const date of sortedDates) {
     const daySessions = sessions.filter(s => s.date === date);
     const totalSec = daySessions.reduce((a, s) => a + (s.duration_seconds || 0), 0);
+    // Điểm danh: ≥15p học ĐÚNG ngày đó VÀ hoàn thành hết bài ĐÚNG ngày đó (scheduled_date = date)
+    // → tránh trường hợp treo giờ ngày 27 nhưng bấm hoàn thành ngày 28
+    const dayCompletedIds = completedIdsByDate[date] || new Set();
     const dayLessons = dayMap[date] || [];
-    const dayCompletedIds = new Set(
-      [...completionSet]
-        .filter(key => key.endsWith(':' + date))
-        .map(key => parseInt(key.split(':')[0]))
-    );
-    const allLessonsDone = dayLessons.length > 0 && dayLessons.every(l => dayCompletedIds.has(l.id));
-    if (totalSec >= 15 * 60 && allLessonsDone) completedDates.add(date);
+    const allLessonsDoneOnSameDay = dayLessons.length > 0 && dayLessons.every(l => dayCompletedIds.has(l.id));
+    if (totalSec >= 15 * 60 && allLessonsDoneOnSameDay) completedDates.add(date);
   }
 
-  // Tính lesson IDs đã hoàn thành (dùng bảng lesson_completions để lưu bền vững)
-  // Không bị reset khi bấm "Học lại"
+  // Tính lesson IDs đã hoàn thành hôm nay — dùng cho progress bar ngày hôm nay
   const todaySessions = sessions.filter(s => s.date === today);
-  const completedLessonIds = new Set(
-    [...completionSet]
-      .filter(key => key.endsWith(':' + today))
-      .map(key => parseInt(key.split(':')[0]))
-  );
+  const completedLessonIds = completedIdsByDate[today] || new Set();
 
   allScheduleDays = sortedDates.map((date, idx) => {
     const prevDate = idx > 0 ? sortedDates[idx - 1] : null;
-    const prevDone = prevDate ? completedDates.has(prevDate) : true; // nếu không có ngày trước thì coi như đã xong
     const isToday  = date === today;
     const isPast   = date < today;
 
-    // Unlock: (là ngày hôm nay HOẶC đã qua) VÀ ngày trước đã hoàn thành
-    const unlocked = (isToday || isPast) && prevDone;
+    // prevAllDone: ngày trước đã hoàn thành hết bài (không cần 15 phút) — dùng để mở khóa
+    const prevAllDone = prevDate ? allLessonsDoneByDate.has(prevDate) : true;
+
+    // Unlock: ngày hiện tại phải khớp với hôm nay HOẶC đã qua, VÀ ngày trước hoàn thành hết bài
+    const unlocked = (isToday || isPast) && prevAllDone;
+
+    // Với ngày hôm nay: check completion theo ngày hôm nay
+    // Với ngày đã qua: check completion đúng ngày đó (không dùng anyDate để tránh nhầm bài trùng lesson_id)
+    const dayCompletedLessonIds = isToday
+      ? completedLessonIds
+      : completedIdsByDate[date] || new Set();
+
+    // Tính tổng thời gian học đúng ngày đó và trạng thái hoàn thành bài
+    const daySessions = sessions.filter(s => s.date === date);
+    const totalSec = daySessions.reduce((a, s) => a + (s.duration_seconds || 0), 0);
+    const dayCompletedIds = completedIdsByDate[date] || new Set();
+    const dayLessons = dayMap[date] || [];
+    const allLessonsDone = dayLessons.length > 0 && dayLessons.every(l => dayCompletedIds.has(l.id));
 
     return {
       date,
@@ -2944,12 +3010,11 @@ async function loadLessons() {
       isDone: completedDates.has(date),
       unlocked,
       prevDate,
-      prevDone,
-      completedLessonIds: isToday ? completedLessonIds : new Set(
-        [...completionSet]
-          .filter(key => key.endsWith(':' + date))
-          .map(key => parseInt(key.split(':')[0]))
-      ),
+      prevDone: prevAllDone,
+      completedLessonIds: dayCompletedLessonIds,
+      totalSec,
+      allLessonsDone,
+      completedAtMap,
     };
   });
 
@@ -3048,7 +3113,16 @@ function renderLessons() {
       badgeHtml = `<span class="day-badge done-badge">✅ Đã hoàn thành</span>`;
     } else if (day.isPast && !day.isDone) {
       dotClass = 'locked';
-      badgeHtml = `<span class="day-badge locked-badge">⚠️ Chưa hoàn thành</span>`;
+      const has15min = day.totalSec >= 15 * 60;
+      let badgeMsg;
+      if (!day.allLessonsDone && !has15min) {
+        badgeMsg = '⚠️ Chưa ghi nhận hoạt động';
+      } else if (day.allLessonsDone && !has15min) {
+        badgeMsg = '⚠️ Chưa ghi nhận điểm danh';
+      } else {
+        badgeMsg = '⚠️ Chưa ghi nhận học';
+      }
+      badgeHtml = `<span class="day-badge locked-badge">${badgeMsg}</span>`;
     } else {
       dotClass = 'future';
       badgeHtml = `<span class="day-badge future-badge">🔒 Chưa tới</span>`;
@@ -3084,6 +3158,10 @@ function renderLessons() {
       }
 
       if (isCompleted) {
+        const completedAtRaw = day.completedAtMap && day.completedAtMap[`${l.id}:${day.date}`];
+        const completedAtStr = completedAtRaw
+          ? new Date(completedAtRaw).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' })
+          : '';
         return `
           <div class="lesson-card completed">
             <div class="lesson-meta">
@@ -3091,8 +3169,8 @@ function renderLessons() {
               <span class="lesson-duration"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${l.duration_estimate} phút</span>
             </div>
             <div class="lesson-title">${esc(l.title)}</div>
-            <div class="lesson-completed-tag">✅ Đã hoàn thành</div>
-            <button class="btn btn-primary" onclick="startLesson(${l.id}, true)" style="margin-top:10px;background:linear-gradient(135deg,var(--green),#22c55e)">
+            <div class="lesson-completed-tag">✅ Đã hoàn thành${completedAtStr ? `<span style="margin-left:8px;font-size:11px;color:var(--text-muted);font-weight:500">🕐 ${completedAtStr}</span>` : ''}</div>
+            <button class="btn btn-primary" onclick="startLesson(${l.id}, true, '${day.date}')" style="margin-top:10px;background:linear-gradient(135deg,var(--green),#22c55e)">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
               Học lại
             </button>
@@ -3106,7 +3184,7 @@ function renderLessons() {
             <span class="lesson-duration"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${l.duration_estimate} phút</span>
           </div>
           <div class="lesson-title">${esc(l.title)}</div>
-          <button class="btn btn-primary" onclick="startLesson(${l.id})">
+          <button class="btn btn-primary" onclick="startLesson(${l.id}, false, '${day.date}')">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
             Bắt đầu học
           </button>
@@ -3120,7 +3198,7 @@ function renderLessons() {
           <div class="day-label">${formatDateVi(day.date)}${badgeHtml}</div>
           <div class="day-line"></div>
         </div>
-        <div class="lesson-grid" style="margin-bottom:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
+        <div class="lesson-grid day-lesson-grid">
           ${lessonCards}
         </div>
       </div>`;
@@ -3128,9 +3206,11 @@ function renderLessons() {
 }
 
 /* EMPLOYEE: LESSON SESSION */
-async function startLesson(lessonId, alreadyCompleted) {
+async function startLesson(lessonId, alreadyCompleted, scheduledDate) {
   const lesson = allLessons.find(l => l.id === lessonId);
   if (!lesson) return;
+
+  const sessionDate = scheduledDate || todayStr();
 
   const { data, error } = await sb.from('learning_sessions').insert({
     user_id: currentUser.id, lesson_id: lessonId, date: todayStr()
@@ -3138,7 +3218,7 @@ async function startLesson(lessonId, alreadyCompleted) {
 
   if (error) { toast('Không thể bắt đầu buổi học.', 'error'); return; }
 
-  activeSession = { id: data.id, lesson };
+  activeSession = { id: data.id, lesson, scheduledDate: sessionDate };
   elapsedSecs   = 0;
   openLessonModal(lesson, !!alreadyCompleted);
   startTimer();
@@ -3465,7 +3545,7 @@ async function endLesson() {
   btn.innerHTML = '<div class="spinner"></div>';
 
   const lessonId = activeSession.lesson.id;
-  const dateStr  = todayStr();
+  const dateStr  = activeSession.scheduledDate || todayStr(); // ghi đúng ngày bài được giao
 
   // 1. Cập nhật learning_sessions
   await sb.from('learning_sessions').update({
@@ -3474,7 +3554,9 @@ async function endLesson() {
 
   // 2. Ghi nhận hoàn thành bài học — dùng insert thay vì upsert để tránh lỗi constraint
   const { error: compErr } = await sb.from('lesson_completions').insert({
-    user_id: currentUser.id, lesson_id: lessonId, date: dateStr,
+    user_id: currentUser.id, lesson_id: lessonId,
+    date: todayStr(),           // ngày thực tế hoàn thành
+    scheduled_date: dateStr,    // ngày bài được giao (từ lesson_schedules)
     completed_at: new Date().toISOString()
   });
   // Bỏ qua lỗi duplicate (đã hoàn thành rồi bấm Học lại thêm lần nữa)
@@ -3909,7 +3991,7 @@ async function loadAssignData() {
   const [{ data: lessons }, { data: users }, { data: schedules }] = await Promise.all([
     sb.from('lessons').select('id,title,type'),
     sb.from('users').select('id,name').eq('role','EMPLOYEE'),
-    sb.from('lesson_schedules').select('*,lessons(title)').gte('date', today).order('date')
+    sb.from('lesson_schedules').select('*,lessons(title,type)').order('date', { ascending: false })
   ]);
   allLessonsAdmin = lessons || [];
   allUsersAdmin   = users   || [];
@@ -3924,10 +4006,17 @@ async function loadAssignData() {
     tbody.innerHTML = '<tr class="empty-row"><td colspan="4" style="text-align:center;color:var(--text-muted);padding:20px">Chưa có phân công nào</td></tr>';
     return;
   }
+  const typeBadge = t => {
+    const map = { READING:'badge-reading', LISTENING:'badge-listening', VOCAB:'badge-vocab', GRAMMAR:'badge-grammar' };
+    const label = { READING:'Reading', LISTENING:'Listening', VOCAB:'Vocabulary', GRAMMAR:'Grammar' };
+    const cls = map[t] || 'badge-admin';
+    return `<span class="badge ${cls}">${label[t] || (t||'—')}</span>`;
+  };
   tbody.innerHTML = schedules.map(s => `
     <tr>
       <td data-label="Ngày học" style="font-weight:600">${s.date}</td>
       <td data-label="Bài học">${esc(s.lessons?.title || '—')}</td>
+      <td data-label="Loại bài học">${typeBadge(s.lessons?.type)}</td>
       <td data-label="Thao tác">
         <button onclick="deleteAssign(${s.id})" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:12px;padding:4px 8px;border-radius:6px;transition:all .2s" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--text-muted)'">🗑 Xoá</button>
       </td>
