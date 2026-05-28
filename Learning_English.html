@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="EngLearn" />
@@ -57,7 +57,13 @@ html, body {
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Loại bỏ 300ms tap delay trên toàn bộ app */
+  touch-action: manipulation;
+  /* Ngăn iOS text size adjust khi xoay màn hình */
+  -webkit-text-size-adjust: 100%;
 }
+/* Tắt highlight xanh khi tap trên iOS */
+* { -webkit-tap-highlight-color: transparent; }
 
 /* ===== UTILITIES ===== */
 .hidden { display: none !important; }
@@ -86,7 +92,7 @@ html, body {
 @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 @keyframes fadeInScale { from { opacity:0; transform:scale(.95); } to { opacity:1; transform:scale(1); } }
 @keyframes slideUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
-@keyframes shimmer { to { background-position: 200% center; } }
+@keyframes shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
 @keyframes pulse-dot { 0%,100% { transform:scale(1); box-shadow:0 0 0 0 rgba(13,148,136,.4); } 50% { transform:scale(1.15); box-shadow:0 0 0 6px rgba(13,148,136,0); } }
 @keyframes floatOrb { 0%,100% { transform:translateY(0) scale(1); } 50% { transform:translateY(-18px) scale(1.04); } }
 @keyframes gradientShift { 0% { background-position:0% 50%; } 50% { background-position:100% 50%; } 100% { background-position:0% 50%; } }
@@ -95,12 +101,12 @@ html, body {
 .anim-slide-up { animation: slideUp .5s ease forwards; }
 
 /* ===== BUTTONS ===== */
-button { cursor: pointer; border: none; font-family: var(--font-body); font-size: 15px; transition: all var(--transition); }
+button { cursor: pointer; border: none; font-family: var(--font-body); font-size: 15px; transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition); }
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   padding: 14px 22px; border-radius: 12px; font-weight: 600; font-size: 15px; width: 100%;
-  letter-spacing: -.01em; transition: all var(--transition);
+  letter-spacing: -.01em; transition: transform var(--transition), box-shadow var(--transition);
   position: relative; overflow: hidden;
 }
 .btn::before {
@@ -130,9 +136,12 @@ button { cursor: pointer; border: none; font-family: var(--font-body); font-size
 input[type=email], input[type=password], input[type=text], select {
   width: 100%; padding: 13px 16px;
   border: 1.5px solid var(--border); border-radius: 12px;
-  font-size: 15px; font-family: var(--font-body); background: #fff; color: var(--text);
-  outline: none; transition: all var(--transition);
+  /* 16px: ngưỡng iOS dùng để không zoom khi focus */
+  font-size: 16px; font-family: var(--font-body); background: #fff; color: var(--text);
+  outline: none; transition: border-color var(--transition), box-shadow var(--transition);
   box-shadow: var(--shadow-sm);
+  -webkit-appearance: none;
+  touch-action: manipulation;
 }
 input:focus, select:focus {
   border-color: var(--teal);
@@ -185,10 +194,11 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   font-size: 14px; font-weight: 500; z-index: 9999;
   transition: transform .35s cubic-bezier(.34,1.56,.64,1);
   max-width: 340px; text-align: center;
-  box-shadow: var(--shadow-lg); backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-lg); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255,255,255,.1);
+  transform: translateX(-50%) translateY(90px) translateZ(0);
 }
-#toast.show { transform: translateX(-50%) translateY(0); }
+#toast.show { transform: translateX(-50%) translateY(0) translateZ(0); }
 #toast.error { background: var(--red); }
 #toast.success { background: var(--green); }
 
@@ -196,8 +206,9 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 .overlay {
   position: fixed; inset: 0; background: rgba(15,23,42,.6);
   z-index: 100; display: flex; align-items: flex-end; justify-content: center;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
   animation: fadeIn .2s ease;
+  transform: translateZ(0);
 }
 @media (min-width: 640px) { .overlay { align-items: center; } }
 .modal {
@@ -216,7 +227,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   padding: 20px 24px; border-bottom: 1px solid var(--border-light);
   flex-shrink: 0; background: #fff;
 }
-.modal-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 24px; max-width: 100%; }
+.modal-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 24px; max-width: 100%; -webkit-overflow-scrolling: touch; }
 .modal-body * { max-width: 100%; box-sizing: border-box; }
 .modal-footer {
   padding: 16px 24px; border-top: 1px solid var(--border-light);
@@ -235,7 +246,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   content: ''; position: absolute; inset: 0;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,.3), transparent);
   animation: shimmer 2s ease infinite;
-  background-size: 200% auto;
+  will-change: transform;
 }
 
 /* =====================================================
@@ -254,11 +265,13 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   width: 500px; height: 500px;
   background: radial-gradient(circle, rgba(13,148,136,.13) 0%, transparent 65%);
   top: -120px; right: -130px; animation: floatOrb 9s ease-in-out infinite;
+  will-change: transform;
 }
 #view-login::after {
   width: 380px; height: 380px;
   background: radial-gradient(circle, rgba(99,102,241,.1) 0%, transparent 65%);
   bottom: -80px; left: -100px; animation: floatOrb 12s ease-in-out infinite reverse;
+  will-change: transform;
 }
 
 /* Login card */
@@ -283,7 +296,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   background: linear-gradient(90deg, transparent, var(--teal-mid), transparent);
 }
 
-.login-logo-wrap { position: relative; display: inline-block; margin-bottom: 20px; animation: floatOrb 4s ease-in-out infinite; }
+.login-logo-wrap { position: relative; display: inline-block; margin-bottom: 20px; animation: floatOrb 4s ease-in-out infinite; will-change: transform; }
 .login-logo-ring {
   position: absolute; inset: -6px; border-radius: 26px;
   border: 1.5px solid rgba(13,148,136,.2);
@@ -338,7 +351,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   display: inline-flex; align-items: center; gap: 6px;
   color: var(--text-muted); font-size: 14px; font-weight: 500;
   background: none; border: none; cursor: pointer; padding: 8px 14px;
-  border-radius: 10px; transition: all .2s; width: auto;
+  border-radius: 10px; transition: transform .2s, opacity .2s, box-shadow .2s; width: auto;
 }
 .back-link:hover { background: var(--bg-2); color: var(--text); }
 
@@ -348,8 +361,9 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 .pin-dots { display: flex; gap: 14px; justify-content: center; margin-bottom: 18px; }
 .pin-dot {
   width: 15px; height: 15px; border-radius: 50%;
-  border: 2px solid #d1d5db; transition: all var(--transition-spring);
+  border: 2px solid #d1d5db; transition: transform var(--transition-spring), background var(--transition-spring), border-color var(--transition-spring), box-shadow var(--transition-spring);
   background: transparent;
+  will-change: transform;
 }
 .pin-dot.filled {
   background: linear-gradient(135deg, var(--teal), var(--teal-bright));
@@ -369,10 +383,12 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   border: none;
   background: #f1f5f9;
   font-size: 20px; font-weight: 600;
-  color: var(--text); transition: all var(--transition-spring);
+  color: var(--text); transition: transform var(--transition-spring), box-shadow var(--transition-spring), background var(--transition-spring), color var(--transition-spring);
   box-shadow: 0 2px 6px rgba(0,0,0,.08);
   font-family: var(--font-display);
   display: flex; align-items: center; justify-content: center;
+  will-change: transform;
+  touch-action: manipulation;
 }
 .key:hover { background: var(--teal-light); color: var(--teal); box-shadow: 0 4px 16px rgba(13,148,136,.2); transform: scale(1.06); }
 .key:active { transform: scale(.90); }
@@ -400,6 +416,8 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   background: var(--bg-2); outline: none;
   transition: border-color .2s, box-shadow .2s;
   font-family: var(--font-display);
+  -webkit-appearance: none;
+  touch-action: manipulation;
 }
 .pin-input-desktop:focus {
   border-color: var(--teal);
@@ -438,9 +456,10 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
    APP HEADER
 ===================================================== */
 .app-header {
-  background: rgba(255,255,255,.9); backdrop-filter: blur(12px);
+  background: rgba(255,255,255,.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-light);
   position: sticky; top: 0; z-index: 50;
+  transform: translateZ(0);
 }
 .app-header-inner {
   max-width: 1400px; margin: 0 auto; padding: 0 20px;
@@ -547,7 +566,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 .tab {
   padding: 9px 6px; border-radius: 10px; font-size: 12px; font-weight: 600;
   background: none; border: none; color: var(--text-muted); white-space: nowrap;
-  transition: all var(--transition); letter-spacing: -.01em;
+  transition: color var(--transition), background var(--transition), box-shadow var(--transition); letter-spacing: -.01em;
   text-align: center; overflow: hidden; text-overflow: ellipsis;
 }
 .tab.active {
@@ -573,9 +592,11 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 .lesson-card {
   background: #fff; border-radius: var(--radius); border: 1px solid var(--border-light);
   padding: 24px; display: flex; flex-direction: column; gap: 16px;
-  transition: all var(--transition); cursor: default;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+  cursor: default;
   box-shadow: var(--shadow-sm);
   animation: fadeIn .4s ease both;
+  will-change: transform;
 }
 .lesson-card:nth-child(2) { animation-delay: .05s; }
 .lesson-card:nth-child(3) { animation-delay: .1s; }
@@ -642,7 +663,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px;
   border-radius: 9px; border: 1.5px solid var(--border); background: #fff;
   color: var(--text); font-size: 12px; font-weight: 600; cursor: pointer;
-  font-family: var(--font-body); transition: all .15s;
+  font-family: var(--font-body); transition: transform .15s, opacity .15s, box-shadow .15s;
 }
 .be-add-btn:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
 .be-blocks { padding: 14px; display: flex; flex-direction: column; gap: 10px; min-height: 120px; }
@@ -663,27 +684,29 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   width: 24px; height: 24px; border-radius: 6px; border: none;
   background: var(--red-light); color: var(--red); cursor: pointer;
   font-size: 13px; display: flex; align-items: center; justify-content: center;
-  transition: all .15s;
+  transition: transform .15s, opacity .15s, box-shadow .15s;
 }
 .be-block-del:hover { background: var(--red); color: #fff; }
 .be-block-move {
   width: 24px; height: 24px; border-radius: 6px; border: none;
   background: var(--bg-2); color: var(--text-muted); cursor: pointer;
   font-size: 13px; display: flex; align-items: center; justify-content: center;
-  transition: all .15s;
+  transition: transform .15s, opacity .15s, box-shadow .15s;
 }
 .be-block-move:hover { background: var(--border); color: var(--text); }
 .be-block-body { padding: 10px 12px; }
 .be-text-input {
-  width: 100%; border: none; outline: none; font-size: 14px; line-height: 1.8;
+  width: 100%; border: none; outline: none; font-size: 16px; line-height: 1.8;
   font-family: var(--font-body); color: var(--text); background: transparent;
   resize: vertical; min-height: 60px; padding: 4px 0;
+  -webkit-appearance: none; touch-action: manipulation;
 }
 .be-text-input::placeholder { color: var(--text-sub); }
 .be-callout-input {
-  width: 100%; border: none; outline: none; font-size: 14px; line-height: 1.7;
+  width: 100%; border: none; outline: none; font-size: 16px; line-height: 1.7;
   font-family: var(--font-body); color: var(--teal-dark); background: transparent;
   resize: vertical; min-height: 48px; padding: 4px 0; font-style: italic;
+  -webkit-appearance: none; touch-action: manipulation;
 }
 .be-block.type-callout { border-color: rgba(13,148,136,.3); }
 .be-block.type-callout .be-block-header { background: linear-gradient(90deg, var(--teal-light), #e0f2fe); color: var(--teal-dark); border-bottom-color: rgba(13,148,136,.15); }
@@ -695,15 +718,15 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 .be-table th { background: linear-gradient(135deg, var(--teal-dark), var(--teal)); }
 .be-table th input {
   width: 100%; padding: 9px 11px; border: none; outline: none;
-  background: transparent; font-size: 12px; font-weight: 700; color: #fff;
+  background: transparent; font-size: 16px; font-weight: 700; color: #fff;
   font-family: var(--font-body); text-transform: uppercase; letter-spacing: .04em;
   min-width: 80px;
 }
 .be-table th input::placeholder { color: rgba(255,255,255,.55); }
 .be-table td input {
   width: 100%; padding: 8px 11px; border: none; outline: none;
-  background: transparent; font-size: 13px; color: var(--text);
-  font-family: var(--font-body); min-width: 80px;
+  background: transparent; font-size: 16px; color: var(--text);
+  font-family: var(--font-body); min-width: 80px; touch-action: manipulation;
 }
 .be-table td input:focus { background: rgba(13,148,136,.06); }
 .be-table tr:nth-child(even) td { background: var(--bg-2); }
@@ -712,13 +735,13 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 .be-tc-btn {
   padding: 4px 10px; border-radius: 7px; border: 1.5px solid var(--border);
   background: #fff; font-size: 11px; font-weight: 600; cursor: pointer;
-  font-family: var(--font-body); color: var(--text-muted); transition: all .15s;
+  font-family: var(--font-body); color: var(--text-muted); transition: transform .15s, opacity .15s, box-shadow .15s;
 }
 .be-tc-btn:hover { border-color: var(--teal); color: var(--teal); }
 /* Image block */
 .be-img-drop {
   border: 2px dashed var(--border); border-radius: 10px; padding: 20px;
-  text-align: center; cursor: pointer; transition: all .2s; background: var(--bg-2);
+  text-align: center; cursor: pointer; transition: transform .2s, opacity .2s, box-shadow .2s; background: var(--bg-2);
 }
 .be-img-drop:hover { border-color: var(--teal); background: var(--teal-light); }
 .be-img-drop .be-img-icon { font-size: 28px; margin-bottom: 6px; }
@@ -770,13 +793,13 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 .ge-ex-block { background: var(--bg-2); border: 1.5px solid var(--border); border-radius: 10px; padding: 14px; margin-top: 16px; }
 .ge-ex-title { font-size: 13px; font-weight: 700; color: var(--teal); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
 .ge-ex-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-.ge-ex-row input { flex: 1; padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; background: #fff; font-family: var(--font-body); }
+.ge-ex-row input { flex: 1; padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 16px; background: #fff; font-family: var(--font-body); -webkit-appearance: none; touch-action: manipulation; }
 .ge-ex-row input:focus { border-color: var(--teal); outline: none; }
 .ge-ex-del { width: 28px; height: 28px; border-radius: 6px; border: none; background: var(--red-light); color: var(--red); cursor: pointer; font-size: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-.ge-ex-add { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 8px; border: 1.5px dashed var(--teal); background: var(--teal-light); color: var(--teal); font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font-body); transition: all .15s; }
+.ge-ex-add { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 8px; border: 1.5px dashed var(--teal); background: var(--teal-light); color: var(--teal); font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font-body); transition: transform .15s, opacity .15s, box-shadow .15s; }
 .ge-ex-add:hover { background: rgba(13,148,136,.15); }
 .ge-ex-hint { font-size: 11px; color: var(--text-sub); margin-top: 4px; }
-.ge-ex-instruction { width: 100%; padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; background: #fff; font-family: var(--font-body); margin-bottom: 10px; }
+.ge-ex-instruction { width: 100%; padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 16px; background: #fff; font-family: var(--font-body); margin-bottom: 10px; -webkit-appearance: none; touch-action: manipulation; }
 
 
 
@@ -908,9 +931,10 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 .grammar-ex-input {
   border: none; border-bottom: 2.5px solid var(--teal);
   background: rgba(13,148,136,.07); border-radius: 6px 6px 0 0;
-  padding: 4px 12px; font-size: 14px; font-family: var(--font-body);
+  padding: 4px 12px; font-size: 16px; font-family: var(--font-body);
   color: var(--text); outline: none; min-width: 90px;
-  text-align: center; transition: all .2s;
+  text-align: center; transition: background .2s, box-shadow .2s;
+  -webkit-appearance: none; touch-action: manipulation; will-change: transform;
 }
 .grammar-ex-input:focus {
   background: rgba(13,148,136,.14);
@@ -984,14 +1008,14 @@ audio { width: 100%; }
   position: absolute; top: 12px; right: 12px;
   background: var(--red-light); color: var(--red); border: none;
   border-radius: 7px; padding: 4px 9px; font-size: 12px; font-weight: 700;
-  cursor: pointer; font-family: var(--font-body); transition: all .15s; width: auto;
+  cursor: pointer; font-family: var(--font-body); transition: transform .15s, opacity .15s, box-shadow .15s; width: auto;
 }
 .rq-del-q-btn:hover { background: var(--red); color: #fff; }
 .rq-add-q-btn {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 9px 16px; border-radius: 9px; border: 1.5px dashed var(--teal-mid);
   background: var(--teal-glass); color: var(--teal); font-size: 13px; font-weight: 700;
-  cursor: pointer; font-family: var(--font-body); transition: all .2s; width: 100%;
+  cursor: pointer; font-family: var(--font-body); transition: transform .2s, opacity .2s, box-shadow .2s; width: 100%;
   justify-content: center;
 }
 .rq-add-q-btn:hover { background: var(--teal-light); border-style: solid; }
@@ -1014,7 +1038,7 @@ audio { width: 100%; }
 .rq-emp-option {
   padding: 12px 16px; border-radius: 11px; border: 1.5px solid var(--border);
   background: #fff; font-size: 14px; font-weight: 500; color: var(--text);
-  cursor: pointer; text-align: left; transition: all .18s; font-family: var(--font-body);
+  cursor: pointer; text-align: left; transition: transform .18s, opacity .18s, box-shadow .18s; font-family: var(--font-body);
   width: 100%; display: flex; align-items: center; gap: 10px;
 }
 .rq-emp-option:hover:not(:disabled) { border-color: var(--teal); background: var(--teal-light); color: var(--teal); }
@@ -1024,7 +1048,7 @@ audio { width: 100%; }
 .rq-opt-letter {
   width: 26px; height: 26px; border-radius: 50%; background: var(--bg-2); flex-shrink: 0;
   display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;
-  transition: all .18s;
+  transition: transform .18s, opacity .18s, box-shadow .18s;
 }
 .rq-emp-option.correct .rq-opt-letter { background: var(--green); color: #fff; }
 .rq-emp-option.wrong .rq-opt-letter { background: var(--red); color: #fff; }
@@ -1043,7 +1067,7 @@ audio { width: 100%; }
   margin-top: 14px; display: inline-flex; align-items: center; gap: 6px;
   padding: 10px 22px; border-radius: 10px; background: var(--red-light); color: var(--red);
   border: 1.5px solid rgba(239,68,68,.25); font-size: 13px; font-weight: 700;
-  cursor: pointer; font-family: var(--font-body); transition: all .18s; width: auto;
+  cursor: pointer; font-family: var(--font-body); transition: transform .18s, opacity .18s, box-shadow .18s; width: auto;
 }
 .rq-retry-btn:hover { background: var(--red); color: #fff; }
 
@@ -1080,7 +1104,7 @@ audio { width: 100%; }
 .stat-card {
   background: #fff; border-radius: var(--radius); border: 1px solid var(--border-light);
   padding: 22px; box-shadow: var(--shadow-sm);
-  transition: all var(--transition); animation: fadeIn .5s ease both;
+  transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition); animation: fadeIn .5s ease both;
   position: relative; overflow: hidden;
 }
 .stat-card::before {
@@ -1133,7 +1157,7 @@ select {
   background: none; border: none; color: var(--text-muted); font-size: 14px;
   cursor: pointer; font-family: var(--font-body); font-weight: 500;
   display: flex; align-items: center; gap: 5px; margin: 0 auto; width: auto;
-  padding: 8px 16px; border-radius: 8px; transition: all var(--transition);
+  padding: 8px 16px; border-radius: 8px; transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
 }
 .back-link:hover { color: var(--teal); background: var(--teal-light); }
 
@@ -1192,6 +1216,11 @@ select {
   /* Monthly attendance table: giữ scroll ngang (quá nhiều cột) */
   #monthly-attendance-wrap { overflow-x: auto !important; }
   #monthly-attendance-wrap .att-table { min-width: 600px; }
+
+  /* Table-wrap bên trong card section: padding để card con không sát mép, bottom 12px để không cụt */
+  .table-wrap tbody { padding: 12px 12px 12px; }
+  /* Đảm bảo table-wrap trong card section không transparent */
+  .table-wrap { background: var(--card) !important; }
 }
 
 @media (min-width: 641px) and (max-width: 900px) {
@@ -1486,7 +1515,7 @@ select {
 .mini-test-option {
   padding: 14px 12px; border-radius: 12px; font-size: 14px; font-weight: 600;
   border: 2px solid var(--border); background: #fff; color: var(--text);
-  cursor: pointer; transition: all var(--transition); text-align: left;
+  cursor: pointer; transition: transform var(--transition), box-shadow var(--transition), background var(--transition); text-align: left;
   min-height: 52px; display: flex; align-items: center;
   line-height: 1.4;
 }
@@ -1540,7 +1569,7 @@ select {
   flex: 1; padding: 14px 18px; border-radius: 12px;
   border: 2px solid var(--border); font-size: 16px; font-weight: 600;
   font-family: var(--font-display); color: var(--text); background: #fff;
-  outline: none; transition: all .2s; box-shadow: var(--shadow-sm);
+  outline: none; transition: transform .2s, opacity .2s, box-shadow .2s; box-shadow: var(--shadow-sm);
   letter-spacing: .01em;
 }
 .mt-type-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.15); }
@@ -1709,7 +1738,7 @@ select {
   color: #fff; font-size: 17px; font-weight: 800;
   font-family: 'Bricolage Grotesque', sans-serif; letter-spacing: -.01em;
   box-shadow: 0 5px 0 var(--teal-dark), 0 8px 20px rgba(13,148,136,.4);
-  transition: all .12s ease;
+  transition: transform .12s ease, opacity .12s ease, box-shadow .12s ease;
   animation: wBtnSlide .5s cubic-bezier(.34,1.4,.64,1) 1.3s both;
   position: relative; overflow: hidden;
 }
@@ -1769,12 +1798,12 @@ select {
 .confirm-cancel {
   padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 600;
   background: var(--bg-2); color: var(--text-muted); border: 1.5px solid var(--border);
-  cursor: pointer; transition: all var(--transition); font-family: var(--font-body);
+  cursor: pointer; transition: transform var(--transition), box-shadow var(--transition), background var(--transition); font-family: var(--font-body);
 }
 .confirm-cancel:hover { background: var(--border); color: var(--text); }
 .confirm-ok {
   padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 600;
-  color: #fff; border: none; cursor: pointer; transition: all var(--transition);
+  color: #fff; border: none; cursor: pointer; transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition);
   font-family: var(--font-body);
 }
 .confirm-ok.danger  { background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 4px 14px rgba(239,68,68,.35); }
@@ -1812,7 +1841,7 @@ select {
 .mt-review-confirm {
   width: 100%; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 700;
   background: linear-gradient(135deg, var(--teal), var(--teal-mid)); color: #fff;
-  border: none; cursor: pointer; transition: all .2s; box-shadow: var(--shadow-teal);
+  border: none; cursor: pointer; transition: transform .2s, opacity .2s, box-shadow .2s; box-shadow: var(--shadow-teal);
   display: none; /* hiện sau khi lật */
 }
 .mt-review-confirm:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(13,148,136,.35); }
@@ -2088,7 +2117,7 @@ select {
             <div class="timer-chip" id="modal-timer">0:00</div>
             <div class="text-xs mt-2" style="color:var(--text-muted);font-weight:500">⏱ Đang học</div>
           </div>
-          <button id="btn-close-lesson" onclick="tryCloseLessonModal()" title="Đóng bài học" style="width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg);color:var(--text-muted);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;line-height:1;transition:all .15s" onmouseover="this.style.background='var(--bg-2)'" onmouseout="this.style.background='var(--bg)'">×</button>
+          <button id="btn-close-lesson" onclick="tryCloseLessonModal()" title="Đóng bài học" style="width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg);color:var(--text-muted);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;line-height:1;transition: transform .15s, opacity .15s, box-shadow .15s" onmouseover="this.style.background='var(--bg-2)'" onmouseout="this.style.background='var(--bg)'">×</button>
         </div>
       </div>
     </div>
@@ -2175,7 +2204,7 @@ select {
     <div class="table-section-header" style="margin-top:28px;display:flex;align-items:center;justify-content:space-between">
       <h2>📅 Bảng điểm danh tháng</h2>
       <div style="display:flex;align-items:center;gap:8px">
-        <input type="month" id="attendance-month-filter" style="padding:6px 12px;border-radius:8px;border:1.5px solid var(--border);font-size:13px;background:#fff;color:#1e293b;outline:none;cursor:pointer" onchange="loadMonthlyAttendance(this.value)">
+        <input type="month" id="attendance-month-filter" style="padding:6px 12px;border-radius:8px;border:1.5px solid var(--border);font-size:16px;background:#fff;color:#1e293b;outline:none;cursor:pointer" onchange="loadMonthlyAttendance(this.value)">
       </div>
     </div>
     <div id="monthly-attendance-wrap" style="background:#fff;border-radius:var(--radius);border:1px solid var(--border-light);box-shadow:var(--shadow-sm);overflow:hidden;overflow-x:auto;margin-bottom:28px">
@@ -2185,26 +2214,28 @@ select {
     </div>
 
     <!-- Assign Lessons Section -->
-    <div class="table-section-header" style="margin-top:28px;display:flex;align-items:center;justify-content:space-between">
-      <h2>📚 Phân công bài học theo ngày</h2>
-      <button class="btn btn-primary btn-sm" onclick="openAssignModal()">+ Phân công mới</button>
+    <div style="margin-top:28px;background:var(--card);border-radius:var(--radius);border:1px solid var(--border-light);box-shadow:var(--shadow);overflow:hidden">
+      <div class="table-section-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border-light);margin:0">
+        <h2>📚 Phân công bài học theo ngày</h2>
+        <button class="btn btn-primary btn-sm" onclick="openAssignModal()">+ Phân công mới</button>
+      </div>
+      <div class="table-wrap" style="margin:0;border-radius:0;box-shadow:none;border:none">
+        <table>
+          <thead>
+            <tr>
+              <th>Ngày học</th>
+              <th>Bài học</th>
+              <th>Loại bài học</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="assign-tbody">
+            <tr class="empty-row"><td colspan="4">Đang tải...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="assign-pagination"></div>
     </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Ngày học</th>
-            <th>Bài học</th>
-            <th>Loại bài học</th>
-            <th>Thao tác</th>
-          </tr>
-        </thead>
-        <tbody id="assign-tbody">
-          <tr class="empty-row"><td colspan="4">Đang tải...</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div id="assign-pagination"></div>
 
     <!-- Modal phân công -->
     <div id="assign-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px">
@@ -2213,7 +2244,7 @@ select {
         <div style="display:flex;flex-direction:column;gap:16px">
           <div>
             <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Ngày học</label>
-            <input type="date" id="assign-date" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:14px;background:var(--bg-2)">
+            <input type="date" id="assign-date" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;background:var(--bg-2)">
           </div>
           <div>
             <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Bài học <span style="color:var(--teal)">(chọn nhiều)</span></label>
@@ -2237,14 +2268,14 @@ select {
           <!-- Tiêu đề -->
           <div>
             <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Tiêu đề bài học</label>
-            <input type="text" id="lm-title" placeholder="VD: Numbers 1–100" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:14px;background:var(--bg-2)">
+            <input type="text" id="lm-title" placeholder="VD: Numbers 1–100" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;background:var(--bg-2)">
           </div>
 
           <!-- Loại + Thời gian -->
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
             <div>
               <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Loại</label>
-              <select id="lm-type" onchange="onLessonTypeChange()" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:14px;background:var(--bg-2)">
+              <select id="lm-type" onchange="onLessonTypeChange()" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;background:var(--bg-2)">
                 <option value="VOCAB">📝 Vocabulary</option>
                 <option value="READING">📖 Reading</option>
                 <option value="GRAMMAR">⚙️ Grammar</option>
@@ -2253,7 +2284,7 @@ select {
             </div>
             <div>
               <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Thời lượng ước tính (phút)</label>
-              <input type="number" id="lm-duration" value="10" min="1" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:14px;background:var(--bg-2)">
+              <input type="number" id="lm-duration" value="10" min="1" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;background:var(--bg-2)">
             </div>
           </div>
 
@@ -2262,13 +2293,13 @@ select {
             <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Danh sách từ vựng</label>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
               <span style="font-size:12px;color:var(--text-sub)">Mỗi dòng: <code style="background:var(--bg-2);padding:2px 6px;border-radius:4px;font-size:11px">từ | phiên âm | nghĩa</code></span>
-              <button type="button" onclick="document.getElementById('lm-excel-input').click()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:8px;border:1.5px solid #16a34a;background:#f0fdf4;color:#16a34a;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);transition:all .2s" onmouseover="this.style.background='#dcfce7'" onmouseout="this.style.background='#f0fdf4'">
+              <button type="button" onclick="document.getElementById('lm-excel-input').click()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:8px;border:1.5px solid #16a34a;background:#f0fdf4;color:#16a34a;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);transition: transform .2s, opacity .2s, box-shadow .2s" onmouseover="this.style.background='#dcfce7'" onmouseout="this.style.background='#f0fdf4'">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                 Import Excel
               </button>
               <input type="file" id="lm-excel-input" accept=".xlsx,.xls" class="hidden" onchange="importVocabFromExcel(this)">
             </div>
-            <textarea id="lm-vocab-input" rows="10" placeholder="father (n) | /ˈfɑːðər/ | cha, bố&#10;mother (n) | /ˈmʌðər/ | mẹ&#10;(có thể bỏ phiên âm: word | nghĩa)&#10;..." style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:14px;background:var(--bg-2);font-family:var(--font-body);resize:vertical;line-height:1.7"></textarea>
+            <textarea id="lm-vocab-input" rows="10" placeholder="father (n) | /ˈfɑːðər/ | cha, bố&#10;mother (n) | /ˈmʌðər/ | mẹ&#10;(có thể bỏ phiên âm: word | nghĩa)&#10;..." style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;background:var(--bg-2);font-family:var(--font-body);resize:vertical;line-height:1.7"></textarea>
             <div id="lm-vocab-preview" style="margin-top:8px;font-size:12px;color:var(--text-muted)"></div>
           </div>
 
@@ -2305,7 +2336,7 @@ select {
               </div>
             </div>
             <div style="margin-top:8px;display:flex;gap:8px">
-              <button type="button" id="lm-toggle-ex-btn" onclick="geToggleExercise()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;border:1.5px solid var(--teal);background:var(--teal-light);color:var(--teal);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);transition:all .15s" onmouseover="this.style.background='rgba(13,148,136,.15)'" onmouseout="this.style.background='var(--teal-light)'">
+              <button type="button" id="lm-toggle-ex-btn" onclick="geToggleExercise()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;border:1.5px solid var(--teal);background:var(--teal-light);color:var(--teal);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);transition: transform .15s, opacity .15s, box-shadow .15s" onmouseover="this.style.background='rgba(13,148,136,.15)'" onmouseout="this.style.background='var(--teal-light)'">
                 ✏️ Thêm bài tập
               </button>
             </div>
@@ -2329,24 +2360,24 @@ select {
 
             <div style="margin-bottom:14px">
               <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">URL Audio / Video</label>
-              <input type="url" id="lm-audio-url" placeholder="https://www.youtube.com/watch?v=... hoặc link MP3 trực tiếp" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:14px;background:var(--bg-2)" oninput="onAudioUrlInput(this.value)">
+              <input type="url" id="lm-audio-url" placeholder="https://www.youtube.com/watch?v=... hoặc link MP3 trực tiếp" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;background:var(--bg-2)" oninput="onAudioUrlInput(this.value)">
               <div id="lm-audio-url-hint" style="margin-top:6px;font-size:12px;color:var(--text-muted)"></div>
             </div>
             <div style="margin-bottom:14px;display:flex;gap:10px;align-items:flex-end">
               <div style="flex:1">
                 <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Kết thúc lúc (phút:giây) — để trống = hết video</label>
-                <input type="text" id="lm-audio-end" placeholder="4:00" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:14px;background:var(--bg-2)" oninput="onAudioEndInput(this.value)">
+                <input type="text" id="lm-audio-end" placeholder="4:00" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;background:var(--bg-2)" oninput="onAudioEndInput(this.value)">
                 <div id="lm-audio-end-hint" style="margin-top:4px;font-size:11px;color:var(--text-muted)"></div>
               </div>
             </div>
             <div>
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
                 <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin:0">Transcript bài nghe</label>
-                <button type="button" id="lm-gen-blank-btn" onclick="generateFillBlank()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:8px;border:1.5px solid var(--indigo);background:var(--indigo-light);color:var(--indigo);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);transition:all .2s" onmouseover="this.style.background='#e0e7ff'" onmouseout="this.style.background='var(--indigo-light)'">
+                <button type="button" id="lm-gen-blank-btn" onclick="generateFillBlank()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:8px;border:1.5px solid var(--indigo);background:var(--indigo-light);color:var(--indigo);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);transition: transform .2s, opacity .2s, box-shadow .2s" onmouseover="this.style.background='#e0e7ff'" onmouseout="this.style.background='var(--indigo-light)'">
                   ✨ Tạo bài điền từ tự động (AI)
                 </button>
               </div>
-              <textarea id="lm-transcript-input" rows="8" placeholder="Paste transcript của bài nghe vào đây...&#10;&#10;VD: Hello everyone! Today we're going to talk about sports. Many young children play sports these days..." style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:13px;background:var(--bg-2);font-family:var(--font-body);resize:vertical;line-height:1.7"></textarea>
+              <textarea id="lm-transcript-input" rows="8" placeholder="Paste transcript của bài nghe vào đây...&#10;&#10;VD: Hello everyone! Today we're going to talk about sports. Many young children play sports these days..." style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;background:var(--bg-2);font-family:var(--font-body);resize:vertical;line-height:1.7"></textarea>
               <div style="margin-top:6px;font-size:11px;color:var(--text-muted)">📌 Nhập transcript → nhấn <strong>"Tạo bài điền từ tự động"</strong> để AI chọn từ cần điền. Admin thấy đáp án, nhân viên chỉ thấy chỗ trống.</div>
             </div>
 
@@ -2376,11 +2407,11 @@ select {
         <div style="display:flex;flex-direction:column;gap:14px">
           <div>
             <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Họ tên</label>
-            <input type="text" id="emp-name" placeholder="Nguyễn Văn A" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:14px;background:var(--bg-2)">
+            <input type="text" id="emp-name" placeholder="Nguyễn Văn A" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;background:var(--bg-2)">
           </div>
           <div>
             <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Email</label>
-            <input type="email" id="emp-email" placeholder="nhanvien@congty.com" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:14px;background:var(--bg-2)">
+            <input type="email" id="emp-email" placeholder="nhanvien@congty.com" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;background:var(--bg-2)">
           </div>
         </div>
         <div style="display:flex;gap:10px;margin-top:22px">
@@ -2391,63 +2422,71 @@ select {
     </div>
 
     <!-- Table -->
-    <div class="table-section-header" style="margin-top:28px">
-      <h2 style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px" onclick="toggleEmpTable()">
-        👥 Danh sách nhân viên
-        <span id="emp-table-arrow" style="font-size:12px;color:var(--text-muted);transition:transform .2s;display:inline-block">▼</span>
-      </h2>
-      <button class="btn btn-primary btn-sm" onclick="openEmpModal()">+ Thêm nhân viên</button>
-    </div>
-    <div id="emp-table-wrap" class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Nhân viên</th>
-            <th>Đăng nhập cuối</th>
-            <th>Mã PIN</th>
-            <th>Thao tác</th>
-          </tr>
-        </thead>
-        <tbody id="admin-tbody">
-          <tr class="empty-row"><td colspan="4">Đang tải dữ liệu...</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div id="emp-pagination"></div>
-    <!-- Daily Progress Section -->
-    <div class="table-section-header" style="margin-top:36px;display:flex;align-items:center;justify-content:space-between">
-      <h2>📊 Tiến độ học theo ngày</h2>
-      <div style="display:flex;align-items:center;gap:8px">
-        <input type="date" id="progress-date-filter" style="padding:6px 12px;border-radius:8px;border:1.5px solid var(--border);font-size:13px;background:var(--bg-2);color:var(--text)" onchange="loadProgressByDate(this.value)">
+    <div style="margin-top:28px;background:var(--card);border-radius:var(--radius);border:1px solid var(--border-light);box-shadow:var(--shadow);overflow:hidden">
+      <div class="table-section-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border-light);margin:0">
+        <h2 style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px" onclick="toggleEmpTable()">
+          👥 Danh sách nhân viên
+          <span id="emp-table-arrow" style="font-size:12px;color:var(--text-muted);transition:transform .2s;display:inline-block">▼</span>
+        </h2>
+        <button class="btn btn-primary btn-sm" onclick="openEmpModal()">+ Thêm nhân viên</button>
       </div>
+      <div id="emp-table-wrap" class="table-wrap" style="margin:0;border-radius:0;box-shadow:none;border:none">
+        <table>
+          <thead>
+            <tr>
+              <th>Nhân viên</th>
+              <th>Đăng nhập cuối</th>
+              <th>Mã PIN</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="admin-tbody">
+            <tr class="empty-row"><td colspan="4">Đang tải dữ liệu...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="emp-pagination"></div>
     </div>
-    <div id="progress-day-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:0">
-      <div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text-muted);font-size:13px">Đang tải...</div>
+    <!-- Daily Progress Section -->
+    <div style="margin-top:36px;background:var(--card);border-radius:var(--radius);border:1px solid var(--border-light);box-shadow:var(--shadow);overflow:hidden">
+      <div class="table-section-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border-light);margin:0">
+        <h2>📊 Tiến độ học theo ngày</h2>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="date" id="progress-date-filter" style="padding:6px 12px;border-radius:8px;border:1.5px solid var(--border);font-size:16px;background:var(--bg-2);color:var(--text)" onchange="loadProgressByDate(this.value)">
+        </div>
+      </div>
+      <div style="padding:16px">
+        <div id="progress-day-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
+          <div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text-muted);font-size:13px">Đang tải...</div>
+        </div>
+      </div>
+      <div id="progress-pagination"></div>
     </div>
-    <div id="progress-pagination" style="margin-bottom:28px"></div>
 
     <!-- Lesson Management Section -->
-    <div class="table-section-header" style="margin-top:36px">
-      <h2>📘 Quản lý bài học</h2>
-      <button class="btn btn-primary btn-sm" onclick="openLessonMgmtModal()">+ Thêm bài học</button>
+    <div style="margin-top:36px;margin-bottom:40px;background:var(--card);border-radius:var(--radius);border:1px solid var(--border-light);box-shadow:var(--shadow);overflow:hidden">
+      <div class="table-section-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border-light);margin:0">
+        <h2>📘 Quản lý bài học</h2>
+        <button class="btn btn-primary btn-sm" onclick="openLessonMgmtModal()">+ Thêm bài học</button>
+      </div>
+      <div class="table-wrap" style="margin:0;border-radius:0;box-shadow:none;border:none">
+        <table>
+          <thead>
+            <tr>
+              <th>Tiêu đề</th>
+              <th>Loại</th>
+              <th>Thời lượng</th>
+              <th>Nội dung</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="lessons-mgmt-tbody">
+            <tr class="empty-row"><td colspan="5">Đang tải...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="lesson-pagination"></div>
     </div>
-    <div class="table-wrap" style="margin-bottom:0">
-      <table>
-        <thead>
-          <tr>
-            <th>Tiêu đề</th>
-            <th>Loại</th>
-            <th>Thời lượng</th>
-            <th>Nội dung</th>
-            <th>Thao tác</th>
-          </tr>
-        </thead>
-        <tbody id="lessons-mgmt-tbody">
-          <tr class="empty-row"><td colspan="5">Đang tải...</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div id="lesson-pagination" style="margin-bottom:40px"></div>
   </main>
 </div>
 <script>
@@ -2505,13 +2544,15 @@ function renderPagination(containerId, total, currentPage, onGoto) {
   const start = (currentPage - 1) * PAGE_SIZE + 1;
   const end   = Math.min(currentPage * PAGE_SIZE, total);
   const s = containerId; // use as namespace key via data attr
+  // All sections are now wrapped in cards, pagination is the card footer — just a top border separator
+  container.style.marginTop = '0';
   container.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border:1px solid var(--border-light);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);background:#fff;font-size:13px;color:var(--text-muted)">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid var(--border-light);background:#fff;font-size:13px;color:var(--text-muted)">
       <span>${start}–${end} / ${total} mục</span>
       <div style="display:flex;align-items:center;gap:6px">
-        <button onclick="window._pgGoto('${s}',${currentPage-1})" ${currentPage<=1?'disabled':''} style="padding:5px 13px;border-radius:8px;border:1.5px solid var(--border);background:${currentPage<=1?'var(--bg-2)':'#fff'};color:${currentPage<=1?'var(--text-sub)':'var(--text)'};font-size:13px;cursor:${currentPage<=1?'default':'pointer'};font-weight:500;transition:all .15s">← Trước</button>
+        <button onclick="window._pgGoto('${s}',${currentPage-1})" ${currentPage<=1?'disabled':''} style="padding:5px 13px;border-radius:8px;border:1.5px solid var(--border);background:${currentPage<=1?'var(--bg-2)':'#fff'};color:${currentPage<=1?'var(--text-sub)':'var(--text)'};font-size:13px;cursor:${currentPage<=1?'default':'pointer'};font-weight:500;transition: transform .15s, opacity .15s, box-shadow .15s">← Trước</button>
         <span style="padding:4px 12px;border-radius:8px;background:var(--teal);color:#fff;font-size:13px;font-weight:700">${currentPage} / ${totalPages}</span>
-        <button onclick="window._pgGoto('${s}',${currentPage+1})" ${currentPage>=totalPages?'disabled':''} style="padding:5px 13px;border-radius:8px;border:1.5px solid var(--border);background:${currentPage>=totalPages?'var(--bg-2)':'#fff'};color:${currentPage>=totalPages?'var(--text-sub)':'var(--text)'};font-size:13px;cursor:${currentPage>=totalPages?'default':'pointer'};font-weight:500;transition:all .15s">Tiếp →</button>
+        <button onclick="window._pgGoto('${s}',${currentPage+1})" ${currentPage>=totalPages?'disabled':''} style="padding:5px 13px;border-radius:8px;border:1.5px solid var(--border);background:${currentPage>=totalPages?'var(--bg-2)':'#fff'};color:${currentPage>=totalPages?'var(--text-sub)':'var(--text)'};font-size:13px;cursor:${currentPage>=totalPages?'default':'pointer'};font-weight:500;transition: transform .15s, opacity .15s, box-shadow .15s">Tiếp →</button>
       </div>
     </div>`;
 }
@@ -4031,8 +4072,8 @@ function renderEmployeePage() {
       <td data-label="Mã PIN">${pinDisplay}</td>
       <td data-label="Thao tác">
         <div style="display:flex;gap:6px">
-          <button onclick="resetPinCode('${r.id}','${esc(r.name)}')" style="background:#fff7ed;color:#c2410c;border:none;cursor:pointer;font-size:12px;padding:5px 10px;border-radius:7px;font-weight:600;transition:all .2s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">🔄 Reset PIN</button>
-          <button onclick="deleteEmployee('${r.id}','${esc(r.name)}')" style="background:var(--red-light);color:var(--red);border:none;cursor:pointer;font-size:12px;padding:5px 10px;border-radius:7px;font-weight:600;transition:all .2s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">🗑 Xoá</button>
+          <button onclick="resetPinCode('${r.id}','${esc(r.name)}')" style="background:#fff7ed;color:#c2410c;border:none;cursor:pointer;font-size:12px;padding:5px 10px;border-radius:7px;font-weight:600;transition: transform .2s, opacity .2s, box-shadow .2s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">🔄 Reset PIN</button>
+          <button onclick="deleteEmployee('${r.id}','${esc(r.name)}')" style="background:var(--red-light);color:var(--red);border:none;cursor:pointer;font-size:12px;padding:5px 10px;border-radius:7px;font-weight:600;transition: transform .2s, opacity .2s, box-shadow .2s" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">🗑 Xoá</button>
         </div>
       </td>
     </tr>`;
@@ -4103,7 +4144,7 @@ function renderAssignPage() {
       <td data-label="Bài học">${esc(s.lessons?.title || '—')}</td>
       <td data-label="Loại bài học">${typeBadge(s.lessons?.type)}</td>
       <td data-label="Thao tác">
-        <button onclick="deleteAssign(${s.id})" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:12px;padding:4px 8px;border-radius:6px;transition:all .2s" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--text-muted)'">🗑 Xoá</button>
+        <button onclick="deleteAssign(${s.id})" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:12px;padding:4px 8px;border-radius:6px;transition: transform .2s, opacity .2s, box-shadow .2s" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--text-muted)'">🗑 Xoá</button>
       </td>
     </tr>
   `).join('');
@@ -4212,7 +4253,7 @@ function renderProgressPage() {
 
   grid.innerHTML = slice.map(({ u, mins, pct, done, scheduledIds, completedCount, lessons, statusBadge }) => {
     return `
-      <div style="background:var(--card);border-radius:14px;padding:16px;border:1.5px solid ${done ? 'rgba(22,163,74,.25)' : 'var(--border-light)'};box-shadow:var(--shadow-sm);transition:all .2s">
+      <div style="background:var(--card);border-radius:14px;padding:16px;border:1.5px solid ${done ? 'rgba(22,163,74,.25)' : 'var(--border-light)'};box-shadow:var(--shadow-sm);transition: transform .2s, opacity .2s, box-shadow .2s">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
           <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal-bright));display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0">${esc((u.name[0]||'?').toUpperCase())}</div>
           <div style="flex:1;min-width:0">
