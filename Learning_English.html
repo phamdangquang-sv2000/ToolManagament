@@ -3375,7 +3375,8 @@ async function loadTodaySessions() {
   const today = todayStr();
   const { data } = await sb.from('learning_sessions')
     .select('*').eq('user_id', currentUser.id).eq('date', today);
-  updateProgress(data || []);
+  window._todaySessions = data || [];
+  updateProgress(window._todaySessions);
 }
 
 function updateProgress(sessions) {
@@ -4216,8 +4217,8 @@ function startTimer() {
     const m = Math.floor(elapsedSecs / 60);
     const s = elapsedSecs % 60;
     document.getElementById('modal-timer').textContent = m + ':' + String(s).padStart(2,'0');
-    // Cập nhật progress bar realtime trong khi học
-    loadTodaySessions();
+    // Cập nhật progress bar từ cache local, không fetch DB mỗi giây
+    updateProgress(window._todaySessions || []);
   }, 1000);
 
   // Autosave mỗi 10 giây phòng tắt tab đột ngột
