@@ -495,9 +495,9 @@
   }
 
   .card-icon {
-    width: 50px; height: 50px; border-radius: 14px;
+    width: 64px; height: 64px; border-radius: 16px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 24px; margin-bottom: 18px; position: relative;
+    font-size: 30px; margin-bottom: 18px; position: relative;
     box-shadow: 0 4px 16px rgba(0,0,0,.4), 0 4px 0 rgba(0,0,0,.5);
     transform: translateZ(12px);
     transition: transform .35s, box-shadow .35s;
@@ -518,7 +518,7 @@
   }
 
   .card-icon svg {
-    width: 26px; height: 26px; position: relative; z-index: 1;
+    width: 34px; height: 34px; position: relative; z-index: 1;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,.4));
     transition: transform .35s cubic-bezier(.17,.67,.35,1.4);
   }
@@ -1179,6 +1179,13 @@
         <div class="form-group">
           <label class="form-label">Biểu tượng</label>
           <div class="emoji-grid" id="emojiGrid"></div>
+          <div style="margin-top:8px;">
+            <div style="font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.09em;text-transform:uppercase;font-family:var(--mono);margin-bottom:5px;">Hoặc dán link ảnh</div>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <input class="form-input" id="fIconUrl" placeholder="https://…/icon.png" style="font-size:12px;padding:7px 10px;flex:1;" oninput="onIconUrlChange(this.value)"/>
+              <div id="iconUrlPreview" style="width:36px;height:36px;border-radius:9px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .2s;">🖼️</div>
+            </div>
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label">Màu sắc</label>
@@ -1774,6 +1781,9 @@ const SVG_ICONS = {
 };
 
 function getAppIcon(emoji, colorHex) {
+  if (emoji && (emoji.startsWith('http://') || emoji.startsWith('https://'))) {
+    return `<img src="${esc(emoji)}" alt="icon" style="width:64px;height:64px;object-fit:cover;border-radius:16px;display:block;position:absolute;inset:0;margin:auto;" onerror="this.style.display='none'"/>`;
+  }
   if (SVG_ICONS[emoji]) {
     return `<span style="color:${colorHex};display:flex;align-items:center;justify-content:center;">${SVG_ICONS[emoji]}</span>`;
   }
@@ -1893,6 +1903,8 @@ function openAdd() {
   document.getElementById('fDesc').value = '';
   document.getElementById('fTags').value = '';
   document.getElementById('fSrc').value = '';
+  document.getElementById('fIconUrl').value = '';
+  onIconUrlChange('');
   buildEmojiGrid(); buildColorSwatches(); switchSource('file');
   openModal('appModal');
   setTimeout(() => document.getElementById('fName').focus(), 250);
@@ -1912,6 +1924,9 @@ function openEdit(id) {
   document.getElementById('fDesc').value  = app.desc  || '';
   document.getElementById('fTags').value  = app.tags  || '';
   document.getElementById('fSrc').value   = app.src   || '';
+  const iconUrl = (app.emoji || '').startsWith('http') ? app.emoji : '';
+  document.getElementById('fIconUrl').value = iconUrl;
+  onIconUrlChange(iconUrl);
   buildEmojiGrid(); buildColorSwatches(); switchSource(srcMode);
   openModal('appModal');
   setTimeout(() => document.getElementById('fName').focus(), 250);
@@ -1923,6 +1938,8 @@ function saveApp() {
   const desc  = document.getElementById('fDesc').value.trim();
   const tags  = document.getElementById('fTags').value.trim();
   const src   = document.getElementById('fSrc').value.trim();
+  const iconUrl = document.getElementById('fIconUrl').value.trim();
+  const finalEmoji = iconUrl ? iconUrl : selectedEmoji;
   if (!name) { document.getElementById('fName').focus(); return; }
   if (!src)  { document.getElementById('fSrc').focus(); return; }
 
@@ -1930,13 +1947,13 @@ function saveApp() {
   if (editingId) {
     const idx = apps.findIndex(a => a.id === editingId);
     if (idx !== -1) {
-      apps[idx] = { ...apps[idx], name, badge, desc, tags, src, emoji: selectedEmoji, color: selectedColor };
+      apps[idx] = { ...apps[idx], name, badge, desc, tags, src, emoji: finalEmoji, color: selectedColor };
       row = apps[idx];
       const pane = document.getElementById('pane-' + editingId);
       if (pane) { const f = pane.querySelector('iframe'); if (f) f.remove(); }
     }
   } else {
-    row = { id: genId(), name, badge, desc, tags, src, emoji: selectedEmoji, color: selectedColor, position: apps.length };
+    row = { id: genId(), name, badge, desc, tags, src, emoji: finalEmoji, color: selectedColor, position: apps.length };
     apps.push(row);
   }
 
@@ -1989,6 +2006,18 @@ function deleteApp(id) {
 // ════════════════════════════════════════
 // EMOJI & COLOR PICKERS
 // ════════════════════════════════════════
+function onIconUrlChange(url) {
+  const preview = document.getElementById('iconUrlPreview');
+  if (!preview) return;
+  if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+    preview.innerHTML = `<img src="${url}" alt="preview" style="width:100%;height:100%;object-fit:contain;" onerror="this.parentElement.innerHTML='❌'"/>`;
+    // Deselect emoji buttons since URL takes priority
+    document.querySelectorAll('#emojiGrid .emoji-btn').forEach(b => b.classList.remove('selected'));
+  } else {
+    preview.innerHTML = '🖼️';
+  }
+}
+
 function buildEmojiGrid() {
   const grid = document.getElementById('emojiGrid');
   grid.innerHTML = '';
@@ -2000,6 +2029,9 @@ function buildEmojiGrid() {
       selectedEmoji = em;
       grid.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
+      // Clear the URL input when an emoji is chosen
+      const urlInput = document.getElementById('fIconUrl');
+      if (urlInput) { urlInput.value = ''; onIconUrlChange(''); }
     };
     grid.appendChild(btn);
   });
