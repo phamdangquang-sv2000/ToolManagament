@@ -1845,12 +1845,48 @@ select {
   display: none; /* hiện sau khi lật */
 }
 .mt-review-confirm:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(13,148,136,.35); }
+
+/* ===== INTRO VIDEO OVERLAY ===== */
+#intro-video-overlay {
+  position: fixed; inset: 0; z-index: 99998;
+  background: #000;
+  display: flex; align-items: center; justify-content: center;
+  animation: wFadeIn .3s ease forwards;
+}
+#intro-video-overlay.fade-out {
+  animation: wFadeOut .6s cubic-bezier(.4,0,.6,1) forwards;
+  pointer-events: none;
+}
+#intro-video-el {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+#intro-skip-btn {
+  position: absolute; bottom: 32px; right: 24px;
+  background: rgba(255,255,255,.18); color: #fff;
+  border: 1.5px solid rgba(255,255,255,.35);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border-radius: 99px; padding: 8px 20px;
+  font-size: 13px; font-weight: 600; font-family: var(--font-body);
+  cursor: pointer; letter-spacing: .02em;
+  transition: background .2s, transform .2s;
+  animation: fadeIn .4s .8s ease both;
+}
+#intro-skip-btn:hover { background: rgba(255,255,255,.3); transform: scale(1.04); }
 </style>
 </head>
 <body>
 
 <!-- TOAST -->
 <div id="toast"></div>
+
+<!-- INTRO VIDEO OVERLAY (shown once after first PIN setup) -->
+<div id="intro-video-overlay" class="hidden">
+  <video id="intro-video-el" autoplay muted playsinline
+    src="https://dubvrtthmopdlyvxjhbw.supabase.co/storage/v1/object/public/image/kling_20260528_VIDEO_Use_the_pr_3706_0.mp4">
+  </video>
+  <button id="intro-skip-btn">Bỏ qua →</button>
+</div>
 
 <!-- WELCOME OVERLAY (shown on first PIN login) -->
 <div id="welcome-overlay" class="hidden">
@@ -2836,13 +2872,47 @@ function finishLogin(rec, isNewPin = false) {
   saveUser(u);
   resetLoginForm();
   if (isNewPin && u.role === 'EMPLOYEE') {
-    // Switch to employee view immediately (hides login), then overlay on top
-    showView('employee');
-    loadEmployeeData(); // load data in background while animation plays
-    showWelcomeAnimation(u.name, () => {}); // no-op callback — view already shown
+    // Keep login view hidden behind overlays; show employee only after all animations done
+    // Show a blank black screen immediately so login disappears cleanly
+    document.getElementById('view-login').style.display = 'none';
+    loadEmployeeData(); // load data in background while video/animation plays
+    showIntroVideo(() => {
+      // Now show employee view UNDER the welcome overlay (invisible because overlay is on top)
+      showView('employee');
+      showWelcomeAnimation(u.name, () => {}); // welcome dismisses → employee visible
+    });
   } else {
     goTo(u.role);
   }
+}
+
+
+/* ===== INTRO VIDEO ===== */
+function showIntroVideo(onDone) {
+  const overlay = document.getElementById('intro-video-overlay');
+  const video   = document.getElementById('intro-video-el');
+  const skipBtn = document.getElementById('intro-skip-btn');
+  if (!overlay || !video) { onDone(); return; }
+
+  overlay.classList.remove('hidden');
+  overlay.classList.remove('fade-out');
+  video.currentTime = 0;
+  video.play().catch(() => {});
+
+  const finish = () => {
+    video.pause();
+    skipBtn.removeEventListener('click', finish);
+    video.removeEventListener('ended', finish);
+    overlay.classList.add('fade-out');
+    setTimeout(() => {
+      overlay.classList.add('hidden');
+      overlay.classList.remove('fade-out');
+      onDone();
+    }, 600);
+  };
+
+  video.addEventListener('ended', finish);
+  skipBtn.addEventListener('click', finish);
 }
 
 /* ===== WELCOME ANIMATION ===== */
