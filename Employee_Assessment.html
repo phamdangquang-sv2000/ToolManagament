@@ -5,27 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hệ Thống Đánh Giá Nhân Viên</title>
 
-  <!-- ╔═══════════════════════════════════════════════════════════════════╗
-       ║  SUBMIT-ON-CLOSE v4 + ANTI-CHEAT (inline, chạy trước CDN)        ║
-       ║                                                                   ║
-       ║  THIẾT KẾ v4 — Edge Function "auto-submit" nhận POST đơn giản:  ║
-       ║    sendBeacon POST {action, attempt_id, employee_id, test_id}    ║
-       ║    → Edge Function dùng service_role PATCH DB ngay lập tức       ║
-       ║    → Không cần pg_cron, không cần chờ                           ║
-       ║                                                                   ║
-       ║  2 NHIỆM VỤ của inline script (chạy cả khi navigate + reload):  ║
-       ║    1. Restore session token (F5 hợp lệ, không bị block)          ║
-       ║    2. Nếu F5: gửi action=cancel để undo submit, ghi vi phạm      ║
-       ╚═══════════════════════════════════════════════════════════════════╝ -->
   <script>
-  // ═══════════════════════════════════════════════════════════════════════════
-  // SUBMIT-ON-CLOSE v4 — INLINE SCRIPT (chạy trước mọi CDN)
-  //
-  // Edge Function "auto-submit" nhận POST đơn giản (text/plain body):
-  //   action="submit" → PATCH attempt submitted + assignment completed NGAY
-  //   action="cancel" → PATCH attempt in_progress (undo khi F5)
-  // Dùng sendBeacon (hoạt động khi tab đóng) + fetch keepalive (fallback).
-  // ═══════════════════════════════════════════════════════════════════════════
+
   (function() {
     'use strict';
     try {
@@ -427,6 +408,27 @@
     }
     .nav-item svg { flex-shrink: 0; opacity: 0.7; }
     .nav-item.active svg, .nav-item:hover svg { opacity: 1; }
+    .nav-item-recycle:hover { background: rgba(255,88,88,0.10) !important; color: var(--danger) !important; }
+    .nav-item-recycle.active { background: rgba(255,88,88,0.15) !important; color: #ff8585 !important; border-color: rgba(255,88,88,0.25) !important; }
+
+    /* Recycle Bin view */
+    .recycle-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px; }
+    .recycle-tabs { display:flex;gap:4px;background:rgba(255,255,255,0.04);border-radius:10px;padding:3px;border:1px solid rgba(255,255,255,0.07); }
+    .recycle-tab { padding:7px 16px;border:none;background:transparent;color:var(--text-muted);border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;transition:all 0.2s;font-family:'Sora',sans-serif; }
+    .recycle-tab.active { background:rgba(255,88,88,0.18);color:#ff8585;box-shadow:inset 0 1px 0 rgba(255,255,255,0.06); }
+    .recycle-empty { text-align:center;padding:60px 20px;color:var(--text-muted); }
+    .recycle-empty svg { opacity:0.25;margin-bottom:12px; }
+    .recycle-item { display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.07);background:rgba(20,23,38,0.7);margin-bottom:8px;transition:all 0.2s; }
+    .recycle-item:hover { border-color:rgba(255,255,255,0.12);background:rgba(25,28,46,0.9); }
+    .recycle-item-icon { width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px; }
+    .recycle-item-info { flex:1;min-width:0; }
+    .recycle-item-name { font-weight:600;font-size:14px;color:var(--text-primary);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+    .recycle-item-meta { font-size:12px;color:var(--text-muted); }
+    .recycle-item-actions { display:flex;gap:6px;flex-shrink:0; }
+    .btn-restore { padding:6px 14px;border-radius:8px;border:1px solid rgba(67,233,123,0.30);background:rgba(67,233,123,0.10);color:#43e97b;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'Sora',sans-serif;display:flex;align-items:center;gap:5px; }
+    .btn-restore:hover { background:rgba(67,233,123,0.20);border-color:rgba(67,233,123,0.50); }
+    .btn-perm-delete { padding:6px 14px;border-radius:8px;border:1px solid rgba(255,88,88,0.30);background:rgba(255,88,88,0.10);color:#ff7878;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'Sora',sans-serif;display:flex;align-items:center;gap:5px; }
+    .btn-perm-delete:hover { background:rgba(255,88,88,0.22);border-color:rgba(255,88,88,0.50); }
     .sidebar-footer { padding: 16px; border-top: 1px solid rgba(255,255,255,0.06); }
     .user-info {
       display: flex; align-items: center; gap: 11px; padding: 12px;
@@ -1377,6 +1379,11 @@
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
         Cài đặt
       </button>
+      <button class="nav-item nav-item-recycle" data-view="recycle" onclick="App.admin.navigate('recycle')" style="color:var(--danger);margin-top:4px;">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        Recycle Bin
+        <span id="recycle-badge" class="nav-badge hidden" style="background:var(--danger);"></span>
+      </button>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info">
@@ -1954,6 +1961,7 @@ const App = {
           App.screen.show('admin');
           App.admin.navigate('dashboard');
           App.grading._preloadBadge();
+          App.recycleBin.init().catch(e => console.warn('RecycleBin init:', e));
           setTimeout(() => { try { App.realtime.subscribe(); } catch(e) { console.warn('Realtime unavailable:', e); } }, 500);
           return;
         } else {
@@ -2080,7 +2088,9 @@ const App = {
     close(id) { document.getElementById(id).classList.remove('open'); },
     confirm(title, message, onOk) {
       document.getElementById('confirm-title').textContent = title;
-      document.getElementById('confirm-message').textContent = message;
+      const msgEl = document.getElementById('confirm-message');
+      msgEl.style.whiteSpace = 'pre-line';
+      msgEl.textContent = message;
       document.getElementById('confirm-ok-btn').onclick = () => {
         App.modal.close('modal-confirm');
         onOk();
@@ -2165,6 +2175,7 @@ const App = {
       App.screen.show('admin');
       App.admin.navigate('dashboard');
       App.grading._preloadBadge();
+      App.recycleBin.init().catch(e => console.warn('RecycleBin init:', e));
       App.toast.show('Đăng nhập thành công!', 'success');
       setTimeout(() => { try { App.realtime.subscribe(); } catch(e) { console.warn('Realtime unavailable:', e); } }, 500);
     },
@@ -2616,7 +2627,7 @@ const App = {
     navigate(view) {
       App.state.currentView = view;
       document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.view === view));
-      const titles = { dashboard:'Dashboard', projects:'Quản lý dự án', tests:'Bài thi', employees:'Nhân viên', assignments:'Phân công', grading:'Chấm điểm', results:'Kết quả', settings:'Cài đặt' };
+      const titles = { dashboard:'Dashboard', projects:'Quản lý dự án', tests:'Bài thi', employees:'Nhân viên', assignments:'Phân công', grading:'Chấm điểm', results:'Kết quả', settings:'Cài đặt', recycle:'🗑️ Recycle Bin' };
       document.getElementById('topbar-title').textContent = titles[view] || view;
       const contentEl = document.getElementById('admin-content');
       contentEl.innerHTML = App.views[view] ? App.views[view].render() : '<div>404</div>';
@@ -3010,6 +3021,7 @@ const App = {
               <th>Điểm</th>
               <th>Kết quả</th>
               <th>Ngày chấm</th>
+              <th></th>
             </tr></thead><tbody id="admin-results-tbody"></tbody></table>
           </div>
           <div class="pagination" id="admin-results-pagination"></div>
@@ -3045,6 +3057,39 @@ const App = {
         `;
       },
       load() {}
+    },
+
+    recycle: {
+      render() {
+        return `
+          <div class="recycle-header">
+            <div>
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+                <span style="font-size:22px;">🗑️</span>
+                <span style="font-size:16px;font-weight:700;color:var(--text-primary);">Recycle Bin</span>
+                <span id="recycle-count-badge" style="padding:2px 10px;background:rgba(255,88,88,0.15);border:1px solid rgba(255,88,88,0.30);border-radius:100px;font-size:12px;color:#ff8585;font-weight:600;"></span>
+              </div>
+              <div style="font-size:12px;color:var(--text-muted);">Dữ liệu đã xóa — khôi phục hoặc xóa vĩnh viễn tại đây.</div>
+            </div>
+            <button class="btn btn-danger btn-sm" id="recycle-clear-btn" onclick="App.recycleBin.clearAll()" style="display:none;">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+              Xóa tất cả vĩnh viễn
+            </button>
+          </div>
+          <div class="recycle-tabs" style="margin-bottom:18px;">
+            <button class="recycle-tab active" data-rtype="all" onclick="App.recycleBin.filterType('all',this)">Tất cả</button>
+            <button class="recycle-tab" data-rtype="test" onclick="App.recycleBin.filterType('test',this)">Bài thi</button>
+            <button class="recycle-tab" data-rtype="project" onclick="App.recycleBin.filterType('project',this)">Dự án</button>
+            <button class="recycle-tab" data-rtype="assignment" onclick="App.recycleBin.filterType('assignment',this)">Phân công</button>
+            <button class="recycle-tab" data-rtype="question" onclick="App.recycleBin.filterType('question',this)">Câu hỏi</button>
+          </div>
+          <div id="recycle-list"></div>
+        `;
+      },
+      load() {
+        // render() là async — gọi sau khi DOM đã có #recycle-list
+        setTimeout(() => App.recycleBin.render(), 0);
+      }
     }
   },
 
@@ -3122,9 +3167,10 @@ const App = {
       App.views.projects.load();
     },
     delete(id, name) {
-      App.modal.confirm('Xóa dự án', `Bạn có chắc muốn xóa dự án "${name}"?`, async () => {
+      App.modal.confirm('Chuyển vào Recycle Bin', `Dự án "${name}" sẽ được chuyển vào Recycle Bin. Bạn có thể khôi phục sau.`, async () => {
         await db.from('exam_projects').update({ deleted_at: new Date().toISOString() }).eq('id', id);
-        App.toast.show('Đã xóa dự án.', 'success');
+        App.recycleBin.addItem({ id, type: 'project', name, deleted_at: new Date().toISOString() });
+        App.toast.show('Đã chuyển dự án vào Recycle Bin.', 'warning');
         App.views.projects.load();
       });
     }
@@ -3254,33 +3300,11 @@ const App = {
       App.views.tests.load();
     },
     delete(id, name) {
-      App.modal.confirm('Xóa bài thi', `Xóa bài thi "${name}" và toàn bộ dữ liệu liên quan (câu hỏi, phân công, kết quả)?`, async () => {
+      App.modal.confirm('Chuyển vào Recycle Bin', `Bài thi "${name}" sẽ được chuyển vào Recycle Bin. Bạn có thể khôi phục sau.`, async () => {
         try {
-          // 1. Lấy danh sách attempt_id thuộc bài thi này
-          const { data: attempts } = await db.from('exam_exam_attempts').select('id').eq('test_id', id);
-          const attemptIds = (attempts || []).map(a => a.id);
-
-          // 2. Xóa exam_test_answers theo attempt_id
-          if (attemptIds.length) {
-            await db.from('exam_test_answers').delete().in('attempt_id', attemptIds);
-          }
-
-          // 3. Xóa exam_test_results theo test_id
-          await db.from('exam_test_results').delete().eq('test_id', id);
-
-          // 4. Xóa exam_exam_attempts theo test_id
-          await db.from('exam_exam_attempts').delete().eq('test_id', id);
-
-          // 5. Xóa exam_test_assignments theo test_id
-          await db.from('exam_test_assignments').delete().eq('test_id', id);
-
-          // 6. Xóa exam_questions theo test_id
-          await db.from('exam_questions').delete().eq('test_id', id);
-
-          // 7. Xóa bài thi
-          await db.from('exam_tests').delete().eq('id', id);
-
-          App.toast.show('Đã xóa bài thi và toàn bộ dữ liệu liên quan.', 'success');
+          await db.from('exam_tests').update({ deleted_at: new Date().toISOString() }).eq('id', id);
+          App.recycleBin.addItem({ id, type: 'test', name, deleted_at: new Date().toISOString() });
+          App.toast.show('Đã chuyển bài thi vào Recycle Bin.', 'warning');
           App.views.tests.load();
         } catch (e) {
           App.toast.show('Lỗi khi xóa: ' + e.message, 'error');
@@ -3456,9 +3480,11 @@ const App = {
       App.views.assignments.load();
     },
     delete(id) {
-      App.modal.confirm('Hủy phân công', 'Hủy phân công này?', async () => {
+      App.modal.confirm('Chuyển vào Recycle Bin', 'Phân công này sẽ được chuyển vào Recycle Bin.', async () => {
+        const asgn = App.state.tables.assignments.data.find(x => x.id === id);
         await db.from('exam_test_assignments').update({ deleted_at: new Date().toISOString() }).eq('id', id);
-        App.toast.show('Đã hủy phân công.', 'success');
+        App.recycleBin.addItem({ id, type: 'assignment', name: asgn ? `${asgn.test_name} → ${asgn.employee_name}` : id, deleted_at: new Date().toISOString() });
+        App.toast.show('Đã chuyển phân công vào Recycle Bin.', 'warning');
         App.views.assignments.load();
       });
     }
@@ -3592,7 +3618,10 @@ const App = {
       await db.from('exam_questions').update({ correct_answers: answers }).eq('id', id);
     },
     async deleteQuestion(id) {
+      const q = App.questions.questionList.find(x => x.id === id);
       await db.from('exam_questions').update({ deleted_at: new Date().toISOString() }).eq('id', id);
+      App.recycleBin.addItem({ id, type: 'question', name: q ? (q.question_text?.substring(0,60) + (q.question_text?.length > 60 ? '...' : '')) : id, deleted_at: new Date().toISOString() });
+      App.toast.show('Câu hỏi đã chuyển vào Recycle Bin.', 'warning');
       await App.questions.load();
       await db.from('exam_tests').update({ question_count: App.questions.questionList.length }).eq('id', App.questions.currentTestId);
     },
@@ -3799,8 +3828,8 @@ const App = {
 
       const { data: proj } = await db.from('exam_projects').select('name').eq('id', ctx.attempt.exam_tests?.project_id).single();
 
-      // Insert result
-      const { error } = await db.from('exam_test_results').insert({
+      // Insert / upsert result (upsert theo attempt_id để chấm lại không bị lỗi duplicate)
+      const resultPayload = {
         attempt_id: ctx.attempt.id,
         employee_id: ctx.attempt.employee_id,
         test_id: ctx.attempt.test_id,
@@ -3811,7 +3840,10 @@ const App = {
         total_score: total,
         score_percentage: pct.toFixed(1),
         pass_fail: passFail,
-      });
+        deleted_at: null,   // đảm bảo clear soft-delete nếu đây là chấm lại
+      };
+      const { error } = await db.from('exam_test_results')
+        .upsert(resultPayload, { onConflict: 'attempt_id' });
       if (error) { App.toast.show('Lỗi lưu kết quả: ' + error.message, 'error'); return; }
 
       // Update attempt status
@@ -3837,6 +3869,8 @@ const App = {
       App.toast.show(`Đã chấm xong. Kết quả: ${passFail.toUpperCase()}`, 'success');
       App.modal.close('modal-grade');
       App.views.grading.load();
+      // Nếu admin đang ở tab Kết quả thì reload luôn
+      if (App.state.currentView === 'results') App.views.results.load();
     }
   },
 
@@ -3852,7 +3886,7 @@ const App = {
       const page = filtered.slice((t.page-1)*t.perPage, t.page*t.perPage);
       const tbody = document.getElementById('admin-results-tbody');
       if (!tbody) return;
-      if (!page.length) { tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><p>Chưa có kết quả.</p></div></td></tr>`; return; }
+      if (!page.length) { tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><p>Chưa có kết quả.</p></div></td></tr>`; return; }
       tbody.innerHTML = page.map(r => `
         <tr>
           <td class="font-semibold">${r.employee_name}</td>
@@ -3861,6 +3895,12 @@ const App = {
           <td><strong>${r.total_score||0}</strong> (${r.score_percentage||0}%)</td>
           <td>${r.pass_fail==='pass'?'<span class="badge badge-success">PASS</span>':'<span class="badge badge-danger">FAIL</span>'}</td>
           <td class="text-sm text-muted">${App.util.formatDate(r.created_at)}</td>
+          <td>
+            <button class="btn-action" style="gap:5px;color:var(--warning);border-color:rgba(255,210,0,0.25);background:rgba(255,210,0,0.07);" onclick="App.viewResults.regrade('${r.id}','${r.attempt_id}','${(r.employee_name||'').replace(/'/g,'&#39;')}','${(r.test_name||'').replace(/'/g,'&#39;')}')" title="Chấm lại bài này">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+              Chấm lại
+            </button>
+          </td>
         </tr>
       `).join('');
       App.util.renderPagination('admin-results-pagination', t, () => App.viewResults.render_table());
@@ -3875,6 +3915,47 @@ const App = {
       let filtered = [...t.data];
       if (f) filtered = filtered.filter(r=>r.pass_fail===f);
       t.filtered = filtered; t.page = 1; App.viewResults.render_table();
+    },
+
+    regrade(resultId, attemptId, employeeName, testName) {
+      App.modal.confirm(
+        '🔄 Chấm lại bài thi',
+        `Bạn muốn chấm lại bài của "${employeeName}" — "${testName}"?\n\n⚠️ Kết quả cũ sẽ bị xóa và bài thi sẽ trở về trạng thái chờ chấm.`,
+        async () => {
+          try {
+            // 1. Xóa result cũ (soft delete)
+            await db.from('exam_test_results')
+              .update({ deleted_at: new Date().toISOString() })
+              .eq('id', resultId);
+
+            // 2. Reset attempt về submitted để có thể chấm lại
+            await db.from('exam_exam_attempts')
+              .update({ status: 'submitted' })
+              .eq('id', attemptId);
+
+            // 3. Reset assignment về in_progress
+            const { data: attempt } = await db.from('exam_exam_attempts')
+              .select('test_id, employee_id').eq('id', attemptId).single();
+            if (attempt) {
+              await db.from('exam_test_assignments')
+                .update({ status: 'in_progress' })
+                .eq('test_id', attempt.test_id)
+                .eq('employee_id', attempt.employee_id);
+            }
+
+            App.toast.show('Đã reset. Mở modal chấm điểm...', 'warning');
+
+            // 4. Reload results table
+            await App.views.results.load();
+
+            // 5. Mở ngay modal chấm điểm
+            await App.grading.openGrade(attemptId);
+
+          } catch(e) {
+            App.toast.show('Lỗi chấm lại: ' + e.message, 'error');
+          }
+        }
+      );
     }
   },
 
@@ -4954,6 +5035,242 @@ const App = {
       } catch(e) {
         body.innerHTML = `<div class="alert alert-danger">Lỗi tải dữ liệu: ${e.message}</div>`;
       }
+    }
+  },
+
+  /* =========================================================
+     RECYCLE BIN  — Supabase-backed (bảng: exam_recycle_bin)
+     Thay thế hoàn toàn localStorage cũ.
+     Schema bảng:
+       id          uuid PK
+       item_id     text  (ID gốc của record)
+       item_type   text  ('test'|'project'|'assignment'|'question')
+       item_name   text  (tên snapshot lúc xóa)
+       deleted_at  timestamptz
+       deleted_by  text  (tuỳ chọn)
+       meta        jsonb (tuỳ chọn)
+     ========================================================= */
+  recycleBin: {
+    _filter: 'all',
+    _cache: [],          // cache local để render nhanh, tự refresh khi load
+
+    // ── helpers ──────────────────────────────────────────────
+    _updateBadge(count) {
+      const badge = document.getElementById('recycle-badge');
+      if (!badge) return;
+      if (count > 0) { badge.textContent = count; badge.classList.remove('hidden'); }
+      else { badge.classList.add('hidden'); }
+    },
+    _typeLabel(type) {
+      return { test:'📋 Bài thi', project:'📁 Dự án', assignment:'📄 Phân công', question:'❓ Câu hỏi' }[type] || type;
+    },
+    _typeIcon(type) {
+      const colors = { test:'rgba(124,106,247,0.15)', project:'rgba(79,172,254,0.15)', assignment:'rgba(255,210,0,0.15)', question:'rgba(67,233,123,0.15)' };
+      const emojis = { test:'📋', project:'📁', assignment:'📄', question:'❓' };
+      return `<div class="recycle-item-icon" style="background:${colors[type]||'rgba(255,255,255,0.08)'};">${emojis[type]||'📌'}</div>`;
+    },
+
+    // ── Đọc tất cả items từ Supabase ─────────────────────────
+    async _loadFromDB() {
+      try {
+        const { data, error } = await db
+          .from('exam_recycle_bin')
+          .select('*')
+          .order('deleted_at', { ascending: false });
+        if (error) throw error;
+        this._cache = (data || []).map(r => ({
+          id:         r.item_id,
+          type:       r.item_type,
+          name:       r.item_name,
+          deleted_at: r.deleted_at,
+          _row_id:    r.id,           // UUID của row trong exam_recycle_bin
+        }));
+        this._updateBadge(this._cache.length);
+        return this._cache;
+      } catch(e) {
+        console.error('RecycleBin _loadFromDB:', e);
+        return [];
+      }
+    },
+
+    // ── Thêm item vào Recycle Bin (gọi khi xóa mềm) ─────────
+    async addItem(item) {
+      try {
+        const payload = {
+          item_id:    item.id,
+          item_type:  item.type,
+          item_name:  item.name,
+          deleted_at: item.deleted_at || new Date().toISOString(),
+        };
+        // upsert → tránh duplicate nếu double-click
+        const { error } = await db
+          .from('exam_recycle_bin')
+          .upsert(payload, { onConflict: 'item_id,item_type' });
+        if (error) throw error;
+
+        // Cập nhật cache & badge ngay lập tức (không cần chờ reload)
+        const exists = this._cache.find(x => x.id === item.id && x.type === item.type);
+        if (!exists) {
+          this._cache.unshift({ ...item, deleted_at: payload.deleted_at });
+          this._updateBadge(this._cache.length);
+        }
+      } catch(e) {
+        console.error('RecycleBin addItem:', e);
+      }
+    },
+
+    // ── Filter tabs ───────────────────────────────────────────
+    filterType(type, btn) {
+      this._filter = type;
+      document.querySelectorAll('.recycle-tab').forEach(t => t.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      this._renderFromCache();
+    },
+
+    // ── Render từ cache (không gọi DB) ────────────────────────
+    _renderFromCache() {
+      const list = document.getElementById('recycle-list');
+      const countBadge = document.getElementById('recycle-count-badge');
+      const clearBtn = document.getElementById('recycle-clear-btn');
+      if (!list) return;
+
+      const items = this._cache;
+      const filtered = this._filter === 'all' ? items : items.filter(x => x.type === this._filter);
+
+      if (countBadge) countBadge.textContent = `${items.length} mục`;
+      if (clearBtn) clearBtn.style.display = items.length > 0 ? '' : 'none';
+
+      if (!filtered.length) {
+        list.innerHTML = `<div class="recycle-empty">
+          <svg width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="display:block;margin:0 auto 12px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          <div style="font-size:15px;font-weight:600;margin-bottom:4px;">Recycle Bin trống</div>
+          <div style="font-size:13px;">Chưa có dữ liệu nào được chuyển vào đây.</div>
+        </div>`;
+        return;
+      }
+
+      list.innerHTML = filtered.map(item => {
+        const d = new Date(item.deleted_at);
+        const dateStr = d.toLocaleString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+        const safeName = (item.name||'').replace(/'/g, '&#39;');
+        return `<div class="recycle-item" data-id="${item.id}" data-type="${item.type}">
+          ${this._typeIcon(item.type)}
+          <div class="recycle-item-info">
+            <div class="recycle-item-name" title="${safeName}">${item.name}</div>
+            <div class="recycle-item-meta">${this._typeLabel(item.type)} &nbsp;·&nbsp; Xóa lúc ${dateStr}</div>
+          </div>
+          <div class="recycle-item-actions">
+            <button class="btn-restore" onclick="App.recycleBin.restore('${item.id}','${item.type}')">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+              Khôi phục
+            </button>
+            <button class="btn-perm-delete" onclick="App.recycleBin.permanentDelete('${item.id}','${item.type}','${safeName}')">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+              Xóa vĩnh viễn
+            </button>
+          </div>
+        </div>`;
+      }).join('');
+    },
+
+    // ── render() — load DB rồi hiển thị ──────────────────────
+    async render() {
+      const list = document.getElementById('recycle-list');
+      if (list) list.innerHTML = `<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:13px;">Đang tải...</div>`;
+      await this._loadFromDB();
+      this._renderFromCache();
+    },
+
+    // ── Khôi phục item ────────────────────────────────────────
+    async restore(id, type) {
+      const item = this._cache.find(x => x.id === id && x.type === type);
+      try {
+        const tableMap = { test:'exam_tests', project:'exam_projects', assignment:'exam_test_assignments', question:'exam_questions' };
+        const table = tableMap[type];
+        if (table) await db.from(table).update({ deleted_at: null }).eq('id', id);
+
+        // Xóa khỏi exam_recycle_bin
+        await db.from('exam_recycle_bin')
+          .delete()
+          .eq('item_id', id)
+          .eq('item_type', type);
+
+        // Cập nhật cache
+        this._cache = this._cache.filter(x => !(x.id === id && x.type === type));
+        this._updateBadge(this._cache.length);
+        App.toast.show(`Đã khôi phục ${this._typeLabel(type)}: ${item?.name||id}`, 'success');
+        this._renderFromCache();
+
+        if (type === 'test' && App.state.currentView === 'tests') App.views.tests.load();
+        if (type === 'project' && App.state.currentView === 'projects') App.views.projects.load();
+        if (type === 'assignment' && App.state.currentView === 'assignments') App.views.assignments.load();
+      } catch(e) {
+        App.toast.show('Lỗi khôi phục: ' + e.message, 'error');
+      }
+    },
+
+    // ── Xóa vĩnh viễn 1 item ─────────────────────────────────
+    async permanentDelete(id, type, name) {
+      App.modal.confirm('⚠️ Xóa vĩnh viễn', `"${name}" sẽ bị xóa vĩnh viễn và KHÔNG THỂ khôi phục. Tiếp tục?`, async () => {
+        try {
+          await this._hardDelete(id, type);
+
+          // Xóa khỏi exam_recycle_bin
+          await db.from('exam_recycle_bin')
+            .delete()
+            .eq('item_id', id)
+            .eq('item_type', type);
+
+          this._cache = this._cache.filter(x => !(x.id === id && x.type === type));
+          this._updateBadge(this._cache.length);
+          App.toast.show('Đã xóa vĩnh viễn.', 'success');
+          this._renderFromCache();
+        } catch(e) {
+          App.toast.show('Lỗi: ' + e.message, 'error');
+        }
+      });
+    },
+
+    // ── Xóa tất cả trong Recycle Bin ─────────────────────────
+    clearAll() {
+      const items = this._cache;
+      if (!items.length) return;
+      App.modal.confirm('⚠️ Xóa tất cả vĩnh viễn', `Xóa vĩnh viễn ${items.length} mục trong Recycle Bin? Hành động này KHÔNG THỂ hoàn tác.`, async () => {
+        for (const item of items) {
+          try { await this._hardDelete(item.id, item.type); } catch(e) {}
+        }
+        // Xóa toàn bộ rows trong exam_recycle_bin
+        await db.from('exam_recycle_bin').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+        this._cache = [];
+        this._updateBadge(0);
+        App.toast.show('Đã dọn sạch Recycle Bin.', 'success');
+        this._renderFromCache();
+      });
+    },
+
+    // ── Hard delete dữ liệu gốc ───────────────────────────────
+    async _hardDelete(id, type) {
+      if (type === 'test') {
+        const { data: attempts } = await db.from('exam_exam_attempts').select('id').eq('test_id', id);
+        const attemptIds = (attempts || []).map(a => a.id);
+        if (attemptIds.length) await db.from('exam_test_answers').delete().in('attempt_id', attemptIds);
+        await db.from('exam_test_results').delete().eq('test_id', id);
+        await db.from('exam_exam_attempts').delete().eq('test_id', id);
+        await db.from('exam_test_assignments').delete().eq('test_id', id);
+        await db.from('exam_questions').delete().eq('test_id', id);
+        await db.from('exam_tests').delete().eq('id', id);
+      } else if (type === 'project') {
+        await db.from('exam_projects').delete().eq('id', id);
+      } else if (type === 'assignment') {
+        await db.from('exam_test_assignments').delete().eq('id', id);
+      } else if (type === 'question') {
+        await db.from('exam_questions').delete().eq('id', id);
+      }
+    },
+
+    // ── init: load badge khi khởi động app ───────────────────
+    async init() {
+      await this._loadFromDB();
     }
   },
 
