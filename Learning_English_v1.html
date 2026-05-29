@@ -503,7 +503,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   position: relative; overflow: hidden;
   border-radius: 20px; padding: 28px 28px 24px;
   margin-bottom: 28px;
-  background: linear-gradient(135deg, #0f766e 0%, #0d9488 40%, #14b8a6 100%);
+  background: linear-gradient(to right, #0f766e 0%, #0d9488 45%, #14b8a6 80%, #2dd4bf 100%);
   box-shadow: 0 12px 40px rgba(13,148,136,.3), 0 2px 8px rgba(13,148,136,.2);
   animation: fadeIn .5s ease;
 }
@@ -1182,6 +1182,10 @@ select {
   .progress-circle-wrap { display: none; }
   .header-user-chip span { display: none; }
   .app-header-inner { height: 54px; padding: 0 14px; }
+  .sxp-card { padding: 12px 14px; gap: 8px; border-radius: 14px; }
+  .sxp-icon { font-size: 22px; }
+  .sxp-val  { font-size: 17px; }
+  .sxp-lbl  { font-size: 10px; }
 
   /* Tabs: scroll ngang đầy đủ */
   .tabs-section { overflow: visible; }
@@ -1344,35 +1348,201 @@ select {
 }
 
 /* ===== MONTHLY ATTENDANCE GRID ===== */
-.att-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.att-table th, .att-table td { border: 1px solid var(--border-light); text-align: center; white-space: nowrap; }
+/* ===== ATTENDANCE TABLE — Enhanced UI ===== */
+@keyframes attRowIn { from { opacity:0; transform:translateX(-8px); } to { opacity:1; transform:translateX(0); } }
+@keyframes attCellPop { from { transform:scale(.7); opacity:0; } to { transform:scale(1); opacity:1; } }
+@keyframes attCollapseDown { from { opacity:0; max-height:0; } to { opacity:1; max-height:2000px; } }
+
+/* Section wrapper with collapse */
+.att-section-wrap {
+  background: #fff;
+  border-radius: 20px;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 2px 16px rgba(13,148,136,.07), 0 1px 4px rgba(0,0,0,.04);
+  overflow: hidden;
+  margin-bottom: 28px;
+  transition: box-shadow var(--transition);
+}
+.att-section-wrap:hover { box-shadow: 0 6px 28px rgba(13,148,136,.11), 0 2px 8px rgba(0,0,0,.06); }
+
+/* Collapse header */
+.att-collapse-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 22px;
+  background: linear-gradient(135deg, #f0fdfa 0%, #fff 60%);
+  border-bottom: 1px solid rgba(13,148,136,.1);
+  cursor: pointer; user-select: none;
+  transition: background var(--transition);
+  gap: 12px;
+}
+.att-collapse-header:hover { background: linear-gradient(135deg, #e0f8f4 0%, #f8fafc 60%); }
+.att-collapse-header-left { display: flex; align-items: center; gap: 12px; }
+.att-collapse-icon-wrap {
+  width: 38px; height: 38px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--teal) 0%, var(--teal-mid) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; box-shadow: 0 4px 12px rgba(13,148,136,.3); flex-shrink: 0;
+}
+.att-collapse-title { font-size: 16px; font-weight: 700; color: var(--text); font-family: var(--font-display); letter-spacing: -.03em; }
+.att-collapse-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+.att-collapse-right { display: flex; align-items: center; gap: 10px; }
+.att-collapse-chevron {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: rgba(13,148,136,.09); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--teal); transition: transform .3s cubic-bezier(.4,0,.2,1), background .2s;
+  flex-shrink: 0;
+}
+.att-collapse-chevron svg { transition: transform .3s cubic-bezier(.4,0,.2,1); }
+.att-section-wrap.collapsed .att-collapse-chevron svg { transform: rotate(-90deg); }
+.att-collapse-chevron:hover { background: rgba(13,148,136,.16); }
+
+/* Collapsible body */
+.att-collapse-body {
+  overflow: hidden;
+  transition: max-height .4s cubic-bezier(.4,0,.2,1), opacity .3s ease;
+  max-height: 3000px; opacity: 1;
+}
+.att-section-wrap.collapsed .att-collapse-body {
+  max-height: 0; opacity: 0; pointer-events: none;
+}
+
+/* Month filter inside header */
+.att-month-input {
+  padding: 6px 12px; border-radius: 9px;
+  border: 1.5px solid rgba(13,148,136,.2); font-size: 14px;
+  background: #fff; color: #1e293b; outline: none; cursor: pointer;
+  font-family: var(--font-body); transition: border-color .2s, box-shadow .2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+}
+.att-month-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.1); }
+
+/* Overflow scroll container */
+.att-scroll-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Table */
+.att-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px; }
+.att-table th, .att-table td {
+  border-right: 1px solid rgba(226,232,240,.7);
+  border-bottom: 1px solid rgba(226,232,240,.7);
+  text-align: center; white-space: nowrap;
+}
+.att-table th:last-child, .att-table td:last-child { border-right: none; }
+
+/* Header row */
 .att-table thead th {
-  background: var(--bg); padding: 6px 4px;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 10px 4px;
   font-size: 10px; font-weight: 700; color: var(--text-muted);
-  text-transform: uppercase; letter-spacing: .04em;
-  border-bottom: 2px solid var(--border);
+  text-transform: uppercase; letter-spacing: .05em;
+  border-bottom: 2px solid rgba(13,148,136,.15);
+  position: relative;
 }
-.att-table thead th.th-name { text-align: left; padding: 6px 14px; min-width: 140px; position: sticky; left: 0; background: var(--bg); z-index: 2; }
-.att-table thead th.th-day { min-width: 38px; }
-.att-table thead th.th-day.weekend { background: #fff7ed; color: #c2410c; }
-.att-table thead th.th-day.today-col { background: var(--teal-light); color: var(--teal); }
-.att-table tbody td { padding: 0; height: 34px; vertical-align: middle; }
+.att-table thead th.th-name {
+  text-align: left; padding: 10px 18px; min-width: 160px;
+  position: sticky; left: 0; z-index: 3;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  font-size: 11px;
+  border-right: 2px solid rgba(13,148,136,.15) !important;
+}
+.att-table thead th.th-day { min-width: 40px; }
+.att-table thead th.th-day.weekend {
+  background: linear-gradient(180deg, #fff7ed 0%, #fef3e2 100%);
+  color: #c2410c;
+}
+.att-table thead th.th-day.today-col {
+  background: linear-gradient(180deg, rgba(13,148,136,.12) 0%, rgba(13,148,136,.06) 100%);
+  color: var(--teal);
+}
+.att-table thead th.th-day.today-col::after {
+  content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 3px; height: 3px; border-radius: 50%; background: var(--teal);
+}
+
+/* Body rows */
+.att-table tbody td {
+  padding: 0; height: 38px; vertical-align: middle;
+  transition: background .15s;
+}
 .att-table tbody td.td-name {
-  text-align: left; padding: 0 14px; font-weight: 600; font-size: 13px;
-  border-right: 2px solid var(--border); position: sticky; left: 0; background: #fff; z-index: 1;
+  text-align: left; padding: 0 18px; font-weight: 600; font-size: 13px;
+  border-right: 2px solid rgba(13,148,136,.15) !important;
+  position: sticky; left: 0; background: #fff; z-index: 1;
+  transition: background .15s;
+  letter-spacing: -.01em;
 }
+.att-table tbody tr { animation: attRowIn .25s ease both; }
+.att-table tbody tr:nth-child(even) td.td-name { background: #fafcff; }
+.att-table tbody tr:nth-child(even):hover td.td-name { background: var(--teal-glass); }
 .att-table tbody tr:hover td.td-name { background: var(--teal-glass); }
+
+/* Cells */
 .att-cell {
-  display: flex; align-items: center; justify-content: center; height: 34px;
-  font-size: 11px; font-weight: 700; cursor: default;
+  display: flex; align-items: center; justify-content: center; height: 38px;
+  font-size: 12px; font-weight: 700; cursor: default;
+  transition: background .15s, transform .1s;
+  position: relative;
 }
-.att-cell.done    { background: #dcfce7; color: #15803d; }
-.att-cell.partial { background: #fff7ed; color: #c2410c; }
+.att-cell.done {
+  background: linear-gradient(135deg, #dcfce7 0%, #d1fae5 100%);
+  color: #15803d;
+}
+.att-cell.done::after {
+  content: '✓';
+  font-size: 13px; font-weight: 800;
+  text-shadow: 0 1px 2px rgba(22,163,74,.2);
+}
+.att-cell.partial {
+  background: linear-gradient(135deg, #fff7ed 0%, #fef3e2 100%);
+  color: #c2410c;
+}
+.att-cell.partial::after { content: '○'; font-size: 13px; }
 .att-cell.noclass { background: var(--bg); color: var(--text-sub); font-weight: 400; }
 .att-cell.future  { background: #f8fafc; color: transparent; }
-.att-cell.weekend { background: #fff7ed; color: var(--text-sub); }
-.att-table tbody tr:hover .att-cell.done    { background: #bbf7d0; }
-.att-table tbody tr:hover .att-cell.partial { background: #fed7aa; }
+.att-cell.weekend { background: linear-gradient(135deg, #fff7ed 0%, #fef3e2 100%); color: transparent; }
+.att-cell:not(.done):not(.partial):not(.noclass):not(.future):not(.weekend) {
+  background: #fafcff;
+}
+.att-table tbody tr:hover .att-cell.done    { background: linear-gradient(135deg, #bbf7d0 0%, #a7f3d0 100%); }
+.att-table tbody tr:hover .att-cell.partial { background: linear-gradient(135deg, #fed7aa 0%, #fde68a 100%); }
+.att-table tbody tr:hover .att-cell:not(.done):not(.partial):not(.noclass):not(.future):not(.weekend) {
+  background: rgba(239,246,255,.9);
+}
+
+/* Today column highlight */
+.att-table tbody td.today-td { background: rgba(13,148,136,.04) !important; }
+.att-table tbody tr:hover td.today-td { background: rgba(13,148,136,.08) !important; }
+
+/* Legend */
+.att-legend {
+  display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  padding: 12px 20px; border-top: 1px solid rgba(226,232,240,.7);
+  background: linear-gradient(135deg, #f8fafc 0%, #fff 100%);
+}
+.att-legend-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--text-muted); font-weight: 500;
+}
+.att-legend-dot {
+  width: 16px; height: 16px; border-radius: 4px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 800; flex-shrink: 0;
+}
+.att-legend-dot.done { background: linear-gradient(135deg, #dcfce7, #d1fae5); color: #15803d; border: 1px solid #bbf7d0; }
+.att-legend-dot.partial { background: linear-gradient(135deg, #fff7ed, #fef3e2); color: #c2410c; border: 1px solid #fed7aa; }
+.att-legend-dot.noclass { background: var(--bg); border: 1px solid var(--border); }
+
+/* Stats chips in header */
+.att-stat-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+  letter-spacing: .02em; white-space: nowrap;
+}
+.att-stat-chip.done { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+.att-stat-chip.pending { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
 
 /* Loading skeleton */
 .skeleton {
@@ -1453,13 +1623,19 @@ select {
 
 /* completed lesson card */
 .lesson-card.completed {
-  border: 1.5px solid rgba(22,163,74,.25);
-  background: linear-gradient(135deg, #f0fdf4 0%, #fff 100%);
+  border: 1.5px solid rgba(13,148,136,.25);
+  background: linear-gradient(135deg, var(--teal-light) 0%, #fff 100%);
+  box-shadow: 0 4px 0 rgba(13,148,136,.2), var(--shadow-sm);
+}
+.lesson-card.completed:hover {
+  box-shadow: 0 6px 0 rgba(13,148,136,.25), var(--shadow-md);
+  border-color: rgba(13,148,136,.4);
+  transform: translateY(-3px);
 }
 .lesson-completed-tag {
   display: inline-flex; align-items: center; gap: 5px;
-  font-size: 11px; font-weight: 700; color: var(--green);
-  background: var(--green-light); padding: 4px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 700; color: var(--teal-dark);
+  background: var(--teal-light); padding: 4px 10px; border-radius: 20px;
   margin-top: 6px;
 }
 
@@ -1881,24 +2057,37 @@ select {
 
 /* ===== STREAK / XP PANEL ===== */
 .streak-xp-bar {
-  display: flex; gap: 12px; margin: 0 0 18px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px; margin: 0 0 18px;
+}
+@media (max-width: 639px) {
+  .streak-xp-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .sxp-card { min-width: unset; }
 }
 .sxp-card {
   flex: 1; min-width: 130px;
   background: var(--bg-2); border: 1.5px solid var(--border);
   border-radius: 16px; padding: 14px 18px;
   display: flex; align-items: center; gap: 12px;
+  box-shadow: 0 3px 0 var(--border);
+  transition: transform .15s cubic-bezier(.34,1.56,.64,1), box-shadow .15s;
 }
+.sxp-card:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--border), var(--shadow); }
 .sxp-icon { font-size: 26px; flex-shrink: 0; }
 .sxp-info { display: flex; flex-direction: column; }
 .sxp-val  { font-size: 20px; font-weight: 800; color: var(--text); font-family: var(--font-head); line-height: 1; }
 .sxp-lbl  { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; margin-top: 2px; }
-.sxp-card.streak-card { background: linear-gradient(135deg,#fff7ed,#fffbf5); border-color: #fed7aa; }
+.sxp-card.streak-card { background: linear-gradient(135deg,#fff7ed,#fffbf5); border-color: #fed7aa; box-shadow: 0 3px 0 #fed7aa; }
+.sxp-card.streak-card:hover { box-shadow: 0 6px 0 #fed7aa, var(--shadow); }
 .sxp-card.streak-card .sxp-val { color: #ea580c; }
-.sxp-card.xp-card { background: linear-gradient(135deg,#f0fdf4,#f7fffe); border-color: #bbf7d0; }
+.sxp-card.xp-card { background: linear-gradient(135deg,var(--teal-light),#e6fffe); border-color: var(--teal-bright); box-shadow: 0 3px 0 var(--teal-mid); }
+.sxp-card.xp-card:hover { box-shadow: 0 6px 0 var(--teal-mid), var(--shadow); }
 .sxp-card.xp-card .sxp-val { color: var(--teal-dark); }
-.sxp-card.rank-card { background: linear-gradient(135deg,#fefce8,#fffdf5); border-color: #fde68a; cursor: pointer; }
+.sxp-card.rank-card { background: linear-gradient(135deg,#fefce8,#fffdf5); border-color: #fde68a; cursor: pointer; box-shadow: 0 3px 0 #fde68a; }
+.sxp-card.rank-card:hover { box-shadow: 0 6px 0 #fde68a, var(--shadow); }
 .sxp-card.rank-card .sxp-val { color: #b45309; }
 .streak-milestone-btn {
   margin-left: auto; background: linear-gradient(135deg,#f97316,#fb923c);
@@ -1910,6 +2099,182 @@ select {
   0%,100% { box-shadow: 0 0 0 0 rgba(249,115,22,.4); }
   50%      { box-shadow: 0 0 0 6px rgba(249,115,22,0); }
 }
+
+/* ===== ATTENDANCE BUTTON (in streak bar) ===== */
+.sxp-card.att-card {
+  cursor: pointer;
+  background: linear-gradient(135deg,var(--teal-light),#ccfaf6);
+  border-color: var(--teal-bright);
+  box-shadow: 0 3px 0 var(--teal-mid);
+  transition: transform .15s cubic-bezier(.34,1.56,.64,1), box-shadow .15s;
+}
+.sxp-card.att-card:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--teal-mid);
+}
+.sxp-card.att-card .sxp-val { color: var(--teal-dark); }
+
+/* ===== ATTENDANCE POPUP MODAL ===== */
+@keyframes attModalIn  { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes attModalOut { from { transform: translateY(0); } to { transform: translateY(100%); } }
+@keyframes attCellPop  { 0%{transform:scale(0);opacity:0} 70%{transform:scale(1.15)} 100%{transform:scale(1);opacity:1} }
+@keyframes attShine    { from{left:-70%} to{left:140%} }
+
+#att-popup-overlay {
+  position: fixed; inset: 0;
+  background: rgba(15,23,42,.5);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  z-index: 9500; display: flex; align-items: flex-end; justify-content: center;
+  animation: fadeIn .2s ease;
+}
+#att-popup-overlay.hidden { display: none; }
+@media (min-width:640px) { #att-popup-overlay { align-items: center; } }
+
+.att-popup {
+  background: #fff; width: 100%; max-width: 480px;
+  border-radius: 28px 28px 0 0; padding: 0 0 env(safe-area-inset-bottom);
+  max-height: 92vh; display: flex; flex-direction: column;
+  animation: attModalIn .38s cubic-bezier(.34,1.1,.64,1);
+  box-shadow: 0 -8px 40px rgba(0,0,0,.15);
+  overflow: hidden;
+}
+@media (min-width:640px) {
+  .att-popup { border-radius: 28px; max-height: 88vh; animation: fadeInScale .3s ease; }
+}
+
+/* drag handle */
+.att-popup-handle {
+  width: 36px; height: 4px; border-radius: 2px;
+  background: #e5e7eb; margin: 10px auto 0; flex-shrink: 0;
+}
+
+/* header */
+.att-popup-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px 12px; flex-shrink: 0;
+}
+.att-popup-title {
+  font-size: 18px; font-weight: 900; color: #1f2937;
+  font-family: var(--font-display); letter-spacing: -.04em;
+  display: flex; align-items: center; gap: 8px;
+}
+.att-popup-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #f3f4f6; border: none; cursor: pointer;
+  font-size: 18px; display: flex; align-items: center; justify-content: center;
+  color: #6b7280; transition: background .15s;
+  font-family: var(--font-body);
+}
+.att-popup-close:hover { background: #e5e7eb; }
+
+/* month nav */
+.att-popup-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px 14px; flex-shrink: 0;
+}
+.att-nav-btn {
+  width: 36px; height: 36px; border-radius: 12px;
+  background: #f9fafb; border: 2px solid #e5e7eb;
+  cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;
+  color: #374151; transition: background .15s, transform .12s;
+  box-shadow: 0 2px 0 #d1d5db;
+}
+.att-nav-btn:active { transform: translateY(2px); box-shadow: none; }
+.att-nav-btn:hover  { background: #e5e7eb; }
+.att-nav-month {
+  font-size: 16px; font-weight: 800; color: #1f2937;
+  font-family: var(--font-display); letter-spacing: -.02em;
+}
+
+/* stat pills */
+.att-popup-stats {
+  display: flex; gap: 8px; padding: 0 20px 16px; flex-shrink: 0;
+}
+.att-ps {
+  flex: 1; border-radius: 16px; padding: 10px 12px;
+  display: flex; flex-direction: column; align-items: center;
+  border: 2px solid transparent; transition: transform .15s;
+}
+.att-ps:active { transform: scale(.96); }
+.att-ps.present { background: var(--teal-light); border-color: var(--teal-bright); box-shadow: 0 3px 0 var(--teal-mid); }
+.att-ps.absent  { background: #fff1f2; border-color: #fca5a5; box-shadow: 0 3px 0 #fca5a5; }
+.att-ps.remain  { background: #f8fafc; border-color: #e2e8f0; box-shadow: 0 3px 0 #e2e8f0; }
+.att-ps-val { font-size: 22px; font-weight: 900; line-height: 1; font-family: var(--font-display); letter-spacing: -.04em; }
+.att-ps.present .att-ps-val { color: var(--teal-dark); }
+.att-ps.absent  .att-ps-val { color: #dc2626; }
+.att-ps.remain  .att-ps-val { color: #94a3b8; }
+.att-ps-lbl { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; color: #9ca3af; margin-top: 3px; }
+
+/* scrollable calendar body */
+.att-popup-body {
+  flex: 1; overflow-y: auto; padding: 0 16px 20px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* calendar */
+.att-cal-grid {
+  display: grid; grid-template-columns: repeat(5,1fr); gap: 5px;
+}
+.att-cal-dow {
+  text-align: center; font-size: 10px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .04em;
+  padding: 2px 0 8px; color: #9ca3af;
+}
+.att-cal-dow.we { color: #d1d5db; }
+
+.att-day {
+  aspect-ratio: 1; border-radius: 12px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 1px;
+  position: relative; overflow: hidden;
+  border: 2px solid transparent;
+  transition: transform .15s cubic-bezier(.34,1.56,.64,1);
+}
+.att-day:active { transform: scale(.9); }
+.att-day.empty  { visibility: hidden; }
+
+/* weekend — removed (not shown) */
+
+/* future */
+.att-day.fut-day { background: #f9fafb; border: 2px dashed #e5e7eb; }
+.att-day.fut-day .att-day-num { color: #d1d5db; }
+
+/* no lesson day — grey */
+.att-day.no-lesson-day {
+  background: #f3f4f6; border-color: #e5e7eb;
+  box-shadow: 0 2px 0 #e5e7eb;
+}
+.att-day.no-lesson-day .att-day-num { color: #9ca3af; }
+
+/* present — teal */
+.att-day.ok-day {
+  background: linear-gradient(180deg, var(--teal-bright) 0%, var(--teal) 100%);
+  border-color: var(--teal-dark);
+  box-shadow: 0 4px 0 var(--teal-dark);
+}
+.att-day.ok-day::after {
+  content: ''; position: absolute; top: 0; left: -70%; width: 45%; height: 100%;
+  background: linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);
+  animation: attShine 2.8s ease 1.2s both; pointer-events: none;
+}
+.att-day.ok-day .att-day-num  { color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.2); }
+.att-day.ok-day .att-day-icon { color: #fff; }
+
+/* absent — red */
+.att-day.no-day {
+  background: #fff1f2; border-color: #fca5a5;
+  box-shadow: 0 3px 0 #fca5a5;
+}
+.att-day.no-day .att-day-num  { color: #ef4444; }
+.att-day.no-day .att-day-icon { color: #ef4444; }
+
+/* today ring */
+.att-day.today-day {
+  outline: 3px solid var(--teal); outline-offset: 2px;
+}
+
+.att-day-num  { font-size: 12px; font-weight: 800; line-height: 1; font-family: var(--font-display); }
+.att-day-icon { font-size: 10px; font-weight: 700; line-height: 1; }
 
 /* ===== CLAIM REWARD MODAL ===== */
 #claim-reward-overlay {
@@ -2238,6 +2603,13 @@ select {
           <div class="sxp-lbl">Xếp hạng</div>
         </div>
       </div>
+      <div class="sxp-card att-card" onclick="openAttPopup()">
+        <div class="sxp-icon">📅</div>
+        <div class="sxp-info">
+          <div class="sxp-val" id="sxp-att-val">—</div>
+          <div class="sxp-lbl">Điểm danh</div>
+        </div>
+      </div>
     </div>
 
     <!-- Tabs Section -->
@@ -2399,16 +2771,31 @@ select {
       </div>
     </div>
 
-    <!-- Monthly Attendance Grid -->
-    <div class="table-section-header" style="margin-top:28px;display:flex;align-items:center;justify-content:space-between">
-      <h2>📅 Bảng điểm danh tháng</h2>
-      <div style="display:flex;align-items:center;gap:8px">
-        <input type="month" id="attendance-month-filter" style="padding:6px 12px;border-radius:8px;border:1.5px solid var(--border);font-size:16px;background:#fff;color:#1e293b;outline:none;cursor:pointer" onchange="loadMonthlyAttendance(this.value)">
+    <!-- Monthly Attendance Grid — Enhanced Collapsible -->
+    <div class="att-section-wrap" style="margin-top:28px" id="att-section-outer">
+      <!-- Collapse Header -->
+      <div class="att-collapse-header" onclick="toggleAttSection()">
+        <div class="att-collapse-header-left">
+          <div class="att-collapse-icon-wrap">📅</div>
+          <div>
+            <div class="att-collapse-title">Bảng điểm danh tháng</div>
+            <div class="att-collapse-subtitle" id="att-subtitle">Theo dõi chuyên cần nhân viên theo ngày</div>
+          </div>
+        </div>
+        <div class="att-collapse-right">
+          <input type="month" id="attendance-month-filter" class="att-month-input" onchange="loadMonthlyAttendance(this.value)" onclick="e=>e.stopPropagation()">
+          <button class="att-collapse-chevron" aria-label="Thu/mở bảng" onclick="event.stopPropagation();toggleAttSection()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
       </div>
-    </div>
-    <div id="monthly-attendance-wrap" style="background:#fff;border-radius:var(--radius);border:1px solid var(--border-light);box-shadow:var(--shadow-sm);overflow:hidden;overflow-x:auto;margin-bottom:28px">
-      <div id="monthly-attendance-grid">
-        <div style="text-align:center;padding:32px;color:var(--text-muted);font-size:13px">Đang tải...</div>
+      <!-- Collapsible Body -->
+      <div class="att-collapse-body">
+        <div id="monthly-attendance-wrap" class="att-scroll-wrap">
+          <div id="monthly-attendance-grid">
+            <div style="text-align:center;padding:40px;color:var(--text-muted);font-size:13px">Đang tải...</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -3224,8 +3611,11 @@ async function loadEmployeeData() {
   const nameParts = name.split(' ');
   document.getElementById('header-name-label').textContent = nameParts[nameParts.length - 1] || name;
   document.getElementById('header-avatar').textContent = (name[0] || '?').toUpperCase();
+
   await Promise.all([loadLessons(), loadTodaySessions()]);
-  await loadStreakAndXP(); // await để đảm bảo XP luôn hiển thị đúng ngay lần đầu
+  await loadStreakAndXP();
+  // Init attendance chip count (non-blocking)
+  refreshAttPopupIfOpen();
 }
 
 async function loadLessons() {
@@ -3516,7 +3906,7 @@ function renderLessons() {
             </div>
             <div class="lesson-title">${esc(l.title)}</div>
             <div class="lesson-completed-tag">✅ Đã hoàn thành${completedAtStr ? `<span style="margin-left:8px;font-size:11px;color:var(--text-muted);font-weight:500">🕐 ${completedAtStr}</span>` : ''}</div>
-            <button class="btn btn-primary" onclick="startLesson(${l.id}, true, '${day.date}')" style="margin-top:10px;background:linear-gradient(135deg,var(--green),#22c55e)">
+            <button class="btn btn-primary" onclick="startLesson(${l.id}, true, '${day.date}')" style="margin-top:10px;background:linear-gradient(135deg,var(--teal),var(--teal-bright))">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
               Học lại
             </button>
@@ -4278,6 +4668,11 @@ async function loadAdminData() {
 
   // Init monthly attendance
   const maFilter = document.getElementById('attendance-month-filter');
+  // Restore collapse state
+  try {
+    const attWrap = document.getElementById('att-section-outer');
+    if (attWrap && localStorage.getItem('att_collapsed') === '1') attWrap.classList.add('collapsed');
+  } catch {}
   if (maFilter && !maFilter.value) {
     const now = new Date();
     maFilter.value = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
@@ -4627,10 +5022,12 @@ async function loadMonthlyAttendance(monthStr) {
     return `<th class="${cls}"><div style="font-size:10px">${d}</div><div style="font-size:9px;font-weight:500;opacity:.7">${dayName}</div></th>`;
   }).join('');
 
-  const rows = users.map(u => {
+  const rows = users.map((u, uIdx) => {
     const cells = days.map(({ d, dateStr, dow }) => {
       const isWeekend = dow === 0 || dow === 6;
       const isFuture  = dateStr > today;
+      const isToday   = dateStr === today;
+      const todayCls  = isToday ? ' today-td' : '';
 
       // Per-employee scheduled lessons = global (null) + user-specific
       const scheduled = [...new Set(
@@ -4648,26 +5045,42 @@ async function loadMonthlyAttendance(monthStr) {
       const partial   = !attended && hasClass && (timeOk || userComp.size > 0);
 
       if (isWeekend && !hasClass) {
-        return `<td><div class="att-cell weekend"></div></td>`;
+        return `<td class="${todayCls}"><div class="att-cell weekend"></div></td>`;
       }
       if (isFuture) {
-        return `<td><div class="att-cell future">·</div></td>`;
+        return `<td class="${todayCls}"><div class="att-cell future">·</div></td>`;
       }
       if (!hasClass) {
-        return `<td><div class="att-cell noclass" title="Không có bài">&mdash;</div></td>`;
+        return `<td class="${todayCls}"><div class="att-cell noclass" title="Không có bài">&mdash;</div></td>`;
       }
       if (attended) {
-        return `<td><div class="att-cell done" title="Điểm danh: ≥15p + hoàn thành tất cả bài">✓</div></td>`;
+        return `<td class="${todayCls}"><div class="att-cell done" title="Điểm danh: ≥15p + hoàn thành tất cả bài"></div></td>`;
       }
       if (partial) {
         const mins = Math.floor(totalSec / 60);
-        return `<td><div class="att-cell partial" title="${mins}p · ${userComp.size}/${scheduled.length} bài">○</div></td>`;
+        return `<td class="${todayCls}"><div class="att-cell partial" title="${mins}p · ${userComp.size}/${scheduled.length} bài"></div></td>`;
       }
-      return `<td><div class="att-cell" style="background:var(--bg-2);color:var(--text-sub)" title="Chưa học"></div></td>`;
+      return `<td class="${todayCls}"><div class="att-cell" title="Chưa học"></div></td>`;
     }).join('');
 
-    return `<tr><td class="td-name">${esc(u.name)}</td>${cells}</tr>`;
+    return `<tr style="animation-delay:${uIdx * 0.03}s"><td class="td-name">${esc(u.name)}</td>${cells}</tr>`;
   }).join('');
+
+  // Update subtitle
+  const sub = document.getElementById('att-subtitle');
+  if (sub) {
+    const doneCount = users.reduce((acc, u) => {
+      const attended = days.some(({ dateStr }) => {
+        const scheduled = [...new Set(allSchedules.filter(s => s.date === dateStr && (s.user_id === null || s.user_id === u.id)).map(s => s.lesson_id))];
+        if (!scheduled.length || dateStr > today) return false;
+        const totalSec = sessionMap[u.id + ':' + dateStr] || 0;
+        const userComp = compMap[u.id + ':' + dateStr] || new Set();
+        return totalSec >= 15 * 60 && scheduled.every(lid => userComp.has(lid));
+      });
+      return acc + (attended ? 1 : 0);
+    }, 0);
+    sub.textContent = `${users.length} nhân viên · Tháng ${monthStr.replace('-', '/')}`;
+  }
 
   grid.innerHTML = `
     <table class="att-table">
@@ -4679,10 +5092,10 @@ async function loadMonthlyAttendance(monthStr) {
       </thead>
       <tbody>${rows}</tbody>
     </table>
-    <div style="display:flex;align-items:center;gap:16px;padding:10px 14px;border-top:1px solid var(--border-light);font-size:11px;color:var(--text-muted)">
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;border-radius:3px;background:#dcfce7;display:inline-block;border:1px solid #bbf7d0"></span> ✓ Điểm danh (15p + tất cả bài)</span>
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;border-radius:3px;background:#fff7ed;display:inline-block;border:1px solid #fed7aa"></span> ○ Học chưa đủ</span>
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;border-radius:3px;background:var(--bg-2);display:inline-block;border:1px solid var(--border)"></span> — Không có bài</span>
+    <div class="att-legend">
+      <div class="att-legend-item"><div class="att-legend-dot done">✓</div> Điểm danh (15p + tất cả bài)</div>
+      <div class="att-legend-item"><div class="att-legend-dot partial">○</div> Học chưa đủ điều kiện</div>
+      <div class="att-legend-item"><div class="att-legend-dot noclass">—</div> Không có bài phân công</div>
     </div>
   `;
 
@@ -6704,6 +7117,7 @@ async function checkAndUpdateAttendance() {
 
   toast('📅 Điểm danh hôm nay! +10 XP 🔥', 'success');
   await loadStreakAndXP();
+  refreshAttPopupIfOpen();
 }
 
 // ── Load & display streak/XP ─────────────────────────────────────────────
@@ -6944,6 +7358,187 @@ function closeLeaderboardModal() {
   document.getElementById('leaderboard-overlay')?.classList.add('hidden');
 }
 
+// ── Monthly Attendance collapse toggle ──────────────────────────────────────
+function toggleAttSection() {
+  const wrap = document.getElementById('att-section-outer');
+  if (!wrap) return;
+  wrap.classList.toggle('collapsed');
+  // Save state
+  try { localStorage.setItem('att_collapsed', wrap.classList.contains('collapsed') ? '1' : '0'); } catch {}
+}
+
+// ── Employee Attendance Popup ─────────────────────────────────────────────
+let _attPopupMonth = null; // 'YYYY-MM'
+
+function openAttPopup() {
+  document.getElementById('att-popup-overlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  const now = new Date();
+  _attPopupMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+  renderAttPopup(_attPopupMonth);
+}
+
+function closeAttPopup() {
+  document.getElementById('att-popup-overlay').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+function shiftAttMonth(delta) {
+  if (!_attPopupMonth) return;
+  const [y, m] = _attPopupMonth.split('-').map(Number);
+  const d = new Date(y, m - 1 + delta, 1);
+  _attPopupMonth = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+  renderAttPopup(_attPopupMonth);
+}
+
+async function renderAttPopup(monthStr) {
+  if (!currentUser) return;
+  const [year, month] = monthStr.split('-').map(Number);
+  const today = todayStr();
+  const mNames = ['','Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
+
+  // Update nav label
+  const navLabel = document.getElementById('att-nav-month-label');
+  if (navLabel) navLabel.textContent = `${mNames[month]} ${year}`;
+
+  // Disable future nav
+  const nowStr = new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2,'0');
+  const navBtns = document.querySelectorAll('.att-nav-btn');
+  if (navBtns[1]) navBtns[1].disabled = monthStr >= nowStr;
+  if (navBtns[1]) navBtns[1].style.opacity = monthStr >= nowStr ? '.3' : '1';
+
+  // Show spinner while loading
+  const calEl = document.getElementById('att-cal-grid');
+  calEl.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text-muted)"><div class="spinner spinner-teal" style="margin:0 auto 10px;width:24px;height:24px;border-width:3px"></div>Đang tải...</div>`;
+
+  const lastDay = new Date(year, month, 0).getDate();
+  const startDate = `${monthStr}-01`;
+  const endDate   = `${monthStr}-${String(lastDay).padStart(2,'0')}`;
+
+  // Fetch lesson schedules, sessions, completions in parallel
+  const [{ data: schedRows }, { data: sessRows }, { data: compRows }] = await Promise.all([
+    sb.from('lesson_schedules').select('lesson_id,date').gte('date', startDate).lte('date', endDate)
+      .or(`user_id.eq.${currentUser.id},user_id.is.null`),
+    sb.from('learning_sessions').select('date,duration_seconds').eq('user_id', currentUser.id)
+      .gte('date', startDate).lte('date', endDate),
+    sb.from('lesson_completions').select('lesson_id,date').eq('user_id', currentUser.id)
+      .gte('date', startDate).lte('date', endDate)
+  ]);
+
+  // Build maps
+  // schedMap: date → Set of lesson_ids scheduled
+  const schedMap = {};
+  for (const s of (schedRows || [])) {
+    if (!schedMap[s.date]) schedMap[s.date] = new Set();
+    schedMap[s.date].add(s.lesson_id);
+  }
+  // sessMap: date → total seconds
+  const sessMap = {};
+  for (const s of (sessRows || [])) {
+    sessMap[s.date] = (sessMap[s.date] || 0) + (s.duration_seconds || 0);
+  }
+  // compMap: date → Set of completed lesson_ids
+  const compMap = {};
+  for (const c of (compRows || [])) {
+    if (!compMap[c.date]) compMap[c.date] = new Set();
+    compMap[c.date].add(c.lesson_id);
+  }
+
+  // Count stats (weekdays only)
+  let presentCount = 0, absentCount = 0, futureCount = 0;
+  for (let d = 1; d <= lastDay; d++) {
+    const ds  = `${monthStr}-${String(d).padStart(2,'0')}`;
+    const dow = new Date(year, month - 1, d).getDay();
+    if (dow === 0 || dow === 6) continue; // skip weekends
+    if (ds > today) { futureCount++; continue; }
+    const hasLesson = !!schedMap[ds]?.size;
+    if (!hasLesson) continue; // no lesson day — don't count
+    const totalSec = sessMap[ds] || 0;
+    const done = compMap[ds] || new Set();
+    const allDone = [...(schedMap[ds] || [])].every(lid => done.has(lid));
+    if (totalSec >= 15 * 60 && allDone) presentCount++;
+    else absentCount++;
+  }
+
+  const setEl = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  setEl('att-ps-present', presentCount);
+  setEl('att-ps-absent',  absentCount);
+  setEl('att-ps-remain',  futureCount);
+  setEl('sxp-att-val', presentCount + ' ngày');
+
+  // Build calendar — 5 columns (T2–T6), no weekends
+  const dowLabels = ['T2','T3','T4','T5','T6'];
+  const dowHtml = dowLabels.map(d => `<div class="att-cal-dow">${d}</div>`).join('');
+
+  // Offset: day-of-week of 1st of month, Mon=0..Fri=4 (skip Sat/Sun)
+  const firstDow = new Date(year, month - 1, 1).getDay(); // 0=Sun..6=Sat
+  // Map to weekday grid col (Mon=0, Tue=1, Wed=2, Thu=3, Fri=4)
+  const startOffset = firstDow === 0 ? 4 : firstDow - 1; // Sun wraps to Fri col? No — just offset
+  // Actually: if firstDow is Mon(1)→0, Tue(2)→1 ... Fri(5)→4, Sat(6)→0 next row, Sun(0)→0 next row
+  let gridOffset = 0;
+  if (firstDow >= 1 && firstDow <= 5) gridOffset = firstDow - 1;
+  else gridOffset = 0; // Sat or Sun → start from Mon col 0
+
+  const empties = Array(gridOffset).fill('<div class="att-day empty"></div>').join('');
+
+  let cells = '';
+  for (let d = 1; d <= lastDay; d++) {
+    const ds  = `${monthStr}-${String(d).padStart(2,'0')}`;
+    const dow = new Date(year, month - 1, d).getDay();
+    if (dow === 0 || dow === 6) continue; // skip weekends entirely
+
+    const isFuture  = ds > today;
+    const isToday   = ds === today;
+    const hasLesson = !!schedMap[ds]?.size;
+    const totalSec  = sessMap[ds] || 0;
+    const done      = compMap[ds] || new Set();
+    const allDone   = hasLesson && [...(schedMap[ds])].every(lid => done.has(lid));
+    const isPresent = hasLesson && totalSec >= 15 * 60 && allDone;
+    const isAbsent  = hasLesson && !isFuture && !isPresent;
+
+    let cls = 'att-day';
+    let icon = '';
+    if (isFuture) {
+      if (hasLesson) { cls += ' fut-day'; }
+      else           { cls += ' no-lesson-day'; }
+    } else if (isPresent) {
+      cls += ' ok-day';
+      icon = `<div class="att-day-icon">★</div>`;
+    } else if (isAbsent) {
+      cls += ' no-day';
+      icon = `<div class="att-day-icon">✕</div>`;
+    } else {
+      // past day, no lesson
+      cls += ' no-lesson-day';
+    }
+    if (isToday) cls += ' today-day';
+    const delay = isPresent ? `style="animation:attCellPop .35s cubic-bezier(.34,1.56,.64,1) ${(d*0.018).toFixed(2)}s both"` : '';
+    cells += `<div class="${cls}" ${delay}><div class="att-day-num">${d}</div>${icon}</div>`;
+  }
+
+  // Update grid to 5 columns
+  calEl.style.gridTemplateColumns = 'repeat(5, 1fr)';
+  calEl.innerHTML = dowHtml + empties + cells;
+}
+
+// Refresh popup if open after check-in
+function refreshAttPopupIfOpen() {
+  if (!document.getElementById('att-popup-overlay').classList.contains('hidden') && _attPopupMonth) {
+    renderAttPopup(_attPopupMonth);
+  }
+  // always refresh the chip label
+  if (currentUser) {
+    const now = new Date();
+    const ms = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+    sb.from('daily_attendance').select('date').eq('user_id', currentUser.id)
+      .gte('date', ms + '-01').lte('date', ms + '-31')
+      .then(({data}) => {
+        const el = document.getElementById('sxp-att-val');
+        if (el) el.textContent = (data ? data.length : 0) + ' ngày';
+      });
+  }
+}
+
 /* BOOT */
 (function init() {
   const u = loadUser();
@@ -6951,5 +7546,47 @@ function closeLeaderboardModal() {
   else   { showView('login'); }
 })();
 </script>
+<!-- ============================
+     ATTENDANCE POPUP MODAL
+============================= -->
+<div id="att-popup-overlay" class="hidden" onclick="if(event.target===this)closeAttPopup()">
+  <div class="att-popup" id="att-popup">
+    <div class="att-popup-handle"></div>
+    <div class="att-popup-header">
+      <div class="att-popup-title">📅 Lịch điểm danh</div>
+      <button class="att-popup-close" onclick="closeAttPopup()">×</button>
+    </div>
+    <!-- month nav -->
+    <div class="att-popup-nav">
+      <button class="att-nav-btn" onclick="shiftAttMonth(-1)">‹</button>
+      <div class="att-nav-month" id="att-nav-month-label">Tháng 5 2026</div>
+      <button class="att-nav-btn" onclick="shiftAttMonth(+1)">›</button>
+    </div>
+    <!-- stats -->
+    <div class="att-popup-stats">
+      <div class="att-ps present">
+        <div class="att-ps-val" id="att-ps-present">—</div>
+        <div class="att-ps-lbl">✅ Điểm danh</div>
+      </div>
+      <div class="att-ps absent">
+        <div class="att-ps-val" id="att-ps-absent">—</div>
+        <div class="att-ps-lbl">❌ Vắng</div>
+      </div>
+      <div class="att-ps remain">
+        <div class="att-ps-val" id="att-ps-remain">—</div>
+        <div class="att-ps-lbl">⏳ Còn lại</div>
+      </div>
+    </div>
+    <!-- calendar -->
+    <div class="att-popup-body">
+      <div class="att-cal-grid" id="att-cal-grid">
+        <div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text-muted)">
+          <div class="spinner spinner-teal" style="margin:0 auto 10px;width:24px;height:24px;border-width:3px"></div>Đang tải...
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
