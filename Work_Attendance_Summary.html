@@ -2482,8 +2482,9 @@ async function approveLeaveRequest(reqId) {
 
     // 2. Update hr_work_schedule with appropriate marker
     let schedStatus = 'o';
-    if (req.session_type === 'morning') schedStatus = 'om';
-    else if (req.session_type === 'afternoon') schedStatus = 'oa';
+    if (req.leave_type === 'UL') schedStatus = 'u';
+    if (req.session_type === 'morning') schedStatus = (req.leave_type === 'UL') ? 'u' : 'om';
+    else if (req.session_type === 'afternoon') schedStatus = (req.leave_type === 'UL') ? 'u' : 'oa';
 
     await db.from('hr_work_schedule').upsert(
       { employee_id: req.employee_id, work_date: req.leave_date, status: schedStatus },
@@ -3390,6 +3391,19 @@ async function saveLeave() {
   const data = { employee_id: empId, month: leaveDate, days_absent: days, leave_type: leaveType, note: document.getElementById('ml-note').value.trim() || null };
   const { error } = id ? await db.from('hr_leave_records').update(data).eq('id', id) : await db.from('hr_leave_records').insert(data);
   if (error) { toast('Lỗi: ' + error.message, 'error'); return; }
+
+  // Tự động cập nhật ô lịch sch-table khi thêm/sửa bản ghi UL
+  if (leaveType === 'UL' && leaveDate) {
+    const schStatus = 'u';
+    try {
+      await db.from('hr_work_schedule').upsert(
+        { employee_id: empId, work_date: leaveDate, status: schStatus },
+        { onConflict: 'employee_id,work_date' }
+      );
+      S.scheduleData[`${empId}|${leaveDate}`] = schStatus;
+    } catch(schErr) { console.warn('Không thể cập nhật lịch UL:', schErr); }
+  }
+
   toast('Đã lưu', 'success'); closeModal('m-leave');
   await loadAll(); buildMonthOptions(); renderLeaves();
   if (document.getElementById('s-employees').classList.contains('active')) renderEmp();
@@ -4014,6 +4028,7 @@ const SCH_STYLE = {
   xw: { bg:'#e9d5ff', color:'#4c1d95', border:'#c4b5fd', label:'xw' },
   om: { bg:'#fecaca', color:'#7f1d1d', border:'#fca5a5', label:'om' },
   oa: { bg:'#fecaca', color:'#7f1d1d', border:'#fca5a5', label:'oa' },
+  u:  { bg:'#f3e8ff', color:'#6b21a8', border:'#d8b4fe', label:'u' },
 };
 
 const DOW_VI = ['CN','T2','T3','T4','T5','T6','T7'];
@@ -4617,6 +4632,7 @@ function openSchPopup(event, empId, year, month, day, empName) {
       <option value="xw"${currentVal==='xw'?' selected':''}>xw — Đăng ký office nhưng WFH</option>
       <option value="om"${currentVal==='om'?' selected':''}>om — Off buổi sáng</option>
       <option value="oa"${currentVal==='oa'?' selected':''}>oa — Off buổi chiều</option>
+      <option value="u"${currentVal==='u'?' selected':''}>u — Nghỉ không lương (UL)</option>
     </select>
     <div class="sch-popup-btns">
       <button class="btn btn-secondary btn-sm" onclick="closeSchPopup()">Hủy</button>
