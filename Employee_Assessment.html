@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hệ Thống Đánh Giá Nhân Viên</title>
-
   <script>
-
   (function() {
     'use strict';
     try {
@@ -4644,6 +4642,15 @@ const App = {
       _boundContextMenu: null,
       _boundBeforeUnload: null,
 
+      // ── TAB-AWAY 30s AUTO-SUBMIT ──────────────────────────────────────────
+      // Sau khi vi phạm được tính, bắt đầu đếm ngược 30 giây.
+      // Nếu user quay lại trước 30s → clear timer (đã tính vi phạm rồi, không nộp).
+      // Nếu vẫn ở ngoài sau 30s → auto-submit + ghi gian lận.
+      _tabAwayTimer: null,
+      _tabAwayStart: 0,
+      _boundVisReturn: null,
+      _boundFocusReturn: null,
+
       init() {
         const ac = App.exam.antiCheat;
 
@@ -4788,6 +4795,9 @@ const App = {
         if (ac._boundBlur)        { window.removeEventListener('blur', ac._boundBlur); ac._boundBlur = null; }
         if (ac._boundContextMenu) { document.removeEventListener('contextmenu', ac._boundContextMenu); ac._boundContextMenu = null; }
 
+        // Cleanup tab-away timer + return listeners
+        ac._clearTabAwayTimer();
+
         // Xóa toàn bộ các key cũ lẫn mới để không bao giờ sót state
         sessionStorage.removeItem('_ac_snapshot');
         sessionStorage.removeItem('_ac_f5_violation');
@@ -4822,6 +4832,93 @@ const App = {
         } else {
           ac.showOverlay(type);
         }
+
+        // ── TAB-AWAY 30s: bắt đầu đếm ngược khi user rời tab ────────────────
+        // Chỉ áp dụng cho 'tab' và 'focus' (không áp dụng cho 'reload' vì
+        // reload đã được xử lý riêng bởi beforeunload + inline script).
+        // Nếu vi phạm lần 3 thì showFinalOverlay đã submit rồi, không cần timer.
+        if ((type === 'tab' || type === 'focus') && ac.violationCount < 3) {
+          ac._startTabAwayTimer();
+        }
+      },
+
+      // ── Bắt đầu đếm 30 giây tab-away ──────────────────────────────────────
+      _startTabAwayTimer() {
+        const ac = App.exam.antiCheat;
+
+        // Clear timer cũ nếu còn (trường hợp vi phạm liên tiếp nhanh)
+        ac._clearTabAwayTimer();
+
+        ac._tabAwayStart = Date.now();
+
+        // Đăng ký listener "quay lại" — chỉ một lần, tự xóa khi fired
+        ac._boundVisReturn = function() {
+          if (!document.hidden) {
+            ac._clearTabAwayTimer();
+          }
+        };
+        ac._boundFocusReturn = function() {
+          ac._clearTabAwayTimer();
+        };
+        document.addEventListener('visibilitychange', ac._boundVisReturn);
+        window.addEventListener('focus', ac._boundFocusReturn);
+
+        // Đếm 30 giây — nếu vẫn ở ngoài thì auto-submit
+        ac._tabAwayTimer = setTimeout(function() {
+          ac._tabAwayTimer = null;
+          // Kiểm tra lại: vẫn active, vẫn đang thi, vẫn đang ở ngoài tab
+          if (!ac._active || !App.state.examState?.attempt) return;
+          if (App.state.examState?._submitting) return; // đang submit rồi, bỏ qua
+          // Dọn listener return (không cần nữa)
+          ac._removeReturnListeners();
+          // Hiện overlay nộp bài vì ở ngoài quá 30 giây
+          ac._showTabAwayFinalOverlay();
+        }, 30000);
+      },
+
+      // ── Clear timer và listener quay lại ────────────────────────────────────
+      _clearTabAwayTimer() {
+        const ac = App.exam.antiCheat;
+        if (ac._tabAwayTimer) {
+          clearTimeout(ac._tabAwayTimer);
+          ac._tabAwayTimer = null;
+        }
+        ac._removeReturnListeners();
+      },
+
+      _removeReturnListeners() {
+        const ac = App.exam.antiCheat;
+        if (ac._boundVisReturn) {
+          document.removeEventListener('visibilitychange', ac._boundVisReturn);
+          ac._boundVisReturn = null;
+        }
+        if (ac._boundFocusReturn) {
+          window.removeEventListener('focus', ac._boundFocusReturn);
+          ac._boundFocusReturn = null;
+        }
+      },
+
+      // ── Overlay nộp bài do ở ngoài tab > 30 giây ───────────────────────────
+      _showTabAwayFinalOverlay() {
+        const existing = document.getElementById('anticheat-overlay');
+        if (existing) existing.remove();
+        const overlay = document.createElement('div');
+        overlay.id = 'anticheat-overlay';
+        overlay.className = 'anticheat-overlay';
+        overlay.innerHTML = `
+          <div class="anticheat-box" style="border-color:rgba(255,88,88,0.8);">
+            <div class="anticheat-icon">⏱️</div>
+            <div class="anticheat-title" style="font-size:24px;">Bài thi đã bị nộp tự động</div>
+            <div class="anticheat-count" style="background:rgba(255,88,88,0.25);border-color:rgba(255,88,88,0.5);color:#ff8080;">Rời khỏi trang thi quá 30 giây</div>
+            <div class="anticheat-msg">
+              Bạn đã <strong style="color:#ff8080;">rời khỏi trang thi hơn 30 giây</strong>.<br><br>
+              Bài thi của bạn đã được <strong style="color:#ff5858;">tự động nộp</strong>. Hành vi này sẽ được ghi lại và báo cáo đến quản trị viên.
+            </div>
+            <div style="font-size:12px;color:var(--text-muted);">Đang nộp bài...</div>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        setTimeout(() => App.exam.submit(true, true), 2000);
       },
 
       showOverlay(type) {
