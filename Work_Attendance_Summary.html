@@ -1297,7 +1297,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
 
         <!-- Top 3 Nghỉ phép -->
         <div class="card" style="padding:1.25rem">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem">
             <div style="display:flex;align-items:center;gap:.6rem">
               <div style="width:2rem;height:2rem;border-radius:.5rem;background:linear-gradient(135deg,#059669,#10b981);display:flex;align-items:center;justify-content:center;font-size:.9rem">📅</div>
               <div>
@@ -1305,9 +1305,9 @@ tr:hover td{background:rgba(13,148,136,.03)}
                 <div style="font-size:.68rem;color:var(--text-3)">Xin nghỉ nhiều nhất</div>
               </div>
             </div>
-            <div style="display:flex;gap:.35rem">
-              <button id="dash-leave-month" onclick="dashToggle('leave','month')" class="btn btn-sm" style="background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-size:.62rem;padding:.25rem .55rem;border-radius:.4rem">Tháng</button>
-              <button id="dash-leave-year" onclick="dashToggle('leave','year')" class="btn btn-sm btn-secondary" style="font-size:.62rem;padding:.25rem .55rem;border-radius:.4rem">Năm</button>
+            <div style="display:flex;gap:.35rem;align-items:center">
+              <select id="dash-leave-month-sel" onchange="dashPickerChange('leave')" style="font-size:.68rem;padding:.2rem .4rem;border-radius:.4rem;border:1.5px solid var(--border);background:var(--surface);color:var(--text-1);cursor:pointer;max-width:90px"></select>
+              <select id="dash-leave-year-sel" onchange="dashPickerChange('leave')" style="font-size:.68rem;padding:.2rem .4rem;border-radius:.4rem;border:1.5px solid var(--border);background:var(--surface);color:var(--text-1);cursor:pointer;max-width:72px"></select>
             </div>
           </div>
           <div id="top-leave"></div>
@@ -1315,7 +1315,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
 
         <!-- Top 3 Warning -->
         <div class="card" style="padding:1.25rem">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem">
             <div style="display:flex;align-items:center;gap:.6rem">
               <div style="width:2rem;height:2rem;border-radius:.5rem;background:linear-gradient(135deg,#ea580c,#f97316);display:flex;align-items:center;justify-content:center;font-size:.9rem">⚠️</div>
               <div>
@@ -1323,9 +1323,9 @@ tr:hover td{background:rgba(13,148,136,.03)}
                 <div style="font-size:.68rem;color:var(--text-3)">Bị cảnh báo nhiều nhất</div>
               </div>
             </div>
-            <div style="display:flex;gap:.35rem">
-              <button id="dash-warn-month" onclick="dashToggle('warn','month')" class="btn btn-sm" style="background:linear-gradient(135deg,#ea580c,#f97316);color:#fff;font-size:.62rem;padding:.25rem .55rem;border-radius:.4rem">Tháng</button>
-              <button id="dash-warn-year" onclick="dashToggle('warn','year')" class="btn btn-sm btn-secondary" style="font-size:.62rem;padding:.25rem .55rem;border-radius:.4rem">Năm</button>
+            <div style="display:flex;gap:.35rem;align-items:center">
+              <select id="dash-warn-month-sel" onchange="dashPickerChange('warn')" style="font-size:.68rem;padding:.2rem .4rem;border-radius:.4rem;border:1.5px solid var(--border);background:var(--surface);color:var(--text-1);cursor:pointer;max-width:90px"></select>
+              <select id="dash-warn-year-sel" onchange="dashPickerChange('warn')" style="font-size:.68rem;padding:.2rem .4rem;border-radius:.4rem;border:1.5px solid var(--border);background:var(--surface);color:var(--text-1);cursor:pointer;max-width:72px"></select>
             </div>
           </div>
           <div id="top-warn"></div>
@@ -1333,7 +1333,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
 
         <!-- Top 3 Đi trễ / Về sớm -->
         <div class="card" style="padding:1.25rem">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem">
             <div style="display:flex;align-items:center;gap:.6rem">
               <div style="width:2rem;height:2rem;border-radius:.5rem;background:linear-gradient(135deg,#7c3aed,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:.9rem">⏰</div>
               <div>
@@ -1341,9 +1341,9 @@ tr:hover td{background:rgba(13,148,136,.03)}
                 <div style="font-size:.68rem;color:var(--text-3)">Vi phạm giờ giấc nhiều nhất</div>
               </div>
             </div>
-            <div style="display:flex;gap:.35rem">
-              <button id="dash-att-month" onclick="dashToggle('att','month')" class="btn btn-sm" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6);color:#fff;font-size:.62rem;padding:.25rem .55rem;border-radius:.4rem">Tháng</button>
-              <button id="dash-att-year" onclick="dashToggle('att','year')" class="btn btn-sm btn-secondary" style="font-size:.62rem;padding:.25rem .55rem;border-radius:.4rem">Năm</button>
+            <div style="display:flex;gap:.35rem;align-items:center">
+              <select id="dash-att-month-sel" onchange="dashPickerChange('att')" style="font-size:.68rem;padding:.2rem .4rem;border-radius:.4rem;border:1.5px solid var(--border);background:var(--surface);color:var(--text-1);cursor:pointer;max-width:90px"></select>
+              <select id="dash-att-year-sel" onchange="dashPickerChange('att')" style="font-size:.68rem;padding:.2rem .4rem;border-radius:.4rem;border:1.5px solid var(--border);background:var(--surface);color:var(--text-1);cursor:pointer;max-width:72px"></select>
             </div>
           </div>
           <div id="top-att"></div>
@@ -2769,28 +2769,59 @@ function closeMobDrawer() {
 const _origToggleDark = typeof toggleDark === 'function' ? toggleDark : null;
 
 // ============ DASHBOARD ============
-const _dashMode = { leave: 'month', warn: 'month', att: 'month' };
+// _dashMode stores { leave/warn/att: { month: 1-12 or 0=all, year: 2025 } }
+const _dashMode = {
+  leave: { month: new Date().getMonth() + 1, year: new Date().getFullYear() },
+  warn:  { month: new Date().getMonth() + 1, year: new Date().getFullYear() },
+  att:   { month: new Date().getMonth() + 1, year: new Date().getFullYear() },
+};
 
-function dashToggle(card, mode) {
-  _dashMode[card] = mode;
-  // update button styles
-  const colors = { leave: '#059669,#10b981', warn: '#ea580c,#f97316', att: '#7c3aed,#8b5cf6' };
-  const grad = colors[card];
-  const activeBtn = document.getElementById(`dash-${card}-${mode}`);
-  const inactiveBtn = document.getElementById(`dash-${card}-${mode === 'month' ? 'year' : 'month'}`);
-  if (activeBtn) { activeBtn.style.background = `linear-gradient(135deg,${grad})`; activeBtn.style.color = '#fff'; activeBtn.classList.remove('btn-secondary'); }
-  if (inactiveBtn) { inactiveBtn.style.background = ''; inactiveBtn.style.color = ''; inactiveBtn.classList.add('btn-secondary'); }
+const _dashMonthNames = ['Tất cả','Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
+
+function initDashPickers() {
+  const now = new Date();
+  const curYear = now.getFullYear();
+  const years = [];
+  for (let y = curYear; y >= curYear - 4; y--) years.push(y);
+
+  ['leave','warn','att'].forEach(card => {
+    const mSel = document.getElementById(`dash-${card}-month-sel`);
+    const ySel = document.getElementById(`dash-${card}-year-sel`);
+    if (!mSel || !ySel) return;
+
+    // Month options: 0 = Tất cả, 1-12
+    mSel.innerHTML = _dashMonthNames.map((n, i) =>
+      `<option value="${i}" ${i === _dashMode[card].month ? 'selected' : ''}>${n}</option>`
+    ).join('');
+
+    // Year options
+    ySel.innerHTML = years.map(y =>
+      `<option value="${y}" ${y === _dashMode[card].year ? 'selected' : ''}>${y}</option>`
+    ).join('');
+  });
+}
+
+function dashPickerChange(card) {
+  const mSel = document.getElementById(`dash-${card}-month-sel`);
+  const ySel = document.getElementById(`dash-${card}-year-sel`);
+  _dashMode[card].month = parseInt(mSel.value);
+  _dashMode[card].year  = parseInt(ySel.value);
   if (card === 'leave') renderTopLeave();
   else if (card === 'warn') renderTopWarn();
   else if (card === 'att') renderTopAtt();
 }
 
-function _dashFilterDate(dateStr, mode) {
+// Keep dashToggle as no-op for backward compat (buttons removed but just in case)
+function dashToggle(card, mode) {}
+
+function _dashFilterDate(dateStr, card) {
   if (!dateStr) return false;
-  const now = new Date();
-  const d = new Date(dateStr + (dateStr.length === 7 ? '-01' : ''));
-  if (mode === 'month') return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
-  return d.getFullYear() === now.getFullYear();
+  const { month, year } = _dashMode[card];
+  const d = new Date(dateStr.length <= 7 ? dateStr + '-01' : dateStr);
+  if (isNaN(d)) return false;
+  if (d.getFullYear() !== year) return false;
+  if (month === 0) return true; // Tất cả tháng trong năm
+  return d.getMonth() + 1 === month;
 }
 
 function _topRow(name, val, label, rank, grad) {
@@ -2814,9 +2845,8 @@ function _activeEmpIds() {
 }
 
 function renderTopLeave() {
-  const mode = _dashMode.leave;
   const activeIds = _activeEmpIds();
-  const filtered = S.leaves.filter(l => _dashFilterDate(l.month, mode) && activeIds.has(l.employee_id));
+  const filtered = S.leaves.filter(l => _dashFilterDate(l.month, 'leave') && activeIds.has(l.employee_id));
   const map = {};
   filtered.forEach(l => {
     const id = l.employee_id;
@@ -2830,9 +2860,8 @@ function renderTopLeave() {
 }
 
 function renderTopWarn() {
-  const mode = _dashMode.warn;
   const activeIds = _activeEmpIds();
-  const filtered = S.warnings.filter(w => _dashFilterDate(w.warn_date || w.created_at, mode) && activeIds.has(w.employee_id));
+  const filtered = S.warnings.filter(w => _dashFilterDate(w.warning_date || w.warn_date || w.created_at, 'warn') && activeIds.has(w.employee_id));
   const map = {};
   filtered.forEach(w => {
     const id = w.employee_id;
@@ -2846,9 +2875,8 @@ function renderTopWarn() {
 }
 
 function renderTopAtt() {
-  const mode = _dashMode.att;
   const activeIds = _activeEmpIds();
-  const filtered = S.attendance.filter(a => _dashFilterDate(a.date || a.att_date || a.created_at, mode) && activeIds.has(a.employee_id));
+  const filtered = S.attendance.filter(a => _dashFilterDate(a.date || a.att_date || a.created_at, 'att') && activeIds.has(a.employee_id));
   const map = {};
   filtered.forEach(a => {
     const id = a.employee_id;
@@ -2862,6 +2890,7 @@ function renderTopAtt() {
 }
 
 function renderDash() {
+  initDashPickers();
   renderTopLeave();
   renderTopWarn();
   renderTopAtt();
