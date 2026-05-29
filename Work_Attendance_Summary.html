@@ -895,8 +895,8 @@ tr:hover td{background:rgba(13,148,136,.03)}
   }
   #s-calendar #sch-month{ max-width:110px !important; font-size:.8rem !important; }
   #s-calendar #sch-year{ max-width:82px !important; font-size:.8rem !important; }
-  /* Hide legend on mobile to save space */
-  #s-calendar .flex.flex-wrap.gap-1\\.5.ml-auto{ display:none !important; }
+  /* Legend on mobile: compact grid */
+  #sch-legend{ margin-left:0 !important; display:grid !important; grid-template-columns:repeat(4,auto); justify-content:start; gap:.22rem !important; }
   #s-calendar #btn-rules{ display:none !important; }
 }
 
@@ -1652,14 +1652,15 @@ CREATE TABLE hr_leave_requests (<br>
           <span>⚡</span> Khởi tạo tháng
         </button>
         <!-- Legend -->
-        <div class="flex flex-wrap gap-1.5 ml-auto items-center">
-          <span style="display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;background:#e0f2fe;color:#0369a1;font-weight:700">x Office</span>
-          <span style="display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;background:#dcfce7;color:#15803d;font-weight:700">w WFH</span>
-          <span style="display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;background:#fef9c3;color:#854d0e;font-weight:700">o Nghỉ phép</span>
-          <span style="display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;background:#fce7f3;color:#9d174d;font-weight:700">ph Lễ</span>
-          <span style="display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;background:#f3e8ff;color:#7e22ce;font-weight:700">xo/wo Nửa ngày</span>
-          <span style="display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;background:#fee2e2;color:#991b1b;font-weight:700">om/oa Off buổi</span>
-          <span id="btn-rules" class="hidden btn btn-secondary btn-sm" onclick="toggleRulesPanel()" style="font-size:.7rem;padding:.3rem .7rem;cursor:pointer">⚙️ Quy tắc</span>
+        <div id="sch-legend" style="display:flex;flex-wrap:wrap;gap:.3rem;align-items:center;margin-left:auto">
+          <span style="display:inline-flex;align-items:center;font-size:.65rem;padding:.15rem .45rem;border-radius:999px;background:#e0f2fe;color:#0369a1;font-weight:700;white-space:nowrap">x Office</span>
+          <span style="display:inline-flex;align-items:center;font-size:.65rem;padding:.15rem .45rem;border-radius:999px;background:#dcfce7;color:#15803d;font-weight:700;white-space:nowrap">w WFH</span>
+          <span style="display:inline-flex;align-items:center;font-size:.65rem;padding:.15rem .45rem;border-radius:999px;background:#fef9c3;color:#854d0e;font-weight:700;white-space:nowrap">o Nghỉ phép</span>
+          <span style="display:inline-flex;align-items:center;font-size:.65rem;padding:.15rem .45rem;border-radius:999px;background:#fce7f3;color:#9d174d;font-weight:700;white-space:nowrap">ph Lễ</span>
+          <span style="display:inline-flex;align-items:center;font-size:.65rem;padding:.15rem .45rem;border-radius:999px;background:#f3e8ff;color:#7e22ce;font-weight:700;white-space:nowrap">xo/wo Nửa ngày</span>
+          <span style="display:inline-flex;align-items:center;font-size:.65rem;padding:.15rem .45rem;border-radius:999px;background:#fee2e2;color:#991b1b;font-weight:700;white-space:nowrap">om/oa Off buổi</span>
+          <span style="display:inline-flex;align-items:center;font-size:.65rem;padding:.15rem .45rem;border-radius:999px;background:#ffd7b5;color:#7c2d12;border:1.5px solid #fb923c;font-weight:700;white-space:nowrap">u Nghỉ KL</span>
+          <span id="btn-rules" class="hidden btn btn-secondary btn-sm" onclick="toggleRulesPanel()" style="font-size:.65rem;padding:.3rem .7rem;cursor:pointer">⚙️ Quy tắc</span>
         </div>
       </div>
 
@@ -4028,7 +4029,7 @@ const SCH_STYLE = {
   xw: { bg:'#e9d5ff', color:'#4c1d95', border:'#c4b5fd', label:'xw' },
   om: { bg:'#fecaca', color:'#7f1d1d', border:'#fca5a5', label:'om' },
   oa: { bg:'#fecaca', color:'#7f1d1d', border:'#fca5a5', label:'oa' },
-  u:  { bg:'#f3e8ff', color:'#6b21a8', border:'#d8b4fe', label:'u' },
+  u:  { bg:'#ffd7b5', color:'#7c2d12', border:'#fb923c', label:'u' },
 };
 
 const DOW_VI = ['CN','T2','T3','T4','T5','T6','T7'];
