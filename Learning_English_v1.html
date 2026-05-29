@@ -2694,22 +2694,20 @@ const SB_URL=window.__cfg(0),SB_KEY=window.__cfg(1);
 const sb = supabase.createClient(SB_URL, SB_KEY);
 
 /*
-  ╔══════════════════════════════════════════════════════╗
-  ║  MIGRATION: Chạy SQL này trong Supabase SQL Editor  ║
-  ╠══════════════════════════════════════════════════════╣
-  ║  CREATE TABLE IF NOT EXISTS lesson_completions (     ║
-  ║    id SERIAL PRIMARY KEY,                            ║
-  ║    user_id UUID NOT NULL,                            ║
-  ║    lesson_id INTEGER NOT NULL,                       ║
-  ║    date DATE NOT NULL,                               ║
-  ║    completed_at TIMESTAMPTZ DEFAULT NOW(),           ║
-  ║    UNIQUE(user_id, lesson_id, date)                  ║
-  ║  );                                                  ║
-  ║  ALTER TABLE lesson_completions                      ║
-  ║    ENABLE ROW LEVEL SECURITY;                        ║
-  ║  CREATE POLICY "all_access" ON lesson_completions    ║
-  ║    FOR ALL USING (true) WITH CHECK (true);           ║
-  ╚══════════════════════════════════════════════════════╝
+  ╔══════════════════════════════════════════════════════════════════════════╗
+  ║  MIGRATION: Chạy SQL này trong Supabase SQL Editor                      ║
+  ╠══════════════════════════════════════════════════════════════════════════╣
+  ║  -- ĐỔI UNIQUE CONSTRAINT: từ (user,lesson,date) → (user,lesson,sched)  ║
+  ║  ALTER TABLE lesson_completions                                          ║
+  ║    DROP CONSTRAINT IF EXISTS                                             ║
+  ║    lesson_completions_user_id_lesson_id_date_key;                        ║
+  ║  ALTER TABLE lesson_completions                                          ║
+  ║    DROP CONSTRAINT IF EXISTS                                             ║
+  ║    lesson_completions_user_lesson_sched_key;                             ║
+  ║  ALTER TABLE lesson_completions                                          ║
+  ║    ADD CONSTRAINT lesson_completions_user_lesson_sched_key               ║
+  ║    UNIQUE(user_id, lesson_id, scheduled_date);                           ║
+  ╚══════════════════════════════════════════════════════════════════════════╝
 */
 
 /* ── Supabase B: bảng nhan_su (HR system) ── */
@@ -3896,6 +3894,7 @@ async function endLesson() {
 
   const lessonId = activeSession.lesson.id;
   const dateStr  = activeSession.scheduledDate || todayStr(); // ghi đúng ngày bài được giao
+  const today    = todayStr();
 
   // 1. Cập nhật learning_sessions
   await sb.from('learning_sessions').update({
@@ -3905,7 +3904,7 @@ async function endLesson() {
   // 2. Ghi nhận hoàn thành bài học — dùng insert thay vì upsert để tránh lỗi constraint
   const { error: compErr } = await sb.from('lesson_completions').insert({
     user_id: currentUser.id, lesson_id: lessonId,
-    date: todayStr(),           // ngày thực tế hoàn thành
+    date: today,                // ngày thực tế hoàn thành
     scheduled_date: dateStr,    // ngày bài được giao (từ lesson_schedules)
     completed_at: new Date().toISOString()
   });
@@ -3913,6 +3912,7 @@ async function endLesson() {
   if (compErr && compErr.code !== '23505') {
     console.error('[lesson_completions] insert error:', compErr.code, compErr.message);
   }
+
 
   closeLessonModal();
   btn.disabled = false;
