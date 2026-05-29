@@ -1560,6 +1560,7 @@ CREATE TABLE hr_leave_requests (<br>
             <thead><tr>
               <th>#</th><th>Nhân viên</th><th>Lần</th><th>Loại</th>
               <th>Ngày warning</th><th>Lý do</th><th>Ngày gỡ</th><th>Trạng thái</th>
+              <th>Đính kèm</th>
               <th id="th-warn-action" style="display:none">Thao tác</th>
             </tr></thead>
             <tbody id="warn-body"></tbody>
@@ -1781,7 +1782,7 @@ CREATE TABLE hr_leave_requests (<br>
 
 <!-- Warning Modal -->
 <div id="m-warn" class="modal-bd hidden">
-  <div class="modal-box fade" onclick="event.stopPropagation()">
+  <div class="modal-box fade" onclick="event.stopPropagation()" style="max-width:580px">
     <h3 class="font-extrabold text-lg mb-5 tracking-tight" style="color:var(--text-1)">Warning</h3>
     <input type="hidden" id="mw-id">
     <div class="space-y-4">
@@ -1801,10 +1802,46 @@ CREATE TABLE hr_leave_requests (<br>
       <div><label class="label">Ngày warning *</label><input id="mw-date" type="date" class="input"></div>
       <div><label class="label">Lý do</label><textarea id="mw-reason" class="input" rows="2"></textarea></div>
       <div><label class="label">Ngày gỡ (nếu đã gỡ)</label><input id="mw-resolve" type="date" class="input"></div>
+
+      <!-- FILE UPLOAD SECTION -->
+      <div>
+        <label class="label">📎 Đính kèm (ảnh, mail, file...)</label>
+        <div id="mw-dropzone"
+          onclick="document.getElementById('mw-files').click()"
+          ondragover="event.preventDefault();this.style.borderColor='var(--indigo)';this.style.background='rgba(13,148,136,.06)'"
+          ondragleave="this.style.borderColor='';this.style.background=''"
+          ondrop="event.preventDefault();this.style.borderColor='';this.style.background='';handleWarnFileDrop(event)"
+          style="border:2px dashed var(--border);border-radius:.75rem;padding:1.1rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface2)">
+          <div style="font-size:1.6rem;margin-bottom:.3rem">📤</div>
+          <div style="font-size:.8rem;font-weight:600;color:var(--text-2)">Kéo thả hoặc click để chọn file</div>
+          <div style="font-size:.7rem;color:var(--text-3);margin-top:.2rem">Ảnh, PDF, Word, Email (.eml, .msg) — tối đa 10MB/file</div>
+        </div>
+        <input type="file" id="mw-files" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.eml,.msg,.txt" style="display:none" onchange="handleWarnFileSelect(this)">
+
+        <!-- Existing attachments (when editing) -->
+        <div id="mw-existing-files" style="display:none;margin-top:.6rem">
+          <div style="font-size:.7rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.4rem">File đã lưu</div>
+          <div id="mw-existing-list" style="display:flex;flex-wrap:wrap;gap:.45rem"></div>
+        </div>
+
+        <!-- New files to upload -->
+        <div id="mw-new-files" style="display:none;margin-top:.6rem">
+          <div style="font-size:.7rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.4rem">File sẽ upload</div>
+          <div id="mw-new-list" style="display:flex;flex-wrap:wrap;gap:.45rem"></div>
+        </div>
+
+        <!-- Upload progress -->
+        <div id="mw-upload-progress" style="display:none;margin-top:.5rem">
+          <div style="font-size:.75rem;color:var(--indigo);font-weight:600;margin-bottom:.3rem" id="mw-upload-status">Đang upload...</div>
+          <div style="background:var(--surface3);border-radius:999px;height:.4rem;overflow:hidden">
+            <div id="mw-upload-bar" style="height:100%;background:linear-gradient(90deg,#0d9488,#14b8a6);border-radius:999px;width:0%;transition:width .3s"></div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="flex gap-2.5 mt-6 justify-end">
       <button onclick="closeModal('m-warn')" class="btn btn-secondary">Hủy</button>
-      <button onclick="saveWarn()" class="btn btn-primary">Lưu</button>
+      <button onclick="saveWarn()" id="mw-save-btn" class="btn btn-primary">Lưu</button>
     </div>
   </div>
 </div>
@@ -3379,9 +3416,10 @@ function renderWarn() {
       <td style="max-width:260px;white-space:normal;font-size:.75rem;color:var(--text-2)">${w.reason || '—'}</td>
       <td style="color:var(--text-2)">${w.resolve_date ? fmtD(w.resolve_date) : '—'}</td>
       <td>${w.resolve_date ? '<span class="badge bg-green">Đã gỡ</span>' : '<span class="badge bg-red">Active</span>'}</td>
+      <td>${(w.attachments||[]).length ? `<button onclick="showWarnAttachments(event,'${w.id}')" style="display:inline-flex;align-items:center;gap:.3rem;background:var(--indigo-light);color:var(--indigo);border:1px solid rgba(13,148,136,.2);border-radius:.45rem;padding:.2rem .55rem;font-size:.7rem;font-weight:700;cursor:pointer;white-space:nowrap"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>${w.attachments.length}</button>` : '<span style="color:var(--text-3)">—</span>'}</td>
       ${actionCell}
     </tr>`;
-  }).join('') : emptyRow(S.isAdmin ? 9 : 8);
+  }).join('') : emptyRow(S.isAdmin ? 10 : 9);
   renderGenericPager('warn-pager', totalItems, _warnPage, 'gotoWarnPage', 'warning');
 
   // Mobile card list
@@ -3404,11 +3442,30 @@ function renderWarn() {
           ${w.resolve_date ? `<div class="mob-row-card-field"><span class="mob-row-card-label">Ngày gỡ</span><span class="mob-row-card-val">${fmtD(w.resolve_date)}</span></div>` : ''}
         </div>
         ${w.reason ? `<div class="mob-row-card-reason">${w.reason}</div>` : ''}
+        ${(w.attachments||[]).length ? `<div style="padding:.3rem .75rem .5rem;display:flex;flex-wrap:wrap;gap:.35rem">
+          ${(w.attachments||[]).map(a => {
+            const ext = (a.name||'').split('.').pop().toLowerCase();
+            const isImg = ['jpg','jpeg','png','gif','webp','svg'].includes(ext);
+            const icon = warnFileIcon(a.name||'');
+            const action = a.url ? (isImg
+              ? `onclick="warnPreviewImage('${a.url}','${a.name}')"`
+              : `onclick="window.open('${a.url}','_blank')"`)
+              : '';
+            return `<button ${action} style="display:inline-flex;align-items:center;gap:.3rem;background:var(--indigo-light);color:var(--indigo);border:1px solid rgba(13,148,136,.2);border-radius:.45rem;padding:.25rem .6rem;font-size:.72rem;font-weight:600;cursor:pointer;max-width:180px">
+              <span style="flex-shrink:0">${icon}</span>
+              <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(a.name||'').substring(0,22)}</span>
+            </button>`;
+          }).join('')}
+        </div>` : ''}
         ${actions}
       </div>`;
     }).join('') : `<div style="text-align:center;padding:2rem;color:var(--text-3);font-size:.85rem;font-weight:500">Không có dữ liệu</div>`;
   }
 }
+
+// ── Warning file upload state ──
+let _warnNewFiles = []; // File objects to upload
+let _warnDeleteFiles = []; // existing file paths to delete
 
 function openWarnModal(id) {
   const w = id ? S.warnings.find(x => x.id === id) : null;
@@ -3419,7 +3476,206 @@ function openWarnModal(id) {
   document.getElementById('mw-date').value = w?.warning_date || '';
   document.getElementById('mw-reason').value = w?.reason || '';
   document.getElementById('mw-resolve').value = w?.resolve_date || '';
+
+  // Reset file state
+  _warnNewFiles = [];
+  _warnDeleteFiles = [];
+  document.getElementById('mw-files').value = '';
+  document.getElementById('mw-new-files').style.display = 'none';
+  document.getElementById('mw-new-list').innerHTML = '';
+  document.getElementById('mw-upload-progress').style.display = 'none';
+
+  // Show existing attachments if editing
+  const existDiv = document.getElementById('mw-existing-files');
+  const existList = document.getElementById('mw-existing-list');
+  const attachments = w?.attachments || [];
+  if (attachments.length) {
+    existList.innerHTML = attachments.map(a => warnFileChip(a, true)).join('');
+    existDiv.style.display = 'block';
+  } else {
+    existList.innerHTML = '';
+    existDiv.style.display = 'none';
+  }
+
   openModal('m-warn');
+}
+
+function warnFileIcon(name) {
+  const ext = (name || '').split('.').pop().toLowerCase();
+  if (['jpg','jpeg','png','gif','webp','svg'].includes(ext)) return '🖼️';
+  if (ext === 'pdf') return '📄';
+  if (['doc','docx'].includes(ext)) return '📝';
+  if (['xls','xlsx'].includes(ext)) return '📊';
+  if (['eml','msg'].includes(ext)) return '📧';
+  return '📎';
+}
+
+function warnFileChip(attachment, isExisting = false) {
+  const name = attachment.name || (typeof attachment === 'string' ? attachment.split('/').pop() : '');
+  const url = attachment.url || null;
+  const path = attachment.path || attachment;
+  const icon = warnFileIcon(name);
+  const ext = (name || '').split('.').pop().toLowerCase();
+  const isImage = ['jpg','jpeg','png','gif','webp','svg'].includes(ext);
+
+  const removeOnclick = isExisting
+    ? `removeExistingWarnFile('${path}', this)`
+    : `removeNewWarnFile('${attachment.__idx}', this)`;
+
+  // Click on file name/icon: open image inline, or open URL in new tab
+  let fileOnclick = '';
+  if (url) {
+    if (isImage) {
+      fileOnclick = `onclick="warnPreviewImage('${url}','${name}')"`;
+    } else {
+      fileOnclick = `onclick="window.open('${url}','_blank')"`;
+    }
+  }
+
+  return `<div style="display:inline-flex;align-items:center;gap:.35rem;background:var(--surface3);border:1px solid var(--border);border-radius:.5rem;padding:.25rem .55rem;font-size:.72rem;font-weight:600;color:var(--text-1);max-width:200px">
+    <span ${fileOnclick} style="display:flex;align-items:center;gap:.3rem;overflow:hidden;${url ? 'cursor:pointer' : ''};" title="${name}">
+      <span>${icon}</span>
+      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px">${name}</span>
+    </span>
+    <button onclick="${removeOnclick}" style="background:none;border:none;cursor:pointer;color:var(--text-3);font-size:.8rem;padding:0;flex-shrink:0;line-height:1" title="Xóa">✕</button>
+  </div>`;
+}
+
+function warnPreviewImage(url, name) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;cursor:zoom-out';
+  overlay.onclick = () => overlay.remove();
+  overlay.innerHTML = `
+    <div style="color:#fff;font-size:.8rem;opacity:.7;max-width:90vw;text-align:center">${name}</div>
+    <img src="${url}" style="max-width:90vw;max-height:82vh;border-radius:.75rem;box-shadow:0 8px 40px rgba(0,0,0,.6);object-fit:contain" onclick="event.stopPropagation()">
+    <div style="color:rgba(255,255,255,.5);font-size:.72rem">Click bên ngoài để đóng</div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function showWarnAttachments(event, warnId) {
+  event.stopPropagation();
+  // Remove existing popup
+  document.querySelectorAll('.warn-attach-popup').forEach(el => el.remove());
+
+  const w = S.warnings.find(x => x.id === warnId);
+  const attachments = w?.attachments || [];
+  if (!attachments.length) return;
+
+  const btn = event.currentTarget;
+  const rect = btn.getBoundingClientRect();
+
+  const popup = document.createElement('div');
+  popup.className = 'warn-attach-popup';
+  popup.style.cssText = `position:fixed;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:.75rem;box-shadow:0 8px 32px rgba(0,0,0,.15);padding:.6rem;min-width:220px;max-width:300px`;
+
+  // Position below button
+  const top = rect.bottom + 6;
+  const left = Math.min(rect.left, window.innerWidth - 310);
+  popup.style.top = top + 'px';
+  popup.style.left = left + 'px';
+
+  const ext = name => (name||'').split('.').pop().toLowerCase();
+  const isImg = name => ['jpg','jpeg','png','gif','webp','svg'].includes(ext(name));
+
+  popup.innerHTML = `
+    <div style="font-size:.65rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.45rem;padding:0 .25rem">📎 ${attachments.length} file đính kèm</div>
+    ${attachments.map(a => {
+      const name = a.name || '';
+      const url = a.url || '';
+      const icon = warnFileIcon(name);
+      const action = url ? (isImg(name)
+        ? `onclick="warnPreviewImage('${url}','${name}');document.querySelectorAll('.warn-attach-popup').forEach(el=>el.remove())"`
+        : `onclick="window.open('${url}','_blank')"`)
+        : '';
+      return `<div ${action} style="display:flex;align-items:center;gap:.5rem;padding:.4rem .5rem;border-radius:.5rem;cursor:${url?'pointer':'default'};transition:background .15s" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">
+        <span style="font-size:1rem;flex-shrink:0">${icon}</span>
+        <span style="font-size:.75rem;font-weight:500;color:var(--text-1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1" title="${name}">${name}</span>
+        ${url ? `<span style="font-size:.65rem;color:var(--indigo);flex-shrink:0">${isImg(name)?'Xem':'Mở'} ↗</span>` : ''}
+      </div>`;
+    }).join('')}
+  `;
+
+  document.body.appendChild(popup);
+
+  // Close on outside click
+  setTimeout(() => {
+    document.addEventListener('click', function handler() {
+      popup.remove();
+      document.removeEventListener('click', handler);
+    });
+  }, 50);
+}
+
+function handleWarnFileSelect(input) {
+  addWarnFiles([...input.files]);
+  input.value = '';
+}
+
+function handleWarnFileDrop(e) {
+  const files = [...(e.dataTransfer?.files || [])];
+  addWarnFiles(files);
+}
+
+function addWarnFiles(files) {
+  const MAX = 10 * 1024 * 1024; // 10MB
+  files.forEach((f, i) => {
+    if (f.size > MAX) { toast(`File "${f.name}" vượt 10MB, bỏ qua.`, 'warn'); return; }
+    f.__idx = Date.now() + i + Math.random();
+    _warnNewFiles.push(f);
+  });
+  renderNewWarnFiles();
+}
+
+function renderNewWarnFiles() {
+  const wrap = document.getElementById('mw-new-files');
+  const list = document.getElementById('mw-new-list');
+  if (!_warnNewFiles.length) { wrap.style.display = 'none'; list.innerHTML = ''; return; }
+  list.innerHTML = _warnNewFiles.map(f => warnFileChip(f, false)).join('');
+  wrap.style.display = 'block';
+}
+
+function removeNewWarnFile(idx, btn) {
+  _warnNewFiles = _warnNewFiles.filter(f => String(f.__idx) !== String(idx));
+  renderNewWarnFiles();
+}
+
+function removeExistingWarnFile(path, btn) {
+  _warnDeleteFiles.push(path);
+  btn.closest('div[style]').remove();
+  const existList = document.getElementById('mw-existing-list');
+  if (!existList.children.length) document.getElementById('mw-existing-files').style.display = 'none';
+}
+
+async function uploadWarnFiles(warnId, empName) {
+  if (!_warnNewFiles.length) return [];
+  const uploadedPaths = [];
+  const total = _warnNewFiles.length;
+  const progBar = document.getElementById('mw-upload-bar');
+  const progStatus = document.getElementById('mw-upload-status');
+  document.getElementById('mw-upload-progress').style.display = 'block';
+
+  for (let i = 0; i < total; i++) {
+    const file = _warnNewFiles[i];
+    progStatus.textContent = `Đang upload ${i+1}/${total}: ${file.name}`;
+    progBar.style.width = `${Math.round((i/total)*100)}%`;
+
+    const safeEmp = (empName || 'unknown').replace(/[^a-zA-Z0-9_\-]/g, '_').substring(0, 40);
+    const ext = file.name.includes('.') ? file.name.split('.').pop() : 'bin';
+    const baseName = file.name.replace(/[^a-zA-Z0-9_\-\.]/g, '_').substring(0, 60);
+    const path = `${safeEmp}/${warnId}/${Date.now()}_${baseName}`;
+
+    const { data, error } = await db.storage.from('Mail_Warning').upload(path, file, { upsert: true });
+    if (error) { toast(`Upload lỗi "${file.name}": ${error.message}`, 'error'); continue; }
+
+    const { data: urlData } = db.storage.from('Mail_Warning').getPublicUrl(path);
+    uploadedPaths.push({ name: file.name, path: data.path || path, url: urlData?.publicUrl || '' });
+  }
+
+  progBar.style.width = '100%';
+  progStatus.textContent = `✓ Upload xong ${uploadedPaths.length}/${total} file`;
+  setTimeout(() => { document.getElementById('mw-upload-progress').style.display = 'none'; }, 1800);
+  return uploadedPaths;
 }
 
 async function saveWarn() {
@@ -3428,24 +3684,82 @@ async function saveWarn() {
   const date = document.getElementById('mw-date').value;
   if (!empId || !date) { toast('Chọn nhân viên và ngày!', 'error'); return; }
   const emp = S.employees.find(e => e.id === empId);
-  const data = {
-    employee_id: empId,
-    employee_name: emp?.name || '',
-    warning_number: parseInt(document.getElementById('mw-num').value) || 1,
-    warning_type: document.getElementById('mw-type').value,
-    warning_date: date,
-    reason: document.getElementById('mw-reason').value.trim() || null,
-    resolve_date: document.getElementById('mw-resolve').value || null,
-  };
-  const { error } = id
-    ? await db.from('hr_warning_records').update(data).eq('id', id)
-    : await db.from('hr_warning_records').insert(data);
-  if (error) { toast('Lỗi: ' + error.message, 'error'); return; }
-  toast('Đã lưu', 'success'); closeModal('m-warn');
-  await loadAll(); renderWarn();
+
+  const saveBtn = document.getElementById('mw-save-btn');
+  saveBtn.disabled = true;
+  saveBtn.innerHTML = '<span class="spinner"></span> Đang lưu...';
+
+  try {
+    // Determine record ID (for new records, we need to insert first to get the ID)
+    let recordId = id;
+    let existingAttachments = [];
+
+    if (id) {
+      // Editing: get current attachments
+      const existing = S.warnings.find(x => x.id === id);
+      existingAttachments = existing?.attachments || [];
+      // Remove deleted files from existing list
+      existingAttachments = existingAttachments.filter(a => !_warnDeleteFiles.includes(a.path || a));
+    } else {
+      // Insert first to get the ID, then update with attachments
+      const initData = {
+        employee_id: empId,
+        employee_name: emp?.name || '',
+        warning_number: parseInt(document.getElementById('mw-num').value) || 1,
+        warning_type: document.getElementById('mw-type').value,
+        warning_date: date,
+        reason: document.getElementById('mw-reason').value.trim() || null,
+        resolve_date: document.getElementById('mw-resolve').value || null,
+        attachments: [],
+      };
+      const { data: inserted, error: insErr } = await db.from('hr_warning_records').insert(initData).select().single();
+      if (insErr) { toast('Lỗi: ' + insErr.message, 'error'); return; }
+      recordId = inserted.id;
+    }
+
+    // Upload new files
+    const newUploads = await uploadWarnFiles(recordId, emp?.name || empId);
+
+    // Delete removed files from storage
+    if (_warnDeleteFiles.length) {
+      await db.storage.from('Mail_Warning').remove(_warnDeleteFiles);
+    }
+
+    const allAttachments = [...existingAttachments, ...newUploads];
+
+    const data = {
+      employee_id: empId,
+      employee_name: emp?.name || '',
+      warning_number: parseInt(document.getElementById('mw-num').value) || 1,
+      warning_type: document.getElementById('mw-type').value,
+      warning_date: date,
+      reason: document.getElementById('mw-reason').value.trim() || null,
+      resolve_date: document.getElementById('mw-resolve').value || null,
+      attachments: allAttachments,
+    };
+
+    const { error } = id
+      ? await db.from('hr_warning_records').update(data).eq('id', id)
+      : await db.from('hr_warning_records').update(data).eq('id', recordId);
+
+    if (error) { toast('Lỗi: ' + error.message, 'error'); return; }
+    toast('Đã lưu' + (newUploads.length ? ` + ${newUploads.length} file đính kèm` : ''), 'success');
+    closeModal('m-warn');
+    await loadAll(); renderWarn();
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Lưu';
+  }
 }
 
 async function doDelWarn(id) {
+  // Delete attachments from storage too
+  const w = S.warnings.find(x => x.id === id);
+  const attachments = w?.attachments || [];
+  if (attachments.length) {
+    const paths = attachments.map(a => a.path || a).filter(Boolean);
+    if (paths.length) await db.storage.from('Mail_Warning').remove(paths);
+  }
   await db.from('hr_warning_records').delete().eq('id', id);
   toast('Đã xóa', 'success'); await loadAll(); renderWarn();
 }
