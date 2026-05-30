@@ -3166,14 +3166,7 @@ select {
           </div>
           <div>
             <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Bài học <span style="color:var(--teal)">(chọn nhiều)</span></label>
-            <div style="position:relative;margin-top:8px">
-              <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-sub);font-size:14px;pointer-events:none">🔍</span>
-              <input type="text" id="assign-search" placeholder="Tìm tên bài học..." oninput="renderAssignLessonList(document.getElementById('assign-date').value)"
-                style="width:100%;padding:8px 12px 8px 32px;border-radius:8px;border:1.5px solid var(--border);font-size:14px;background:#fff;outline:none;transition:border-color .15s"
-                onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
-            </div>
-            <div id="assign-type-tabs" style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px"></div>
-            <div id="assign-lessons-list" style="margin-top:8px;display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;padding:4px 0"></div>
+            <div id="assign-lessons-list" style="margin-top:8px;display:flex;flex-direction:column;gap:6px;max-height:240px;overflow-y:auto;padding:4px 0"></div>
           </div>
           <p style="font-size:12px;color:var(--text-muted);background:var(--teal-glass);padding:8px 12px;border-radius:8px">📢 Bài học sẽ được phân công cho <strong>tất cả nhân viên</strong></p>
         </div>
@@ -3568,6 +3561,17 @@ select {
       <div class="table-section-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border-light);margin:0">
         <h2>📘 Quản lý bài học</h2>
         <button class="btn btn-primary btn-sm" onclick="openLessonMgmtModal()">+ Thêm bài học</button>
+      </div>
+      <!-- Search + Filter bar -->
+      <div style="padding:12px 20px;border-bottom:1px solid var(--border-light);display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:var(--bg)">
+        <div style="position:relative;flex:1;min-width:180px;max-width:280px">
+          <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-sub);font-size:14px;pointer-events:none">🔍</span>
+          <input type="text" id="lesson-mgmt-search" placeholder="Tìm tên bài học..."
+            oninput="filterLessonMgmt()"
+            style="width:100%;padding:7px 12px 7px 32px;border-radius:8px;border:1.5px solid var(--border);font-size:14px;background:#fff;outline:none;transition:border-color .15s"
+            onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+        </div>
+        <div id="lesson-mgmt-tabs" style="display:flex;flex-wrap:wrap;gap:5px"></div>
       </div>
       <div class="table-wrap" style="margin:0;border-radius:0;box-shadow:none;border:none">
         <table>
@@ -5580,72 +5584,12 @@ function renderAssignPage() {
   renderPagination('assign-pagination', total, assignPage);
 }
 
-async function openAssignModal() {
-  const dateVal = todayStr();
-  document.getElementById('assign-date').value = dateVal;
+function openAssignModal() {
+  document.getElementById('assign-date').value = todayStr();
 
-  // Reset search và filter mỗi lần mở
-  _assignTypeFilter = 'ALL';
-  const searchEl = document.getElementById('assign-search');
-  if (searchEl) searchEl.value = '';
+  renderAssignLessonList(todayStr());
 
   document.getElementById('assign-modal').classList.remove('hidden');
-
-  // Fetch lại schedules từ Supabase để tránh cache cũ
-  const { data: freshSchedules } = await sb
-    .from('lesson_schedules')
-    .select('*,lessons(title,type)')
-    .order('date', { ascending: false });
-  allAssignSchedules = freshSchedules || [];
-
-  renderAssignLessonList(dateVal);
-}
-
-let _assignTypeFilter = 'ALL';
-
-const ASSIGN_TYPE_META = {
-  ALL:      { label: 'Tất cả',    badge: '',   color: 'var(--text)',    bg: 'var(--bg-2)' },
-  READING:  { label: 'Reading',   badge: '📖', color: '#1d4ed8',        bg: '#dbeafe' },
-  LISTENING:{ label: 'Listening', badge: '🎧', color: '#9333ea',        bg: '#f3e8ff' },
-  SPEAKING: { label: 'Speaking',  badge: '🎤', color: 'var(--teal)',    bg: 'var(--teal-light)' },
-  WRITING:  { label: 'Writing',   badge: '✍️', color: 'var(--teal)',    bg: '#e0f2fe' },
-  VOCAB:    { label: 'Vocab',     badge: '📚', color: '#c2410c',        bg: '#ffedd5' },
-  GRAMMAR:  { label: 'Grammar',   badge: '📝', color: '#15803d',        bg: '#dcfce7' },
-};
-
-function setAssignTypeFilter(type, btn) {
-  _assignTypeFilter = type;
-  document.querySelectorAll('.assign-tab-btn').forEach(b => {
-    const t = b.dataset.type;
-    const m = ASSIGN_TYPE_META[t] || ASSIGN_TYPE_META.ALL;
-    b.style.background = 'var(--bg-2)';
-    b.style.color = 'var(--text-muted)';
-    b.style.borderColor = 'transparent';
-    b.style.fontWeight = '500';
-  });
-  const m = ASSIGN_TYPE_META[type] || ASSIGN_TYPE_META.ALL;
-  btn.style.background = m.bg;
-  btn.style.color = m.color;
-  btn.style.borderColor = m.color;
-  btn.style.fontWeight = '700';
-  renderAssignLessonList(document.getElementById('assign-date').value);
-}
-
-function _buildAssignTypeTabs(types) {
-  const tabsEl = document.getElementById('assign-type-tabs');
-  if (!tabsEl) return;
-  const allTypes = ['ALL', ...types];
-  tabsEl.innerHTML = allTypes.map(t => {
-    const m = ASSIGN_TYPE_META[t] || ASSIGN_TYPE_META.ALL;
-    const isActive = _assignTypeFilter === t;
-    const bg    = isActive ? m.bg : 'var(--bg-2)';
-    const color = isActive ? m.color : 'var(--text-muted)';
-    const bord  = isActive ? m.color : 'transparent';
-    const fw    = isActive ? '700' : '500';
-    return `<button onclick="setAssignTypeFilter('${t}',this)" class="assign-tab-btn" data-type="${t}"
-      style="padding:4px 11px;border-radius:20px;border:1.5px solid ${bord};font-size:12px;font-weight:${fw};cursor:pointer;background:${bg};color:${color};transition:all .15s;font-family:var(--font-body)"
-    >${m.badge ? m.badge + ' ' : ''}${m.label}</button>`;
-  }).join('');
 }
 
 function renderAssignLessonList(date) {
@@ -5656,50 +5600,21 @@ function renderAssignLessonList(date) {
       .map(s => s.lesson_id)
   );
 
-  let available = allLessonsAdmin.filter(l => !assignedIds.has(l.id));
-
-  // Build type tabs based on available lessons
-  const presentTypes = [...new Set(available.map(l => l.type))].filter(Boolean).sort();
-  _buildAssignTypeTabs(presentTypes);
-
-  // Filter by type
-  if (_assignTypeFilter !== 'ALL') {
-    available = available.filter(l => l.type === _assignTypeFilter);
-  }
-
-  // Filter by search
-  const q = (document.getElementById('assign-search')?.value || '').trim().toLowerCase();
-  if (q) available = available.filter(l => l.title.toLowerCase().includes(q));
+  const available = allLessonsAdmin.filter(l => !assignedIds.has(l.id));
 
   const lList = document.getElementById('assign-lessons-list');
-
-  if (!allLessonsAdmin.filter(l => !assignedIds.has(l.id)).length) {
+  if (!available.length) {
     lList.innerHTML = `<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:13px;background:var(--bg-2);border-radius:8px">✅ Tất cả bài học đã được phân công cho ngày này.</div>`;
     return;
   }
 
-  if (!available.length) {
-    lList.innerHTML = `<div style="padding:14px;text-align:center;color:var(--text-muted);font-size:13px;background:var(--bg-2);border-radius:8px">Không tìm thấy bài học nào.</div>`;
-    return;
-  }
-
-  const typeMeta = {
-    READING:  { bg:'#dbeafe', color:'#1d4ed8' },
-    LISTENING:{ bg:'#f3e8ff', color:'#9333ea' },
-    SPEAKING: { bg:'var(--teal-light)', color:'var(--teal)' },
-    WRITING:  { bg:'#e0f2fe', color:'var(--teal)' },
-    VOCAB:    { bg:'#ffedd5', color:'#c2410c' },
-    GRAMMAR:  { bg:'#dcfce7', color:'#15803d' },
-  };
-
-  lList.innerHTML = available.map(l => {
-    const tm = typeMeta[l.type] || { bg:'var(--bg-2)', color:'var(--text-muted)' };
-    return `<label style="display:flex;align-items:center;gap:8px;padding:9px 11px;border-radius:8px;cursor:pointer;font-size:14px;border:1px solid var(--border-light);background:#fff;transition:background .15s" onmouseover="this.style.background='var(--teal-light)'" onmouseout="this.style.background='#fff'">
-      <input type="checkbox" value="${l.id}" class="assign-lesson-cb" style="width:16px;height:16px;accent-color:var(--teal);flex-shrink:0">
-      <span style="flex:1;line-height:1.3">${esc(l.title)}</span>
-      <span style="margin-left:4px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:${tm.bg};color:${tm.color};white-space:nowrap">${l.type}</span>
-    </label>`;
-  }).join('');
+  lList.innerHTML = available.map(l => `
+    <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:14px;border:1px solid var(--border-light);background:#fff;transition:background .15s" onmouseover="this.style.background='var(--teal-light)'" onmouseout="this.style.background='#fff'">
+      <input type="checkbox" value="${l.id}" class="assign-lesson-cb" style="width:16px;height:16px;accent-color:var(--teal)">
+      <span>${esc(l.title)}</span>
+      <span style="margin-left:auto;font-size:11px;color:var(--text-muted);font-weight:600">${l.type}</span>
+    </label>
+  `).join('');
 }
 
 /* EMPLOYEE TABLE COLLAPSE */
@@ -6179,10 +6094,53 @@ async function deleteEmployee(id, name) {
 let allLessonsMgmt = [];
 let editingLessonId = null;
 
+let _lessonMgmtTypeFilter = 'ALL';
+
+const LESSON_TYPE_META = {
+  ALL:       { label: 'Tất cả',    emoji: '',   badgeClass: '',                color: 'var(--text)',  bg: 'var(--bg-2)' },
+  READING:   { label: 'Reading',   emoji: '📖', badgeClass: 'badge-reading',   color: '#1d4ed8',      bg: '#dbeafe' },
+  LISTENING: { label: 'Listening', emoji: '🎧', badgeClass: 'badge-listening', color: '#9333ea',      bg: '#f3e8ff' },
+  SPEAKING:  { label: 'Speaking',  emoji: '🎤', badgeClass: 'badge-speaking',  color: 'var(--teal)',  bg: 'var(--teal-light)' },
+  WRITING:   { label: 'Writing',   emoji: '✍️', badgeClass: 'badge-writing',   color: 'var(--teal)',  bg: '#e0f2fe' },
+  VOCAB:     { label: 'Vocab',     emoji: '📝', badgeClass: 'badge-vocab',     color: '#c2410c',      bg: '#ffedd5' },
+  GRAMMAR:   { label: 'Grammar',   emoji: '⚙️', badgeClass: 'badge-grammar',   color: '#15803d',      bg: '#dcfce7' },
+};
+
+function _renderLessonMgmtTabs() {
+  const tabsEl = document.getElementById('lesson-mgmt-tabs');
+  if (!tabsEl) return;
+  const presentTypes = [...new Set(allLessonsMgmt.map(l => l.type))].filter(Boolean).sort();
+  const allTypes = ['ALL', ...presentTypes];
+  tabsEl.innerHTML = allTypes.map(t => {
+    const m = LESSON_TYPE_META[t] || LESSON_TYPE_META.ALL;
+    const isActive = _lessonMgmtTypeFilter === t;
+    const count = t === 'ALL' ? allLessonsMgmt.length : allLessonsMgmt.filter(l => l.type === t).length;
+    return `<button onclick="setLessonMgmtFilter('${t}',this)"
+      style="padding:4px 11px;border-radius:20px;border:1.5px solid ${isActive ? m.color : 'transparent'};font-size:12px;font-weight:${isActive ? '700' : '500'};cursor:pointer;background:${isActive ? m.bg : 'var(--bg-2)'};color:${isActive ? m.color : 'var(--text-muted)'};transition:all .15s;font-family:var(--font-body);display:inline-flex;align-items:center;gap:4px"
+    >${m.emoji ? m.emoji + ' ' : ''}${m.label} <span style="opacity:.65;font-size:11px">${count}</span></button>`;
+  }).join('');
+}
+
+function setLessonMgmtFilter(type, btn) {
+  _lessonMgmtTypeFilter = type;
+  lessonPage = 1;
+  _renderLessonMgmtTabs();
+  renderLessonMgmtPage();
+}
+
+function filterLessonMgmt() {
+  lessonPage = 1;
+  renderLessonMgmtPage();
+}
+
 async function loadLessonsMgmt() {
   const { data } = await sb.from('lessons').select('*').order('created_at', { ascending: false });
   allLessonsMgmt = data || [];
   lessonPage = 1;
+  _lessonMgmtTypeFilter = 'ALL';
+  const searchEl = document.getElementById('lesson-mgmt-search');
+  if (searchEl) searchEl.value = '';
+  _renderLessonMgmtTabs();
   renderLessonMgmtPage();
 }
 
@@ -6196,22 +6154,33 @@ function renderLessonMgmtPage() {
     return;
   }
 
-  const typeEmoji = { READING:'📖', LISTENING:'🎧', VOCAB:'📝', GRAMMAR:'⚙️', SPEAKING:'🎤', WRITING:'✍️' };
-  const typeBadge = { READING:'badge-reading', LISTENING:'badge-listening', VOCAB:'badge-vocab', GRAMMAR:'badge-grammar', SPEAKING:'badge-speaking', WRITING:'badge-writing' };
+  // Apply type filter
+  let filtered = _lessonMgmtTypeFilter === 'ALL'
+    ? allLessonsMgmt
+    : allLessonsMgmt.filter(l => l.type === _lessonMgmtTypeFilter);
 
-  const total = allLessonsMgmt.length;
+  // Apply search filter
+  const q = (document.getElementById('lesson-mgmt-search')?.value || '').trim().toLowerCase();
+  if (q) filtered = filtered.filter(l => l.title.toLowerCase().includes(q));
+
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px">Không tìm thấy bài học nào.</td></tr>`;
+    document.getElementById('lesson-pagination').innerHTML = '';
+    return;
+  }
+
+  const total = filtered.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   if (lessonPage > totalPages) lessonPage = totalPages;
   if (lessonPage < 1) lessonPage = 1;
-  const slice = allLessonsMgmt.slice((lessonPage - 1) * PAGE_SIZE, lessonPage * PAGE_SIZE);
+  const slice = filtered.slice((lessonPage - 1) * PAGE_SIZE, lessonPage * PAGE_SIZE);
 
   tbody.innerHTML = slice.map(l => {
+    const m = LESSON_TYPE_META[l.type] || { emoji: '', badgeClass: '', label: l.type };
     let preview = '—';
     if (l.type === 'VOCAB' && l.content) {
-      try {
-        const words = JSON.parse(l.content);
-        preview = `${words.length} từ vựng`;
-      } catch { preview = 'Nội dung cũ'; }
+      try { const words = JSON.parse(l.content); preview = `${words.length} từ vựng`; }
+      catch { preview = 'Nội dung cũ'; }
     } else if (l.content) {
       const stripped = l.content.replace(/<[^>]+>/g, '').trim();
       preview = stripped.length > 50 ? stripped.slice(0, 50) + '…' : stripped;
@@ -6219,7 +6188,7 @@ function renderLessonMgmtPage() {
     return `
     <tr>
       <td data-label="Tiêu đề" style="font-weight:600;max-width:200px">${esc(l.title)}</td>
-      <td data-label="Loại"><span class="badge ${typeBadge[l.type]||''}">${typeEmoji[l.type]||''} ${l.type}</span></td>
+      <td data-label="Loại"><span class="badge ${m.badgeClass}">${m.emoji} ${l.type}</span></td>
       <td data-label="Thời lượng" style="color:var(--text-muted);font-size:13px">${l.duration_estimate} phút</td>
       <td data-label="Nội dung" style="color:var(--text-muted);font-size:13px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(preview)}</td>
       <td data-label="Thao tác">
