@@ -9615,6 +9615,8 @@ function refreshAttPopupIfOpen() {
       `;
     }
 
+    if (pct === 100) playCorrectSound(); else playWrongSound();
+
     const card = document.getElementById(`sp-card-${idx}`);
     if (card) card.classList.add('done-sentence');
     const navEl = document.getElementById(`sp-nav-${idx}`);
