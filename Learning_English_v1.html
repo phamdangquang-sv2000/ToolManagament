@@ -9183,7 +9183,7 @@ Rules:
       submission_text: JSON.stringify(payload),
       submitted_at:    new Date().toISOString(),
       status:          'graded',
-      grade:           'reviewed',
+      grade:           'pass',
       xp_awarded:      st.maxXP || 0,
       graded_at:       new Date().toISOString(),
     }, { onConflict: 'user_id,lesson_id,scheduled_date' });
