@@ -1570,6 +1570,31 @@
 ═════════════════════════════════════════════════════ -->
 <div id="toast-container"></div>
 
+<!-- ── Delete Confirmation Modal ─────────────────────────── -->
+<div id="modal-delete-confirm" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeDeleteConfirm()">
+  <div class="modal-box" style="max-width:400px;">
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+      <div style="width:40px; height:40px; border-radius:10px; background:var(--red-soft); border:1px solid var(--red-dim); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+        <svg width="18" height="18" fill="none" stroke="#ff8b8d" stroke-width="2" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a1,1,0,0,1,1-1h4a1,1,0,0,1,1,1v2"/></svg>
+      </div>
+      <div>
+        <div style="font-size:15px; font-weight:700; color:#fff;">Delete Incident</div>
+        <div style="font-size:12px; color:var(--text2); margin-top:2px;">This action cannot be undone</div>
+      </div>
+    </div>
+    <p style="font-size:13.5px; color:var(--text); margin-bottom:22px; line-height:1.6;">
+      Are you sure you want to delete ticket <strong style="color:#ff8b8d; font-family:var(--mono);" id="delete-confirm-ticket"></strong>? All timeline logs will also be permanently removed.
+    </p>
+    <div style="display:flex; gap:10px; justify-content:flex-end;">
+      <button class="btn btn-secondary" onclick="closeDeleteConfirm()">Cancel</button>
+      <button id="btn-confirm-delete" class="btn btn-danger" onclick="executeDeleteIncident()">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a1,1,0,0,1,1-1h4a1,1,0,0,1,1,1v2"/></svg>
+        Delete
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Screen flash on arrow impact -->
 <div id="screen-flash"></div>
 
@@ -3368,7 +3393,12 @@ function renderTable(data, isAdmin) {
       <td style="max-width:280px; color:var(--text);">${esc(inc.title)}</td>
       <td><span class="badge badge-${statusClass(inc.status)}">${esc(inc.status)}</span></td>
       <td style="font-size:12px; color:var(--text2); font-family:var(--mono);">${dt}</td>
-      ${isAdmin ? `<td><button class="btn btn-ghost" onclick="event.stopPropagation(); openDetail(${inc.id})" style="padding:4px 10px; font-size:12px; border:1px solid var(--border2);">View</button></td>` : ''}
+      ${isAdmin ? `<td style="white-space:nowrap;">
+        <button class="btn btn-ghost" onclick="event.stopPropagation(); openDetail(${inc.id})" style="padding:4px 10px; font-size:12px; border:1px solid var(--border2);">View</button>
+        <button class="btn btn-danger" onclick="event.stopPropagation(); confirmDeleteIncident(${inc.id}, '${esc(inc.ticket_id)}')" style="padding:4px 10px; font-size:12px; margin-left:4px;" title="Delete incident">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a1,1,0,0,1,1-1h4a1,1,0,0,1,1,1v2"/></svg>
+        </button>
+      </td>` : ''}
     </tr>`;
   }
   html += '</tbody></table></div>';
@@ -3557,6 +3587,49 @@ function removeEditRow(btn) {
   const rows = document.querySelectorAll('#edit-timeline-body tr');
   if (rows.length <= 1) { toast('At least 1 timeline row is required', 'error'); return; }
   btn.closest('tr').remove();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  DELETE INCIDENT
+// ══════════════════════════════════════════════════════════════
+let _deleteTargetId = null;
+let _deleteTargetTicket = null;
+
+function confirmDeleteIncident(id, ticketId) {
+  _deleteTargetId = id;
+  _deleteTargetTicket = ticketId;
+  document.getElementById('delete-confirm-ticket').textContent = ticketId;
+  document.getElementById('modal-delete-confirm').style.display = 'flex';
+}
+
+function closeDeleteConfirm() {
+  document.getElementById('modal-delete-confirm').style.display = 'none';
+  _deleteTargetId = null;
+  _deleteTargetTicket = null;
+}
+
+async function executeDeleteIncident() {
+  if (!_deleteTargetId) return;
+  const btn = document.getElementById('btn-confirm-delete');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Deleting...';
+  try {
+    // Delete timeline logs first (foreign key)
+    const { error: logErr } = await sb.from('incident_logs').delete().eq('incident_id', _deleteTargetId);
+    if (logErr) throw logErr;
+    // Delete incident
+    const { error } = await sb.from('incidents').delete().eq('id', _deleteTargetId);
+    if (error) throw error;
+    closeDeleteConfirm();
+    toast(`Incident ${_deleteTargetTicket} deleted`);
+    loadStats();
+    loadAdminIncidents();
+  } catch(e) {
+    toast(e.message || 'Delete failed', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3,6 5,6 21,6"/><path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a1,1,0,0,1,1-1h4a1,1,0,0,1,1,1v2"/></svg> Delete';
+  }
 }
 
 function closeEditModal() {
