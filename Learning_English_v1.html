@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
 <style>
 /* ===== RESET & BASE ===== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -189,7 +189,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 
 /* ===== TOAST ===== */
 #toast {
-  position: fixed; bottom: 28px; left: 50%;
+  position: fixed; bottom: calc(28px + env(safe-area-inset-bottom)); left: 50%;
   transform: translateX(-50%) translateY(90px);
   background: #0f172a; color: #fff;
   padding: 13px 22px; border-radius: 12px;
@@ -583,6 +583,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   box-shadow: var(--shadow-sm); border: 1px solid rgba(13,148,136,.15);
 }
 .tab:hover:not(.active) { color: var(--text); background: rgba(255,255,255,.6); }
+.tab:active:not(.active) { background: rgba(255,255,255,.85); transform: scale(.97); }
 
 /* Lesson grid */
 .lessons-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
@@ -617,6 +618,11 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   box-shadow: var(--shadow-md);
   transform: translateY(-3px);
   border-color: rgba(13,148,136,.2);
+}
+.lesson-card:active {
+  transform: scale(.97) translateY(0);
+  box-shadow: var(--shadow-sm);
+  border-color: rgba(13,148,136,.25);
 }
 .lesson-title { font-size: 16px; font-weight: 600; line-height: 1.45; color: var(--text); letter-spacing: -.02em; }
 .lesson-meta { display: flex; align-items: center; justify-content: space-between; }
@@ -1051,6 +1057,7 @@ audio { width: 100%; }
   width: 100%; display: flex; align-items: center; gap: 10px;
 }
 .rq-emp-option:hover:not(:disabled) { border-color: var(--teal); background: var(--teal-light); color: var(--teal); }
+.rq-emp-option:active:not(:disabled) { transform: scale(.97); background: var(--teal-light); border-color: var(--teal); }
 .rq-emp-option.correct { border-color: var(--green); background: var(--green-light); color: var(--green); font-weight: 700; pointer-events: none; }
 .rq-emp-option.wrong { border-color: var(--red); background: var(--red-light); color: var(--red); pointer-events: none; }
 .rq-emp-option:disabled { pointer-events: none; cursor: default; }
@@ -1280,6 +1287,7 @@ select {
   box-shadow: 0 2px 8px rgba(0,0,0,.06);
 }
 .vocab-front:hover { border-color: rgba(13,148,136,.3); box-shadow: 0 4px 16px rgba(13,148,136,.12); }
+.vocab-front:active { transform: scale(.96); box-shadow: 0 2px 8px rgba(13,148,136,.1); border-color: rgba(13,148,136,.35); }
 .vocab-speak-btn {
   position: absolute; top: 8px; right: 10px;
   background: none; border: none; padding: 3px 5px; border-radius: 6px;
@@ -2456,6 +2464,7 @@ select {
     cursor: pointer; transition: transform .15s, background .15s; font-family: var(--font-body);
   }
   .speaking-nav-btn:hover { background: var(--teal-light); border-color: var(--teal); color: var(--teal); }
+  .speaking-nav-btn:active:not(:disabled) { transform: scale(.95); background: var(--teal-light); border-color: var(--teal); color: var(--teal); }
   .speaking-nav-btn:disabled { opacity: .4; cursor: not-allowed; }
 
   /* ── Countdown overlay ── */
