@@ -171,6 +171,8 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 }
 .badge-reading   { background: #dbeafe; color: #1d4ed8; }
 .badge-listening { background: #f3e8ff; color: #9333ea; }
+.badge-speaking  { background: #fce7f3; color: #be185d; }
+.badge-writing   { background: #e0f2fe; color: #0369a1; }
 .badge-vocab     { background: #ffedd5; color: #c2410c; }
 .badge-grammar   { background: #dcfce7; color: #15803d; }
 .badge-admin     { background: var(--indigo-light); color: var(--indigo); }
@@ -557,17 +559,24 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   padding-left: 1px; padding-right: 1px; margin: 0 -1px;
 }
 .tabs {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   gap: 5px;
   background: var(--bg-2); padding: 5px; border-radius: 14px;
   border: 1px solid var(--border-light);
 }
 .tab {
+  flex: 1 1 calc(20% - 5px);
+  min-width: 0;
   padding: 9px 6px; border-radius: 10px; font-size: 12px; font-weight: 600;
   background: none; border: none; color: var(--text-muted); white-space: nowrap;
   transition: color var(--transition), background var(--transition), box-shadow var(--transition); letter-spacing: -.01em;
   text-align: center; overflow: hidden; text-overflow: ellipsis;
+}
+/* Speaking & Writing go in row 2 as 2 equal halves */
+.tab[data-type="SPEAKING"],
+.tab[data-type="WRITING"] {
+  flex: 1 1 calc(50% - 5px);
 }
 .tab.active {
   background: #fff; color: var(--teal);
@@ -2345,7 +2354,321 @@ select {
 .lb-meta   { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
 .lb-xp     { font-size: 16px; font-weight: 800; color: var(--teal-dark); flex-shrink: 0; }
 .lb-streak-badge { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 99px; padding: 2px 8px; font-size: 11px; font-weight: 700; color: #ea580c; flex-shrink: 0; }
-</style>
+
+  /* ===== SPEAKING LESSON ===== */
+  .speaking-sentence-card {
+    background: var(--card); border-radius: var(--radius);
+    border: 2px solid var(--border); box-shadow: var(--shadow);
+    padding: 28px 24px; text-align: center; margin-bottom: 16px;
+    animation: fadeInScale .3s ease;
+  }
+  .speaking-sentence-card.active-sentence {
+    border-color: #be185d; box-shadow: 0 4px 20px rgba(190,24,93,.15);
+  }
+  .speaking-sentence-card.done-sentence {
+    border-color: var(--green); background: var(--green-light);
+  }
+  .speaking-sentence-text {
+    font-size: 20px; font-weight: 700; color: var(--text);
+    font-family: var(--font-display); line-height: 1.5; margin-bottom: 16px;
+  }
+  .speaking-word { display: inline; }
+  .speaking-word.match  { color: var(--green); font-weight: 800; }
+  .speaking-word.wrong  { color: var(--red); text-decoration: underline wavy var(--red); font-weight: 800; }
+  .speaking-word.missed { color: var(--red); opacity: .6; }
+  .speaking-record-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 13px 28px; border-radius: 99px; border: none; cursor: pointer;
+    background: linear-gradient(135deg, #be185d, #db2777);
+    color: #fff; font-size: 15px; font-weight: 700;
+    box-shadow: 0 4px 16px rgba(190,24,93,.35);
+    transition: transform .2s, opacity .2s, box-shadow .2s;
+    font-family: var(--font-body);
+  }
+  .speaking-record-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(190,24,93,.45); }
+  .speaking-record-btn.recording {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    animation: pulse-dot .8s ease infinite;
+    box-shadow: 0 4px 20px rgba(220,38,38,.45);
+  }
+  .speaking-record-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+  .speaking-result-wrap { margin-top: 12px; font-size: 13px; }
+  .speaking-score-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .speaking-score-badge.great { background: var(--green-light); color: var(--green); border: 1px solid #bbf7d0; }
+  .speaking-score-badge.ok    { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+  .speaking-score-badge.low   { background: var(--red-light); color: var(--red); border: 1px solid #fca5a5; }
+  .speaking-heard-text { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+  .speaking-progress-wrap {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+  }
+  .speaking-progress-track {
+    flex: 1; height: 7px; background: var(--bg-2); border-radius: 99px; overflow: hidden;
+  }
+  .speaking-progress-fill {
+    height: 100%; background: linear-gradient(90deg, #be185d, #db2777);
+    border-radius: 99px; transition: width .4s cubic-bezier(.4,0,.2,1);
+  }
+  .speaking-nav-btns { display: flex; gap: 10px; justify-content: center; margin-top: 8px; }
+  .speaking-nav-btn {
+    padding: 10px 20px; border-radius: 10px; border: 1.5px solid var(--border);
+    background: #fff; color: var(--text); font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: transform .15s, background .15s;
+    font-family: var(--font-body);
+  }
+  .speaking-nav-btn:hover { background: var(--teal-light); border-color: var(--teal); color: var(--teal); }
+  .speaking-nav-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+  /* ===== WRITING LESSON (Employee) ===== */
+  .writing-lesson-wrap { animation: fadeIn .35s ease; }
+  .writing-prompt-card {
+    background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+    border: 2px solid #7dd3fc; border-radius: var(--radius);
+    padding: 20px 22px; margin-bottom: 18px;
+  }
+  .writing-prompt-label {
+    font-size: 11px; font-weight: 800; color: #0369a1;
+    text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px;
+  }
+  .writing-prompt-text {
+    font-size: 16px; font-weight: 600; color: #0c4a6e; line-height: 1.6;
+  }
+  .writing-textarea {
+    width: 100%; padding: 14px 16px; border-radius: 12px;
+    border: 2px solid var(--border); font-size: 16px;
+    font-family: var(--font-body); background: #fff; color: var(--text);
+    outline: none; resize: vertical; min-height: 160px; line-height: 1.7;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .writing-textarea:focus { border-color: #0369a1; box-shadow: 0 0 0 3px rgba(3,105,161,.12); }
+  .writing-char-count { font-size: 11px; color: var(--text-sub); text-align: right; margin-top: 4px; }
+  .writing-submit-btn {
+    display: flex; align-items: center; gap: 8px; justify-content: center;
+    width: 100%; padding: 14px 22px; border-radius: 12px; border: none; cursor: pointer;
+    background: linear-gradient(135deg, #0369a1, #0284c7);
+    color: #fff; font-size: 15px; font-weight: 700;
+    box-shadow: 0 4px 14px rgba(3,105,161,.3);
+    transition: transform .2s, opacity .2s, box-shadow .2s;
+    font-family: var(--font-body); margin-top: 12px;
+  }
+  .writing-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(3,105,161,.4); }
+  .writing-submit-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+  .writing-submitted-notice {
+    background: var(--green-light); border: 2px solid #bbf7d0;
+    border-radius: 12px; padding: 16px 20px; text-align: center;
+    font-size: 14px; font-weight: 600; color: var(--green); margin-top: 12px;
+  }
+
+  /* ===== VOCAB NOTEBOOK ===== */
+  #vocab-nb-tooltip {
+    position: fixed; z-index: 8888;
+    background: #1e293b; color: #fff; border-radius: 8px;
+    padding: 6px 12px; font-size: 13px; font-weight: 600;
+    box-shadow: 0 4px 16px rgba(0,0,0,.25);
+    pointer-events: all; cursor: pointer;
+    display: none; gap: 6px; align-items: center;
+    white-space: nowrap;
+    transition: opacity .15s;
+    touch-action: manipulation;
+    -webkit-user-select: none; user-select: none;
+  }
+  #vocab-nb-tooltip::after {
+    content: ''; position: absolute; top: 100%; left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent; border-top-color: #1e293b;
+  }
+  #vocab-nb-tooltip:hover { background: #0d9488; }
+
+  /* Notebook modal — bottom sheet popup matching att-popup style */
+  #vocab-nb-overlay {
+    position: fixed; inset: 0; background: rgba(15,23,42,.5);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    z-index: 9100; display: flex; align-items: flex-end; justify-content: center;
+    animation: fadeIn .2s ease;
+  }
+  #vocab-nb-overlay.hidden { display: none !important; }
+  @media (min-width: 640px) { #vocab-nb-overlay { align-items: center; } }
+
+  #vocab-nb-modal {
+    background: #fff; width: 100%; max-width: 480px;
+    border-radius: 28px 28px 0 0; padding: 0 0 env(safe-area-inset-bottom);
+    max-height: 88vh; display: flex; flex-direction: column;
+    box-shadow: 0 -8px 40px rgba(0,0,0,.15);
+    animation: slideUp .38s cubic-bezier(.34,1.1,.64,1);
+    overflow: hidden;
+  }
+  @media (min-width: 640px) {
+    #vocab-nb-modal { border-radius: 28px; max-height: 88vh; animation: fadeInScale .3s ease; }
+  }
+
+  /* drag handle */
+  #vocab-nb-modal::before {
+    content: ''; display: block;
+    width: 36px; height: 4px; border-radius: 2px;
+    background: #e5e7eb; margin: 10px auto 0; flex-shrink: 0;
+  }
+
+  .vocab-nb-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px 12px; flex-shrink: 0; border-bottom: 1px solid var(--border-light);
+    background: #fff;
+  }
+  .vocab-nb-title { font-size: 18px; font-weight: 900; color: var(--text); font-family: var(--font-display); letter-spacing: -.04em; display: flex; align-items: center; gap: 8px; }
+  .vocab-nb-close {
+    width: 32px; height: 32px; border-radius: 50%; background: #f3f4f6;
+    border: none; cursor: pointer; font-size: 18px; color: #6b7280;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+  }
+  .vocab-nb-close:hover { background: #e5e7eb; }
+  .vocab-nb-body { padding: 16px 20px 28px; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  .vocab-nb-empty {
+    text-align: center; padding: 48px 24px;
+    color: var(--text-muted); font-size: 14px;
+  }
+  .vocab-nb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (min-width: 480px) { .vocab-nb-grid { grid-template-columns: repeat(3,1fr); } }
+
+  /* Flashcard in notebook */
+  .nb-flashcard {
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 16px 14px;
+    cursor: pointer; position: relative;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+    box-shadow: var(--shadow-sm);
+  }
+  .nb-flashcard:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--teal); }
+  .nb-flashcard.flipped { background: var(--teal-light); border-color: var(--teal); }
+  .nb-fc-word { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; font-family: var(--font-display); }
+  .nb-fc-context { font-size: 11px; color: var(--text-muted); line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .nb-fc-meaning { font-size: 13px; color: var(--teal-dark); font-weight: 600; display: none; margin-top: 4px; }
+  .nb-flashcard.flipped .nb-fc-context { display: none; }
+  .nb-flashcard.flipped .nb-fc-meaning { display: block; }
+  .nb-fc-del {
+    position: absolute; top: 8px; right: 8px;
+    width: 22px; height: 22px; border-radius: 50%; border: none;
+    background: var(--red-light); color: var(--red); font-size: 11px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity .15s;
+    touch-action: manipulation;
+  }
+  .nb-flashcard:hover .nb-fc-del { opacity: 1; }
+  /* Always show delete on touch devices */
+  @media (pointer: coarse) { .nb-fc-del { opacity: .55; } }
+
+  /* Notebook button in header */
+  .nb-header-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 7px 12px; border-radius: 99px; border: 1.5px solid var(--border);
+    background: #fff; color: var(--text); font-size: 12px; font-weight: 700;
+    cursor: pointer; transition: transform .15s, background .15s, border-color .15s;
+    font-family: var(--font-body); white-space: nowrap;
+    position: relative;
+  }
+  .nb-header-btn:hover { background: var(--teal-light); border-color: var(--teal); color: var(--teal); }
+  .nb-badge-count {
+    position: absolute; top: -4px; right: -4px;
+    background: #be185d; color: #fff; font-size: 10px; font-weight: 800;
+    min-width: 18px; height: 18px; border-radius: 99px;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid #fff; display: none;
+  }
+
+  /* Writing Admin section */
+  .writing-sub-row {
+    background: var(--bg); border: 1.5px solid var(--border-light);
+    border-radius: 12px; padding: 14px 16px; margin-bottom: 8px;
+  }
+  .writing-sub-row:hover { border-color: #7dd3fc; }
+  .writing-sub-meta { font-size: 11px; color: var(--text-sub); margin-bottom: 6px; }
+  .writing-sub-text { font-size: 13px; color: var(--text); line-height: 1.6; margin-bottom: 10px; }
+  .writing-grade-wrap { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .writing-grade-select {
+    padding: 6px 12px; border-radius: 8px; border: 1.5px solid var(--border);
+    background: #fff; font-size: 13px; font-weight: 600; color: var(--text);
+    cursor: pointer; -webkit-appearance: none; font-family: var(--font-body);
+  }
+  .writing-grade-xp {
+    padding: 6px 12px; border-radius: 8px; border: 1.5px solid var(--border);
+    background: #fff; font-size: 13px; font-weight: 600; color: var(--text);
+    width: 90px; font-family: var(--font-body);
+  }
+  .writing-grade-btn {
+    padding: 7px 16px; border-radius: 8px; border: none; cursor: pointer;
+    background: linear-gradient(135deg, #0369a1, #0284c7); color: #fff;
+    font-size: 13px; font-weight: 700; font-family: var(--font-body);
+    transition: opacity .15s, transform .15s;
+  }
+  .writing-grade-btn:hover { opacity: .85; }
+  .writing-graded-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+  }
+  .writing-graded-badge.pass { background: var(--green-light); color: var(--green); }
+    .writing-graded-badge.fail { background: var(--red-light); color: var(--red); }
+
+    /* ===== VOCAB NOTEBOOK OVERLAY ===== */
+    .vocab-nb-overlay {
+      position: fixed; inset: 0; z-index: 7000;
+      background: rgba(0,0,0,.5); display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+    }
+    .vocab-nb-modal {
+      background: var(--bg); border-radius: 20px; padding: 28px 24px 24px;
+      width: 100%; max-width: 760px; max-height: 88vh;
+      display: flex; flex-direction: column; gap: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    }
+    .vocab-nb-header {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .vocab-nb-title { font-size: 18px; font-weight: 800; color: var(--text); }
+    .vocab-nb-count { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+    .vocab-nb-close {
+      width: 32px; height: 32px; border-radius: 50%; border: none;
+      background: var(--bg-2); cursor: pointer; font-size: 16px; color: var(--text-muted);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .vocab-nb-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px; overflow-y: auto; padding-right: 4px;
+    }
+    .vocab-nb-empty {
+      text-align: center; color: var(--text-muted); font-size: 14px;
+      padding: 32px 16px; line-height: 1.6;
+    }
+    .nb-flashcard {
+      background: var(--bg-2); border-radius: 14px; padding: 16px 14px;
+      cursor: pointer; position: relative; min-height: 100px;
+      border: 1.5px solid var(--border); transition: box-shadow .15s, transform .15s;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .nb-flashcard:hover { box-shadow: 0 4px 16px rgba(0,0,0,.10); transform: translateY(-2px); }
+    .nb-fc-word  { font-size: 17px; font-weight: 800; color: var(--text); word-break: break-word; }
+    .nb-fc-context { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+    .nb-fc-meaning { font-size: 12px; color: var(--teal-dark); margin-top: auto; }
+    .nb-fc-del {
+      position: absolute; top: 6px; right: 8px;
+      background: none; border: none; cursor: pointer;
+      font-size: 16px; color: var(--text-muted); line-height: 1; padding: 2px 4px;
+      opacity: .5;
+    }
+    .nb-fc-del:hover { opacity: 1; color: var(--red); }
+    .vocab-nb-tooltip {
+      position: fixed; z-index: 8888;
+      background: #1e293b; color: #fff; border-radius: 10px;
+      padding: 7px 13px; font-size: 13px; font-weight: 700;
+      cursor: pointer; display: none; align-items: center; gap: 6px;
+      box-shadow: 0 4px 14px rgba(0,0,0,.28);
+      white-space: nowrap;
+    }
+    .vocab-nb-tooltip:hover { background: #0f172a; }
+
+  </style>
 </head>
 <body>
 
@@ -2544,6 +2867,9 @@ select {
         Eng<span class="logo-dot">Learn</span>
       </div>
       <div class="header-user-chip">
+                <button class="nb-header-btn" onclick="openVocabNotebook()" title="Sổ từ vựng của tôi">
+            📓 <span class="nb-badge-count" id="nb-badge-count"></span>
+          </button>
         <span id="header-name-label" style="font-size:13px">—</span>
         <div class="avatar" id="header-avatar">?</div>
         <button class="logout-chip" onclick="logout()" title="Đăng xuất">
@@ -2622,6 +2948,8 @@ select {
           <button class="tab" data-type="LISTENING" onclick="switchTab(this)">🎧 Listening</button>
           <button class="tab" data-type="VOCAB" onclick="switchTab(this)">📝 Vocab</button>
           <button class="tab" data-type="GRAMMAR" onclick="switchTab(this)">⚙️ Grammar</button>
+            <button class="tab" data-type="SPEAKING" onclick="switchTab(this)">🎤 Speaking</button>
+            <button class="tab" data-type="WRITING" onclick="switchTab(this)">✍️ Writing</button>
         </div>
       </div>
     </div>
@@ -2823,7 +3151,30 @@ select {
       <div id="assign-pagination"></div>
     </div>
 
-    <!-- Modal phân công -->
+    
+      <!-- Writing Submissions Section -->
+      <div style="margin-top:28px;background:var(--card);border-radius:var(--radius);border:1px solid var(--border-light);box-shadow:var(--shadow);overflow:hidden" id="writing-sub-section">
+        <div class="table-section-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border-light);margin:0">
+          <div>
+            <h2>✍️ Bài viết chờ chấm điểm</h2>
+            <div style="font-size:12px;color:var(--text-sub);margin-top:2px">Nhân viên đã nộp bài writing — chấm điểm và trao XP</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="writing-sub-filter" onchange="loadWritingSubmissions()" style="padding:7px 12px;border-radius:8px;border:1.5px solid var(--border);font-size:13px;background:var(--bg-2)">
+              <option value="pending">Chưa chấm</option>
+              <option value="all">Tất cả</option>
+            </select>
+            <button onclick="loadWritingSubmissions()" title="Tải lại" style="width:34px;height:34px;border-radius:10px;border:1.5px solid var(--border);background:#fff;color:var(--text-muted);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,color .15s,border-color .15s,transform .15s;flex-shrink:0" onmouseover="this.style.background='var(--teal-light)';this.style.color='var(--teal)';this.style.borderColor='var(--teal)'" onmouseout="this.style.background='#fff';this.style.color='var(--text-muted)';this.style.borderColor='var(--border)'" onmousedown="this.style.transform='scale(.9)'" onmouseup="this.style.transform='scale(1)'">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            </button>
+          </div>
+        </div>
+        <div id="writing-sub-list" style="padding:16px 20px;min-height:60px">
+          <div style="text-align:center;color:var(--text-muted);font-size:13px;padding:24px">Đang tải...</div>
+        </div>
+      </div>
+
+  <!-- Modal phân công -->
     <div id="assign-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px">
       <div style="background:var(--bg);border-radius:18px;padding:28px;width:100%;max-width:520px;box-shadow:0 24px 64px rgba(0,0,0,.18);max-height:90vh;overflow-y:auto">
         <h3 style="font-size:17px;font-weight:700;margin-bottom:20px">📅 Phân công bài học</h3>
@@ -2848,7 +3199,10 @@ select {
     <!-- Modal quản lý bài học -->
     <div id="lesson-mgmt-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto">
       <div style="background:var(--bg);border-radius:18px;padding:32px;width:100%;max-width:860px;box-shadow:0 24px 64px rgba(0,0,0,.2);max-height:95vh;overflow-y:auto;margin:auto">
-        <h3 style="font-size:17px;font-weight:700;margin-bottom:20px" id="lesson-mgmt-title">📘 Thêm bài học</h3>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+          <h3 style="font-size:17px;font-weight:700;margin:0" id="lesson-mgmt-title">📘 Thêm bài học</h3>
+          <button onclick="closeLessonMgmtModal()" style="width:34px;height:34px;border-radius:50%;border:none;background:var(--bg-2);color:var(--text-muted);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,color .15s" onmouseover="this.style.background='var(--red-light)';this.style.color='var(--red)'" onmouseout="this.style.background='var(--bg-2)';this.style.color='var(--text-muted)'">×</button>
+        </div>
         <div style="display:flex;flex-direction:column;gap:16px">
 
           <!-- Tiêu đề -->
@@ -2866,6 +3220,8 @@ select {
                 <option value="READING">📖 Reading</option>
                 <option value="GRAMMAR">⚙️ Grammar</option>
                 <option value="LISTENING">🎧 Listening</option>
+                <option value="SPEAKING">🎤 Speaking</option>
+                <option value="WRITING">✍️ Writing</option>
               </select>
             </div>
             <div>
@@ -2978,6 +3334,66 @@ select {
             </div>
           </div>
 
+            <!-- SPEAKING section -->
+            <div id="lm-speaking-section" class="hidden">
+              <!-- How-to box -->
+              <div style="background:linear-gradient(135deg,#fce7f3,#fff0f8);border:1.5px solid #f9a8d4;border-radius:12px;padding:14px 16px;margin-bottom:14px">
+                <div style="font-size:12px;font-weight:800;color:#be185d;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🎤 Cách tạo bài Speaking kiểu Duolingo</div>
+                <div style="font-size:13px;color:#9d174d;line-height:1.7">
+                  Mỗi dòng = 1 câu tiếng Anh. Nhân viên sẽ nhấn <strong>Ghi âm</strong> và đọc to câu đó.<br>
+                  App tự so sánh phát âm, tô xanh từ đúng 🟢, đỏ từ sai 🔴, và hiện điểm %.<br>
+                  <span style="color:#be185d;font-weight:700">Nên dùng câu ngắn 5–12 từ, đơn giản, sát thực tế công việc.</span>
+                </div>
+              </div>
+              <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Danh sách câu luyện đọc <span style="color:var(--red)">*</span></label>
+              <div style="margin:5px 0 8px;font-size:12px;color:var(--text-sub)">Mỗi dòng là một câu — không đánh số, không dấu gạch đầu dòng.</div>
+              <textarea id="lm-speaking-input" rows="9"
+                placeholder="The meeting starts at nine o'clock.&#10;Please send me the report by Friday.&#10;I need to check my email first.&#10;Can you help me with this task?&#10;The customer called about their order.&#10;We have a team meeting every Monday.&#10;..."
+                oninput="updateSpeakingPreview()"
+                style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;background:var(--bg-2);font-family:var(--font-body);resize:vertical;line-height:1.8;-webkit-appearance:none;touch-action:manipulation"></textarea>
+              <div id="lm-speaking-preview" style="margin-top:8px;font-size:12px;color:var(--text-muted);min-height:18px"></div>
+              <!-- Quick tips -->
+              <div style="margin-top:12px;padding:10px 14px;background:var(--bg-2);border-radius:10px;border:1px solid var(--border-light)">
+                <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">💡 Gợi ý theo chủ đề</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                  <button type="button" onclick="insertSpeakingSample('office')" style="padding:4px 10px;border-radius:20px;border:1.5px solid #f9a8d4;background:#fce7f3;color:#be185d;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-body)">🏢 Văn phòng</button>
+                  <button type="button" onclick="insertSpeakingSample('greeting')" style="padding:4px 10px;border-radius:20px;border:1.5px solid #bbf7d0;background:#f0fdf4;color:#15803d;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-body)">👋 Chào hỏi</button>
+                  <button type="button" onclick="insertSpeakingSample('email')" style="padding:4px 10px;border-radius:20px;border:1.5px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-body)">📧 Email / Báo cáo</button>
+                  <button type="button" onclick="insertSpeakingSample('customer')" style="padding:4px 10px;border-radius:20px;border:1.5px solid #fed7aa;background:#fff7ed;color:#c2410c;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-body)">🤝 Khách hàng</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- WRITING section -->
+            <div id="lm-writing-section" class="hidden">
+              <!-- How-to box -->
+              <div style="background:linear-gradient(135deg,#e0f2fe,#f0f9ff);border:1.5px solid #7dd3fc;border-radius:12px;padding:14px 16px;margin-bottom:14px">
+                <div style="font-size:12px;font-weight:800;color:#0369a1;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">✍️ Cách hoạt động của bài Writing</div>
+                <div style="font-size:13px;color:#0c4a6e;line-height:1.7">
+                  Admin đặt đề bài → Nhân viên viết bài trong app → Admin chấm <strong>Đạt / Chưa đạt</strong> và trao XP.<br>
+                  Bài viết được lưu trong tab <em>Chấm bài viết</em> trên trang Admin.
+                </div>
+              </div>
+              <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Đề bài (Writing Prompt) <span style="color:var(--red)">*</span></label>
+              <div style="margin:5px 0 8px;font-size:12px;color:var(--text-sub)">Viết rõ chủ đề và yêu cầu. Nhân viên sẽ thấy đúng nội dung này.</div>
+              <textarea id="lm-writing-prompt" rows="5"
+                placeholder="VD: Write about your daily work routine. Describe what you do in the morning, afternoon, and evening at the office."
+                style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;background:var(--bg-2);font-family:var(--font-body);resize:vertical;line-height:1.7;-webkit-appearance:none;touch-action:manipulation"></textarea>
+              <div style="display:flex;gap:12px;margin-top:12px">
+                <div style="flex:1">
+                  <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Số từ tối thiểu</label>
+                  <input type="number" id="lm-writing-minwords" value="50" min="1" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;background:var(--bg-2)">
+                  <div style="font-size:11px;color:var(--text-sub);margin-top:4px">Nút Nộp bài bị khoá đến khi đủ số từ</div>
+                </div>
+                <div style="flex:1">
+                  <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">XP tối đa khi chấm</label>
+                  <input type="number" id="lm-writing-maxxp" value="20" min="1" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;background:var(--bg-2)">
+                  <div style="font-size:11px;color:var(--text-sub);margin-top:4px">Admin chọn XP thực tế khi chấm</div>
+                </div>
+              </div>
+            </div>
+
+  
         </div>
         <div style="display:flex;gap:10px;margin-top:22px">
           <button class="btn btn-outline btn-sm" style="flex:1" onclick="closeLessonMgmtModal()">Huỷ</button>
@@ -3807,7 +4223,7 @@ function formatDateVi(dateStr) {
 
 function renderLessons() {
   const grid = document.getElementById('lesson-grid');
-  const typeEmoji = { READING:'📖', LISTENING:'🎧', VOCAB:'📝', GRAMMAR:'⚙️' };
+  const typeEmoji = { READING:'📖', LISTENING:'🎧', VOCAB:'📝', GRAMMAR:'⚙️', SPEAKING:'🎤', WRITING:'✍️' };
 
   // Timeline mode: nhóm theo ngày
   const today = todayStr();
@@ -4179,6 +4595,76 @@ function openLessonModal(lesson, alreadyCompleted) {
     }
   }
 
+    // SPEAKING lesson
+    if (lesson.type === 'SPEAKING') {
+      document.getElementById('modal-audio').classList.add('hidden');
+      document.getElementById('modal-audio-inner').innerHTML = '';
+      try {
+        const parsed = JSON.parse(lesson.content || '{}');
+        const sentences = parsed.sentences || [];
+        if (sentences.length > 0) {
+          window._speakingState = { sentences, current: 0, doneCount: 0, done: new Array(sentences.length).fill(false) };
+          contentEl.innerHTML = renderSpeakingLesson(sentences);
+          hintEl.classList.remove('hidden');
+          hintEl.textContent = '🎤 Đọc to từng câu — nhấn nút Ghi âm, nói to và rõ ràng, sau đó sang câu tiếp theo.';
+          endBtn.disabled = true;
+          endLabel.textContent = `Đọc tất cả câu (0/${sentences.length})`;
+          document.getElementById('lesson-overlay').classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+          initVocabNotebookForLesson();
+          return;
+        }
+      } catch(e) { console.error(e); }
+      hintEl.classList.add('hidden');
+      endBtn.disabled = false;
+      endLabel.textContent = 'Kết thúc bài học';
+    }
+
+    // WRITING lesson
+    if (lesson.type === 'WRITING') {
+      document.getElementById('modal-audio').classList.add('hidden');
+      document.getElementById('modal-audio-inner').innerHTML = '';
+      try {
+        const parsed = JSON.parse(lesson.content || '{}');
+        const prompt   = parsed.prompt   || 'Viết một đoạn văn bằng tiếng Anh.';
+        const minWords = parsed.minWords || 50;
+        const maxXP    = parsed.maxXP    || 20;
+        window._writingState = { prompt, minWords, maxXP, submitted: false, lessonId: lesson.id };
+        sb.from('writing_submissions')
+          .select('id,status,grade,xp_awarded,submission_text')
+          .eq('user_id', currentUser.id)
+          .eq('lesson_id', lesson.id)
+          .maybeSingle()
+          .then(({ data: sub }) => {
+            contentEl.innerHTML = renderWritingLesson(parsed, sub);
+            if (sub && sub.status === 'graded') {
+              hintEl.classList.remove('hidden');
+              hintEl.textContent = '✅ Bài đã được chấm điểm. Bạn có thể hoàn thành bài học.';
+              endBtn.disabled = false;
+              endLabel.textContent = 'Hoàn thành bài học';
+              window._writingState.submitted = true;
+            } else if (sub) {
+              hintEl.classList.remove('hidden');
+              hintEl.textContent = '⏳ Bài đã nộp, đang chờ admin chấm điểm. Bạn có thể hoàn thành bài học.';
+              endBtn.disabled = false;
+              endLabel.textContent = 'Hoàn thành bài học';
+              window._writingState.submitted = true;
+            }
+            initVocabNotebookForLesson();
+          });
+        hintEl.classList.remove('hidden');
+        hintEl.textContent = `✍️ Đọc đề bài và viết ít nhất ${minWords} từ, sau đó nhấn Nộp bài.`;
+        endBtn.disabled = true;
+        endLabel.textContent = 'Nộp bài trước';
+        document.getElementById('lesson-overlay').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        return;
+      } catch(e) { console.error(e); }
+      hintEl.classList.add('hidden');
+      endBtn.disabled = false;
+      endLabel.textContent = 'Kết thúc bài học';
+    }
+
   document.getElementById('lesson-overlay').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
 }
@@ -4201,7 +4687,7 @@ function tryCloseLessonModal() {
       activeSession = null;
     }
     window.vocabProgress = null; window.readingQuiz = null; window._fillBlankState = null;
-    window.miniTest = null; window.readingQuiz = null; window._fillBlankState = null;
+    window.miniTest = null; window._speakingState = null; window._writingState = null;
     closeLessonModal();
     loadTodaySessions();
   } else {
@@ -4220,7 +4706,7 @@ function handleOverlayClick(e) {
         activeSession = null;
       }
       window.vocabProgress = null; window.readingQuiz = null; window._fillBlankState = null;
-      window.miniTest = null; window.readingQuiz = null; window._fillBlankState = null;
+      window.miniTest = null; window._speakingState = null; window._writingState = null;
       closeLessonModal();
       loadTodaySessions();
     } else {
@@ -4309,7 +4795,7 @@ async function endLesson() {
   btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> <span id="btn-end-lesson-label">Hoàn thành bài học</span>`;
   activeSession = null;
   window.vocabProgress = null; window.readingQuiz = null; window._fillBlankState = null;
-  window.miniTest = null; window.readingQuiz = null; window._fillBlankState = null;
+  window.miniTest = null; window._speakingState = null; window._writingState = null;
   toast('🎉 Tuyệt vời! Bạn đã hoàn thành bài học.', 'success');
   await loadTodaySessions();
   await loadLessons(); // refresh trạng thái mở khóa + rebuild allScheduleDays với data mới nhất
@@ -4657,6 +5143,7 @@ window.addEventListener('pagehide', () => { stopTimer(); _saveSession(true); });
 
 /* ADMIN: LOAD DATA */
 async function loadAdminData() {
+    loadWritingSubmissions();
   const filter = document.getElementById('admin-date-filter').value;
   const tbody  = document.getElementById('admin-tbody');
   tbody.innerHTML = '<tr class="empty-row"><td colspan="3"><div style="display:flex;align-items:center;justify-content:center;gap:10px"><div class="spinner spinner-teal"></div> Đang tải dữ liệu...</div></td></tr>';
@@ -4820,8 +5307,8 @@ function renderAssignPage() {
     return;
   }
   const typeBadge = t => {
-    const map = { READING:'badge-reading', LISTENING:'badge-listening', VOCAB:'badge-vocab', GRAMMAR:'badge-grammar' };
-    const label = { READING:'Reading', LISTENING:'Listening', VOCAB:'Vocabulary', GRAMMAR:'Grammar' };
+    const map = { READING:'badge-reading', LISTENING:'badge-listening', VOCAB:'badge-vocab', GRAMMAR:'badge-grammar', SPEAKING:'badge-speaking', WRITING:'badge-writing' };
+    const label = { READING:'Reading', LISTENING:'Listening', VOCAB:'Vocabulary', GRAMMAR:'Grammar', SPEAKING:'Speaking', WRITING:'Writing' };
     return `<span class="badge ${map[t]||'badge-admin'}">${label[t]||(t||'—')}</span>`;
   };
   const total = allAssignSchedules.length;
@@ -5346,8 +5833,8 @@ function renderLessonMgmtPage() {
     return;
   }
 
-  const typeEmoji = { READING:'📖', LISTENING:'🎧', VOCAB:'📝', GRAMMAR:'⚙️' };
-  const typeBadge = { READING:'badge-reading', LISTENING:'badge-listening', VOCAB:'badge-vocab', GRAMMAR:'badge-grammar' };
+  const typeEmoji = { READING:'📖', LISTENING:'🎧', VOCAB:'📝', GRAMMAR:'⚙️', SPEAKING:'🎤', WRITING:'✍️' };
+  const typeBadge = { READING:'badge-reading', LISTENING:'badge-listening', VOCAB:'badge-vocab', GRAMMAR:'badge-grammar', SPEAKING:'badge-speaking', WRITING:'badge-writing' };
 
   const total = allLessonsMgmt.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -5501,11 +5988,13 @@ async function importVocabFromExcel(input) {
 function onLessonTypeChange() {
   const type = document.getElementById('lm-type').value;
   document.getElementById('lm-vocab-section').classList.toggle('hidden', type !== 'VOCAB');
-  document.getElementById('lm-content-section').classList.toggle('hidden', type === 'VOCAB' || type === 'LISTENING');
+  document.getElementById('lm-content-section').classList.toggle('hidden',
+    type === 'VOCAB' || type === 'LISTENING' || type === 'SPEAKING' || type === 'WRITING');
   document.getElementById('lm-audio-section').classList.toggle('hidden', type !== 'LISTENING');
   document.getElementById('lm-quiz-section').classList.toggle('hidden', type !== 'READING');
+  document.getElementById('lm-speaking-section').classList.toggle('hidden', type !== 'SPEAKING');
+  document.getElementById('lm-writing-section').classList.toggle('hidden', type !== 'WRITING');
   const isGrammar = type === 'GRAMMAR';
-  const isReading = type === 'READING';
   const exSection = document.getElementById('lm-grammar-ex-section');
   const toggleBtn = document.getElementById('lm-toggle-ex-btn');
   if (exSection && !isGrammar) exSection.classList.add('hidden');
@@ -5523,6 +6012,66 @@ function updateVocabPreview() {
     .split('\n').map(l => l.trim()).filter(l => l && l.includes('|'));
   const el = document.getElementById('lm-vocab-preview');
   if (el) el.textContent = lines.length ? `✓ ${lines.length} từ vựng hợp lệ` : '';
+}
+
+function updateSpeakingPreview() {
+  const lines = (document.getElementById('lm-speaking-input')?.value || '')
+    .split('\n').map(s => s.trim()).filter(Boolean);
+  const el = document.getElementById('lm-speaking-preview');
+  if (!el) return;
+  if (!lines.length) { el.textContent = ''; return; }
+  const avg = Math.round(lines.reduce((a, s) => a + s.split(/\s+/).filter(Boolean).length, 0) / lines.length);
+  el.innerHTML = `<span style="color:var(--green);font-weight:700">✓ ${lines.length} câu</span> · trung bình ~${avg} từ/câu`;
+}
+
+const _speakingSamples = {
+  office: [
+    'The meeting starts at nine o\'clock.',
+    'Please send me the report by Friday.',
+    'I need to check my email first.',
+    'Can you help me with this task?',
+    'The document is on my desk.',
+    'We have a team meeting every Monday.',
+    'Please print two copies of the contract.',
+  ],
+  greeting: [
+    'Good morning, how are you today?',
+    'Nice to meet you, my name is Lan.',
+    'Welcome to our company.',
+    'Have a great day at work.',
+    'See you tomorrow morning.',
+    'Thank you for your time.',
+    'Please come in and have a seat.',
+  ],
+  email: [
+    'I am writing to follow up on our meeting.',
+    'Please find the attached report.',
+    'Could you review this document please?',
+    'I will send you the update by end of day.',
+    'Thank you for your quick response.',
+    'Please let me know if you have any questions.',
+    'I look forward to hearing from you.',
+  ],
+  customer: [
+    'How can I help you today?',
+    'Thank you for calling our company.',
+    'I will check that for you right away.',
+    'Your order will arrive in three days.',
+    'I apologize for the inconvenience.',
+    'We appreciate your patience.',
+    'Is there anything else I can help you with?',
+  ],
+};
+
+function insertSpeakingSample(topic) {
+  const ta = document.getElementById('lm-speaking-input');
+  if (!ta) return;
+  const samples = _speakingSamples[topic] || [];
+  const existing = ta.value.trim();
+  ta.value = existing ? existing + '\n' + samples.join('\n') : samples.join('\n');
+  updateSpeakingPreview();
+  ta.focus();
+  ta.scrollTop = ta.scrollHeight;
 }
 
 function openLessonMgmtModal(id) {
@@ -5585,6 +6134,23 @@ function openLessonMgmtModal(id) {
         document.getElementById('lm-transcript-input').value = l.content || '';
         hideFillBlankPreview();
       }
+    } else if (l.type === 'SPEAKING') {
+      try {
+        const parsed = JSON.parse(l.content || '{}');
+        document.getElementById('lm-speaking-input').value = (parsed.sentences || []).join('\n');
+        updateSpeakingPreview();
+      } catch {
+        document.getElementById('lm-speaking-input').value = '';
+      }
+    } else if (l.type === 'WRITING') {
+      try {
+        const parsed = JSON.parse(l.content || '{}');
+        document.getElementById('lm-writing-prompt').value   = parsed.prompt   || '';
+        document.getElementById('lm-writing-minwords').value = parsed.minWords || 50;
+        document.getElementById('lm-writing-maxxp').value    = parsed.maxXP   || 20;
+      } catch {
+        document.getElementById('lm-writing-prompt').value = '';
+      }
     } else {
       // GRAMMAR: load into rich editor + exercise
       try {
@@ -5604,6 +6170,12 @@ function openLessonMgmtModal(id) {
     document.getElementById('lm-content-input').value = '';
     document.getElementById('lm-audio-url').value     = '';
     document.getElementById('lm-transcript-input').value = '';
+    document.getElementById('lm-speaking-input').value   = '';
+    document.getElementById('lm-writing-prompt').value   = '';
+    document.getElementById('lm-writing-minwords').value = 50;
+    document.getElementById('lm-writing-maxxp').value    = 20;
+    const spPrev = document.getElementById('lm-speaking-preview');
+    if (spPrev) spPrev.textContent = '';
     geSetContent('');
     geLoadExercise(null);
     hideFillBlankPreview();
@@ -5668,6 +6240,17 @@ async function saveLessonMgmt() {
     } else {
       content = JSON.stringify({ transcript, blanks: [] });
     }
+  } else if (type === 'SPEAKING') {
+    const raw = document.getElementById('lm-speaking-input').value;
+    const sentences = raw.split('\n').map(s => s.trim()).filter(Boolean);
+    if (!sentences.length) { toast('Vui lòng nhập ít nhất một câu luyện đọc!', 'error'); return; }
+    content = JSON.stringify({ sentences });
+  } else if (type === 'WRITING') {
+    const prompt   = document.getElementById('lm-writing-prompt').value.trim();
+    const minWords = parseInt(document.getElementById('lm-writing-minwords').value) || 50;
+    const maxXP    = parseInt(document.getElementById('lm-writing-maxxp').value) || 20;
+    if (!prompt) { toast('Vui lòng nhập đề bài Writing!', 'error'); return; }
+    content = JSON.stringify({ prompt, minWords, maxXP });
   }
 
   const row = { title, type, content, duration_estimate: duration, audio_url: finalAudioUrl || null };
@@ -7129,6 +7712,7 @@ async function loadStreakAndXP() {
     { data: attRows },
     { data: rewardRows },
     { data: regRow },
+    { data: writingXpRows },
   ] = await Promise.all([
     sb.from('daily_attendance')
       .select('date, xp_earned, streak_at_time, streak_cycle')
@@ -7141,6 +7725,10 @@ async function loadStreakAndXP() {
       .select('xp_amount')
       .eq('user_id', uid)
       .maybeSingle(),
+    sb.from('writing_submissions')
+      .select('xp_awarded')
+      .eq('user_id', uid)
+      .eq('status', 'graded'),
   ]);
 
   const attendance = attRows   || [];
@@ -7150,7 +7738,8 @@ async function loadStreakAndXP() {
   const attendanceXP   = attendance.reduce((s, r) => s + (r.xp_earned   || 0), 0);
   const bonusXP        = claimed.reduce((s, r)    => s + (r.xp_awarded  || 0), 0);
   const registrationXP = regRow ? (regRow.xp_amount || 0) : 0;
-  const totalXP        = attendanceXP + bonusXP + registrationXP;
+  const writingXP      = (writingXpRows || []).reduce((s, r) => s + (r.xp_awarded || 0), 0);
+  const totalXP        = attendanceXP + bonusXP + registrationXP + writingXP;
 
   // Streak hiện tại (chỉ tính nếu record là hôm nay hoặc weekday hôm qua)
   const today  = todayStr();
@@ -7190,7 +7779,7 @@ async function loadStreakAndXP() {
 // ── Rank calculation ─────────────────────────────────────────────────────
 async function updateMyRank(uid, myXP) {
   try {
-    const [{ data: att }, { data: rewards }, { data: reg }] = await Promise.all([
+    const [{ data: att }, { data: rewards }, { data: reg }, { data: wrXp }] = await Promise.all([
       sb.from('daily_attendance').select('user_id, xp_earned'),
       sb.from('streak_rewards').select('user_id, xp_awarded'),
       sb.from('registration_xp').select('user_id, xp_amount'),
@@ -7539,7 +8128,633 @@ function refreshAttPopupIfOpen() {
   }
 }
 
-/* BOOT */
+
+
+  /* ===================================================================
+     SPEAKING / PRONUNCIATION FEATURE
+  =================================================================== */
+
+  function renderSpeakingLesson(sentences) {
+    const total = sentences.length;
+    const html = `
+      <div class="speaking-progress-wrap">
+        <div class="speaking-progress-track">
+          <div class="speaking-progress-fill" id="sp-prog-fill" style="width:0%"></div>
+        </div>
+        <span style="font-size:12px;font-weight:700;color:var(--text-muted)" id="sp-prog-label">0 / ${total}</span>
+      </div>
+      ${sentences.map((s, i) => `
+        <div class="speaking-sentence-card ${i === 0 ? 'active-sentence' : ''}" id="sp-card-${i}" style="${i > 0 ? 'display:none' : ''}">
+          <div style="font-size:11px;font-weight:800;color:#be185d;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">Câu ${i+1} / ${total}</div>
+          <div class="speaking-sentence-text" id="sp-text-${i}">${esc(s)}</div>
+          <div style="margin-top:12px">
+            <button class="speaking-record-btn" id="sp-rec-btn-${i}" onclick="startSpeakingRecord(${i})">🎤 Bắt đầu ghi âm</button>
+          </div>
+          <div class="speaking-result-wrap" id="sp-result-${i}" style="margin-top:12px"></div>
+          <div class="speaking-nav-btns" id="sp-nav-${i}" style="display:none">
+            <button class="speaking-nav-btn" onclick="speakingRetry(${i})">🔄 Thử lại</button>
+            ${i < total - 1 ? `<button class="speaking-nav-btn" onclick="speakingNext(${i})" style="background:var(--teal-light);border-color:var(--teal);color:var(--teal)">Câu tiếp →</button>` : ''}
+          </div>
+        </div>
+      `).join('')}
+    `;
+    return html;
+  }
+
+  function startSpeakingRecord(idx) {
+    const st = window._speakingState;
+    if (!st) return;
+    
+    // Check browser support
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      // iOS / unsupported browser: show manual text input fallback
+      showSpeakingTextFallback(idx);
+      return;
+    }
+
+    const btn = document.getElementById(`sp-rec-btn-${idx}`);
+    if (btn) {
+      btn.classList.add('recording');
+      btn.textContent = '⏹ Đang ghi âm...';
+      btn.disabled = true;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onresult = (event) => {
+      const heard = event.results[0][0].transcript.toLowerCase().trim();
+      const original = st.sentences[idx].toLowerCase();
+      const { score, wordResults } = scorePronunciation(original, heard);
+      markSpeakingDone(idx, score, st.sentences[idx], wordResults, heard);
+    };
+
+    recognition.onerror = (event) => {
+      if (btn) { btn.classList.remove('recording'); btn.textContent = '🎤 Bắt đầu ghi âm'; btn.disabled = false; }
+      if (event.error === 'no-speech') {
+        toast('Không nghe thấy giọng nói. Hãy thử lại.', 'error');
+      } else {
+        // On error, still allow to proceed
+        markSpeakingDone(idx, 0.5, st.sentences[idx], [], '(lỗi nhận diện)');
+      }
+    };
+
+    recognition.onend = () => {
+      if (btn) { btn.classList.remove('recording'); }
+    };
+
+    recognition.start();
+  }
+
+  function showSpeakingTextFallback(idx) {
+    const st = window._speakingState;
+    if (!st) return;
+    const resultEl = document.getElementById(`sp-result-${idx}`);
+    const btn = document.getElementById(`sp-rec-btn-${idx}`);
+    // Hide mic button, show text input
+    if (btn) btn.style.display = 'none';
+    if (resultEl) {
+      resultEl.innerHTML = `
+        <div style="background:#fff3cd;border:1.5px solid #ffc107;border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:13px;color:#856404">
+          📱 Trình duyệt không hỗ trợ micro. Hãy <strong>gõ lại câu</strong> bên dưới để luyện tập:
+        </div>
+        <div style="display:flex;gap:8px;align-items:stretch">
+          <input type="text" id="sp-text-input-${idx}"
+            placeholder="Gõ lại câu tiếng Anh..."
+            autocomplete="off" autocapitalize="none" spellcheck="false"
+            style="flex:1;padding:12px 14px;border:2px solid var(--border);border-radius:10px;
+                   font-size:16px;font-family:var(--font-body);outline:none;
+                   -webkit-appearance:none;touch-action:manipulation"
+            onfocus="this.style.borderColor='#be185d'"
+            onblur="this.style.borderColor='var(--border)'">
+          <button onclick="submitSpeakingText(${idx})"
+            style="padding:12px 18px;border-radius:10px;border:none;cursor:pointer;
+                   background:linear-gradient(135deg,#be185d,#db2777);color:#fff;
+                   font-size:14px;font-weight:700;font-family:var(--font-body);
+                   white-space:nowrap;flex-shrink:0">
+            ✓ Nộp
+          </button>
+        </div>
+      `;
+    }
+  }
+
+  function submitSpeakingText(idx) {
+    const st = window._speakingState;
+    if (!st) return;
+    const input = document.getElementById(`sp-text-input-${idx}`);
+    const typed = (input?.value || '').trim();
+    if (!typed) { toast('Hãy gõ câu trước khi nộp.', 'error'); return; }
+    const { score, wordResults } = scorePronunciation(st.sentences[idx], typed);
+    markSpeakingDone(idx, score, st.sentences[idx], wordResults, typed);
+  }
+
+  function scorePronunciation(original, heard) {
+    // Normalize both strings
+    const clean = s => s.toLowerCase().replace(/[^a-z0-9\s']/g, '').trim();
+    const origWords = clean(original).split(/\s+/).filter(Boolean);
+    const heardWords = clean(heard).split(/\s+/).filter(Boolean);
+    
+    let matched = 0;
+    const wordResults = origWords.map(ow => {
+      // Check if this word was heard (fuzzy: exact or within 1 edit)
+      const found = heardWords.some(hw => hw === ow || levenshtein(hw, ow) <= 1);
+      if (found) matched++;
+      return { word: ow, ok: found };
+    });
+    
+    const score = origWords.length > 0 ? matched / origWords.length : 0;
+    return { score, wordResults };
+  }
+
+  function levenshtein(a, b) {
+    const m = a.length, n = b.length;
+    const dp = Array.from({length: m+1}, (_, i) => Array.from({length: n+1}, (_, j) => i === 0 ? j : j === 0 ? i : 0));
+    for (let i = 1; i <= m; i++)
+      for (let j = 1; j <= n; j++)
+        dp[i][j] = a[i-1] === b[j-1] ? dp[i-1][j-1] : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+    return dp[m][n];
+  }
+
+  function markSpeakingDone(idx, score, original, wordResults, heard) {
+    const st = window._speakingState;
+    if (!st) return;
+
+    const btn = document.getElementById(`sp-rec-btn-${idx}`);
+    if (btn) { btn.classList.remove('recording'); btn.disabled = false; btn.textContent = '🎤 Ghi âm lại'; }
+
+    const resultEl = document.getElementById(`sp-result-${idx}`);
+    const pct = Math.round(score * 100);
+    let badgeClass = pct >= 80 ? 'great' : pct >= 50 ? 'ok' : 'low';
+    let badgeText  = pct >= 80 ? '🌟 Rất tốt!' : pct >= 50 ? '👌 Được rồi' : '😅 Thử lại';
+
+    // Build highlighted sentence
+    const highlighted = wordResults.length
+      ? wordResults.map(w => `<span class="speaking-word ${w.ok ? 'match' : 'wrong'}">${esc(w.word)}</span>`).join(' ')
+      : esc(original);
+
+    if (resultEl) {
+      resultEl.innerHTML = `
+        <div class="speaking-score-badge ${badgeClass}">${badgeText} ${pct}%</div>
+        <div style="margin-bottom:8px;${wordResults.length ? '' : 'display:none'}">
+          <div style="font-size:11px;font-weight:700;color:var(--text-sub);margin-bottom:4px">KẾT QUẢ NHẬN DIỆN:</div>
+          <div style="font-size:15px;line-height:1.8">${highlighted}</div>
+        </div>
+        ${heard ? `<div class="speaking-heard-text">🗣 Đã nghe: <em>"${esc(heard)}"</em></div>` : ''}
+      `;
+    }
+
+    // Mark card as done (even if low score — let them proceed)
+    const card = document.getElementById(`sp-card-${idx}`);
+    if (card) card.classList.add('done-sentence');
+    const navEl = document.getElementById(`sp-nav-${idx}`);
+    if (navEl) navEl.style.display = 'flex';
+
+    // Update state
+    if (!st.done[idx]) {
+      st.done[idx] = true;
+      st.doneCount++;
+    }
+    updateSpeakingProgress();
+  }
+
+  function speakingRetry(idx) {
+    const card = document.getElementById(`sp-card-${idx}`);
+    if (card) card.classList.remove('done-sentence');
+    const resultEl = document.getElementById(`sp-result-${idx}`);
+    if (resultEl) resultEl.innerHTML = '';
+    const navEl = document.getElementById(`sp-nav-${idx}`);
+    if (navEl) navEl.style.display = 'none';
+    // Restore mic button visibility (may have been hidden by iOS fallback)
+    const btn = document.getElementById(`sp-rec-btn-${idx}`);
+    if (btn) { btn.style.display = ''; btn.classList.remove('recording'); btn.disabled = false; btn.textContent = '🎤 Bắt đầu ghi âm'; }
+
+    // Revert state
+    const st = window._speakingState;
+    if (st && st.done[idx]) {
+      st.done[idx] = false;
+      st.doneCount = Math.max(0, st.doneCount - 1);
+    }
+    updateSpeakingProgress();
+  }
+
+  function speakingNext(idx) {
+    const st = window._speakingState;
+    if (!st) return;
+    const nextIdx = idx + 1;
+    if (nextIdx >= st.sentences.length) return;
+    
+    // Hide current, show next
+    const cur = document.getElementById(`sp-card-${idx}`);
+    const next = document.getElementById(`sp-card-${nextIdx}`);
+    if (cur) cur.style.display = 'none';
+    if (next) { next.style.display = 'block'; next.classList.add('active-sentence'); next.scrollIntoView({behavior:'smooth',block:'center'}); }
+    
+    st.current = nextIdx;
+  }
+
+  function updateSpeakingProgress() {
+    const st = window._speakingState;
+    if (!st) return;
+    const done = st.done.filter(Boolean).length;
+    const total = st.sentences.length;
+    
+    const fill  = document.getElementById('sp-prog-fill');
+    const label = document.getElementById('sp-prog-label');
+    if (fill)  fill.style.width = (total ? (done/total*100) : 0) + '%';
+    if (label) label.textContent = done + ' / ' + total;
+    
+    const endBtn = document.getElementById('btn-end-lesson');
+    const endLbl = document.getElementById('btn-end-lesson-label');
+    if (endBtn && endLbl) {
+      if (done >= total) {
+        endBtn.disabled = false;
+        endLbl.textContent = '🎉 Hoàn thành bài Speaking!';
+      } else {
+        endBtn.disabled = true;
+        endLbl.textContent = `Đọc tất cả câu (${done}/${total})`;
+      }
+    }
+  }
+
+
+  /* ===================================================================
+     WRITING PRACTICE FEATURE
+  =================================================================== */
+
+  function renderWritingLesson(parsed, existingSub) {
+    const prompt   = parsed.prompt   || 'Viết một đoạn văn bằng tiếng Anh.';
+    const minWords = parsed.minWords || 50;
+
+    if (existingSub && existingSub.status === 'graded') {
+      return `
+        <div class="writing-lesson-wrap">
+          <div class="writing-prompt-card">
+            <div class="writing-prompt-label">📝 Đề bài</div>
+            <div class="writing-prompt-text">${esc(prompt)}</div>
+          </div>
+          <div class="writing-submitted-notice" style="background:var(--teal-light);border-color:var(--teal-bright);color:var(--teal-dark)">
+            ✅ Bài đã được chấm điểm
+            <div style="font-size:13px;margin-top:6px;color:var(--text-muted)">
+              ${existingSub.grade === 'pass' ? '🌟 Đạt — +' + (existingSub.xp_awarded||0) + ' XP' : '📝 Cần cải thiện'}
+            </div>
+          </div>
+          <div style="margin-top:14px">
+            <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">BÀI LÀM CỦA BẠN</div>
+            <div style="background:var(--bg-2);border-radius:10px;padding:14px;font-size:14px;line-height:1.8;color:var(--text)">${esc(existingSub.submission_text || '').replace(/\n/g,'<br>')}</div>
+          </div>
+        </div>`;
+    }
+
+    if (existingSub) {
+      return `
+        <div class="writing-lesson-wrap">
+          <div class="writing-prompt-card">
+            <div class="writing-prompt-label">📝 Đề bài</div>
+            <div class="writing-prompt-text">${esc(prompt)}</div>
+          </div>
+          <div class="writing-submitted-notice">
+            ⏳ Bài đã nộp — đang chờ admin chấm điểm
+          </div>
+          <div style="margin-top:14px">
+            <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">BÀI LÀM CỦA BẠN</div>
+            <div style="background:var(--bg-2);border-radius:10px;padding:14px;font-size:14px;line-height:1.8;color:var(--text)">${esc(existingSub.submission_text || '').replace(/\n/g,'<br>')}</div>
+          </div>
+        </div>`;
+    }
+
+    return `
+      <div class="writing-lesson-wrap">
+        <div class="writing-prompt-card">
+          <div class="writing-prompt-label">📝 Đề bài</div>
+          <div class="writing-prompt-text">${esc(prompt)}</div>
+        </div>
+        <div style="margin-top:6px;font-size:12px;color:var(--text-sub);margin-bottom:10px">✏️ Viết ít nhất <strong>${minWords} từ</strong></div>
+        <textarea class="writing-textarea" id="writing-text-input"
+          placeholder="Bắt đầu viết bài của bạn tại đây..."
+          oninput="onWritingInput(this)"></textarea>
+        <div class="writing-char-count" id="writing-word-count">0 từ (cần ${minWords} từ)</div>
+        <button class="writing-submit-btn" id="writing-submit-btn" onclick="submitWriting()" disabled>
+          📤 Nộp bài
+        </button>
+      </div>`;
+  }
+
+  function onWritingInput(ta) {
+    const words = ta.value.trim().split(/\s+/).filter(Boolean).length;
+    const st = window._writingState;
+    const minWords = st ? st.minWords : 50;
+    const countEl = document.getElementById('writing-word-count');
+    const submitBtn = document.getElementById('writing-submit-btn');
+    if (countEl) countEl.textContent = `${words} từ (cần ${minWords} từ)`;
+    if (submitBtn) submitBtn.disabled = words < minWords;
+  }
+
+  async function submitWriting() {
+    const st = window._writingState;
+    if (!st || !currentUser || !activeSession) return;
+    
+    const ta = document.getElementById('writing-text-input');
+    if (!ta) return;
+    const text = ta.value.trim();
+    const words = text.split(/\s+/).filter(Boolean).length;
+    if (words < st.minWords) {
+      toast(`Cần ít nhất ${st.minWords} từ! (Hiện tại: ${words} từ)`, 'error');
+      return;
+    }
+
+    const btn = document.getElementById('writing-submit-btn');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2.5px;margin:0 auto"></div>'; }
+
+    const scheduledDate = activeSession.scheduledDate || todayStr();
+
+    const { error } = await sb.from('writing_submissions').upsert({
+      user_id:         currentUser.id,
+      lesson_id:       st.lessonId || activeSession.lesson.id,
+      scheduled_date:  scheduledDate,
+      submission_text: text,
+      submitted_at:    new Date().toISOString(),
+      status:          'pending',
+      xp_awarded:      0,
+    }, { onConflict: 'user_id,lesson_id,scheduled_date' });
+
+    if (error) {
+      toast('Lỗi nộp bài: ' + error.message, 'error');
+      if (btn) { btn.disabled = false; btn.textContent = '📤 Nộp bài'; }
+      return;
+    }
+
+    st.submitted = true;
+    toast('📤 Đã nộp bài thành công! Admin sẽ chấm điểm sớm.', 'success');
+
+    // Render submitted state
+    const contentEl = document.getElementById('modal-content');
+    const lesson = activeSession.lesson;
+    try {
+      const parsed = JSON.parse(lesson.content || '{}');
+      contentEl.innerHTML = renderWritingLesson(parsed, { status: 'pending', submission_text: text });
+    } catch {}
+
+    // Enable end lesson
+    const endBtn = document.getElementById('btn-end-lesson');
+    const endLbl = document.getElementById('btn-end-lesson-label');
+    if (endBtn) endBtn.disabled = false;
+    if (endLbl) endLbl.textContent = 'Hoàn thành bài học';
+    const hintEl = document.getElementById('lesson-completion-hint');
+    if (hintEl) { hintEl.classList.remove('hidden'); hintEl.textContent = '⏳ Bài đã nộp, đang chờ chấm điểm. Bạn có thể hoàn thành bài học.'; }
+  }
+
+  /* ===== ADMIN: Load Writing Submissions ===== */
+  async function loadWritingSubmissions() {
+    if (!document.getElementById('writing-sub-list')) return;
+    const listEl = document.getElementById('writing-sub-list');
+    listEl.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:13px;padding:24px">Đang tải...</div>';
+
+    const filter = document.getElementById('writing-sub-filter')?.value || 'pending';
+    
+    // Load submissions with lesson and user info
+    let query = sb.from('writing_submissions')
+      .select('id, user_id, lesson_id, scheduled_date, submission_text, submitted_at, status, grade, xp_awarded')
+      .order('submitted_at', { ascending: false })
+      .limit(50);
+    if (filter === 'pending') query = query.eq('status', 'pending');
+
+    const [{ data: subs }, { data: usersData }, { data: lessonsData }] = await Promise.all([
+      query,
+      sb.from('users').select('id, name'),
+      sb.from('lessons').select('id, title'),
+    ]);
+
+    const userMap   = {};
+    (usersData   || []).forEach(u => userMap[u.id]   = u.name);
+    const lessonMap = {};
+    (lessonsData || []).forEach(l => lessonMap[l.id] = l.title);
+
+    if (!subs || !subs.length) {
+      listEl.innerHTML = `<div style="text-align:center;color:var(--text-muted);font-size:13px;padding:32px">${filter === 'pending' ? '✅ Không có bài viết nào chờ chấm' : 'Chưa có bài nào'}</div>`;
+      return;
+    }
+
+    listEl.innerHTML = subs.map(sub => {
+      const name = userMap[sub.user_id] || sub.user_id.slice(0,8);
+      const title = lessonMap[sub.lesson_id] || 'Bài viết';
+      const date = sub.scheduled_date || sub.submitted_at?.split('T')[0];
+      const submittedAt = sub.submitted_at ? new Date(sub.submitted_at).toLocaleString('vi-VN', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+      
+      const isGraded = sub.status === 'graded';
+      const gradedBadge = isGraded
+        ? `<span class="writing-graded-badge ${sub.grade === 'pass' ? 'pass' : 'fail'}">${sub.grade === 'pass' ? '✅ Đạt' : '❌ Chưa đạt'} · +${sub.xp_awarded||0} XP</span>`
+        : '';
+
+      return `
+        <div class="writing-sub-row">
+          <div class="writing-sub-meta">👤 <strong>${esc(name)}</strong> · 📚 ${esc(title)} · 📅 ${esc(date||'')} · 🕐 ${esc(submittedAt)} ${gradedBadge}</div>
+          <div class="writing-sub-text">${esc(sub.submission_text || '').replace(/\n/g,'<br>')}</div>
+          ${!isGraded ? `
+            <div class="writing-grade-wrap">
+              <select class="writing-grade-select" id="grade-sel-${sub.id}">
+                <option value="pass">✅ Đạt</option>
+                <option value="fail">❌ Chưa đạt</option>
+              </select>
+              <input type="number" class="writing-grade-xp" id="grade-xp-${sub.id}" placeholder="XP" value="10" min="0" max="100">
+              <button class="writing-grade-btn" onclick="gradeWriting('${sub.id}','${sub.user_id}','${sub.lesson_id}')">💾 Chấm điểm</button>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  async function gradeWriting(subId, userId, lessonId) {
+    const grade = document.getElementById(`grade-sel-${subId}`)?.value || 'pass';
+    const xp    = parseInt(document.getElementById(`grade-xp-${subId}`)?.value) || 0;
+
+    const btn = document.querySelector(`.writing-grade-btn[onclick*="${subId}"]`);
+    if (btn) { btn.disabled = true; btn.textContent = '...'; }
+
+    const { error } = await sb.from('writing_submissions').update({
+      status:     'graded',
+      grade:      grade,
+      xp_awarded: xp,
+      graded_at:  new Date().toISOString(),
+    }).eq('id', subId);
+
+    if (error) {
+      toast('Lỗi chấm điểm: ' + error.message, 'error');
+      if (btn) { btn.disabled = false; btn.textContent = '💾 Chấm điểm'; }
+      return;
+    }
+
+    toast(`✅ Đã chấm điểm · ${grade === 'pass' ? 'Đạt' : 'Chưa đạt'} · +${xp} XP`, 'success');
+    await loadWritingSubmissions();
+  }
+
+
+  /* ===================================================================
+     VOCAB NOTEBOOK FEATURE
+  =================================================================== */
+
+  function initVocabNotebookForLesson() {
+    // Remove any existing listener
+    const contentEl = document.getElementById('modal-content');
+    if (!contentEl) return;
+
+    const tooltip = document.getElementById('vocab-nb-tooltip');
+    if (!tooltip) return;
+
+    let tooltipWord = '';
+    let tooltipContext = '';
+
+    const showTooltip = (x, y, word, context) => {
+      tooltipWord = word;
+      tooltipContext = context;
+      tooltip.style.display = 'flex';
+      tooltip.style.left = Math.min(x, window.innerWidth - 140) + 'px';
+      tooltip.style.top  = (y - 44) + 'px';
+    };
+
+    const handleSelection = (e) => {
+      if (e.target === tooltip || tooltip.contains(e.target)) return;
+      // Small delay on touch to allow browser to finalize selection
+      const check = () => {
+        const sel = window.getSelection();
+        const text = (sel?.toString() || '').trim();
+        if (!text || text.length < 2 || text.length > 60 || text.includes('\n')) {
+          tooltip.style.display = 'none';
+          return;
+        }
+        // Only show inside lesson modal
+        const overlay = document.getElementById('lesson-overlay');
+        if (!overlay || overlay.classList.contains('hidden')) { tooltip.style.display = 'none'; return; }
+        const range = sel.getRangeAt(0);
+        const rect  = range.getBoundingClientRect();
+        const context = sel.anchorNode?.textContent?.trim().slice(0, 120) || '';
+        showTooltip(rect.left + rect.width/2 - 50, rect.top + window.scrollY, text, context);
+      };
+      // touchend needs slight delay for selection to stabilize
+      if (e.type === 'touchend') setTimeout(check, 120);
+      else check();
+    };
+
+    // Remove previous touchend handler if any, then re-register
+    if (document._vocabTouchHandler) {
+      document.removeEventListener('touchend', document._vocabTouchHandler);
+    }
+    document._vocabTouchHandler = handleSelection;
+
+    document.onmouseup = handleSelection;
+    // Touch support: use addEventListener to allow multiple handlers
+    document.addEventListener('touchend', handleSelection, { passive: true });
+
+    tooltip.onclick = async () => {
+      if (!tooltipWord || !currentUser) return;
+      tooltip.style.display = 'none';
+      window.getSelection()?.removeAllRanges();
+
+      const { error } = await sb.from('vocab_notebook').insert({
+        user_id:   currentUser.id,
+        word:      tooltipWord,
+        context:   tooltipContext,
+        lesson_id: activeSession?.lesson?.id || null,
+        saved_at:  new Date().toISOString(),
+      });
+
+      if (error && error.code !== '23505') {
+        toast('Không thể lưu từ: ' + error.message, 'error');
+      } else {
+        toast(`💾 Đã lưu "${tooltipWord}" vào sổ từ vựng!`, 'success');
+        refreshNbBadge();
+      }
+    };
+  }
+
+  async function refreshNbBadge() {
+    if (!currentUser) return;
+    const { count } = await sb.from('vocab_notebook')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', currentUser.id);
+    const badge = document.getElementById('nb-badge-count');
+    if (badge) {
+      badge.textContent = count || 0;
+      badge.style.display = (count && count > 0) ? 'flex' : 'none';
+    }
+  }
+
+  async function openVocabNotebook() {
+    const overlay = document.getElementById('vocab-nb-overlay');
+    if (!overlay) return;
+    overlay.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+
+    const grid = document.getElementById('vocab-nb-grid');
+    grid.innerHTML = '<div class="vocab-nb-empty"><div style="font-size:32px;margin-bottom:10px">⏳</div>Đang tải...</div>';
+
+    const { data, error } = await sb.from('vocab_notebook')
+      .select('id, word, context, saved_at')
+      .eq('user_id', currentUser.id)
+      .order('saved_at', { ascending: false });
+
+    const countEl = document.getElementById('nb-word-count');
+
+    if (!data || !data.length) {
+      grid.innerHTML = `<div class="vocab-nb-empty" style="grid-column:1/-1">
+        <div style="font-size:40px;margin-bottom:12px">📓</div>
+        <div style="font-weight:700;font-size:15px;color:var(--text);margin-bottom:6px">Sổ từ vựng trống</div>
+        <div style="font-size:13px;color:var(--text-muted)">Bôi đen từ bất kỳ trong bài học để lưu vào đây</div>
+      </div>`;
+      if (countEl) countEl.textContent = '0 từ';
+      return;
+    }
+
+    if (countEl) countEl.textContent = data.length + ' từ';
+
+    grid.innerHTML = data.map(item => `
+      <div class="nb-flashcard" id="nb-fc-${item.id}" onclick="flipNbCard(this)">
+        <button class="nb-fc-del" onclick="event.stopPropagation();deleteNbWord('${item.id}')" title="Xoá">×</button>
+        <div class="nb-fc-word">${esc(item.word)}</div>
+        <div class="nb-fc-context">${esc(item.context || 'Chưa có ngữ cảnh')}</div>
+        <div class="nb-fc-meaning">📖 Nhấn từ điển để tra nghĩa</div>
+      </div>
+    `).join('');
+  }
+
+  function flipNbCard(card) {
+    card.classList.toggle('flipped');
+    if (card.classList.contains('flipped')) {
+      const wordEl = card.querySelector('.nb-fc-word');
+      const word = wordEl?.textContent?.trim();
+      if (word) {
+        // Open dictionary in new tab
+        window.open('https://dictionary.cambridge.org/dictionary/english/' + encodeURIComponent(word), '_blank');
+        card.classList.remove('flipped');
+      }
+    }
+  }
+
+  function closeVocabNotebook() {
+    const overlay = document.getElementById('vocab-nb-overlay');
+    if (overlay) overlay.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  async function deleteNbWord(id) {
+    const { error } = await sb.from('vocab_notebook').delete().eq('id', id);
+    if (error) { toast('Lỗi xoá từ: ' + error.message, 'error'); return; }
+    const card = document.getElementById(`nb-fc-${id}`);
+    if (card) { card.style.opacity = '0'; card.style.transform = 'scale(.8)'; card.style.transition = 'opacity .2s, transform .2s'; setTimeout(() => card.remove(), 200); }
+    refreshNbBadge();
+    // Update count
+    const grid = document.getElementById('vocab-nb-grid');
+    const remaining = grid?.querySelectorAll('.nb-flashcard').length - 1;
+    const countEl = document.getElementById('nb-word-count');
+    if (countEl && remaining >= 0) countEl.textContent = remaining + ' từ';
+  }
+
+  /* BOOT */
 (function init() {
   const u = loadUser();
   if (u) { currentUser = u; goTo(u.role); }
@@ -7588,5 +8803,29 @@ function refreshAttPopupIfOpen() {
   </div>
 </div>
 
-</body>
+
+  <!-- ============================
+       VOCAB NOTEBOOK MODAL
+  ============================= -->
+  <div id="vocab-nb-tooltip">💾 Lưu từ</div>
+
+  <div id="vocab-nb-overlay" class="hidden" onclick="if(event.target===this)closeVocabNotebook()">
+    <div id="vocab-nb-modal">
+      <div class="vocab-nb-header">
+        <div class="vocab-nb-title">📓 Sổ từ vựng của tôi</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span id="nb-word-count" style="font-size:13px;color:var(--text-muted);font-weight:600">0 từ</span>
+          <button class="vocab-nb-close" onclick="closeVocabNotebook()">×</button>
+        </div>
+      </div>
+      <div class="vocab-nb-body">
+        <div style="font-size:12px;color:var(--text-sub);margin-bottom:14px;padding:10px 12px;background:var(--teal-glass);border-radius:10px">
+          💡 Bôi đen bất kỳ từ/cụm từ nào trong bài học để lưu vào sổ. Nhấn thẻ để xem nghĩa (tra từ điển).
+        </div>
+        <div id="vocab-nb-grid" class="vocab-nb-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  </body>
 </html>
