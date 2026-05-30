@@ -377,6 +377,18 @@
       to   { opacity: 1; transform: translateY(0) scaleY(1); }
     }
 
+    /* ── Drag & drop timeline rows ─────────────────────── */
+    .drag-handle { opacity: 0.4; transition: opacity .15s, color .15s; }
+    .drag-handle:hover { opacity: 1 !important; color: var(--red) !important; cursor: grab !important; }
+    #edit-timeline-body tr.drag-over td {
+      background: rgba(232,55,58,.12) !important;
+      border-top: 2px solid var(--red) !important;
+    }
+    #timeline-body tr.drag-over td {
+      background: rgba(232,55,58,.12) !important;
+      border-top: 2px solid var(--red) !important;
+    }
+
     #image-preview { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
     #image-preview img {
       width: 84px; height: 84px; object-fit: cover;
@@ -2190,6 +2202,7 @@
           <table class="tbl">
             <thead>
               <tr>
+                <th style="width:28px;" title="Drag to reorder"></th>
                 <th style="min-width:171px; white-space:nowrap;">Timestamp</th>
                 <th style="min-width:140px; white-space:nowrap;">Ticket / Ref</th>
                 <th style="width:80px; white-space:nowrap;">Priority</th>
@@ -2508,6 +2521,7 @@
       <div style="overflow-x:auto; border:1px solid var(--border); border-radius:10px;">
         <table class="tbl" style="font-size:12px; width:100%;">
           <thead><tr>
+            <th style="width:28px; padding:8px 6px;" title="Drag to reorder"></th>
             <th style="min-width:171px; padding:8px 6px;">Timestamp</th>
             <th style="min-width:140px; padding:8px 6px;">Ticket / Ref</th>
             <th style="min-width:80px;  padding:8px 6px;">Priority</th>
@@ -2888,6 +2902,14 @@ function addTimelineRow(ts='', ref='', prio='P1', status='In Process', activity=
   const rowId = 'tlrow-' + Date.now() + Math.random().toString(36).slice(2);
   tr.dataset.rowId = rowId;
   tr.innerHTML = `
+    <td style="padding:6px 4px; cursor:grab; color:var(--text3); text-align:center;" class="drag-handle" title="Drag to reorder">
+      <svg width="12" height="16" viewBox="0 0 12 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="4" cy="3" r="1.4"/><circle cx="8" cy="3" r="1.4"/>
+        <circle cx="4" cy="7" r="1.4"/><circle cx="8" cy="7" r="1.4"/>
+        <circle cx="4" cy="11" r="1.4"/><circle cx="8" cy="11" r="1.4"/>
+        <circle cx="4" cy="15" r="1.4"/><circle cx="8" cy="15" r="1.4"/>
+      </svg>
+    </td>
     <td><div style="display:flex;gap:4px;align-items:center;">
       <input type="text" class="field tl-ts" value="${ts}" placeholder="YYYY-MM-DD HH:MM:SS" autocomplete="off" style="min-width:185px;" />
       <button class="btn btn-ghost" onclick="setNow(this)" style="padding:4px 6px; flex-shrink:0;" title="Now">
@@ -2920,6 +2942,7 @@ function addTimelineRow(ts='', ref='', prio='P1', status='In Process', activity=
   // Auto-resize the new activity textarea
   const ta = tr.querySelector('.tl-activity');
   if (ta) { autoResize(ta); ta.addEventListener('input', () => autoResize(ta)); }
+  initCreateTimelineDragDrop();
 
   // ── Mobile card (mirrors the hidden table row) ──
   const cardsWrap = document.getElementById('timeline-cards');
@@ -3534,6 +3557,7 @@ function openEditModal() {
   });
 
   document.getElementById('modal-edit').style.display = 'flex';
+  setTimeout(initEditTimelineDragDrop, 50);
 }
 
 function removeExistingEditImage(btn, url) {
@@ -3545,7 +3569,16 @@ function addEditTimelineRow(logId='', ts='', ref='', prio='P1', status='In Proce
   const tbody = document.getElementById('edit-timeline-body');
   const tr = document.createElement('tr');
   tr.dataset.logId = logId || '';
+  tr.draggable = true;
   tr.innerHTML = `
+    <td style="padding:6px 4px; cursor:grab; color:var(--text3); text-align:center;" class="drag-handle" title="Drag to reorder">
+      <svg width="12" height="16" viewBox="0 0 12 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="4" cy="3" r="1.4"/><circle cx="8" cy="3" r="1.4"/>
+        <circle cx="4" cy="7" r="1.4"/><circle cx="8" cy="7" r="1.4"/>
+        <circle cx="4" cy="11" r="1.4"/><circle cx="8" cy="11" r="1.4"/>
+        <circle cx="4" cy="15" r="1.4"/><circle cx="8" cy="15" r="1.4"/>
+      </svg>
+    </td>
     <td><div style="display:flex;gap:4px;align-items:center;">
       <input type="text" class="field edit-tl-ts" value="${ts}" placeholder="YYYY-MM-DD HH:MM:SS" autocomplete="off" style="min-width:171px; font-size:12px; padding:6px 9px;" />
       <button class="btn btn-ghost" onclick="setEditNow(this)" style="padding:3px 5px; flex-shrink:0;" title="Now">
@@ -3577,6 +3610,7 @@ function addEditTimelineRow(logId='', ts='', ref='', prio='P1', status='In Proce
   tbody.appendChild(tr);
   const ta = tr.querySelector('.edit-tl-activity');
   if (ta) { autoResize(ta); }
+  initEditTimelineDragDrop();
 }
 
 function setEditNow(btn) {
@@ -3587,6 +3621,107 @@ function removeEditRow(btn) {
   const rows = document.querySelectorAll('#edit-timeline-body tr');
   if (rows.length <= 1) { toast('At least 1 timeline row is required', 'error'); return; }
   btn.closest('tr').remove();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  DRAG & DROP — Edit timeline row reordering
+// ══════════════════════════════════════════════════════════════
+let _dragSrc = null;
+
+function initEditTimelineDragDrop() {
+  const tbody = document.getElementById('edit-timeline-body');
+  if (!tbody) return;
+
+  tbody.querySelectorAll('tr').forEach(tr => {
+    // Avoid double-binding
+    if (tr._dragBound) return;
+    tr._dragBound = true;
+
+    tr.addEventListener('dragstart', e => {
+      _dragSrc = tr;
+      e.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => tr.style.opacity = '0.4', 0);
+    });
+    tr.addEventListener('dragend', () => {
+      tr.style.opacity = '';
+      tbody.querySelectorAll('tr').forEach(r => r.classList.remove('drag-over'));
+    });
+    tr.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (tr !== _dragSrc) {
+        tbody.querySelectorAll('tr').forEach(r => r.classList.remove('drag-over'));
+        tr.classList.add('drag-over');
+      }
+    });
+    tr.addEventListener('dragleave', () => tr.classList.remove('drag-over'));
+    tr.addEventListener('drop', e => {
+      e.preventDefault();
+      if (_dragSrc && _dragSrc !== tr) {
+        const rows = [...tbody.querySelectorAll('tr')];
+        const srcIdx = rows.indexOf(_dragSrc);
+        const tgtIdx = rows.indexOf(tr);
+        if (srcIdx < tgtIdx) tbody.insertBefore(_dragSrc, tr.nextSibling);
+        else tbody.insertBefore(_dragSrc, tr);
+      }
+      tr.classList.remove('drag-over');
+    });
+
+    // Only allow drag to start from the handle
+    const handle = tr.querySelector('.drag-handle');
+    if (handle) {
+      handle.addEventListener('mousedown', () => { tr.draggable = true; });
+      handle.addEventListener('mouseup',   () => { tr.draggable = false; });
+      tr.draggable = false; // disable by default, enable only on handle mousedown
+    }
+  });
+}
+
+function initCreateTimelineDragDrop() {
+  const tbody = document.getElementById('timeline-body');
+  if (!tbody) return;
+
+  tbody.querySelectorAll('tr').forEach(tr => {
+    if (tr._dragBound) return;
+    tr._dragBound = true;
+
+    tr.addEventListener('dragstart', e => {
+      _dragSrc = tr;
+      e.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => tr.style.opacity = '0.4', 0);
+    });
+    tr.addEventListener('dragend', () => {
+      tr.style.opacity = '';
+      tbody.querySelectorAll('tr').forEach(r => r.classList.remove('drag-over'));
+    });
+    tr.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (tr !== _dragSrc) {
+        tbody.querySelectorAll('tr').forEach(r => r.classList.remove('drag-over'));
+        tr.classList.add('drag-over');
+      }
+    });
+    tr.addEventListener('dragleave', () => tr.classList.remove('drag-over'));
+    tr.addEventListener('drop', e => {
+      e.preventDefault();
+      if (_dragSrc && _dragSrc !== tr) {
+        const rows = [...tbody.querySelectorAll('tr')];
+        const srcIdx = rows.indexOf(_dragSrc);
+        const tgtIdx = rows.indexOf(tr);
+        if (srcIdx < tgtIdx) tbody.insertBefore(_dragSrc, tr.nextSibling);
+        else tbody.insertBefore(_dragSrc, tr);
+      }
+      tr.classList.remove('drag-over');
+    });
+
+    const handle = tr.querySelector('.drag-handle');
+    if (handle) {
+      handle.addEventListener('mousedown', () => { tr.draggable = true; });
+      handle.addEventListener('mouseup',   () => { tr.draggable = false; });
+      tr.draggable = false;
+    }
+  });
 }
 
 // ══════════════════════════════════════════════════════════════
