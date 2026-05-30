@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="EngLearn" />
@@ -193,7 +193,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   transform: translateX(-50%) translateY(90px);
   background: #0f172a; color: #fff;
   padding: 13px 22px; border-radius: 12px;
-  font-size: 14px; font-weight: 500; z-index: 9999;
+  font-size: 14px; font-weight: 500; z-index: 999999;
   transition: transform .35s cubic-bezier(.34,1.56,.64,1);
   max-width: 340px; text-align: center;
   box-shadow: var(--shadow-lg); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
@@ -229,7 +229,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   padding: 20px 24px; border-bottom: 1px solid var(--border-light);
   flex-shrink: 0; background: #fff;
 }
-.modal-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 24px; max-width: 100%; -webkit-overflow-scrolling: touch; }
+.modal-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 24px; max-width: 100%; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
 .modal-body * { max-width: 100%; box-sizing: border-box; }
 .modal-footer {
   padding: 16px 24px; border-top: 1px solid var(--border-light);
@@ -2377,6 +2377,9 @@ select {
     font-family: var(--font-display); line-height: 1.6; margin-bottom: 16px;
     letter-spacing: .01em;
   }
+  @media (max-width: 380px) {
+    .speaking-sentence-text { font-size: 18px; line-height: 1.55; }
+  }
   /* word-by-word tokens */
   .sp-word { display: inline-block; padding: 2px 1px; border-radius: 4px; transition: all .2s; }
   .sp-word.heard    { color: var(--text-muted); background: var(--bg-2); }
@@ -2747,6 +2750,81 @@ select {
       white-space: nowrap;
     }
     .vocab-nb-tooltip:hover { background: #0f172a; }
+
+  /* =====================================================
+     HOVER GUARD — chỉ áp dụng hover effects trên thiết
+     bị có con trỏ thật (desktop/laptop). Trên mobile
+     (pointer: coarse) không có hover, tránh state "dính"
+     sau khi tap.
+  ===================================================== */
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 12px 32px rgba(13,148,136,.35); }
+    .btn-outline:hover { border-color: var(--teal); color: var(--teal); box-shadow: var(--shadow); transform: translateY(-1px); }
+    .btn-ghost:hover { background: var(--bg-2); color: var(--text); }
+    .input-wrap .eye-btn:hover { color: var(--teal); }
+    .back-link:hover { background: var(--bg-2); color: var(--text); }
+    .key:hover { background: var(--teal-light); color: var(--teal); box-shadow: 0 4px 16px rgba(13,148,136,.2); transform: scale(1.06); }
+    .key-ok:hover { background: linear-gradient(135deg, var(--teal-dark), var(--teal)); transform: scale(1.06); box-shadow: 0 8px 24px rgba(13,148,136,.4); }
+    .key-del:hover { color: var(--red); background: var(--red-light); transform: scale(1.06); }
+    .logout-chip:hover { background: var(--red-light); color: var(--red); }
+    .tab:hover:not(.active) { color: var(--text); background: rgba(255,255,255,.6); }
+    .lesson-card:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(13,148,136,.15), 0 2px 8px rgba(0,0,0,.06); }
+    .be-add-btn:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
+    .be-block:hover { border-color: var(--teal-mid); }
+    .be-block-del:hover { background: var(--red); color: #fff; }
+    .be-block-move:hover { background: var(--border); color: var(--text); }
+    .be-tc-btn:hover { border-color: var(--teal); color: var(--teal); }
+    .be-img-drop:hover { border-color: var(--teal); background: var(--teal-light); }
+    .ge-ex-add:hover { background: rgba(13,148,136,.15); }
+    .rq-question-block:hover { border-color: var(--teal-bright); }
+    .rq-del-q-btn:hover { background: var(--red); color: #fff; }
+    .rq-add-q-btn:hover { background: var(--teal-light); border-style: solid; }
+    .rq-emp-option:hover:not(:disabled) { border-color: var(--teal); background: var(--teal-light); color: var(--teal); }
+    .rq-retry-btn:hover { background: var(--red); color: #fff; }
+    .stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    tbody tr:hover { background: var(--teal-glass); }
+    .back-link:hover { color: var(--teal); background: var(--teal-light); }
+    .table-wrap tbody tr:hover { background: var(--teal-glass); }
+    .vocab-front:hover { border-color: rgba(13,148,136,.3); box-shadow: 0 4px 16px rgba(13,148,136,.12); }
+    .vocab-speak-btn:hover { color: var(--teal); background: var(--teal-glass); }
+    .att-section-wrap:hover { box-shadow: 0 6px 28px rgba(13,148,136,.11), 0 2px 8px rgba(0,0,0,.06); }
+    .att-collapse-header:hover { background: linear-gradient(135deg, #e0f8f4 0%, #f8fafc 60%); }
+    .att-collapse-chevron:hover { background: rgba(13,148,136,.16); }
+    .att-table tbody tr:nth-child(even):hover td.td-name { background: var(--teal-glass); }
+    .att-table tbody tr:hover td.td-name { background: var(--teal-glass); }
+    .att-table tbody tr:hover .att-cell.done    { background: linear-gradient(135deg, #bbf7d0 0%, #a7f3d0 100%); }
+    .att-table tbody tr:hover .att-cell.partial { background: linear-gradient(135deg, #fed7aa 0%, #fde68a 100%); }
+    .att-table tbody tr:hover .att-cell:not(.done):not(.partial):not(.noclass):not(.future):not(.weekend) { background: rgba(13,148,136,.06); }
+    .att-table tbody tr:hover td.today-td { background: rgba(13,148,136,.08) !important; }
+    .lesson-card.completed:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+    .mini-test-option:hover { border-color: var(--teal); background: var(--teal-light); }
+    .wv-cta:hover  { transform: translateY(-2px); box-shadow: 0 7px 0 var(--teal-dark), 0 12px 28px rgba(13,148,136,.45); }
+    .confirm-cancel:hover { background: var(--border); color: var(--text); }
+    .confirm-ok:hover   { transform: translateY(-1px); filter: brightness(1.08); }
+    .mt-review-confirm:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(13,148,136,.35); }
+    #intro-skip-btn:hover { background: rgba(255,255,255,.3); transform: scale(1.04); }
+    .sxp-card:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--border), var(--shadow); }
+    .sxp-card.streak-card:hover { box-shadow: 0 6px 0 #fed7aa, var(--shadow); }
+    .sxp-card.xp-card:hover { box-shadow: 0 6px 0 var(--teal-mid), var(--shadow); }
+    .sxp-card.rank-card:hover { box-shadow: 0 6px 0 #fde68a, var(--shadow); }
+    .att-popup-close:hover { background: #e5e7eb; }
+    .att-nav-btn:hover  { background: #e5e7eb; }
+    .claim-m-btn:hover   { transform: scale(1.05); }
+    .claim-close-btn:hover { background: var(--border); }
+    .speaking-record-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(13,148,136,.48); }
+    .sp-listen-btn:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
+    .speaking-nav-btn:hover { background: var(--teal-light); border-color: var(--teal); color: var(--teal); }
+    .writing-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(13,148,136,.4); }
+    #vocab-nb-tooltip:hover { background: #0d9488; }
+    .vocab-nb-close:hover { background: #e5e7eb; }
+    .nb-flashcard:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--teal); }
+    .nb-flashcard:hover .nb-fc-del { opacity: 1; }
+    .nb-header-btn:hover { background: var(--teal-light); border-color: var(--teal); color: var(--teal); }
+    .writing-sub-row:hover { border-color: var(--teal-bright); }
+    .writing-grade-btn:hover { opacity: .85; }
+    .nb-fc-del:hover { opacity: 1; color: var(--red); }
+    .vocab-nb-tooltip:hover { background: #0f172a; }
+  }
 
   </style>
 </head>
