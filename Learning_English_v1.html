@@ -593,34 +593,37 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 .tabs-section { margin-bottom: 20px; animation: fadeIn .5s .1s both; }
 .tabs-section-label { font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 12px; }
 .tabs-wrap {
-  padding-left: 1px; padding-right: 1px; margin: 0 -1px;
+  margin: 0 -20px;
+  padding: 0 20px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
+.tabs-wrap::-webkit-scrollbar { display: none; }
 .tabs {
   display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  background: var(--bg-2); padding: 5px; border-radius: 14px;
-  border: 1px solid var(--border-light);
+  flex-wrap: nowrap;
+  gap: 8px;
+  padding: 2px 2px 6px 2px;
+  width: max-content;
 }
 .tab {
-  flex: 1 1 calc(20% - 5px);
-  min-width: 0;
-  padding: 9px 6px; border-radius: 10px; font-size: 12px; font-weight: 600;
-  background: none; border: none; color: var(--text-muted); white-space: nowrap;
-  transition: color var(--transition), background var(--transition), box-shadow var(--transition); letter-spacing: -.01em;
-  text-align: center; overflow: hidden; text-overflow: ellipsis;
+  flex: none;
+  padding: 8px 16px; border-radius: 99px; font-size: 13px; font-weight: 600;
+  background: var(--card); border: 1.5px solid var(--border);
+  color: var(--text-muted); white-space: nowrap;
+  transition: color var(--transition), background var(--transition), border-color var(--transition), box-shadow var(--transition);
+  letter-spacing: -.01em;
 }
-/* Speaking & Writing go in row 2 as 2 equal halves */
 .tab[data-type="SPEAKING"],
-.tab[data-type="WRITING"] {
-  flex: 1 1 calc(50% - 5px);
-}
+.tab[data-type="WRITING"] { flex: none; }
 .tab.active {
-  background: #fff; color: var(--teal);
-  box-shadow: var(--shadow-sm); border: 1px solid rgba(13,148,136,.15);
+  background: var(--teal); color: #fff;
+  border-color: var(--teal);
+  box-shadow: 0 4px 12px rgba(13,148,136,.3);
 }
-.tab:hover:not(.active) { color: var(--text); background: rgba(255,255,255,.6); }
-.tab:active:not(.active) { background: rgba(255,255,255,.85); transform: scale(.97); }
+.tab:hover:not(.active) { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
+.tab:active { transform: scale(.95); }
 
 /* Lesson grid */
 .lessons-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
@@ -1219,6 +1222,7 @@ select {
 ===================================================== */
 @media (max-width: 640px) {
   .emp-main, .admin-main { padding: 16px; }
+  .tabs-wrap { margin: 0 -16px; padding: 0 16px; }
   .progress-card { padding: 22px 20px 20px; }
   .progress-card h2 { font-size: 18px; }
   .stats-grid { grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
@@ -1240,9 +1244,8 @@ select {
   .sxp-val  { font-size: 17px; }
   .sxp-lbl  { font-size: 10px; }
 
-  /* Tabs: scroll ngang đầy đủ */
+  /* Tabs: pill chips scroll ngang */
   .tabs-section { overflow: visible; }
-  .tabs-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
   /* Tables: chuyển sang card layout trên mobile */
   .table-wrap { overflow: visible; box-shadow: none; background: transparent; border: none; }
@@ -3161,7 +3164,7 @@ select {
 
     <!-- Tabs Section -->
     <div class="tabs-section">
-      <div class="tabs-label" style="font-size:11px;font-weight:700;color:var(--text-sub);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Danh mục bài học</div>
+      <div class="tabs-section-label">Danh mục bài học</div>
       <div class="tabs-wrap">
         <div class="tabs" id="lesson-tabs">
           <button class="tab active" data-type="ALL" onclick="switchTab(this)">✦ Tất cả</button>
@@ -4976,7 +4979,7 @@ function openLessonModal(lesson, alreadyCompleted) {
         <div class="vocab-criteria-hint">
           ✅ Lật tất cả thẻ để xem nghĩa — sau đó sẽ vào mini-test
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px">
           ${words.map((w,i) => `
             <div class="vocab-card" data-idx="${i}" onclick="flipVocabCard(event,this,'${esc(w.word)}',${i})" title="Nhấn để xem nghĩa" style="animation-delay:${i*0.04}s">
               <div class="vocab-card-inner">
