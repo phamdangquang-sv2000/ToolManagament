@@ -494,6 +494,43 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 }
 .logout-chip:hover { background: var(--red-light); color: var(--red); }
 
+/* ===== BGM TOGGLE BUTTON ===== */
+.bgm-btn {
+  width: 30px; height: 30px; border-radius: 50%; padding: 0;
+  background: none; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-muted); transition: background var(--transition), color var(--transition);
+  position: relative; flex-shrink: 0;
+}
+.bgm-btn:hover { background: var(--teal-glass); color: var(--teal); }
+.bgm-btn.bgm-off { color: var(--text-sub); }
+.bgm-btn .bgm-wave {
+  display: flex; align-items: center; gap: 1.5px; height: 14px;
+}
+.bgm-btn .bgm-bar {
+  width: 3px; border-radius: 99px;
+  background: currentColor;
+  animation: bgm-dance 0.8s ease-in-out infinite alternate;
+  transform-origin: bottom;
+}
+.bgm-btn .bgm-bar:nth-child(1) { height: 6px;  animation-delay: 0s;   }
+.bgm-btn .bgm-bar:nth-child(2) { height: 12px; animation-delay: 0.15s; }
+.bgm-btn .bgm-bar:nth-child(3) { height: 8px;  animation-delay: 0.3s; }
+.bgm-btn .bgm-bar:nth-child(4) { height: 10px; animation-delay: 0.1s; }
+.bgm-btn.bgm-off .bgm-bar { animation: none; height: 3px !important; opacity: 0.35; }
+@keyframes bgm-dance {
+  from { transform: scaleY(0.4); }
+  to   { transform: scaleY(1);   }
+}
+/* strikethrough line when muted */
+.bgm-btn .bgm-mute-line {
+  position: absolute; width: 18px; height: 2px;
+  background: var(--text-sub); border-radius: 2px;
+  transform: rotate(-45deg); display: none; left: 50%; top: 50%;
+  margin-left: -9px; margin-top: -1px;
+}
+.bgm-btn.bgm-off .bgm-mute-line { display: block; }
+
 /* =====================================================
    EMPLOYEE VIEW
 ===================================================== */
@@ -2783,6 +2820,7 @@ select {
     .key-ok:hover { background: linear-gradient(135deg, var(--teal-dark), var(--teal)); transform: scale(1.06); box-shadow: 0 8px 24px rgba(13,148,136,.4); }
     .key-del:hover { color: var(--red); background: var(--red-light); transform: scale(1.06); }
     .logout-chip:hover { background: var(--red-light); color: var(--red); }
+    .bgm-btn:hover { background: var(--teal-glass); color: var(--teal); }
     .tab:hover:not(.active) { color: var(--text); background: rgba(255,255,255,.6); }
     .lesson-card:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(13,148,136,.15), 0 2px 8px rgba(0,0,0,.06); }
     .be-add-btn:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
@@ -3046,6 +3084,15 @@ select {
           </button>
         <span id="header-name-label" style="font-size:13px">—</span>
         <div class="avatar" id="header-avatar">?</div>
+        <button class="bgm-btn" id="bgm-btn-emp" onclick="toggleBgm()" title="Nhạc nền">
+          <div class="bgm-wave">
+            <div class="bgm-bar"></div>
+            <div class="bgm-bar"></div>
+            <div class="bgm-bar"></div>
+            <div class="bgm-bar"></div>
+          </div>
+          <div class="bgm-mute-line"></div>
+        </button>
         <button class="logout-chip" onclick="logout()" title="Đăng xuất">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         </button>
@@ -3225,6 +3272,15 @@ select {
       <div class="header-user-chip">
         <span style="font-size:13px">Quản trị viên</span>
         <div class="avatar" style="background:linear-gradient(135deg,var(--teal),var(--teal-bright))">A</div>
+        <button class="bgm-btn" id="bgm-btn-admin" onclick="toggleBgm()" title="Nhạc nền">
+          <div class="bgm-wave">
+            <div class="bgm-bar"></div>
+            <div class="bgm-bar"></div>
+            <div class="bgm-bar"></div>
+            <div class="bgm-bar"></div>
+          </div>
+          <div class="bgm-mute-line"></div>
+        </button>
         <button class="logout-chip" onclick="logout()" title="Đăng xuất">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         </button>
@@ -4008,6 +4064,7 @@ function loadUser()  { try { return JSON.parse(localStorage.getItem('el_user'));
 function clearSession() { localStorage.removeItem('el_user'); currentUser = null; }
 
 async function logout() {
+  stopBgm();
   if (currentUser?.role === 'ADMIN') await sb.auth.signOut();
   if (realtimeChannel) sb.removeChannel(realtimeChannel);
   clearSession();
@@ -4032,6 +4089,7 @@ function goTo(role) {
     showView('employee');
     loadEmployeeData();
   }
+  startBgm();
 }
 
 /* TOAST */
@@ -4059,6 +4117,68 @@ function playCorrectSound() {
 }
 function playWrongSound() {
   try { _sfx.wrong.currentTime = 0; _sfx.wrong.play().catch(()=>{}); } catch(e) {}
+}
+
+/* ===== BACKGROUND MUSIC ===== */
+const _bgm = new Audio('https://dubvrtthmopdlyvxjhbw.supabase.co/storage/v1/object/public/sound_englearn/EngLearn%20Drift.mp3');
+_bgm.loop   = true;
+_bgm.volume = 0.35;
+
+let _bgmEnabled = true; // default: bật
+
+function _bgmLoadState() {
+  try {
+    const v = localStorage.getItem('bgm_enabled');
+    if (v !== null) _bgmEnabled = v !== '0';
+  } catch(e) {}
+}
+function _bgmSaveState() {
+  try { localStorage.setItem('bgm_enabled', _bgmEnabled ? '1' : '0'); } catch(e) {}
+}
+
+function _bgmUpdateButtons() {
+  document.querySelectorAll('.bgm-btn').forEach(btn => {
+    if (_bgmEnabled) {
+      btn.classList.remove('bgm-off');
+      btn.title = 'Tắt nhạc nền';
+    } else {
+      btn.classList.add('bgm-off');
+      btn.title = 'Bật nhạc nền';
+    }
+  });
+}
+
+function startBgm() {
+  _bgmLoadState();
+  _bgmUpdateButtons();
+  if (_bgmEnabled) {
+    _bgm.play().catch(() => {
+      // Autoplay blocked → chờ user interaction rồi thử lại
+      const resume = () => {
+        if (_bgmEnabled) _bgm.play().catch(() => {});
+        document.removeEventListener('click', resume);
+        document.removeEventListener('touchstart', resume);
+      };
+      document.addEventListener('click',      resume, { once: true });
+      document.addEventListener('touchstart', resume, { once: true });
+    });
+  }
+}
+
+function toggleBgm() {
+  _bgmEnabled = !_bgmEnabled;
+  _bgmSaveState();
+  _bgmUpdateButtons();
+  if (_bgmEnabled) {
+    _bgm.play().catch(() => {});
+  } else {
+    _bgm.pause();
+  }
+}
+
+function stopBgm() {
+  _bgm.pause();
+  _bgm.currentTime = 0;
 }
 
 /* CONFIRM DIALOG */
@@ -4314,6 +4434,7 @@ async function finishLogin(rec, isNewPin = false) {
         await grantRegistrationXP(u.id);  // grant XP → insert registration_xp
         showView('employee');
         await loadEmployeeData();          // load sau khi XP đã được ghi → hiển thị đúng
+        startBgm();
       });
     });
   } else {
@@ -4816,19 +4937,14 @@ async function startLesson(lessonId, alreadyCompleted, scheduledDate) {
 }
 
 function openLessonModal(lesson, alreadyCompleted) {
+  _bgm.pause();  // tắt nhạc nền khi vào bài học
   currentLessonCompleted = !!alreadyCompleted;
   // Update close button appearance based on completion status
   const closeBtn = document.getElementById('btn-close-lesson');
   if (closeBtn) {
-    if (currentLessonCompleted) {
-      closeBtn.title = 'Đóng bài học';
-      closeBtn.style.opacity = '1';
-      closeBtn.style.color = 'var(--text-muted)';
-    } else {
-      closeBtn.title = 'Phải hoàn thành bài học trước khi đóng';
-      closeBtn.style.opacity = '0.4';
-      closeBtn.style.color = '#ef4444';
-    }
+    closeBtn.title = 'Đóng bài học';
+    closeBtn.style.opacity = '1';
+    closeBtn.style.color = 'var(--text-muted)';
   }
   document.getElementById('modal-badge').className   = 'badge badge-' + lesson.type.toLowerCase();
   document.getElementById('modal-badge').textContent = lesson.type;
@@ -5107,6 +5223,7 @@ let currentLessonCompleted = false; // set to true when this lesson was already 
 function closeLessonModal() {
   document.getElementById('lesson-overlay').classList.add('hidden');
   document.body.style.overflow = '';
+  if (_bgmEnabled) _bgm.play().catch(() => {});  // bật lại nhạc nền khi thoát bài học
 }
 
 function tryCloseLessonModal() {
@@ -5129,7 +5246,22 @@ function tryCloseLessonModal() {
     closeLessonModal();
     loadTodaySessions();
   } else {
-    toast('Hãy hoàn thành bài học trước khi đóng!', 'error');
+    // Bài chưa hoàn thành → vẫn cho phép đóng (chỉ lưu session, không ghi nhận hoàn thành)
+    stopTimer();
+    if (activeSession) {
+      sb.from('learning_sessions').update({
+        ended_at: new Date().toISOString(), duration_seconds: elapsedSecs
+      }).eq('id', activeSession.id).then(() => {});
+      activeSession = null;
+    }
+    window.vocabProgress = null; window.readingQuiz = null; window._fillBlankState = null;
+    window.miniTest = null; window._speakingState = null; window._writingState = null;
+    if (window._activeRecognition) { try { window._activeRecognition.abort(); } catch(e){} window._activeRecognition = null; }
+    if (window._activeRecognitionTimeout) { clearTimeout(window._activeRecognitionTimeout); window._activeRecognitionTimeout = null; }
+    if (window._spCountdownTimer) { clearInterval(window._spCountdownTimer); window._spCountdownTimer = null; }
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    closeLessonModal();
+    loadTodaySessions();
   }
 }
 
@@ -5153,7 +5285,22 @@ function handleOverlayClick(e) {
       closeLessonModal();
       loadTodaySessions();
     } else {
-      toast('Hãy hoàn thành bài học trước khi đóng!', 'error');
+      // Bài chưa hoàn thành → vẫn cho phép đóng khi click overlay (chỉ lưu session, không ghi nhận hoàn thành)
+      stopTimer();
+      if (activeSession) {
+        sb.from('learning_sessions').update({
+          ended_at: new Date().toISOString(), duration_seconds: elapsedSecs
+        }).eq('id', activeSession.id).then(() => {});
+        activeSession = null;
+      }
+      window.vocabProgress = null; window.readingQuiz = null; window._fillBlankState = null;
+      window.miniTest = null; window._speakingState = null; window._writingState = null;
+      if (window._activeRecognition) { try { window._activeRecognition.abort(); } catch(e){} window._activeRecognition = null; }
+      if (window._activeRecognitionTimeout) { clearTimeout(window._activeRecognitionTimeout); window._activeRecognitionTimeout = null; }
+      if (window._spCountdownTimer) { clearInterval(window._spCountdownTimer); window._spCountdownTimer = null; }
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      closeLessonModal();
+      loadTodaySessions();
     }
   }
 }
