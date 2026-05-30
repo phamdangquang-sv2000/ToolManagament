@@ -2440,8 +2440,9 @@ select {
     width: 100%; padding: 14px 16px; border-radius: 12px;
     border: 2px solid var(--border); font-size: 16px;
     font-family: var(--font-body); background: #fff; color: var(--text);
-    outline: none; resize: vertical; min-height: 160px; line-height: 1.7;
+    outline: none; resize: none; min-height: 160px; line-height: 1.8;
     transition: border-color .2s, box-shadow .2s;
+    overflow-y: hidden;
   }
   .writing-textarea:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.12); }
   .writing-char-count { font-size: 11px; color: var(--text-sub); text-align: right; margin-top: 4px; }
@@ -3181,7 +3182,7 @@ select {
         <div style="display:flex;flex-direction:column;gap:16px">
           <div>
             <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Ngày học</label>
-            <input type="date" id="assign-date" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;background:var(--bg-2)">
+            <input type="date" id="assign-date" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;background:var(--bg-2)" onchange="renderAssignLessonList(this.value)">
           </div>
           <div>
             <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Bài học <span style="color:var(--teal)">(chọn nhiều)</span></label>
@@ -5600,17 +5601,34 @@ function renderAssignPage() {
 function openAssignModal() {
   document.getElementById('assign-date').value = todayStr();
 
-  // Render lessons as checkboxes
+  renderAssignLessonList(todayStr());
+
+  document.getElementById('assign-modal').classList.remove('hidden');
+}
+
+function renderAssignLessonList(date) {
+  // Collect lesson IDs already assigned on this date
+  const assignedIds = new Set(
+    allAssignSchedules
+      .filter(s => s.date === date)
+      .map(s => s.lesson_id)
+  );
+
+  const available = allLessonsAdmin.filter(l => !assignedIds.has(l.id));
+
   const lList = document.getElementById('assign-lessons-list');
-  lList.innerHTML = allLessonsAdmin.map(l => `
+  if (!available.length) {
+    lList.innerHTML = `<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:13px;background:var(--bg-2);border-radius:8px">✅ Tất cả bài học đã được phân công cho ngày này.</div>`;
+    return;
+  }
+
+  lList.innerHTML = available.map(l => `
     <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:14px;border:1px solid var(--border-light);background:#fff;transition:background .15s" onmouseover="this.style.background='var(--teal-light)'" onmouseout="this.style.background='#fff'">
       <input type="checkbox" value="${l.id}" class="assign-lesson-cb" style="width:16px;height:16px;accent-color:var(--teal)">
       <span>${esc(l.title)}</span>
       <span style="margin-left:auto;font-size:11px;color:var(--text-muted);font-weight:600">${l.type}</span>
     </label>
   `).join('');
-
-  document.getElementById('assign-modal').classList.remove('hidden');
 }
 
 /* EMPLOYEE TABLE COLLAPSE */
@@ -9063,13 +9081,18 @@ function refreshAttPopupIfOpen() {
           placeholder="Bắt đầu viết bài của bạn tại đây..."
           oninput="onWritingInput(this)"></textarea>
         <div class="writing-char-count" id="writing-word-count">0 từ (cần ${minWords} từ)</div>
+        <div style="margin-top:8px;font-size:12px;color:var(--text-sub);text-align:center">🔥 Đọc đề bài và viết ít nhất ${minWords} từ, sau đó nhấn Nộp bài.</div>
         <button class="writing-submit-btn" id="writing-submit-btn" onclick="submitWriting()" disabled>
-          📤 Nộp bài
+          📤 Nộp bài trước
         </button>
       </div>`;
   }
 
   function onWritingInput(ta) {
+    // Auto-expand height
+    ta.style.height = 'auto';
+    ta.style.height = Math.max(160, ta.scrollHeight) + 'px';
+
     const words = ta.value.trim().split(/\s+/).filter(Boolean).length;
     const st = window._writingState;
     const minWords = st ? st.minWords : 50;
