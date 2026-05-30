@@ -3233,6 +3233,33 @@ select {
           <!-- VOCAB section -->
           <div id="lm-vocab-section">
             <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Danh sách từ vựng</label>
+
+            <!-- ✨ AI VOCAB GENERATOR PANEL -->
+            <div id="lm-ai-vocab-panel" style="background:linear-gradient(135deg,#f0fdfa,#eff6ff);border:1.5px solid rgba(13,148,136,.25);border-radius:12px;padding:14px 16px;margin-bottom:14px;margin-top:8px">
+              <div style="display:flex;align-items:center;gap:7px;margin-bottom:12px">
+                <span style="font-size:16px">✨</span>
+                <span style="font-size:13px;font-weight:700;color:var(--teal-dark)">Tạo từ vựng bằng AI</span>
+                <span style="font-size:11px;color:var(--text-muted);margin-left:auto;font-weight:500">Không trùng các bài đã có</span>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <div style="flex:1;min-width:140px">
+                  <label style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;display:block">Chủ đề</label>
+                  <input type="text" id="lm-ai-topic" placeholder="VD: Family, Food, Travel, Office…" style="width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid var(--border);font-size:15px;background:#fff;font-family:var(--font-body);outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+                </div>
+                <div style="width:90px;flex-shrink:0">
+                  <label style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;display:block">Số từ</label>
+                  <input type="number" id="lm-ai-count" value="10" min="1" max="50" style="width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid var(--border);font-size:15px;background:#fff;font-family:var(--font-body);outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+                </div>
+                <div style="display:flex;align-items:flex-end">
+                  <button type="button" id="lm-ai-gen-btn" onclick="generateVocabWithAI()" style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--teal),var(--teal-mid));color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);box-shadow:0 4px 14px rgba(13,148,136,.3);transition:transform .2s,box-shadow .2s,opacity .2s;white-space:nowrap" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(13,148,136,.4)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 14px rgba(13,148,136,.3)'">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                    Tạo bằng AI
+                  </button>
+                </div>
+              </div>
+              <div id="lm-ai-vocab-status" style="margin-top:10px;font-size:12px;color:var(--text-muted);min-height:16px"></div>
+            </div>
+
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
               <span style="font-size:12px;color:var(--text-sub)">Mỗi dòng: <code style="background:var(--bg-2);padding:2px 6px;border-radius:4px;font-size:11px">từ | phiên âm | nghĩa</code></span>
               <button type="button" onclick="document.getElementById('lm-excel-input').click()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:8px;border:1.5px solid #16a34a;background:#f0fdf4;color:#16a34a;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);transition: transform .2s, opacity .2s, box-shadow .2s" onmouseover="this.style.background='#dcfce7'" onmouseout="this.style.background='#f0fdf4'">
@@ -3243,6 +3270,61 @@ select {
             </div>
             <textarea id="lm-vocab-input" rows="10" placeholder="father (n) | /ˈfɑːðər/ | cha, bố&#10;mother (n) | /ˈmʌðər/ | mẹ&#10;(có thể bỏ phiên âm: word | nghĩa)&#10;..." style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;background:var(--bg-2);font-family:var(--font-body);resize:vertical;line-height:1.7"></textarea>
             <div id="lm-vocab-preview" style="margin-top:8px;font-size:12px;color:var(--text-muted)"></div>
+          </div>
+
+          <!-- GRAMMAR TOPIC SELECTOR (only shown for GRAMMAR type) -->
+          <div id="lm-grammar-topic-row" class="hidden">
+            <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Chủ đề ngữ pháp</label>
+            <select id="lm-grammar-topic" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;background:var(--bg-2)" onchange="onGrammarTopicChange()">
+              <option value="">— Chọn chủ đề —</option>
+              <option>Nouns</option><option>Countable and uncountable nouns</option><option>Plural nouns</option><option>Possessive nouns</option>
+              <option>Pronouns</option><option>Subject pronouns</option><option>Object pronouns</option><option>Possessive adjectives</option><option>Possessive pronouns</option><option>Reflexive pronouns</option><option>Relative pronouns</option><option>Indefinite pronouns</option>
+              <option>Verbs</option><option>Verb to be</option><option>Auxiliary verbs</option><option>Action and stative verbs</option><option>Regular and irregular verbs</option>
+              <option>Tenses - Present Simple</option><option>Tenses - Present Continuous</option><option>Tenses - Present Perfect</option><option>Tenses - Present Perfect Continuous</option>
+              <option>Tenses - Past Simple</option><option>Tenses - Past Continuous</option><option>Tenses - Past Perfect</option><option>Tenses - Past Perfect Continuous</option>
+              <option>Tenses - Future Simple (will)</option><option>Tenses - Be going to</option><option>Tenses - Future Continuous</option><option>Tenses - Future Perfect</option>
+              <option>Adjectives</option><option>Adjective order</option><option>Comparatives</option><option>Superlatives</option><option>Equality (as...as)</option>
+              <option>Adverbs</option><option>Adverbs of frequency</option><option>Adverbs of manner</option><option>Adverbs of time</option><option>Adverbs of degree</option>
+              <option>Articles (a, an, the)</option><option>Determiners</option><option>Quantifiers (some, many, much, few, little)</option>
+              <option>Prepositions - time</option><option>Prepositions - place</option><option>Prepositions - movement</option><option>Prepositions - dependent</option>
+              <option>Conjunctions</option><option>Coordinating conjunctions</option><option>Subordinating conjunctions</option><option>Correlative conjunctions</option>
+              <option>Sentence structure</option><option>Subject and predicate</option><option>Objects and complements</option><option>Word order</option>
+              <option>Simple sentences</option><option>Compound sentences</option><option>Complex sentences</option>
+              <option>Questions (Yes/No questions)</option><option>WH-questions</option><option>Question tags</option><option>Negation</option><option>Imperatives</option><option>Exclamations</option>
+              <option>There is / There are</option><option>Have / Have got</option>
+              <option>Modal verbs (can, could, may, might)</option><option>Modal verbs (must, have to, should, ought to)</option><option>Modal verbs (need, dare, used to)</option>
+              <option>Gerunds (V-ing)</option><option>Infinitives (to V)</option><option>Bare infinitives</option><option>Verb patterns</option>
+              <option>Passive voice</option><option>Causative form (have/get something done)</option>
+              <option>Reported speech</option><option>Direct and indirect speech</option>
+              <option>Conditionals (type 0, 1, 2, 3)</option><option>Mixed conditionals</option>
+              <option>Relative clauses (defining)</option><option>Relative clauses (non-defining)</option><option>Reduced relative clauses</option>
+              <option>Noun clauses</option><option>Adverbial clauses</option><option>Participle clauses</option>
+              <option>Phrasal verbs</option><option>Collocations</option><option>Idiomatic expressions</option>
+              <option>Linking words</option><option>Discourse markers</option>
+              <option>Inversion</option><option>Subjunctive mood</option><option>Cleft sentences</option><option>Emphasis structures</option>
+              <option>Parallel structure</option><option>Ellipsis</option><option>Nominalisation</option>
+              <option>Formal vs informal grammar</option><option>Academic grammar structures</option>
+            </select>
+
+            <!-- ✨ AI GRAMMAR GENERATOR PANEL -->
+            <div id="lm-ai-grammar-panel" style="background:linear-gradient(135deg,#dcfce7,#f0fdfa);border:1.5px solid rgba(22,163,74,.25);border-radius:12px;padding:14px 16px;margin-top:12px">
+              <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px">
+                <span style="font-size:16px">🤖</span>
+                <span style="font-size:13px;font-weight:700;color:#15803d">Tạo bài giảng Grammar bằng AI</span>
+                <span style="font-size:11px;color:var(--text-muted);margin-left:auto">Tự động tạo nội dung + bài tập</span>
+              </div>
+              <div style="font-size:12px;color:#166534;line-height:1.6;margin-bottom:10px;background:rgba(22,163,74,.06);border-radius:8px;padding:8px 10px">
+                AI sẽ tạo: <strong>giải thích ngữ pháp</strong> (bảng công thức, ví dụ) + <strong>bài tập điền từ</strong> (5–8 câu) dựa trên chủ đề bạn chọn. Nội dung sẽ tự điền vào form bên dưới — bạn có thể chỉnh sửa thêm.
+              </div>
+              <button type="button" id="lm-ai-grammar-btn" onclick="generateGrammarWithAI()"
+                style="display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:9px;border:none;background:linear-gradient(135deg,#16a34a,#22c55e);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);box-shadow:0 4px 14px rgba(22,163,74,.3);transition:transform .2s,box-shadow .2s,opacity .2s;white-space:nowrap"
+                onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(22,163,74,.4)'"
+                onmouseout="this.style.transform='';this.style.boxShadow='0 4px 14px rgba(22,163,74,.3)'">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                ✨ Tạo bài giảng bằng AI
+              </button>
+              <div id="lm-ai-grammar-status" style="margin-top:10px;font-size:12px;color:var(--text-muted);min-height:16px"></div>
+            </div>
           </div>
 
           <!-- READING / GRAMMAR section -->
@@ -3292,7 +3374,35 @@ select {
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
               <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin:0">📝 Câu hỏi trắc nghiệm <span style="color:var(--teal);text-transform:none;letter-spacing:0;font-size:11px">(bắt buộc trả lời đúng để hoàn thành)</span></label>
             </div>
-            <div class="rq-note" style="margin-bottom:12px">💡 Nhân viên phải đọc xong bài và trả lời đúng tất cả câu hỏi mới được tính hoàn thành bài Reading.</div>
+            <div class="rq-note" style="margin-bottom:14px">💡 Nhân viên phải đọc xong bài và trả lời đúng tất cả câu hỏi mới được tính hoàn thành bài Reading.</div>
+
+            <!-- ✨ AI QUIZ GENERATOR -->
+            <div style="background:linear-gradient(135deg,#f0fdfa,#eff6ff);border:1.5px solid rgba(13,148,136,.25);border-radius:12px;padding:14px 16px;margin-bottom:16px">
+              <div style="display:flex;align-items:center;gap:7px;margin-bottom:12px">
+                <span style="font-size:16px">✨</span>
+                <span style="font-size:13px;font-weight:700;color:var(--teal-dark)">Tạo câu hỏi bằng AI</span>
+                <span style="font-size:11px;color:var(--text-muted);margin-left:auto">Dựa trên nội dung đoạn văn phía trên</span>
+              </div>
+              <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+                <div style="width:100px;flex-shrink:0">
+                  <label style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;display:block">Số câu hỏi</label>
+                  <input type="number" id="lm-ai-quiz-count" value="3" min="1" max="10"
+                    style="width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid var(--border);font-size:15px;background:#fff;font-family:var(--font-body);outline:none;transition:border-color .2s"
+                    onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+                </div>
+                <div style="display:flex;align-items:flex-end">
+                  <button type="button" id="lm-ai-quiz-btn" onclick="generateQuizWithAI()"
+                    style="display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--teal),var(--teal-mid));color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);box-shadow:0 4px 14px rgba(13,148,136,.3);transition:transform .2s,box-shadow .2s;white-space:nowrap"
+                    onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(13,148,136,.4)'"
+                    onmouseout="this.style.transform='';this.style.boxShadow='0 4px 14px rgba(13,148,136,.3)'">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                    Tạo bằng AI
+                  </button>
+                </div>
+              </div>
+              <div id="lm-ai-quiz-status" style="margin-top:10px;font-size:12px;color:var(--text-muted);min-height:16px"></div>
+            </div>
+
             <div id="lm-quiz-questions" style="display:flex;flex-direction:column;gap:12px"></div>
             <button type="button" class="rq-add-q-btn" style="margin-top:12px" onclick="addQuizQuestion()">+ Thêm câu hỏi</button>
           </div>
@@ -3506,14 +3616,18 @@ select {
           <label style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:8px">
             AI Provider
           </label>
-          <div style="display:flex;gap:8px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button id="ai-provider-groq" onclick="setAiProvider('groq')"
-              style="flex:1;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;font-size:13px;font-weight:700;font-family:var(--font-body);transition:.2s;background:var(--bg-2);color:var(--text-muted)">
+              style="flex:1;min-width:100px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;font-size:13px;font-weight:700;font-family:var(--font-body);transition:.2s;background:var(--bg-2);color:var(--text-muted)">
               ⚡ Groq
             </button>
             <button id="ai-provider-gemini" onclick="setAiProvider('gemini')"
-              style="flex:1;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;font-size:13px;font-weight:700;font-family:var(--font-body);transition:.2s;background:var(--bg-2);color:var(--text-muted)">
-              ✨ Gemini 2.5 Flash
+              style="flex:1;min-width:100px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;font-size:13px;font-weight:700;font-family:var(--font-body);transition:.2s;background:var(--bg-2);color:var(--text-muted)">
+              ✨ Gemini
+            </button>
+            <button id="ai-provider-openrouter" onclick="setAiProvider('openrouter')"
+              style="flex:1;min-width:100px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;font-size:13px;font-weight:700;font-family:var(--font-body);transition:.2s;background:var(--bg-2);color:var(--text-muted)">
+              🔀 OpenRouter
             </button>
           </div>
           <div id="ai-provider-status" style="margin-top:6px;font-size:12px;color:var(--text-muted)"></div>
@@ -3539,6 +3653,13 @@ select {
             </button>
           </div>
           <div id="groq-key-status" style="margin-top:8px;font-size:12px;color:var(--text-muted)"></div>
+          <button onclick="checkGroqQuota()" id="groq-quota-btn"
+            style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg-2);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);transition:.2s"
+            onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)';this.style.background='var(--teal-light)'"
+            onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)';this.style.background='var(--bg-2)'">
+            🔍 Kiểm tra quota
+          </button>
+          <div id="groq-quota-result" style="margin-top:8px;font-size:12px"></div>
         </div>
 
         <!-- Gemini API Key -->
@@ -3561,6 +3682,76 @@ select {
             </button>
           </div>
           <div id="gemini-key-status" style="margin-top:8px;font-size:12px;color:var(--text-muted)"></div>
+          <button onclick="checkGeminiQuota()" id="gemini-quota-btn"
+            style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg-2);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);transition:.2s"
+            onmouseover="this.style.borderColor='#4285f4';this.style.color='#4285f4';this.style.background='#eff6ff'"
+            onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)';this.style.background='var(--bg-2)'">
+            🔍 Kiểm tra quota
+          </button>
+          <div id="gemini-quota-result" style="margin-top:8px;font-size:12px"></div>
+        </div>
+
+        <!-- OpenRouter API Key + Model -->
+        <div id="openrouter-key-section">
+          <label style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:8px">
+            OpenRouter API Key
+            <a href="https://openrouter.ai/keys" target="_blank" style="margin-left:8px;font-size:11px;color:var(--teal);font-weight:600;text-transform:none;letter-spacing:0">Lấy key →</a>
+          </label>
+          <div style="display:flex;gap:10px;align-items:center">
+            <div style="position:relative;flex:1">
+              <input type="password" id="admin-openrouter-key" placeholder="sk-or-v1-..." autocomplete="off"
+                style="width:100%;padding:11px 44px 11px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:14px;font-family:var(--font-body);background:var(--bg-2);outline:none;transition:border-color .2s"
+                onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+              <button onclick="toggleOpenRouterKeyVisibility()" title="Hiện/ẩn key"
+                style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);padding:0;width:auto;font-size:16px" id="openrouter-eye-btn">👁</button>
+            </div>
+            <button onclick="saveOpenRouterKey()"
+              style="padding:11px 20px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:14px;font-weight:700;font-family:var(--font-body);white-space:nowrap;box-shadow:0 4px 14px rgba(124,58,237,.35)">
+              💾 Lưu
+            </button>
+          </div>
+          <div id="openrouter-key-status" style="margin-top:8px;font-size:12px;color:var(--text-muted)"></div>
+          <button onclick="checkOpenRouterQuota()" id="openrouter-quota-btn"
+            style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg-2);color:var(--text-muted);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);transition:.2s"
+            onmouseover="this.style.borderColor='#7c3aed';this.style.color='#7c3aed';this.style.background='#f5f3ff'"
+            onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)';this.style.background='var(--bg-2)'">
+            🔍 Kiểm tra credits
+          </button>
+          <div id="openrouter-quota-result" style="margin-top:8px;font-size:12px"></div>
+
+          <!-- Model selector -->
+          <div style="margin-top:14px">
+            <label style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:8px">
+              Model OpenRouter
+            </label>
+            <div style="display:flex;gap:8px;align-items:center">
+              <select id="openrouter-model-select" onchange="saveOpenRouterModel(this.value)"
+                style="flex:1;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:13px;font-family:var(--font-body);background:var(--bg-2);color:var(--text);outline:none;transition:border-color .2s;-webkit-appearance:none"
+                onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+                <optgroup label="🆓 Miễn phí">
+                  <option value="google/gemini-2.0-flash-exp:free">Gemini 2.0 Flash Exp (Free)</option>
+                  <option value="meta-llama/llama-4-scout:free">Llama 4 Scout (Free)</option>
+                  <option value="meta-llama/llama-4-maverick:free">Llama 4 Maverick (Free)</option>
+                  <option value="deepseek/deepseek-r1:free">DeepSeek R1 (Free)</option>
+                  <option value="deepseek/deepseek-chat-v3-0324:free">DeepSeek V3 (Free)</option>
+                  <option value="qwen/qwen3-235b-a22b:free">Qwen3 235B (Free)</option>
+                  <option value="microsoft/mai-ds-r1:free">Microsoft MAI DS R1 (Free)</option>
+                </optgroup>
+                <optgroup label="💎 Trả phí">
+                  <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
+                  <option value="openai/gpt-4.1-nano">GPT-4.1 Nano</option>
+                  <option value="openai/gpt-4o">GPT-4o</option>
+                  <option value="anthropic/claude-sonnet-4-5">Claude Sonnet 4.5</option>
+                  <option value="anthropic/claude-haiku-4-5">Claude Haiku 4.5</option>
+                  <option value="google/gemini-2.5-flash">Gemini 2.5 Flash</option>
+                  <option value="google/gemini-2.5-pro">Gemini 2.5 Pro</option>
+                  <option value="deepseek/deepseek-r1">DeepSeek R1</option>
+                  <option value="x-ai/grok-3-mini">Grok 3 Mini</option>
+                </optgroup>
+              </select>
+            </div>
+            <div id="openrouter-model-status" style="margin-top:6px;font-size:11px;color:var(--text-muted)"></div>
+          </div>
         </div>
 
       </div>
@@ -3665,7 +3856,7 @@ function goTo(role) {
     showView('admin');
     loadAdminData();
     subscribeRealtime();
-    setTimeout(() => { loadGroqKeyToInput(); loadGeminiKeyToInput(); loadAiProviderSetting(); }, 100);
+    setTimeout(() => { loadGroqKeyToInput(); loadGeminiKeyToInput(); loadOpenRouterKeyToInput(); loadAiProviderSetting(); }, 100);
   } else {
     showView('employee');
     loadEmployeeData();
@@ -6062,6 +6253,113 @@ async function importVocabFromExcel(input) {
   }
 }
 
+/* ===== AI VOCAB GENERATOR ===== */
+async function generateVocabWithAI() {
+  const topic = (document.getElementById('lm-ai-topic')?.value || '').trim();
+  const count = parseInt(document.getElementById('lm-ai-count')?.value) || 10;
+  const statusEl = document.getElementById('lm-ai-vocab-status');
+  const btn = document.getElementById('lm-ai-gen-btn');
+
+  if (!topic) {
+    if (statusEl) { statusEl.style.color = 'var(--red)'; statusEl.textContent = '⚠️ Vui lòng nhập chủ đề trước khi tạo.'; }
+    document.getElementById('lm-ai-topic')?.focus();
+    return;
+  }
+  if (count < 1 || count > 50) {
+    if (statusEl) { statusEl.style.color = 'var(--red)'; statusEl.textContent = '⚠️ Số từ hợp lệ: 1 – 50.'; }
+    return;
+  }
+
+  // Collect all existing words across ALL vocab lessons (to avoid duplicates)
+  const existingWords = new Set();
+  (allLessonsMgmt || []).forEach(l => {
+    if (l.type !== 'VOCAB' || !l.content) return;
+    try {
+      const words = JSON.parse(l.content);
+      words.forEach(w => { if (w.word) existingWords.add(w.word.toLowerCase().replace(/\s*\(.*?\)\s*/g, '').trim()); });
+    } catch {}
+  });
+
+  // Also collect words already in current textarea (current lesson being edited)
+  const taLines = (document.getElementById('lm-vocab-input')?.value || '')
+    .split('\n').map(l => l.trim()).filter(l => l.includes('|'));
+  taLines.forEach(l => {
+    const w = l.split('|')[0].trim().toLowerCase().replace(/\s*\(.*?\)\s*/g, '').trim();
+    if (w) existingWords.add(w);
+  });
+
+  const existingList = [...existingWords].slice(0, 300); // cap to avoid huge prompt
+
+  // UI: loading state
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; btn.style.cursor = 'not-allowed'; }
+  if (statusEl) { statusEl.style.color = 'var(--teal)'; statusEl.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:spin .65s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> AI đang tạo từ vựng…</span>'; }
+
+  try {
+    const systemPrompt = `You are an English vocabulary expert for Vietnamese learners. Generate vocabulary words in JSON format exactly as specified. Return ONLY a JSON object with a "words" array. No markdown, no explanation.`;
+
+    const excludeHint = existingList.length
+      ? `\n\nIMPORTANT: Do NOT include any of these already-used words (case-insensitive): ${existingList.join(', ')}`
+      : '';
+
+    const userContent = `Generate exactly ${count} English vocabulary words on the topic: "${topic}".${excludeHint}
+
+Return a JSON object like:
+{
+  "words": [
+    { "word": "father (n)", "phonetic": "/ˈfɑːðər/", "meaning": "cha, bố" },
+    ...
+  ]
+}
+
+Rules:
+- "word" should include part of speech in parentheses, e.g. "happy (adj)", "run (v)", "family (n)"
+- "phonetic" must be valid IPA in slashes, e.g. /ˈhæpi/
+- "meaning" must be Vietnamese translation
+- All ${count} words must be different and fit the topic "${topic}"
+- Words must be common, practical English vocabulary suitable for Vietnamese adult learners`;
+
+    const result = await callAI(systemPrompt, userContent, 1200);
+
+    const words = result?.words;
+    if (!Array.isArray(words) || words.length === 0) throw new Error('AI không trả về danh sách từ hợp lệ.');
+
+    // Filter out any accidental duplicates AI still produced
+    const filtered = words.filter(w => {
+      const base = (w.word || '').toLowerCase().replace(/\s*\(.*?\)\s*/g, '').trim();
+      return base && !existingWords.has(base);
+    });
+
+    const lines = filtered.map(w => {
+      const word = (w.word || '').trim();
+      const ph   = (w.phonetic || '').trim();
+      const mn   = (w.meaning || '').trim();
+      return ph ? `${word} | ${ph} | ${mn}` : `${word} | ${mn}`;
+    });
+
+    if (!lines.length) throw new Error('Tất cả từ AI tạo đều đã tồn tại trong các bài trước. Hãy thử chủ đề khác hoặc tăng số từ.');
+
+    // Append (don't overwrite) existing textarea content
+    const ta = document.getElementById('lm-vocab-input');
+    const existing = ta.value.trim();
+    ta.value = existing ? existing + '\n' + lines.join('\n') : lines.join('\n');
+    ta.dispatchEvent(new Event('input'));
+    updateVocabPreview();
+
+    const skipped = words.length - filtered.length;
+    const skipNote = skipped > 0 ? ` (bỏ qua ${skipped} từ trùng)` : '';
+    if (statusEl) { statusEl.style.color = 'var(--green)'; statusEl.textContent = `✅ Đã thêm ${filtered.length} từ vựng chủ đề "${topic}"${skipNote}.`; }
+    toast(`✅ AI đã tạo ${filtered.length} từ vựng!`, 'success');
+
+  } catch(err) {
+    console.error('[AI Vocab]', err);
+    const msg = err?.message || 'Lỗi không xác định';
+    if (statusEl) { statusEl.style.color = 'var(--red)'; statusEl.textContent = '❌ ' + msg; }
+    toast('Lỗi AI: ' + msg, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.style.opacity = ''; btn.style.cursor = ''; }
+  }
+}
+
 function onLessonTypeChange() {
   const type = document.getElementById('lm-type').value;
   document.getElementById('lm-vocab-section').classList.toggle('hidden', type !== 'VOCAB');
@@ -6076,6 +6374,19 @@ function onLessonTypeChange() {
   const toggleBtn = document.getElementById('lm-toggle-ex-btn');
   if (exSection && !isGrammar) exSection.classList.add('hidden');
   if (toggleBtn) toggleBtn.classList.toggle('hidden', !isGrammar);
+  // Show/hide grammar topic row
+  const topicRow = document.getElementById('lm-grammar-topic-row');
+  if (topicRow) topicRow.classList.toggle('hidden', !isGrammar);
+}
+
+function onGrammarTopicChange() {
+  const topic = document.getElementById('lm-grammar-topic')?.value;
+  if (!topic) return;
+  // Auto-fill title if empty
+  const titleEl = document.getElementById('lm-title');
+  if (titleEl && !titleEl.value.trim()) {
+    titleEl.value = 'Grammar: ' + topic;
+  }
 }
 
 // Live preview đếm số từ
@@ -6273,6 +6584,11 @@ function closeLessonMgmtModal() {
   document.getElementById('lm-grammar-ex-section')?.classList.add('hidden');
   const btn = document.getElementById('lm-toggle-ex-btn');
   if (btn) btn.textContent = '✏️ Thêm bài tập';
+  // Reset grammar topic
+  const topicEl = document.getElementById('lm-grammar-topic');
+  if (topicEl) topicEl.value = '';
+  const grammarStatus = document.getElementById('lm-ai-grammar-status');
+  if (grammarStatus) grammarStatus.textContent = '';
 }
 
 async function saveLessonMgmt() {
@@ -6355,6 +6671,215 @@ async function deleteLessonMgmt(id, title) {
   toast('Đã xoá bài học.', 'success');
   await loadLessonsMgmt();
   await loadAssignData();
+}
+
+/* ===== AI QUIZ GENERATOR (Reading) ===== */
+async function generateQuizWithAI() {
+  const statusEl = document.getElementById('lm-ai-quiz-status');
+  const btn      = document.getElementById('lm-ai-quiz-btn');
+  const count    = Math.min(10, Math.max(1, parseInt(document.getElementById('lm-ai-quiz-count')?.value) || 3));
+
+  // Get passage text from block editor
+  const html = geGetContent();
+  const passageText = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+
+  if (!passageText || passageText.length < 30) {
+    if (statusEl) { statusEl.style.color = 'var(--red)'; statusEl.textContent = '⚠️ Vui lòng nhập nội dung đoạn văn trước khi tạo câu hỏi.'; }
+    return;
+  }
+
+  // Loading state
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; btn.style.cursor = 'not-allowed'; }
+  if (statusEl) {
+    statusEl.style.color = 'var(--teal)';
+    statusEl.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin .65s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> AI đang tạo ' + count + ' câu hỏi…</span>';
+  }
+
+  try {
+    const systemPrompt = `You are an English reading comprehension quiz expert for Vietnamese adult learners. 
+Generate multiple-choice questions strictly based on the provided passage.
+Return ONLY a valid JSON object with a "questions" array. No markdown, no explanation outside the JSON.`;
+
+    const userContent = `Reading passage:
+"""
+${passageText.slice(0, 4000)}
+"""
+
+Generate exactly ${count} multiple-choice reading comprehension questions based ONLY on the passage above.
+
+Return this exact JSON structure:
+{
+  "questions": [
+    {
+      "question": "What is the main topic of the passage?",
+      "options": ["Option A text", "Option B text", "Option C text", "Option D text"],
+      "correctIndex": 0
+    }
+  ]
+}
+
+Rules:
+- Each question must have exactly 4 options (A, B, C, D)
+- correctIndex is 0-based (0=A, 1=B, 2=C, 3=D)
+- Questions must be answerable from the passage only — no outside knowledge
+- Wrong options must be plausible but clearly incorrect based on the passage
+- Questions should test understanding, not just word-spotting
+- Write questions and options in English
+- Vary question types: main idea, detail, vocabulary in context, inference
+- correctIndex should be distributed (not all 0)`;
+
+    const result = await callAI(systemPrompt, userContent, 2000);
+
+    const questions = result?.questions;
+    if (!Array.isArray(questions) || questions.length === 0) throw new Error('AI không trả về câu hỏi hợp lệ.');
+
+    // Validate & sanitize each question
+    const valid = [];
+    for (const q of questions) {
+      if (!q.question || !Array.isArray(q.options) || q.options.length < 4) continue;
+      const ci = parseInt(q.correctIndex);
+      valid.push({
+        question: q.question.trim(),
+        options: q.options.slice(0, 4).map(o => String(o).trim()),
+        correctIndex: isNaN(ci) || ci < 0 || ci > 3 ? 0 : ci
+      });
+    }
+    if (!valid.length) throw new Error('Không parse được câu hỏi từ AI. Thử lại.');
+
+    // Load into builder — APPEND (don't clear existing)
+    valid.forEach(q => addQuizQuestion(q));
+
+    if (statusEl) {
+      statusEl.style.color = 'var(--green)';
+      statusEl.textContent = `✅ Đã thêm ${valid.length} câu hỏi. Kiểm tra lại và chỉnh sửa nếu cần.`;
+    }
+    toast(`✅ AI đã tạo ${valid.length} câu hỏi trắc nghiệm!`, 'success');
+
+    // Scroll to first new question
+    setTimeout(() => {
+      const blocks = document.querySelectorAll('#lm-quiz-questions .rq-question-block');
+      if (blocks.length) blocks[blocks.length - valid.length]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+
+  } catch(err) {
+    console.error('[AI Quiz]', err);
+    const msg = err?.message || 'Lỗi không xác định';
+    if (statusEl) { statusEl.style.color = 'var(--red)'; statusEl.textContent = '❌ ' + msg; }
+    toast('Lỗi AI: ' + msg, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.style.opacity = ''; btn.style.cursor = ''; }
+  }
+}
+
+/* ===== AI GRAMMAR LESSON GENERATOR ===== */
+async function generateGrammarWithAI() {
+  const topic = (document.getElementById('lm-grammar-topic')?.value || '').trim();
+  const statusEl = document.getElementById('lm-ai-grammar-status');
+  const btn = document.getElementById('lm-ai-grammar-btn');
+
+  if (!topic) {
+    if (statusEl) { statusEl.style.color = 'var(--red)'; statusEl.textContent = '⚠️ Vui lòng chọn chủ đề ngữ pháp trước.'; }
+    document.getElementById('lm-grammar-topic')?.focus();
+    return;
+  }
+
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; btn.style.cursor = 'not-allowed'; }
+  if (statusEl) {
+    statusEl.style.color = 'var(--teal)';
+    statusEl.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin .65s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> AI đang tạo bài giảng…</span>';
+  }
+
+  try {
+    const systemPrompt = `You are an English grammar teacher creating lesson content for Vietnamese adult employees at a company. 
+Return ONLY a JSON object as specified. No markdown, no explanation outside the JSON.`;
+
+    const userContent = `Create a complete grammar lesson on the topic: "${topic}"
+
+Return this exact JSON structure:
+{
+  "title": "Auto-filled lesson title in English",
+  "html": "Complete HTML lesson content (headings, tables, bullet lists, examples — well-formatted)",
+  "instruction": "Fill-in-the-blank exercise instruction in Vietnamese. Example: Điền dạng đúng của động từ trong ngoặc vào chỗ trống.",
+  "exercises": [
+    { "before": "text before blank", "answer": "correct answer", "after": "text after blank", "hint": "(optional base form or hint)" },
+    ...
+  ]
+}
+
+Requirements for "html":
+- Use <h2> for section headings (e.g. "What is it?", "Structure / Formula", "Examples")
+- Use <table> for formula/structure tables with <thead><tbody>, styled columns
+- Use <ul><li> for bullet point lists
+- Use <p> for explanatory paragraphs
+- Include at least: 1 explanation section, 1 formula/structure table, 4–6 clear example sentences with Vietnamese translations in parentheses
+- Content must be clear, practical, and relevant to a Vietnamese office worker context
+- Write section headings and examples in English; Vietnamese translations in parentheses where helpful
+
+Requirements for "exercises":
+- Provide exactly 6 fill-in-the-blank exercises
+- Each exercise tests the "${topic}" grammar point directly
+- Use practical, workplace-relevant sentences
+- "before" = text before the blank (can be empty string)
+- "answer" = the correct word/phrase to fill in
+- "after" = text after the blank (can be empty string)
+- "hint" = optional base form or hint in parentheses, e.g. "(go)" or "(present simple)"
+- Make sure full sentence = before + [blank] + after`;
+
+    const result = await callAI(systemPrompt, userContent, 3000);
+
+    if (!result.html) throw new Error('AI không trả về nội dung bài giảng.');
+    if (!Array.isArray(result.exercises) || result.exercises.length === 0) throw new Error('AI không tạo được bài tập.');
+
+    // 1. Auto-fill title if empty
+    const titleEl = document.getElementById('lm-title');
+    if (titleEl && !titleEl.value.trim() && result.title) {
+      titleEl.value = result.title;
+    } else if (titleEl && !titleEl.value.trim()) {
+      titleEl.value = 'Grammar: ' + topic;
+    }
+
+    // 2. Set lesson HTML content into block editor
+    geSetContent(result.html.trim());
+
+    // 3. Show exercise section and populate it
+    const exSection = document.getElementById('lm-grammar-ex-section');
+    if (exSection) exSection.classList.remove('hidden');
+    const toggleBtn = document.getElementById('lm-toggle-ex-btn');
+    if (toggleBtn) toggleBtn.textContent = '✏️ Ẩn bài tập';
+
+    // Set exercise instruction
+    const instrEl = document.getElementById('ge-ex-instruction');
+    if (instrEl) instrEl.value = result.instruction || 'Điền từ đúng vào chỗ trống.';
+
+    // Clear existing rows
+    const rowsEl = document.getElementById('ge-ex-rows');
+    if (rowsEl) rowsEl.innerHTML = '';
+    _geExRows = [];
+
+    // Add each exercise row
+    result.exercises.forEach(ex => {
+      geAddExRow({
+        before: ex.before || '',
+        answer: ex.answer || '',
+        after: ex.after || '',
+        hint: ex.hint || ''
+      });
+    });
+
+    if (statusEl) {
+      statusEl.style.color = 'var(--green)';
+      statusEl.textContent = `✅ Đã tạo bài giảng "${topic}" với ${result.exercises.length} câu bài tập. Kiểm tra và chỉnh sửa nếu cần.`;
+    }
+    toast('✅ AI đã tạo xong bài giảng Grammar!', 'success');
+
+  } catch(err) {
+    console.error('[AI Grammar]', err);
+    const msg = err?.message || 'Lỗi không xác định';
+    if (statusEl) { statusEl.style.color = 'var(--red)'; statusEl.textContent = '❌ ' + msg; }
+    toast('Lỗi AI: ' + msg, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.style.opacity = ''; btn.style.cursor = ''; }
+  }
 }
 
 /* ===== QUIZ BUILDER (Admin) ===== */
@@ -6783,6 +7308,7 @@ async function generateFillBlank() {
   const provider = getAiProvider();
   if (provider === 'groq' && !getGroqKey()) { toast('Vui lòng nhập Groq API Key trong Cài đặt AI.', 'error'); return; }
   if (provider === 'gemini' && !getGeminiKey()) { toast('Vui lòng nhập Gemini API Key trong Cài đặt AI.', 'error'); return; }
+  if (provider === 'openrouter' && !getOpenRouterKey()) { toast('Vui lòng nhập OpenRouter API Key trong Cài đặt AI.', 'error'); return; }
 
   const btn = document.getElementById('lm-gen-blank-btn');
   const origHtml = btn.innerHTML;
@@ -8700,6 +9226,7 @@ function refreshAttPopupIfOpen() {
     const provider = getAiProvider();
     if (provider === 'groq' && !getGroqKey()) { toast('Vui lòng nhập Groq API Key trong Cài đặt AI.', 'error'); return; }
     if (provider === 'gemini' && !getGeminiKey()) { toast('Vui lòng nhập Gemini API Key trong Cài đặt AI.', 'error'); return; }
+    if (provider === 'openrouter' && !getOpenRouterKey()) { toast('Vui lòng nhập OpenRouter API Key trong Cài đặt AI.', 'error'); return; }
 
     const aiBtn = document.querySelector(`button[data-subid="${subId}"]`);
     const feedbackEl = document.getElementById(`ai-feedback-${subId}`);
@@ -8715,7 +9242,8 @@ Format: {"score":<0-100>,"grade":"pass or fail (pass if score>=50)","xp":<20 if 
       if (gradeEl) gradeEl.value = result.grade || 'pass';
       if (xpEl)    xpEl.value   = result.xp    || 10;
       const scoreColor = result.score >= 80 ? 'var(--green)' : result.score >= 50 ? 'var(--teal)' : 'var(--red)';
-      const providerLabel = getAiProvider() === 'gemini' ? '✨ Gemini 2.5 Flash' : '✨ Groq AI';
+      const providerLabels = { groq: '⚡ Groq AI', gemini: '✨ Gemini 2.5 Flash', openrouter: '🔀 ' + getOpenRouterModel() };
+      const providerLabel = providerLabels[getAiProvider()] || '✨ AI';
       if (feedbackEl) {
         feedbackEl.style.display = 'block';
         feedbackEl.innerHTML = `
@@ -8903,7 +9431,7 @@ Format: {"score":<0-100>,"grade":"pass or fail (pass if score>=50)","xp":<20 if 
 
   /* ===== AI PROVIDER SYSTEM ===== */
 
-  // Get current provider: 'groq' | 'gemini'
+  // Get current provider: 'groq' | 'gemini' | 'openrouter'
   function getAiProvider() {
     return window._aiProvider || localStorage.getItem('ai_provider') || 'groq';
   }
@@ -8913,21 +9441,30 @@ Format: {"score":<0-100>,"grade":"pass or fail (pass if score>=50)","xp":<20 if 
     localStorage.setItem('ai_provider', provider);
     sb.from('app_settings').upsert({ key: 'ai_provider', value: provider }, { onConflict: 'key' }).then(() => {});
     renderAiProviderUI();
-    toast(`✅ Đã chọn ${provider === 'gemini' ? 'Gemini 2.5 Flash' : 'Groq'}`, 'success');
+    const labels = { groq: 'Groq (Llama 4)', gemini: 'Gemini 2.5 Flash', openrouter: 'OpenRouter · ' + getOpenRouterModel() };
+    toast('✅ Đã chọn ' + (labels[provider] || provider), 'success');
   }
 
   function renderAiProviderUI() {
     const provider = getAiProvider();
-    const groqBtn    = document.getElementById('ai-provider-groq');
-    const geminiBtn  = document.getElementById('ai-provider-gemini');
-    const statusEl   = document.getElementById('ai-provider-status');
-    const activeStyle = 'background:linear-gradient(135deg,var(--teal),var(--teal-mid));color:#fff;border-color:var(--teal);box-shadow:var(--shadow-teal)';
-    const inactiveStyle = 'background:var(--bg-2);color:var(--text-muted);border-color:var(--border);box-shadow:none';
-    if (groqBtn)   groqBtn.style.cssText   += ';' + (provider === 'groq'   ? activeStyle : inactiveStyle);
-    if (geminiBtn) geminiBtn.style.cssText += ';' + (provider === 'gemini' ? activeStyle : inactiveStyle);
-    if (statusEl) statusEl.innerHTML = provider === 'gemini'
-      ? '<span style="color:#4285f4">✨ Đang dùng Gemini 2.5 Flash</span>'
-      : '<span style="color:var(--teal)">⚡ Đang dùng Groq (Llama 4)</span>';
+    const ids = ['groq', 'gemini', 'openrouter'];
+    const activeStyle  = 'flex:1;min-width:100px;padding:10px 14px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:700;font-family:var(--font-body);transition:.2s;border:1.5px solid var(--teal);background:linear-gradient(135deg,var(--teal),var(--teal-mid));color:#fff;box-shadow:var(--shadow-teal)';
+    const inactiveStyle = 'flex:1;min-width:100px;padding:10px 14px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:700;font-family:var(--font-body);transition:.2s;border:1.5px solid var(--border);background:var(--bg-2);color:var(--text-muted);box-shadow:none';
+    ids.forEach(id => {
+      const btn = document.getElementById('ai-provider-' + id);
+      if (btn) btn.style.cssText = provider === id ? activeStyle : inactiveStyle;
+    });
+    // Show/hide OR section
+    const orSection = document.getElementById('openrouter-key-section');
+    if (orSection) orSection.style.display = provider === 'openrouter' ? 'block' : 'none';
+    const statusEl = document.getElementById('ai-provider-status');
+    const orModel = getOpenRouterModel();
+    const statusMap = {
+      groq:       '<span style="color:var(--teal)">⚡ Đang dùng Groq · Llama 4 Scout</span>',
+      gemini:     '<span style="color:#4285f4">✨ Đang dùng Gemini 2.5 Flash</span>',
+      openrouter: '<span style="color:#7c3aed">🔀 Đang dùng OpenRouter · <strong>' + orModel + '</strong></span>',
+    };
+    if (statusEl) statusEl.innerHTML = statusMap[provider] || '';
   }
 
   /* ===== GROQ KEY HELPERS ===== */
@@ -9011,6 +9548,68 @@ Format: {"score":<0-100>,"grade":"pass or fail (pass if score>=50)","xp":<20 if 
       if (status) status.innerHTML = '<span style="color:var(--text-muted)">Chưa có key — nhập và lưu bên trên</span>';
     }
   }
+
+  /* ===== OPENROUTER KEY + MODEL HELPERS ===== */
+  function getOpenRouterKey() {
+    return window._openRouterApiKey || localStorage.getItem('openrouter_api_key') || '';
+  }
+  function getOpenRouterModel() {
+    return window._openRouterModel || localStorage.getItem('openrouter_model') || 'google/gemini-2.0-flash-exp:free';
+  }
+  async function saveOpenRouterKey() {
+    const key = document.getElementById('admin-openrouter-key')?.value?.trim();
+    if (!key) { toast('Vui lòng nhập OpenRouter API Key', 'error'); return; }
+    const btn = document.querySelector('button[onclick="saveOpenRouterKey()"]');
+    if (btn) { btn.disabled = true; btn.textContent = '...'; }
+    const { error } = await sb.from('app_settings').upsert({ key: 'openrouter_api_key', value: key }, { onConflict: 'key' });
+    if (btn) { btn.disabled = false; btn.textContent = '💾 Lưu'; }
+    if (error) { toast('Lỗi lưu key: ' + error.message, 'error'); return; }
+    window._openRouterApiKey = key;
+    localStorage.setItem('openrouter_api_key', key);
+    const status = document.getElementById('openrouter-key-status');
+    if (status) status.innerHTML = '<span style="color:var(--green)">✅ Đã lưu thành công</span>';
+    toast('✅ Đã lưu OpenRouter API Key', 'success');
+  }
+  function saveOpenRouterModel(model) {
+    window._openRouterModel = model;
+    localStorage.setItem('openrouter_model', model);
+    sb.from('app_settings').upsert({ key: 'openrouter_model', value: model }, { onConflict: 'key' }).then(() => {});
+    const statusEl = document.getElementById('openrouter-model-status');
+    if (statusEl) statusEl.innerHTML = '<span style="color:var(--teal)">✅ Đã chọn: ' + model + '</span>';
+    renderAiProviderUI();
+  }
+  function toggleOpenRouterKeyVisibility() {
+    const inp = document.getElementById('admin-openrouter-key');
+    const btn = document.getElementById('openrouter-eye-btn');
+    if (!inp) return;
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    if (btn) btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+  }
+  async function loadOpenRouterKeyToInput() {
+    const inp    = document.getElementById('admin-openrouter-key');
+    const status = document.getElementById('openrouter-key-status');
+    const selEl  = document.getElementById('openrouter-model-select');
+    const cachedKey = localStorage.getItem('openrouter_api_key');
+    if (cachedKey && inp) { inp.value = cachedKey; window._openRouterApiKey = cachedKey; }
+    const { data: keyData } = await sb.from('app_settings').select('value').eq('key', 'openrouter_api_key').maybeSingle();
+    if (keyData?.value) {
+      window._openRouterApiKey = keyData.value;
+      localStorage.setItem('openrouter_api_key', keyData.value);
+      if (inp) inp.value = keyData.value;
+      if (status) status.innerHTML = '<span style="color:#7c3aed">🔑 Key đã được lưu</span>';
+    } else if (!cachedKey) {
+      if (status) status.innerHTML = '<span style="color:var(--text-muted)">Chưa có key — nhập và lưu bên trên</span>';
+    }
+    const cachedModel = localStorage.getItem('openrouter_model');
+    if (cachedModel && selEl) { selEl.value = cachedModel; window._openRouterModel = cachedModel; }
+    const { data: modelData } = await sb.from('app_settings').select('value').eq('key', 'openrouter_model').maybeSingle();
+    if (modelData?.value) {
+      window._openRouterModel = modelData.value;
+      localStorage.setItem('openrouter_model', modelData.value);
+      if (selEl) selEl.value = modelData.value;
+    }
+  }
+
   async function loadAiProviderSetting() {
     const cached = localStorage.getItem('ai_provider');
     if (cached) window._aiProvider = cached;
@@ -9022,15 +9621,12 @@ Format: {"score":<0-100>,"grade":"pass or fail (pass if score>=50)","xp":<20 if 
     renderAiProviderUI();
   }
 
-  /* ===== UNIFIED AI CALL (Groq OR Gemini) ===== */
-  // Returns parsed JSON object from AI. systemPrompt + userContent → object
+  /* ===== UNIFIED AI CALL (Groq | Gemini | OpenRouter) ===== */
   async function callAI(systemPrompt, userContent, maxTokens) {
     const provider = getAiProvider();
-    if (provider === 'gemini') {
-      return callGemini(systemPrompt, userContent, maxTokens);
-    } else {
-      return callGroqDirect(systemPrompt, userContent, maxTokens);
-    }
+    if (provider === 'gemini')     return callGemini(systemPrompt, userContent, maxTokens);
+    if (provider === 'openrouter') return callOpenRouter(systemPrompt, userContent, maxTokens);
+    return callGroqDirect(systemPrompt, userContent, maxTokens);
   }
 
   async function callGroqDirect(systemPrompt, userContent, maxTokens) {
@@ -9038,7 +9634,7 @@ Format: {"score":<0-100>,"grade":"pass or fail (pass if score>=50)","xp":<20 if 
     if (!key) throw new Error('Chưa có Groq API Key. Vui lòng nhập trong Cài đặt AI.');
     const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
       body: JSON.stringify({
         model: 'meta-llama/llama-4-scout-17b-16e-instruct',
         max_tokens: maxTokens || 800,
@@ -9062,7 +9658,7 @@ Format: {"score":<0-100>,"grade":"pass or fail (pass if score>=50)","xp":<20 if 
     const key = getGeminiKey();
     if (!key) throw new Error('Chưa có Gemini API Key. Vui lòng nhập trong Cài đặt AI.');
     const resp = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + key,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -9083,6 +9679,220 @@ Format: {"score":<0-100>,"grade":"pass or fail (pass if score>=50)","xp":<20 if 
     const s = raw.indexOf('{'), e2 = raw.lastIndexOf('}');
     if (s === -1 || e2 === -1) throw new Error('Không parse được JSON từ Gemini');
     return JSON.parse(raw.slice(s, e2 + 1));
+  }
+
+  async function callOpenRouter(systemPrompt, userContent, maxTokens) {
+    const key   = getOpenRouterKey();
+    const model = getOpenRouterModel();
+    if (!key) throw new Error('Chưa có OpenRouter API Key. Vui lòng nhập trong Cài đặt AI.');
+    const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + key,
+        'HTTP-Referer': window.location.href,
+        'X-Title': 'EngLearn'
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: maxTokens || 800,
+        temperature: 0.2,
+        response_format: { type: 'json_object' },
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userContent }
+        ]
+      })
+    });
+    const data = await resp.json();
+    if (data.error) throw new Error('OpenRouter: ' + (data.error.message || JSON.stringify(data.error)));
+    const raw = (data.choices?.[0]?.message?.content || '').trim();
+    const s = raw.indexOf('{'), e2 = raw.lastIndexOf('}');
+    if (s === -1 || e2 === -1) throw new Error('Không parse được JSON từ OpenRouter (' + model + ')');
+    return JSON.parse(raw.slice(s, e2 + 1));
+  }
+
+
+
+  /* ===== AI QUOTA CHECKERS ===== */
+
+  function _quotaSetLoading(btnId, resultId, loading) {
+    const btn = document.getElementById(btnId);
+    const res = document.getElementById(resultId);
+    if (btn) {
+      btn.disabled = loading;
+      btn.style.opacity = loading ? '0.6' : '';
+      btn.style.cursor  = loading ? 'not-allowed' : '';
+      btn.innerHTML = loading
+        ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin .65s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Đang kiểm tra…'
+        : '🔍 Kiểm tra quota';
+      if (btnId === 'openrouter-quota-btn' && !loading) btn.innerHTML = '🔍 Kiểm tra credits';
+    }
+    if (res && loading) { res.innerHTML = ''; }
+  }
+
+  function _quotaCard(icon, label, value, valueColor, subLabel) {
+    return `<div style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:10px;background:var(--bg-2);border:1.5px solid var(--border);margin:2px 4px 2px 0">
+      <span style="font-size:15px">${icon}</span>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em">${label}</div>
+        <div style="font-size:13px;font-weight:700;color:${valueColor}">${value}</div>
+        ${subLabel ? `<div style="font-size:10px;color:var(--text-sub)">${subLabel}</div>` : ''}
+      </div>
+    </div>`;
+  }
+
+  /* ── GROQ ── */
+  async function checkGroqQuota() {
+    const key = getGroqKey();
+    const res = document.getElementById('groq-quota-result');
+    if (!key) { if (res) { res.style.color='var(--red)'; res.textContent='⚠️ Chưa có API Key.'; } return; }
+    _quotaSetLoading('groq-quota-btn', 'groq-quota-result', true);
+    try {
+      // Send a minimal request and read rate-limit headers
+      const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+        body: JSON.stringify({
+          model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+          max_tokens: 1,
+          messages: [{ role: 'user', content: 'Hi' }]
+        })
+      });
+      const hdrs = {
+        rpmLimit:    resp.headers.get('x-ratelimit-limit-requests'),
+        rpmRem:      resp.headers.get('x-ratelimit-remaining-requests'),
+        tpmLimit:    resp.headers.get('x-ratelimit-limit-tokens'),
+        tpmRem:      resp.headers.get('x-ratelimit-remaining-tokens'),
+        tpdLimit:    resp.headers.get('x-ratelimit-limit-tokens-per-day') || resp.headers.get('x-ratelimit-limit-tokens_per_day'),
+        tpdRem:      resp.headers.get('x-ratelimit-remaining-tokens-per-day') || resp.headers.get('x-ratelimit-remaining-tokens_per_day'),
+        resetReq:    resp.headers.get('x-ratelimit-reset-requests'),
+        resetTok:    resp.headers.get('x-ratelimit-reset-tokens'),
+      };
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error.message);
+
+      let html = '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">';
+      if (hdrs.rpmRem !== null)  html += _quotaCard('🔄', 'Req/phút còn', hdrs.rpmRem + (hdrs.rpmLimit ? '/' + hdrs.rpmLimit : ''), Number(hdrs.rpmRem) > 0 ? 'var(--green)' : 'var(--red)', hdrs.resetReq ? 'Reset: ' + hdrs.resetReq : '');
+      if (hdrs.tpmRem !== null)  html += _quotaCard('⚡', 'Token/phút còn', Number(hdrs.tpmRem).toLocaleString() + (hdrs.tpmLimit ? '/' + Number(hdrs.tpmLimit).toLocaleString() : ''), Number(hdrs.tpmRem) > 1000 ? 'var(--green)' : 'var(--red)', hdrs.resetTok ? 'Reset: ' + hdrs.resetTok : '');
+      if (hdrs.tpdRem !== null)  html += _quotaCard('📅', 'Token/ngày còn', Number(hdrs.tpdRem).toLocaleString() + (hdrs.tpdLimit ? '/' + Number(hdrs.tpdLimit).toLocaleString() : ''), Number(hdrs.tpdRem) > 5000 ? 'var(--green)' : 'var(--red)', 'Reset lúc 00:00 UTC');
+      if (!hdrs.rpmRem && !hdrs.tpmRem) html += '<span style="color:var(--green);font-weight:600">✅ Key hợp lệ · Headers không khả dụng với model này</span>';
+      html += '</div>';
+      if (res) res.innerHTML = html;
+    } catch(e) {
+      const msg = e.message || '';
+      if (res) {
+        if (msg.includes('rate_limit') || msg.includes('429')) {
+          res.innerHTML = '<span style="color:var(--red);font-weight:600">🚫 Đã hết rate limit · Thử lại sau ít phút</span>';
+        } else if (msg.includes('401') || msg.includes('invalid_api_key') || msg.includes('Unauthorized')) {
+          res.innerHTML = '<span style="color:var(--red);font-weight:600">❌ API Key không hợp lệ</span>';
+        } else {
+          res.innerHTML = `<span style="color:var(--red)">❌ ${msg}</span>`;
+        }
+      }
+    } finally {
+      _quotaSetLoading('groq-quota-btn', 'groq-quota-result', false);
+    }
+  }
+
+  /* ── GEMINI ── */
+  async function checkGeminiQuota() {
+    const key = getGeminiKey();
+    const res = document.getElementById('gemini-quota-result');
+    if (!key) { if (res) { res.style.color='var(--red)'; res.textContent='⚠️ Chưa có API Key.'; } return; }
+    _quotaSetLoading('gemini-quota-btn', 'gemini-quota-result', true);
+    try {
+      const resp = await fetch(
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + key,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: 'Hi' }] }],
+            generationConfig: { maxOutputTokens: 1, temperature: 0 }
+          })
+        }
+      );
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+
+      // Gemini doesn't expose quota headers — show usage from response + static limits
+      const usage = data.usageMetadata || {};
+      let html = '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">';
+      html += _quotaCard('✅', 'Trạng thái', 'Key hợp lệ', 'var(--green)', '');
+      html += _quotaCard('📊', 'Tokens dùng (test)', (usage.totalTokenCount || usage.promptTokenCount || '~2') + ' tokens', 'var(--teal)', 'Request này');
+      html += _quotaCard('📅', 'Giới hạn ngày', '1,500 req', 'var(--text)', 'Gemini 2.5 Flash Free');
+      html += _quotaCard('🔄', 'Giới hạn phút', '10 req/phút', 'var(--text)', 'Free tier');
+      html += '</div>';
+      html += '<div style="margin-top:6px;font-size:11px;color:var(--text-sub)">⚠️ Gemini không cung cấp API xem quota thời gian thực. Số liệu trên là giới hạn tối đa của Free tier.</div>';
+      if (res) res.innerHTML = html;
+    } catch(e) {
+      const msg = e.message || '';
+      if (res) {
+        if (msg.includes('RESOURCE_EXHAUSTED') || msg.includes('429') || msg.toLowerCase().includes('quota')) {
+          res.innerHTML = '<span style="color:var(--red);font-weight:600">🚫 Đã hết quota hôm nay · Reset lúc 00:00 UTC</span><br><span style="font-size:11px;color:var(--text-sub)">Gemini Free: 1,500 req/ngày · 10 req/phút</span>';
+        } else if (msg.includes('API_KEY_INVALID') || msg.includes('400')) {
+          res.innerHTML = '<span style="color:var(--red);font-weight:600">❌ API Key không hợp lệ</span>';
+        } else {
+          res.innerHTML = `<span style="color:var(--red)">❌ ${msg}</span>`;
+        }
+      }
+    } finally {
+      _quotaSetLoading('gemini-quota-btn', 'gemini-quota-result', false);
+    }
+  }
+
+  /* ── OPENROUTER ── */
+  async function checkOpenRouterQuota() {
+    const key = getOpenRouterKey();
+    const res = document.getElementById('openrouter-quota-result');
+    if (!key) { if (res) { res.style.color='var(--red)'; res.textContent='⚠️ Chưa có API Key.'; } return; }
+    _quotaSetLoading('openrouter-quota-btn', 'openrouter-quota-result', true);
+    try {
+      const resp = await fetch('https://openrouter.ai/api/v1/auth/key', {
+        headers: { 'Authorization': 'Bearer ' + key }
+      });
+      const data = await resp.json();
+      if (!resp.ok || data.error) throw new Error(data.error?.message || 'Không lấy được thông tin key');
+
+      const d = data.data || data;
+      const creditLimit  = d.limit ?? null;
+      const creditUsed   = d.usage ?? null;
+      const creditRemain = (creditLimit !== null && creditUsed !== null) ? (creditLimit - creditUsed) : null;
+      const isFree       = creditLimit === null || creditLimit === 0;
+      const label        = d.label || d.name || 'API Key';
+      const rateLimit    = d.rate_limit;
+
+      let html = '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">';
+      html += _quotaCard('🔑', 'Key', label.length > 20 ? label.slice(0,20)+'…' : label, 'var(--text)', '');
+
+      if (isFree) {
+        html += _quotaCard('💳', 'Credits', 'Free / Unlimited', 'var(--green)', 'Chỉ dùng free models');
+      } else if (creditRemain !== null) {
+        const color = creditRemain > 0.5 ? 'var(--green)' : creditRemain > 0.1 ? '#f59e0b' : 'var(--red)';
+        html += _quotaCard('💳', 'Credits còn', '$' + creditRemain.toFixed(4), color, 'Đã dùng $' + (creditUsed||0).toFixed(4));
+        if (creditLimit !== null) html += _quotaCard('📊', 'Giới hạn', '$' + creditLimit.toFixed(2), 'var(--text)', 'Tổng credit');
+      }
+
+      if (rateLimit) {
+        const interval = rateLimit.interval || '';
+        const reqs     = rateLimit.requests || rateLimit.limit || '';
+        if (reqs) html += _quotaCard('🔄', 'Rate limit', reqs + ' req/' + interval, 'var(--teal)', '');
+      }
+      html += '</div>';
+      if (res) res.innerHTML = html;
+    } catch(e) {
+      const msg = e.message || '';
+      if (res) {
+        if (msg.includes('401') || msg.includes('Unauthorized') || msg.includes('invalid')) {
+          res.innerHTML = '<span style="color:var(--red);font-weight:600">❌ API Key không hợp lệ</span>';
+        } else {
+          res.innerHTML = `<span style="color:var(--red)">❌ ${msg}</span>`;
+        }
+      }
+    } finally {
+      _quotaSetLoading('openrouter-quota-btn', 'openrouter-quota-result', false);
+    }
   }
 
   /* BOOT */
