@@ -1005,6 +1005,203 @@
     .score-input { width: 90px; }
 
     /* =====================================================
+       GRADING ENHANCEMENTS — REDESIGNED UI
+       ===================================================== */
+
+    /* ── Candidate info header ── */
+    .grade-candidate-header {
+      display: flex; align-items: center; gap: 16px;
+      padding: 18px 22px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px; margin-bottom: 20px;
+      position: relative; overflow: hidden;
+    }
+    .grade-candidate-header::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--accent-grad);
+    }
+    .grade-avatar {
+      width: 46px; height: 46px; border-radius: 12px;
+      background: var(--accent-grad);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 800; color: #fff; flex-shrink: 0;
+      font-family: 'Sora', sans-serif;
+      box-shadow: 0 4px 16px rgba(124,106,247,0.40);
+    }
+    .grade-candidate-info { flex: 1; min-width: 0; }
+    .grade-candidate-name { font-size: 16px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.2px; }
+    .grade-candidate-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .grade-meta-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+    .grade-meta-pill {
+      display: flex; align-items: center; gap: 5px;
+      padding: 5px 12px; border-radius: 100px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.09);
+      font-size: 11.5px; color: var(--text-secondary); font-weight: 600;
+    }
+    .grade-meta-pill .pill-icon { opacity: 0.7; }
+
+    /* ── Question cards ── */
+    .grade-q-card {
+      border-radius: 14px; margin-bottom: 14px; overflow: hidden;
+      border: 1.5px solid rgba(255,255,255,0.07);
+      background: rgba(18,21,38,0.92);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .grade-q-card:hover { border-color: rgba(255,255,255,0.13); box-shadow: 0 4px 20px rgba(0,0,0,0.28); }
+    .grade-q-card.q-correct  { border-color: rgba(67,233,123,0.28); }
+    .grade-q-card.q-wrong    { border-color: rgba(255,88,88,0.22); }
+    .grade-q-card.q-partial  { border-color: rgba(255,210,0,0.25); }
+    .grade-q-card.q-essay    { border-color: rgba(124,106,247,0.22); }
+
+    .grade-q-head {
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.025);
+    }
+    .grade-q-num {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: rgba(124,106,247,0.18);
+      color: #a89df9; font-size: 12px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-family: 'JetBrains Mono', monospace;
+    }
+    .grade-q-text { flex: 1; font-size: 13.5px; font-weight: 600; color: var(--text-primary); line-height: 1.5; }
+    .grade-q-type-badge { padding: 3px 10px; border-radius: 100px; font-size: 10.5px; font-weight: 700; flex-shrink: 0; }
+    .qbadge-single   { background: rgba(168,85,247,0.15); color: #c084fc; }
+    .qbadge-multiple { background: rgba(79,172,254,0.13); color: #4facfe; }
+    .qbadge-essay    { background: rgba(67,233,123,0.13); color: #43e97b; }
+    .grade-q-score-badge {
+      padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 700;
+      background: rgba(255,255,255,0.06); color: var(--text-muted);
+      border: 1px solid rgba(255,255,255,0.09); flex-shrink: 0;
+    }
+
+    .grade-q-body { padding: 16px 18px; }
+
+    /* Answer display */
+    .grade-answer-block { margin-bottom: 14px; }
+    .grade-answer-label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-muted); margin-bottom: 6px; }
+    .grade-answer-text {
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 9px;
+      font-size: 13.5px; color: var(--text-primary); line-height: 1.6;
+    }
+    .grade-answer-text.no-answer { color: var(--text-muted); font-style: italic; }
+    .grade-answer-text.essay-long { min-height: 64px; white-space: pre-wrap; word-break: break-word; }
+
+    /* Correct answer chip row */
+    .grade-correct-row {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .grade-correct-label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-muted); white-space: nowrap; }
+    .grade-answer-chip {
+      padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 600;
+      background: rgba(67,233,123,0.12); color: #43e97b;
+      border: 1px solid rgba(67,233,123,0.22);
+    }
+    .grade-answer-chip.chip-wrong {
+      background: rgba(255,88,88,0.10); color: #ff7878;
+      border-color: rgba(255,88,88,0.22);
+    }
+    .grade-result-chip {
+      margin-left: auto; padding: 4px 12px; border-radius: 100px;
+      font-size: 11.5px; font-weight: 700;
+    }
+    .grade-result-chip.correct  { background: rgba(67,233,123,0.15); color: #43e97b; border: 1px solid rgba(67,233,123,0.30); }
+    .grade-result-chip.wrong    { background: rgba(255,88,88,0.14); color: #ff6b6b; border: 1px solid rgba(255,88,88,0.28); }
+    .grade-result-chip.partial  { background: rgba(255,210,0,0.14); color: #ffd200; border: 1px solid rgba(255,210,0,0.28); }
+
+    /* Scoring row */
+    .grade-score-panel {
+      display: flex; align-items: center; gap: 12px; flex-wrap: nowrap;
+      padding: 11px 14px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px;
+      margin-top: 4px;
+      min-width: 0;
+    }
+    .partial-toggle-label {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 12px; color: var(--text-secondary); cursor: pointer; user-select: none;
+      padding: 5px 10px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      transition: all 0.18s;
+    }
+    .partial-toggle-label:hover { background: rgba(79,172,254,0.09); border-color: rgba(79,172,254,0.25); color: #4facfe; }
+    .partial-toggle-label input[type="checkbox"] { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; flex-shrink: 0; }
+    .partial-score-info { font-size: 11.5px; color: var(--info); font-weight: 600; }
+
+    .override-wrap { display: flex; align-items: center; gap: 7px; margin-left: auto; flex-shrink: 0; }
+    .override-wrap label { font-size: 11px; color: var(--text-muted); font-weight: 700; white-space: nowrap; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; }
+    .override-input {
+      width: 72px !important; max-width: 72px; padding: 6px 8px; text-align: center;
+      font-size: 15px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+      flex: 0 0 72px;
+    }
+    .override-max-label {
+      font-size: 14px; color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace; font-weight: 700;
+      white-space: nowrap; line-height: 1;
+    }
+
+    /* Essay score input */
+    .essay-score-wrap {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px;
+      background: rgba(124,106,247,0.05);
+      border: 1px solid rgba(124,106,247,0.15);
+      border-radius: 10px;
+      margin-top: 4px;
+    }
+    .essay-score-wrap label { font-size: 11.5px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin: 0; white-space: nowrap; }
+    .essay-score-input {
+      width: 80px !important; max-width: 80px; padding: 7px 10px; text-align: center;
+      font-size: 16px; font-weight: 800; font-family: 'JetBrains Mono', monospace;
+      flex: 0 0 80px;
+    }
+    .essay-score-max { font-size: 14px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-weight: 700; white-space: nowrap; line-height: 1; }
+    .essay-score-hint { font-size: 11px; color: var(--text-muted); margin-left: 8px; font-style: italic; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* ── Live score bar (footer) ── */
+    .grade-live-bar {
+      display: flex; align-items: stretch; gap: 0;
+      background: rgba(12,14,28,0.96);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 2px;
+    }
+    .grade-live-group {
+      display: flex; flex-direction: column; justify-content: center; gap: 3px;
+      padding: 14px 22px;
+      border-right: 1px solid rgba(255,255,255,0.07);
+      flex: 1; min-width: 0;
+    }
+    .grade-live-label { font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; white-space: nowrap; }
+    .grade-live-val { font-size: 22px; font-weight: 800; font-family: 'JetBrains Mono', monospace; letter-spacing: -0.5px; color: var(--text-primary); line-height: 1.1; }
+    .grade-live-pct { font-size: 22px; font-weight: 800; font-family: 'JetBrains Mono', monospace; letter-spacing: -0.5px; line-height: 1.1; }
+    .grade-live-pct.pass { color: var(--success); }
+    .grade-live-pct.fail { color: var(--danger); }
+    .grade-live-status {
+      display: flex; align-items: center; justify-content: center;
+      padding: 14px 20px;
+      font-size: 12px; font-weight: 800; letter-spacing: 0.3px;
+      white-space: nowrap; flex-shrink: 0; min-width: 140px;
+      border-left: 1px solid rgba(255,255,255,0.07);
+    }
+    .grade-live-status.pass { background: rgba(67,233,123,0.12); color: #43e97b; }
+    .grade-live-status.fail { background: rgba(255,88,88,0.12); color: #ff6b6b; }
+
+    /* =====================================================
        CHECKBOX
        ===================================================== */
     .checkbox-group {
@@ -1834,10 +2031,39 @@
       <button class="modal-close" onclick="App.modal.close('modal-grade')">✕</button>
     </div>
     <div class="modal-body" id="modal-grade-body"></div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="App.modal.close('modal-grade')">Đóng</button>
-      <button class="btn btn-danger" id="btn-reject" onclick="App.grading.finalize('fail')">Reject (Fail)</button>
-      <button class="btn btn-success" id="btn-approve" onclick="App.grading.finalize('pass')">Approve (Pass)</button>
+    <div class="modal-footer" style="flex-direction:column;align-items:stretch;gap:12px;padding:16px 20px;">
+      <!-- Live score preview bar -->
+      <div class="grade-live-bar" id="grade-live-bar">
+        <div class="grade-live-group">
+          <div class="grade-live-label">Tổng điểm</div>
+          <div class="grade-live-val" id="grade-total">0</div>
+        </div>
+        <div class="grade-live-group">
+          <div class="grade-live-label">Tổng tối đa</div>
+          <div class="grade-live-val" id="grade-possible">0</div>
+        </div>
+        <div class="grade-live-group">
+          <div class="grade-live-label">Tỷ lệ %</div>
+          <div class="grade-live-pct fail" id="grade-pct">0.0%</div>
+        </div>
+        <div class="grade-live-group" style="border-right:none;">
+          <div class="grade-live-label">Điểm đạt</div>
+          <div class="grade-live-val" id="grade-pass-threshold">70%</div>
+        </div>
+        <div class="grade-live-status fail" id="grade-live-status">⏳ Hiện tại: FAIL ✗</div>
+      </div>
+      <!-- Action buttons -->
+      <div style="display:flex;justify-content:flex-end;gap:10px;align-items:center;">
+        <button class="btn btn-secondary" onclick="App.modal.close('modal-grade')">✕ Đóng</button>
+        <button class="btn btn-danger" id="btn-reject" onclick="App.grading.finalize('fail')" style="min-width:140px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          Reject (Fail)
+        </button>
+        <button class="btn btn-success" id="btn-approve" onclick="App.grading.finalize('pass')" style="min-width:150px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Approve (Pass)
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -3756,51 +3982,128 @@ const App = {
       let autoScore = 0;
       let totalPossible = (questions||[]).reduce((s,q) => s + (q.score||0), 0);
 
+      const empName = attempt.hr_employees?.name || '?';
+      const empInitial = empName.trim().split(' ').pop()?.[0]?.toUpperCase() || '?';
       body.innerHTML = `
-        <div class="card mb-4" style="background:var(--bg-secondary);">
-          <div class="two-col">
-            <div><div class="text-sm text-muted">Nhân viên</div><div class="font-semibold">${attempt.hr_employees?.name}</div></div>
-            <div><div class="text-sm text-muted">Email</div><div>${attempt.hr_employees?.email}</div></div>
-            <div><div class="text-sm text-muted">Bài thi</div><div class="font-semibold">${attempt.exam_tests?.name}</div></div>
-            <div><div class="text-sm text-muted">Dự án</div><div>${attempt.exam_tests?._project_name||projName}</div></div>
-            <div><div class="text-sm text-muted">Bắt đầu</div><div class="text-sm">${App.util.formatDate(attempt.started_at)}</div></div>
-            <div><div class="text-sm text-muted">Nộp lúc</div><div class="text-sm">${App.util.formatDate(attempt.submitted_at)}</div></div>
+        <!-- Candidate header -->
+        <div class="grade-candidate-header">
+          <div class="grade-avatar">${empInitial}</div>
+          <div class="grade-candidate-info">
+            <div class="grade-candidate-name">${empName}</div>
+            <div class="grade-candidate-sub">${attempt.hr_employees?.email || ''}</div>
+          </div>
+          <div class="grade-meta-pills">
+            <div class="grade-meta-pill">
+              <span class="pill-icon">📋</span>
+              <span>${attempt.exam_tests?.name || ''}</span>
+            </div>
+            <div class="grade-meta-pill">
+              <span class="pill-icon">📁</span>
+              <span>${attempt.exam_tests?._project_name || projName || '—'}</span>
+            </div>
+            <div class="grade-meta-pill">
+              <span class="pill-icon">🕐</span>
+              <span>${App.util.formatDate(attempt.submitted_at)}</span>
+            </div>
           </div>
         </div>
+
+        <!-- Questions -->
         <div>
           ${(questions||[]).map((q,i) => {
             const ans = answerMap[q.id];
             const userAns = ans?.answer_data;
             let autoCalc = 0;
+            let partialCalc = 0;
             let isCorrect = false;
+            let correctHits = 0;
+            let totalCorrect = 0;
             if (q.type !== 'essay') {
               const correctSet = new Set(q.correct_answers||[]);
               const userSet = new Set(Array.isArray(userAns) ? userAns : userAns ? [userAns] : []);
+              totalCorrect = correctSet.size;
               isCorrect = correctSet.size === userSet.size && [...correctSet].every(x=>userSet.has(x));
-              if (isCorrect) { autoCalc = q.score||0; autoScore += autoCalc; }
+              if (isCorrect) { autoCalc = q.score||0; }
+              // Partial scoring for multiple-choice (no penalty for wrong selections)
+              if (q.type === 'multiple' && correctSet.size > 0) {
+                correctHits = [...userSet].filter(x => correctSet.has(x)).length;
+                const wrongHits = [...userSet].filter(x => !correctSet.has(x)).length;
+                partialCalc = wrongHits === 0
+                  ? parseFloat(((correctHits / correctSet.size) * (q.score||0)).toFixed(2))
+                  : autoCalc;
+              }
+              autoScore += autoCalc;
             }
+            // card state class
+            const cardClass = q.type === 'essay' ? 'q-essay' : (isCorrect ? 'q-correct' : (partialCalc > 0 && partialCalc < (q.score||0) ? 'q-partial' : 'q-wrong'));
+            const typeBadgeClass = q.type === 'single' ? 'qbadge-single' : q.type === 'multiple' ? 'qbadge-multiple' : 'qbadge-essay';
+            const typeLabel = q.type === 'single' ? 'Một đáp án' : q.type === 'multiple' ? 'Nhiều đáp án' : 'Tự luận';
+            const userAnsDisplay = userAns
+              ? (Array.isArray(userAns) ? userAns.join(', ') : userAns)
+              : null;
             return `
-              <div class="grading-answer">
-                <div class="grading-q">Câu ${i+1}: ${q.question_text}</div>
-                <div class="grading-a">
-                  Trả lời: ${userAns ? (Array.isArray(userAns) ? userAns.join(', ') : userAns) : '<em style="color:var(--text-muted)">Không trả lời</em>'}
+              <div class="grade-q-card ${cardClass}">
+                <!-- Head -->
+                <div class="grade-q-head">
+                  <div class="grade-q-num">${i+1}</div>
+                  <div class="grade-q-text">${q.question_text}</div>
+                  <span class="grade-q-type-badge ${typeBadgeClass}">${typeLabel}</span>
+                  <span class="grade-q-score-badge">⭐ ${q.score||0} điểm</span>
                 </div>
-                ${q.type !== 'essay' ? `<div class="grading-correct">✓ Đáp án đúng: ${(q.correct_answers||[]).join(', ')} · ${isCorrect?'<span style="color:var(--success)">Đúng</span>':'<span style="color:var(--danger)">Sai</span>'} · ${autoCalc}/${q.score||0} điểm</div>` : `
-                  <div class="mt-2">
-                    <label class="text-sm text-muted">Điểm câu tự luận (tối đa ${q.score||0}):</label>
-                    <input type="number" class="score-input essay-score-input" data-qid="${q.id}" data-max="${q.score||0}" min="0" max="${q.score||0}" step="0.5" value="0" onchange="App.grading.recalcTotal()">
+                <!-- Body -->
+                <div class="grade-q-body">
+                  <!-- User answer -->
+                  <div class="grade-answer-block">
+                    <div class="grade-answer-label">Câu trả lời của thí sinh</div>
+                    <div class="grade-answer-text ${userAnsDisplay ? (q.type==='essay' ? 'essay-long' : '') : 'no-answer'}">
+                      ${userAnsDisplay || 'Không trả lời'}
+                    </div>
                   </div>
-                `}
+
+                  ${q.type !== 'essay' ? `
+                    <!-- Correct answer chips + result -->
+                    <div class="grade-correct-row">
+                      <span class="grade-correct-label">Đáp án đúng:</span>
+                      ${(q.correct_answers||[]).map(a => `<span class="grade-answer-chip">${a}</span>`).join('')}
+                      ${isCorrect
+                        ? `<span class="grade-result-chip correct">✓ Đúng hoàn toàn</span>`
+                        : (partialCalc > 0 && q.type === 'multiple'
+                          ? `<span class="grade-result-chip partial">⚡ Đúng ${correctHits}/${totalCorrect}</span>`
+                          : `<span class="grade-result-chip wrong">✗ Sai / Thiếu</span>`)}
+                    </div>
+                    <!-- Score panel -->
+                    <div class="grade-score-panel">
+                      ${q.type === 'multiple' && !isCorrect && totalCorrect > 0 ? `
+                        <span class="partial-score-info">Đúng ${correctHits}/${totalCorrect} ý → ${partialCalc} đ nếu partial</span>
+                        <label class="partial-toggle-label" title="Áp dụng chấm điểm theo tỷ lệ số đáp án đúng được chọn">
+                          <input type="checkbox" onchange="App.grading.applyPartial('${q.id}', ${partialCalc}, ${autoCalc}, this.checked)">
+                          Partial scoring
+                        </label>
+                      ` : ''}
+                      <div class="override-wrap">
+                        <label>Override</label>
+                        <input type="number" class="override-input grade-override-input" id="override-${q.id}" data-auto="${autoCalc}" data-max="${q.score||0}" min="0" max="${q.score||0}" step="0.25" value="${autoCalc}" oninput="App.grading.recalcTotal()">
+                        <span class="override-max-label">/ ${q.score||0}</span>
+                      </div>
+                    </div>
+                  ` : `
+                    <!-- Essay scoring -->
+                    <div class="essay-score-wrap">
+                      <label>Điểm tự luận</label>
+                      <input type="number" class="score-input essay-score-input" data-qid="${q.id}" data-max="${q.score||0}" min="0" max="${q.score||0}" step="0.5" value="0" oninput="App.grading.recalcTotal()">
+                      <span class="essay-score-max">/ ${q.score||0}</span>
+                      <span class="essay-score-hint">Nhập điểm dựa trên nội dung bài viết</span>
+                    </div>
+                  `}
+                </div>
               </div>
             `;
           }).join('')}
         </div>
-        <div class="card mt-4" style="background:var(--bg-secondary);">
-          <div class="flex items-center justify-between">
-            <div><div class="text-sm text-muted">Điểm tự động (trắc nghiệm)</div><div class="text-xl font-bold" style="color:var(--accent);">${autoScore} / ${totalPossible}</div></div>
-            <div><div class="text-sm text-muted">Tổng điểm (bao gồm tự luận)</div><div class="text-xl font-bold" id="grade-total">${autoScore}</div></div>
-            <div><div class="text-sm text-muted">Điểm đạt</div><div>${attempt.exam_tests?.pass_score||70}%</div></div>
-          </div>
+        <div style="padding:10px 16px;background:rgba(124,106,247,0.06);border:1px solid rgba(124,106,247,0.14);border-radius:10px;font-size:12px;color:var(--text-muted);margin-top:4px;line-height:1.6;">
+          💡 <strong style="color:var(--text-secondary)">Hướng dẫn:</strong>
+          Câu đúng hoàn toàn tự động tính điểm. Câu nhiều đáp án có thể bật <em>Partial scoring</em>.
+          Điều chỉnh <em>Override</em> để ghi đè điểm thủ công. Tổng điểm cập nhật theo thời gian thực ở dưới.
         </div>
       `;
       // Store for recalc
@@ -3808,19 +4111,68 @@ const App = {
       App.state.gradeContext.totalPossible = totalPossible;
       App.state.gradeContext.passPct = attempt.exam_tests?.pass_score || 70;
       App.modal.open('modal-grade');
+      // Populate static elements in live bar and run initial recalc
+      const elPossible = document.getElementById('grade-possible');
+      const elThreshold = document.getElementById('grade-pass-threshold');
+      if (elPossible) elPossible.textContent = totalPossible;
+      if (elThreshold) elThreshold.textContent = (attempt.exam_tests?.pass_score || 70) + '%';
+      setTimeout(() => App.grading.recalcTotal(), 30);
     },
 
     recalcTotal() {
-      let total = App.state.gradeContext.autoScore || 0;
-      document.querySelectorAll('.essay-score-input').forEach(inp => { total += parseFloat(inp.value)||0; });
-      document.getElementById('grade-total').textContent = total.toFixed(1);
+      let total = 0;
+      // Sum all per-question override inputs (non-essay MC questions)
+      document.querySelectorAll('.grade-override-input').forEach(inp => {
+        const max = parseFloat(inp.dataset.max) || 0;
+        let val = Math.min(Math.max(parseFloat(inp.value) || 0, 0), max);
+        total += val;
+      });
+      // Sum all essay score inputs
+      document.querySelectorAll('.essay-score-input').forEach(inp => {
+        const max = parseFloat(inp.dataset.max) || 0;
+        let val = Math.min(Math.max(parseFloat(inp.value) || 0, 0), max);
+        total += val;
+      });
+      const ctx = App.state.gradeContext;
+      const possible = ctx?.totalPossible || 0;
+      const pct = possible > 0 ? (total / possible * 100) : 0;
+      const passPct = ctx?.passPct || 70;
+      const isPassing = pct >= passPct;
+
+      const elTotal = document.getElementById('grade-total');
+      const elPct = document.getElementById('grade-pct');
+      const elStatus = document.getElementById('grade-live-status');
+      if (elTotal) elTotal.textContent = parseFloat(total.toFixed(2));
+      if (elPct) {
+        elPct.textContent = pct.toFixed(1) + '%';
+        elPct.className = 'grade-live-pct ' + (isPassing ? 'pass' : 'fail');
+      }
+      if (elStatus) {
+        elStatus.textContent = isPassing ? '✓ Hiện tại: PASS' : '✗ Hiện tại: FAIL';
+        elStatus.className = 'grade-live-status ' + (isPassing ? 'pass' : 'fail');
+      }
+    },
+
+    // Apply partial or all-or-nothing score to a question's override input
+    applyPartial(qid, partialScore, autoScore, usePartial) {
+      const inp = document.getElementById('override-' + qid);
+      if (!inp) return;
+      inp.value = usePartial ? partialScore : autoScore;
+      App.grading.recalcTotal();
     },
 
     async finalize(result) {
       const ctx = App.state.gradeContext;
       if (!ctx) return;
-      let total = ctx.autoScore || 0;
-      document.querySelectorAll('.essay-score-input').forEach(inp => { total += parseFloat(inp.value)||0; });
+      let total = 0;
+      document.querySelectorAll('.grade-override-input').forEach(inp => {
+        const max = parseFloat(inp.dataset.max) || 0;
+        total += Math.min(Math.max(parseFloat(inp.value) || 0, 0), max);
+      });
+      document.querySelectorAll('.essay-score-input').forEach(inp => {
+        const max = parseFloat(inp.dataset.max) || 0;
+        total += Math.min(Math.max(parseFloat(inp.value) || 0, 0), max);
+      });
       const pct = ctx.totalPossible > 0 ? (total / ctx.totalPossible * 100) : 0;
       const passFail = result; // 'pass' or 'fail'
 
