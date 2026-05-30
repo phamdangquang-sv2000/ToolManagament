@@ -593,24 +593,39 @@
     .search-box svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
     .table-wrap {
       overflow-x: auto; border-radius: var(--radius);
-      border: 1px solid rgba(255,255,255,0.07);
-      background: rgba(18,21,36,0.90);
-      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(22,26,46,0.97);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06);
     }
     table { width: 100%; border-collapse: collapse; }
-    thead { background: rgba(255,255,255,0.03); }
+    thead {
+      background: rgba(124,106,247,0.08);
+      border-bottom: 2px solid rgba(124,106,247,0.20);
+    }
     th {
-      padding: 13px 16px; text-align: left;
-      font-size: 10.5px; font-weight: 700; color: var(--text-muted);
+      padding: 13px 18px; text-align: left;
+      font-size: 11px; font-weight: 700; color: rgba(168,157,249,0.85);
       white-space: nowrap; cursor: pointer; user-select: none;
-      text-transform: uppercase; letter-spacing: 0.8px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      text-transform: uppercase; letter-spacing: 1px;
     }
     th:hover { color: #a89df9; }
-    td { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; color: var(--text-primary); }
+    td {
+      padding: 15px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      vertical-align: middle; color: var(--text-primary);
+      font-size: 13.5px;
+    }
     tr:last-child td { border-bottom: none; }
-    tbody tr { transition: background 0.15s; }
-    tbody tr:hover { background: rgba(255,255,255,0.03); }
+    tbody tr {
+      transition: background 0.15s;
+      border-left: 3px solid transparent;
+    }
+    tbody tr:hover {
+      background: rgba(124,106,247,0.07);
+      border-left-color: rgba(124,106,247,0.40);
+    }
+    tbody tr:nth-child(even) { background: rgba(255,255,255,0.018); }
+    tbody tr:nth-child(even):hover { background: rgba(124,106,247,0.07); }
     .pagination { display: flex; align-items: center; gap: 4px; justify-content: flex-end; margin-top: 18px; }
     .page-btn {
       padding: 7px 13px; border-radius: 8px;
