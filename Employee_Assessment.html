@@ -1106,9 +1106,10 @@
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 9px;
       font-size: 13.5px; color: var(--text-primary); line-height: 1.6;
+      display: block; text-align: left;
     }
     .grade-answer-text.no-answer { color: var(--text-muted); font-style: italic; }
-    .grade-answer-text.essay-long { min-height: 64px; white-space: pre-wrap; word-break: break-word; }
+    .grade-answer-text.essay-long { white-space: pre-wrap; word-break: break-word; }
 
     /* Correct answer chip row */
     .grade-correct-row {
@@ -1135,7 +1136,7 @@
 
     /* Scoring row */
     .grade-score-panel {
-      display: flex; align-items: center; gap: 12px; flex-wrap: nowrap;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
       padding: 11px 14px;
       background: rgba(255,255,255,0.025);
       border: 1px solid rgba(255,255,255,0.07);
@@ -1158,9 +1159,9 @@
     .override-wrap { display: flex; align-items: center; gap: 7px; margin-left: auto; flex-shrink: 0; }
     .override-wrap label { font-size: 11px; color: var(--text-muted); font-weight: 700; white-space: nowrap; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; }
     .override-input {
-      width: 72px !important; max-width: 72px; padding: 6px 8px; text-align: center;
+      width: 80px !important; min-width: 80px; max-width: 80px; padding: 6px 10px; text-align: center;
       font-size: 15px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
-      flex: 0 0 72px;
+      flex: 0 0 80px;
     }
     .override-max-label {
       font-size: 14px; color: var(--text-muted);
@@ -1215,6 +1216,133 @@
     }
     .grade-live-status.pass { background: rgba(67,233,123,0.12); color: #43e97b; }
     .grade-live-status.fail { background: rgba(255,88,88,0.12); color: #ff6b6b; }
+
+
+    /* =====================================================
+       REVIEW MODAL (Employee xem lại bài thi)
+       ===================================================== */
+    .review-header {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; flex-wrap: wrap;
+      padding: 18px 22px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 14px; margin-bottom: 20px;
+      position: relative; overflow: hidden;
+    }
+    .review-header::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--accent-grad);
+    }
+    .review-test-proj { font-size: 11.5px; color: var(--text-muted); font-weight: 600; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .review-test-name { font-size: 18px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.3px; }
+    .review-result-block { text-align: right; flex-shrink: 0; }
+    .review-result-score {
+      font-size: 28px; font-weight: 800; letter-spacing: -1px;
+      font-family: 'JetBrains Mono', monospace; line-height: 1;
+      margin-bottom: 6px;
+    }
+    .review-result-score.pass { color: var(--success); }
+    .review-result-score.fail { color: var(--danger); }
+    .review-result-score span { font-size: 13px; font-weight: 500; color: var(--text-muted); font-family: 'Sora', sans-serif; }
+
+    /* Question card */
+    .rv-q-card {
+      border-radius: 14px; margin-bottom: 14px;
+      border: 1.5px solid rgba(255,255,255,0.08);
+      background: rgba(20,23,40,0.95);
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.20);
+      transition: border-color 0.2s;
+    }
+    .rv-q-card.rv-correct  { border-color: rgba(67,233,123,0.30); }
+    .rv-q-card.rv-wrong    { border-color: rgba(255,88,88,0.25); }
+    .rv-q-card.rv-essay    { border-color: rgba(124,106,247,0.25); }
+    .rv-q-card.rv-skipped  { border-color: rgba(255,255,255,0.06); }
+
+    .rv-q-head {
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .rv-q-head.rv-correct { background: rgba(67,233,123,0.06); }
+    .rv-q-head.rv-wrong   { background: rgba(255,88,88,0.06); }
+    .rv-q-head.rv-essay   { background: rgba(124,106,247,0.06); }
+    .rv-q-head.rv-skipped { background: rgba(255,255,255,0.02); }
+
+    .rv-q-num {
+      width: 28px; height: 28px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; flex-shrink: 0;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .rv-correct .rv-q-num  { background: rgba(67,233,123,0.18); color: #43e97b; }
+    .rv-wrong   .rv-q-num  { background: rgba(255,88,88,0.18);  color: #ff7878; }
+    .rv-essay   .rv-q-num  { background: rgba(124,106,247,0.18); color: #a89df9; }
+    .rv-skipped .rv-q-num  { background: rgba(255,255,255,0.07); color: var(--text-muted); }
+
+    .rv-q-text { flex: 1; font-size: 14px; font-weight: 600; color: var(--text-primary); line-height: 1.5; }
+    .rv-q-status {
+      display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+    }
+    .rv-status-icon { font-size: 18px; line-height: 1; }
+    .rv-score-tag {
+      font-size: 12px; font-weight: 700;
+      padding: 4px 10px; border-radius: 100px;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+    }
+    .rv-correct .rv-score-tag { background: rgba(67,233,123,0.14); color: #43e97b; border: 1px solid rgba(67,233,123,0.25); }
+    .rv-wrong   .rv-score-tag { background: rgba(255,88,88,0.13);  color: #ff7878; border: 1px solid rgba(255,88,88,0.22); }
+    .rv-essay   .rv-score-tag { background: rgba(124,106,247,0.13); color: #a89df9; border: 1px solid rgba(124,106,247,0.22); }
+    .rv-skipped .rv-score-tag { background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.08); }
+
+    .rv-q-body { padding: 16px 18px; }
+
+    /* Essay answer box */
+    .rv-essay-box {
+      padding: 12px 16px;
+      background: rgba(124,106,247,0.05);
+      border: 1px solid rgba(124,106,247,0.14);
+      border-radius: 10px; margin-top: 10px;
+      font-size: 14px; color: var(--text-primary); line-height: 1.7;
+      white-space: pre-wrap; word-break: break-word;
+    }
+    .rv-essay-box.no-answer { color: var(--text-muted); font-style: italic; }
+    .rv-essay-pending { display:flex;align-items:center;gap:6px;margin-top:8px;font-size:11.5px;color:var(--warning);font-weight:600; }
+
+    /* Options list */
+    .rv-options { display: flex; flex-direction: column; gap: 7px; margin-top: 10px; }
+    .rv-option {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: 10px;
+      border: 1.5px solid transparent;
+      transition: all 0.15s;
+      font-size: 13.5px;
+    }
+    .rv-option.opt-neutral  { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.07); color: var(--text-secondary); }
+    .rv-option.opt-correct-picked { background: rgba(67,233,123,0.10); border-color: rgba(67,233,123,0.35); color: var(--text-primary); }
+    .rv-option.opt-correct-missed { background: rgba(67,233,123,0.05); border-color: rgba(67,233,123,0.22); color: var(--text-secondary); }
+    .rv-option.opt-wrong-picked   { background: rgba(255,88,88,0.09);  border-color: rgba(255,88,88,0.30);  color: var(--text-primary); }
+
+    .rv-opt-letter {
+      width: 26px; height: 26px; border-radius: 7px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800;
+    }
+    .opt-neutral .rv-opt-letter          { background: rgba(255,255,255,0.07); color: var(--text-muted); }
+    .opt-correct-picked .rv-opt-letter   { background: rgba(67,233,123,0.20); color: #43e97b; }
+    .opt-correct-missed .rv-opt-letter   { background: rgba(67,233,123,0.10); color: #43e97b; }
+    .opt-wrong-picked .rv-opt-letter     { background: rgba(255,88,88,0.18);  color: #ff7878; }
+
+    .rv-opt-text { flex: 1; }
+    .rv-opt-badge {
+      font-size: 11px; font-weight: 700; padding: 2px 9px;
+      border-radius: 100px; white-space: nowrap; flex-shrink: 0;
+    }
+    .opt-correct-picked .rv-opt-badge { background: rgba(67,233,123,0.18); color: #43e97b; }
+    .opt-correct-missed .rv-opt-badge { background: rgba(67,233,123,0.10); color: #43e97b; }
+    .opt-wrong-picked   .rv-opt-badge { background: rgba(255,88,88,0.15);  color: #ff7878; }
 
     /* =====================================================
        CHECKBOX
@@ -4039,13 +4167,13 @@ const App = {
               totalCorrect = correctSet.size;
               isCorrect = correctSet.size === userSet.size && [...correctSet].every(x=>userSet.has(x));
               if (isCorrect) { autoCalc = q.score||0; }
-              // Partial scoring for multiple-choice (no penalty for wrong selections)
+              // Partial scoring for multiple-choice
+              // correctHits/totalCorrect * score, trừ penalty mỗi đáp án sai, min = 0
               if (q.type === 'multiple' && correctSet.size > 0) {
                 correctHits = [...userSet].filter(x => correctSet.has(x)).length;
                 const wrongHits = [...userSet].filter(x => !correctSet.has(x)).length;
-                partialCalc = wrongHits === 0
-                  ? parseFloat(((correctHits / correctSet.size) * (q.score||0)).toFixed(2))
-                  : autoCalc;
+                const rawPartial = ((correctHits - wrongHits) / correctSet.size) * (q.score||0);
+                partialCalc = parseFloat(Math.max(0, rawPartial).toFixed(2));
               }
               autoScore += autoCalc;
             }
@@ -4070,9 +4198,7 @@ const App = {
                   <!-- User answer -->
                   <div class="grade-answer-block">
                     <div class="grade-answer-label">Câu trả lời của thí sinh</div>
-                    <div class="grade-answer-text ${userAnsDisplay ? (q.type==='essay' ? 'essay-long' : '') : 'no-answer'}">
-                      ${userAnsDisplay || 'Không trả lời'}
-                    </div>
+                    <div class="grade-answer-text ${userAnsDisplay ? (q.type==='essay' ? 'essay-long' : '') : 'no-answer'}">${userAnsDisplay || 'Không trả lời'}</div>
                   </div>
 
                   ${q.type !== 'essay' ? `
@@ -4089,7 +4215,7 @@ const App = {
                     <!-- Score panel -->
                     <div class="grade-score-panel">
                       ${q.type === 'multiple' && !isCorrect && totalCorrect > 0 ? `
-                        <span class="partial-score-info">Đúng ${correctHits}/${totalCorrect} ý → ${partialCalc} đ nếu partial</span>
+                        <span class="partial-score-info">Đúng ${correctHits}/${totalCorrect} ý → ${partialCalc} đ (partial)</span>
                         <label class="partial-toggle-label" title="Áp dụng chấm điểm theo tỷ lệ số đáp án đúng được chọn">
                           <input type="checkbox" onchange="App.grading.applyPartial('${q.id}', ${partialCalc}, ${autoCalc}, this.checked)">
                           Partial scoring
@@ -5422,18 +5548,26 @@ const App = {
         const pf = result?.pass_fail;
 
         body.innerHTML = `
-          <div class="card mb-4" style="background:var(--bg-secondary);">
-            <div class="flex items-center justify-between flex-wrap gap-2">
-              <div>
-                <div class="text-sm text-muted">${reviewProjName}</div>
-                <div style="font-size:18px;font-weight:700;">${attempt.exam_tests?.name||''}</div>
-              </div>
-              ${result ? `<div style="text-align:right;">
-                <div style="font-size:24px;font-weight:800;color:${pf==='pass'?'var(--success)':'var(--danger)'};">${result.total_score} <span style="font-size:14px;font-weight:400;">/ ${totalPossible} điểm</span></div>
-                <span class="badge ${pf==='pass'?'badge-success':'badge-danger'}" style="font-size:13px;">${pf==='pass'?'ĐẠT (PASS)':'KHÔNG ĐẠT (FAIL)'}</span>
-              </div>` : '<span class="badge badge-warning">Chờ chấm điểm</span>'}
+          <!-- Header: test info + result -->
+          <div class="review-header">
+            <div>
+              <div class="review-test-proj">${reviewProjName || '—'}</div>
+              <div class="review-test-name">${attempt.exam_tests?.name || ''}</div>
+            </div>
+            <div class="review-result-block">
+              ${result
+                ? `<div class="review-result-score ${pf === 'pass' ? 'pass' : 'fail'}">
+                    ${result.total_score} <span>/ ${totalPossible} điểm</span>
+                   </div>
+                   <span class="badge ${pf === 'pass' ? 'badge-success' : 'badge-danger'}" style="font-size:13px;padding:5px 14px;">
+                     ${pf === 'pass' ? '✓ ĐẠT (PASS)' : '✗ KHÔNG ĐẠT (FAIL)'}
+                   </span>`
+                : `<span class="badge badge-warning" style="font-size:13px;padding:5px 14px;">⏳ Chờ chấm điểm</span>`
+              }
             </div>
           </div>
+
+          <!-- Question cards -->
           <div>
             ${(questions||[]).map((q, i) => {
               const userAns = answerMap[q.id];
@@ -5445,53 +5579,48 @@ const App = {
               const isCorrect = !isEssay && correctSet.size > 0 && correctSet.size === userSet.size && [...correctSet].every(x => userSet.has(x));
               const hasAnswer = userArr.length > 0;
 
+              // Card state
+              const state = isEssay ? 'rv-essay' : (isCorrect ? 'rv-correct' : (hasAnswer ? 'rv-wrong' : 'rv-skipped'));
+              const statusIcon = isEssay ? '📝' : (isCorrect ? '✅' : (hasAnswer ? '❌' : '⬜'));
+              const scoreEarned = isEssay ? '?' : (isCorrect ? (q.score||0) : 0);
+              const scoreLabel = isEssay ? `? / ${q.score||0}` : `${scoreEarned} / ${q.score||0}`;
+
+              // Build options HTML
               let optionsHtml = '';
               if (!isEssay) {
-                const opts = ['A','B','C','D'].map(l => q['option_'+l.toLowerCase()]).filter(Boolean);
-                if (opts.length) {
-                  optionsHtml = `<div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
-                  ${['A','B','C','D'].filter(l => q['option_'+l.toLowerCase()]).map(l => {
+                const letters = ['A','B','C','D'].filter(l => q['option_'+l.toLowerCase()]);
+                if (letters.length) {
+                  optionsHtml = '<div class="rv-options">' + letters.map(l => {
                     const opt = q['option_'+l.toLowerCase()];
                     const isUserPick = userSet.has(l);
                     const isCorrectOpt = correctSet.has(l);
-                    let bg = 'transparent', border = '1px solid var(--border)', icon = '';
-                    if (isCorrectOpt && isUserPick) { bg = 'rgba(34,197,94,0.12)'; border = '1px solid var(--success)'; icon = '<span style="color:var(--success);font-weight:700;">✓</span>'; }
-                    else if (isCorrectOpt) { bg = 'rgba(34,197,94,0.07)'; border = '1px solid var(--success)'; icon = '<span style="color:var(--success);">✓</span>'; }
-                    else if (isUserPick) { bg = 'rgba(239,68,68,0.10)'; border = '1px solid var(--danger)'; icon = '<span style="color:var(--danger);">✗</span>'; }
-                    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:${bg};border:${border};">
-                      <span style="width:22px;height:22px;border-radius:5px;background:rgba(255,255,255,0.06);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">${l}</span>
-                      <span style="${isUserPick?'font-weight:600;':''};flex:1;">${opt}</span>
-                      <span style="min-width:20px;">${icon}</span>
-                      ${isUserPick && !isCorrectOpt ? '<span style="font-size:11px;color:var(--danger);">Bạn chọn</span>' : ''}
-                      ${isCorrectOpt && !isUserPick ? '<span style="font-size:11px;color:var(--success);">Đáp án đúng</span>' : ''}
-                      ${isCorrectOpt && isUserPick ? '<span style="font-size:11px;color:var(--success);">Bạn chọn ✓</span>' : ''}
+                    let cls = 'opt-neutral', badge = '';
+                    if (isCorrectOpt && isUserPick)  { cls = 'opt-correct-picked'; badge = '✓ Bạn chọn đúng'; }
+                    else if (isCorrectOpt)            { cls = 'opt-correct-missed'; badge = '✓ Đáp án đúng'; }
+                    else if (isUserPick)              { cls = 'opt-wrong-picked';   badge = '✗ Bạn chọn sai'; }
+                    return `<div class="rv-option ${cls}">
+                      <span class="rv-opt-letter">${l}</span>
+                      <span class="rv-opt-text" style="${isUserPick?'font-weight:600;':''}">${opt}</span>
+                      ${badge ? `<span class="rv-opt-badge">${badge}</span>` : ''}
                     </div>`;
-                  }).join('')}
-                </div>`;
+                  }).join('') + '</div>';
                 }
               } else {
-                optionsHtml = `<div style="margin-top:10px;padding:10px 14px;background:var(--bg-secondary);border-radius:8px;border:1px solid var(--border);">
-                  <div class="text-sm text-muted" style="margin-bottom:4px;">Câu trả lời của bạn:</div>
-                  <div style="${!hasAnswer?'color:var(--text-muted);font-style:italic;':''}">${hasAnswer ? userArr.join(', ') : 'Không trả lời'}</div>
-                </div>`;
+                const ansText = hasAnswer ? userArr.join(', ') : null;
+                optionsHtml = `<div class="rv-essay-box ${ansText ? '' : 'no-answer'}">${ansText || 'Không trả lời'}</div>
+                  ${!result ? '<div class="rv-essay-pending">⏳ Đang chờ giáo viên chấm điểm</div>' : ''}`;
               }
 
-              const scoreEarned = isEssay ? '?' : (isCorrect ? (q.score||0) : 0);
-              const headerColor = isEssay ? 'var(--text-muted)' : (isCorrect ? 'var(--success)' : (hasAnswer ? 'var(--danger)' : 'var(--text-muted)'));
-              const headerIcon = isEssay ? '📝' : (isCorrect ? '✅' : (hasAnswer ? '❌' : '⬜'));
-
-              return `<div class="grading-answer" style="margin-bottom:16px;">
-                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
-                  <div class="grading-q" style="flex:1;">
-                    <span style="color:var(--text-muted);font-size:13px;">Câu ${i+1}</span>
-                    <div style="margin-top:4px;">${q.question_text}</div>
-                  </div>
-                  <div style="text-align:right;white-space:nowrap;">
-                    <div style="font-size:18px;">${headerIcon}</div>
-                    <div style="font-size:12px;color:${headerColor};font-weight:600;">${scoreEarned} / ${q.score||0} điểm</div>
+              return `<div class="rv-q-card ${state}">
+                <div class="rv-q-head ${state}">
+                  <div class="rv-q-num">${i+1}</div>
+                  <div class="rv-q-text">${q.question_text}</div>
+                  <div class="rv-q-status">
+                    <span class="rv-status-icon">${statusIcon}</span>
+                    <span class="rv-score-tag">${scoreLabel} điểm</span>
                   </div>
                 </div>
-                ${optionsHtml}
+                <div class="rv-q-body">${optionsHtml}</div>
               </div>`;
             }).join('')}
           </div>
