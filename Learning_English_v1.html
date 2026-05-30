@@ -5573,12 +5573,19 @@ function renderAssignPage() {
   renderPagination('assign-pagination', total, assignPage);
 }
 
-function openAssignModal() {
-  document.getElementById('assign-date').value = todayStr();
-
-  renderAssignLessonList(todayStr());
-
+async function openAssignModal() {
+  const dateVal = todayStr();
+  document.getElementById('assign-date').value = dateVal;
   document.getElementById('assign-modal').classList.remove('hidden');
+
+  // Reload schedules từ Supabase trước để tránh cache cũ
+  const { data: freshSchedules } = await sb
+    .from('lesson_schedules')
+    .select('*,lessons(title,type)')
+    .order('date', { ascending: false });
+  allAssignSchedules = freshSchedules || [];
+
+  renderAssignLessonList(dateVal);
 }
 
 function renderAssignLessonList(date) {
@@ -5912,7 +5919,13 @@ async function deleteAssign(id) {
     .delete()
     .eq('awarded_at', date);
 
-  // 6. Delete the schedule row itself
+  // 6. Delete writing_submissions for this lesson on this date
+  await sb.from('writing_submissions')
+    .delete()
+    .eq('lesson_id', lesson_id)
+    .eq('scheduled_date', date);
+
+  // 7. Delete the schedule row itself
   const { error } = await sb.from('lesson_schedules').delete().eq('id', id);
   if (error) { toast('Lỗi xoá phân công: ' + error.message, 'error'); return; }
 
