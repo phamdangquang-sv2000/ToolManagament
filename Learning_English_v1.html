@@ -3152,28 +3152,8 @@ select {
       <div id="assign-pagination"></div>
     </div>
 
-    
-      <!-- Writing Submissions Section -->
-      <div style="margin-top:28px;background:var(--card);border-radius:var(--radius);border:1px solid var(--border-light);box-shadow:var(--shadow);overflow:hidden" id="writing-sub-section">
-        <div class="table-section-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border-light);margin:0">
-          <div>
-            <h2>✍️ Bài viết chờ chấm điểm</h2>
-            <div style="font-size:12px;color:var(--text-sub);margin-top:2px">Nhân viên đã nộp bài writing — chấm điểm và trao XP</div>
-          </div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <select id="writing-sub-filter" onchange="loadWritingSubmissions()" style="padding:7px 12px;border-radius:8px;border:1.5px solid var(--border);font-size:13px;background:var(--bg-2)">
-              <option value="pending">Chưa chấm</option>
-              <option value="all">Tất cả</option>
-            </select>
-            <button onclick="loadWritingSubmissions()" title="Tải lại" style="width:34px;height:34px;border-radius:10px;border:1.5px solid var(--border);background:#fff;color:var(--text-muted);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,color .15s,border-color .15s,transform .15s;flex-shrink:0" onmouseover="this.style.background='var(--teal-light)';this.style.color='var(--teal)';this.style.borderColor='var(--teal)'" onmouseout="this.style.background='#fff';this.style.color='var(--text-muted)';this.style.borderColor='var(--border)'" onmousedown="this.style.transform='scale(.9)'" onmouseup="this.style.transform='scale(1)'">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-            </button>
-          </div>
-        </div>
-        <div id="writing-sub-list" style="padding:16px 20px;min-height:60px">
-          <div style="text-align:center;color:var(--text-muted);font-size:13px;padding:24px">Đang tải...</div>
-        </div>
-      </div>
+
+
 
   <!-- Modal phân công -->
     <div id="assign-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px">
@@ -4906,15 +4886,9 @@ function openLessonModal(lesson, alreadyCompleted) {
           .maybeSingle()
           .then(({ data: sub }) => {
             contentEl.innerHTML = renderWritingLesson(parsed, sub);
-            if (sub && sub.status === 'graded') {
+            if (sub) {
               hintEl.classList.remove('hidden');
-              hintEl.textContent = '✅ Bài đã được chấm điểm. Bạn có thể hoàn thành bài học.';
-              endBtn.disabled = false;
-              endLabel.textContent = 'Hoàn thành bài học';
-              window._writingState.submitted = true;
-            } else if (sub) {
-              hintEl.classList.remove('hidden');
-              hintEl.textContent = '⏳ Bài đã nộp, đang chờ admin chấm điểm. Bạn có thể hoàn thành bài học.';
+              hintEl.textContent = '✅ Đã có bài sửa từ AI. Bạn có thể hoàn thành bài học.';
               endBtn.disabled = false;
               endLabel.textContent = 'Hoàn thành bài học';
               window._writingState.submitted = true;
@@ -4922,7 +4896,7 @@ function openLessonModal(lesson, alreadyCompleted) {
             initVocabNotebookForLesson();
           });
         hintEl.classList.remove('hidden');
-        hintEl.textContent = `✍️ Đọc đề bài và viết ít nhất ${minWords} từ, sau đó nhấn Nộp bài.`;
+        hintEl.textContent = `✍️ Viết ít nhất ${minWords} từ bằng tiếng Anh, AI sẽ sửa lỗi cho bạn.`;
         endBtn.disabled = true;
         endLabel.textContent = 'Nộp bài trước';
         document.getElementById('lesson-overlay').classList.remove('hidden');
@@ -5412,7 +5386,8 @@ window.addEventListener('pagehide', () => { stopTimer(); _saveSession(true); });
 
 /* ADMIN: LOAD DATA */
 async function loadAdminData() {
-    loadWritingSubmissions();
+  
+
   const filter = document.getElementById('admin-date-filter').value;
   const tbody  = document.getElementById('admin-tbody');
   tbody.innerHTML = '<tr class="empty-row"><td colspan="3"><div style="display:flex;align-items:center;justify-content:center;gap:10px"><div class="spinner spinner-teal"></div> Đang tải dữ liệu...</div></td></tr>';
@@ -9029,44 +9004,67 @@ function refreshAttPopupIfOpen() {
      WRITING PRACTICE FEATURE
   =================================================================== */
 
+  function parseWritingSubmission(sub) {
+    // Backward-compat: submission_text may be JSON {original, corrected, notes} or plain legacy text
+    if (!sub || !sub.submission_text) return { original: '', corrected: '', notes: [] };
+    const raw = sub.submission_text;
+    try {
+      const obj = JSON.parse(raw);
+      if (obj && typeof obj === 'object' && (obj.corrected !== undefined || obj.original !== undefined)) {
+        return {
+          original:  obj.original  || '',
+          corrected: obj.corrected || '',
+          notes:     Array.isArray(obj.notes) ? obj.notes : [],
+        };
+      }
+    } catch {}
+    return { original: raw, corrected: '', notes: [] };
+  }
+
+  function renderWritingReviewBlock(parsed) {
+    const notesHtml = (parsed.notes && parsed.notes.length) ? `
+      <div style="margin-top:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">📚 GHI CHÚ TỪ AI</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${parsed.notes.map(n => `
+            <div style="background:#fff;border:1px solid var(--border-light);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.6">
+              <div><span style="color:var(--red);text-decoration:line-through">${esc(n.original||'')}</span> <span style="color:var(--text-muted)">→</span> <span style="color:var(--green);font-weight:600">${esc(n.correction||'')}</span></div>
+              ${n.explanation ? `<div style="margin-top:4px;color:var(--text-muted);font-size:12px">💡 ${esc(n.explanation)}</div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>` : '';
+
+    return `
+      <div class="writing-submitted-notice" style="background:var(--teal-light);border-color:var(--teal-bright);color:var(--teal-dark)">
+        ✅ AI đã sửa bài cho bạn — hãy đọc kỹ để rút kinh nghiệm
+      </div>
+      <div style="margin-top:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">✏️ BÀI VIẾT CỦA BẠN</div>
+        <div style="background:var(--bg-2);border-radius:10px;padding:14px;font-size:14px;line-height:1.8;color:var(--text)">${esc(parsed.original || '').replace(/\n/g,'<br>')}</div>
+      </div>
+      ${parsed.corrected ? `
+        <div style="margin-top:14px">
+          <div style="font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">✨ BẢN SỬA BỞI AI</div>
+          <div style="background:#fff;border:2px solid var(--teal-bright);border-radius:10px;padding:14px;font-size:14px;line-height:1.8;color:var(--text)">${esc(parsed.corrected).replace(/\n/g,'<br>')}</div>
+        </div>` : ''}
+      ${notesHtml}
+    `;
+  }
+
   function renderWritingLesson(parsed, existingSub) {
     const prompt   = parsed.prompt   || 'Viết một đoạn văn bằng tiếng Anh.';
     const minWords = parsed.minWords || 50;
 
-    if (existingSub && existingSub.status === 'graded') {
-      return `
-        <div class="writing-lesson-wrap">
-          <div class="writing-prompt-card">
-            <div class="writing-prompt-label">📝 Đề bài</div>
-            <div class="writing-prompt-text">${esc(prompt)}</div>
-          </div>
-          <div class="writing-submitted-notice" style="background:var(--teal-light);border-color:var(--teal-bright);color:var(--teal-dark)">
-            ✅ Bài đã được chấm điểm
-            <div style="font-size:13px;margin-top:6px;color:var(--text-muted)">
-              ${existingSub.grade === 'pass' ? '🌟 Đạt — +' + (existingSub.xp_awarded||0) + ' XP' : '📝 Cần cải thiện'}
-            </div>
-          </div>
-          <div style="margin-top:14px">
-            <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">BÀI LÀM CỦA BẠN</div>
-            <div style="background:var(--bg-2);border-radius:10px;padding:14px;font-size:14px;line-height:1.8;color:var(--text)">${esc(existingSub.submission_text || '').replace(/\n/g,'<br>')}</div>
-          </div>
-        </div>`;
-    }
-
     if (existingSub) {
+      const sp = parseWritingSubmission(existingSub);
       return `
         <div class="writing-lesson-wrap">
           <div class="writing-prompt-card">
             <div class="writing-prompt-label">📝 Đề bài</div>
             <div class="writing-prompt-text">${esc(prompt)}</div>
           </div>
-          <div class="writing-submitted-notice">
-            ⏳ Bài đã nộp — đang chờ admin chấm điểm
-          </div>
-          <div style="margin-top:14px">
-            <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">BÀI LÀM CỦA BẠN</div>
-            <div style="background:var(--bg-2);border-radius:10px;padding:14px;font-size:14px;line-height:1.8;color:var(--text)">${esc(existingSub.submission_text || '').replace(/\n/g,'<br>')}</div>
-          </div>
+          ${renderWritingReviewBlock(sp)}
         </div>`;
     }
 
@@ -9076,20 +9074,19 @@ function refreshAttPopupIfOpen() {
           <div class="writing-prompt-label">📝 Đề bài</div>
           <div class="writing-prompt-text">${esc(prompt)}</div>
         </div>
-        <div style="margin-top:6px;font-size:12px;color:var(--text-sub);margin-bottom:10px">✏️ Viết ít nhất <strong>${minWords} từ</strong></div>
+        <div style="margin-top:6px;font-size:12px;color:var(--text-sub);margin-bottom:10px">✏️ Viết ít nhất <strong>${minWords} từ</strong> bằng <strong>tiếng Anh</strong></div>
         <textarea class="writing-textarea" id="writing-text-input"
-          placeholder="Bắt đầu viết bài của bạn tại đây..."
+          placeholder="Bắt đầu viết bài của bạn tại đây (bằng tiếng Anh)..."
           oninput="onWritingInput(this)"></textarea>
         <div class="writing-char-count" id="writing-word-count">0 từ (cần ${minWords} từ)</div>
-        <div style="margin-top:8px;font-size:12px;color:var(--text-sub);text-align:center">🔥 Đọc đề bài và viết ít nhất ${minWords} từ, sau đó nhấn Nộp bài.</div>
+        <div style="margin-top:8px;font-size:12px;color:var(--text-sub);text-align:center">🤖 AI sẽ sửa lỗi chính tả & ngữ pháp cho bạn rút kinh nghiệm. Không chấm điểm.</div>
         <button class="writing-submit-btn" id="writing-submit-btn" onclick="submitWriting()" disabled>
-          📤 Nộp bài trước
+          ✨ Nộp bài & nhờ AI sửa
         </button>
       </div>`;
   }
 
   function onWritingInput(ta) {
-    // Auto-expand height
     ta.style.height = 'auto';
     ta.style.height = Math.max(160, ta.scrollHeight) + 'px';
 
@@ -9102,10 +9099,22 @@ function refreshAttPopupIfOpen() {
     if (submitBtn) submitBtn.disabled = words < minWords;
   }
 
+  // Heuristic: detect Vietnamese by diacritics or common VN-only words
+  function looksLikeVietnamese(text) {
+    if (!text) return false;
+    // Vietnamese-specific diacritic letters
+    if (/[ăâđêôơưĂÂĐÊÔƠƯàáảãạằắẳẵặầấẩẫậèéẻẽẹềếểễệìíỉĩịòóỏõọồốổỗộờớởỡợùúủũụừứửữựỳýỷỹỵÀÁẢÃẠẰẮẲẴẶẦẤẨẪẬÈÉẺẼẸỀẾỂỄỆÌÍỈĨỊÒÓỎÕỌỒỐỔỖỘỜỚỞỠỢÙÚỦŨỤỪỨỬỮỰỲÝỶỸỴ]/.test(text)) return true;
+    // Common VN words without diacritics still trigger
+    const lower = ' ' + text.toLowerCase() + ' ';
+    const vnHits = [' toi ',' minh ',' ban ',' khong ',' duoc ',' cua ',' va ',' la ',' nguoi ',' hoc ',' tieng viet ',' nhe ',' nha ',' lam ',' gi ',' nay ',' the ',' nhung ',' voi '];
+    let hits = 0; for (const w of vnHits) if (lower.includes(w)) hits++;
+    return hits >= 3;
+  }
+
   async function submitWriting() {
     const st = window._writingState;
     if (!st || !currentUser || !activeSession) return;
-    
+
     const ta = document.getElementById('writing-text-input');
     if (!ta) return;
     const text = ta.value.trim();
@@ -9115,8 +9124,55 @@ function refreshAttPopupIfOpen() {
       return;
     }
 
+    // Quick local check — block obvious Vietnamese before calling AI
+    if (looksLikeVietnamese(text)) {
+      toast('❌ Bài viết phải bằng tiếng Anh! Hãy viết lại bằng tiếng Anh.', 'error');
+      return;
+    }
+
+    const provider = getAiProvider();
+    if (provider === 'groq' && !getGroqKey()) { toast('Chưa cấu hình Groq API Key trong Cài đặt AI.', 'error'); return; }
+    if (provider === 'gemini' && !getGeminiKey()) { toast('Chưa cấu hình Gemini API Key trong Cài đặt AI.', 'error'); return; }
+    if (provider === 'openrouter' && !getOpenRouterKey()) { toast('Chưa cấu hình OpenRouter API Key trong Cài đặt AI.', 'error'); return; }
+
     const btn = document.getElementById('writing-submit-btn');
-    if (btn) { btn.disabled = true; btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2.5px;margin:0 auto"></div>'; }
+    if (btn) { btn.disabled = true; btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2.5px;margin:0 auto;display:inline-block;vertical-align:middle"></div> AI đang sửa bài...'; }
+
+    const systemPrompt = `You are an English writing tutor for Vietnamese learners. Return ONLY JSON, no markdown, no code fences.
+Schema:
+{
+  "isVietnamese": <true if the submission is written in Vietnamese instead of English, otherwise false>,
+  "corrected": "<the full corrected English version with spelling and grammar fixed, preserving the learner's meaning and structure as much as possible>",
+  "notes": [
+    { "original": "<short wrong phrase/word>", "correction": "<the fixed version>", "explanation": "<short Vietnamese explanation>" }
+  ]
+}
+Rules:
+- If isVietnamese is true, set corrected to "" and notes to [].
+- Include up to 8 of the most important corrections in notes (spelling, grammar, word choice). Keep "original" short.
+- Explanations MUST be in Vietnamese, concise.
+- Do NOT give a score. Do NOT grade the writing.`;
+
+    let aiResult;
+    try {
+      aiResult = await callAI(systemPrompt, `Prompt:\n${st.prompt}\n\nLearner's writing:\n${text}`, 1500);
+    } catch (err) {
+      toast('Lỗi AI: ' + (err?.message || String(err)), 'error');
+      if (btn) { btn.disabled = false; btn.innerHTML = '✨ Nộp bài & nhờ AI sửa'; }
+      return;
+    }
+
+    if (aiResult && aiResult.isVietnamese) {
+      toast('❌ Bài viết bằng tiếng Việt! Bạn phải học lại và viết lại bằng tiếng Anh.', 'error');
+      if (btn) { btn.disabled = false; btn.innerHTML = '✨ Nộp bài & nhờ AI sửa'; }
+      return;
+    }
+
+    const payload = {
+      original:  text,
+      corrected: (aiResult && aiResult.corrected) || text,
+      notes:     (aiResult && Array.isArray(aiResult.notes)) ? aiResult.notes.slice(0, 12) : [],
+    };
 
     const scheduledDate = activeSession.scheduledDate || todayStr();
 
@@ -9124,172 +9180,44 @@ function refreshAttPopupIfOpen() {
       user_id:         currentUser.id,
       lesson_id:       st.lessonId || activeSession.lesson.id,
       scheduled_date:  scheduledDate,
-      submission_text: text,
+      submission_text: JSON.stringify(payload),
       submitted_at:    new Date().toISOString(),
-      status:          'pending',
-      xp_awarded:      0,
+      status:          'graded',
+      grade:           'reviewed',
+      xp_awarded:      st.maxXP || 0,
+      graded_at:       new Date().toISOString(),
     }, { onConflict: 'user_id,lesson_id,scheduled_date' });
 
     if (error) {
-      toast('Lỗi nộp bài: ' + error.message, 'error');
-      if (btn) { btn.disabled = false; btn.textContent = '📤 Nộp bài'; }
+      toast('Lỗi lưu bài: ' + error.message, 'error');
+      if (btn) { btn.disabled = false; btn.innerHTML = '✨ Nộp bài & nhờ AI sửa'; }
       return;
     }
 
     st.submitted = true;
-    toast('📤 Đã nộp bài thành công! Admin sẽ chấm điểm sớm.', 'success');
+    toast('✨ AI đã sửa xong! Hãy đọc kỹ phần sửa để rút kinh nghiệm.', 'success');
 
-    // Render submitted state
     const contentEl = document.getElementById('modal-content');
     const lesson = activeSession.lesson;
     try {
       const parsed = JSON.parse(lesson.content || '{}');
-      contentEl.innerHTML = renderWritingLesson(parsed, { status: 'pending', submission_text: text });
+      contentEl.innerHTML = renderWritingLesson(parsed, {
+        status: 'graded',
+        submission_text: JSON.stringify(payload),
+      });
     } catch {}
 
-    // Enable end lesson
     const endBtn = document.getElementById('btn-end-lesson');
     const endLbl = document.getElementById('btn-end-lesson-label');
     if (endBtn) endBtn.disabled = false;
     if (endLbl) endLbl.textContent = 'Hoàn thành bài học';
     const hintEl = document.getElementById('lesson-completion-hint');
-    if (hintEl) { hintEl.classList.remove('hidden'); hintEl.textContent = '⏳ Bài đã nộp, đang chờ chấm điểm. Bạn có thể hoàn thành bài học.'; }
+    if (hintEl) { hintEl.classList.remove('hidden'); hintEl.textContent = '✅ Đã có bài sửa từ AI. Bạn có thể hoàn thành bài học.'; }
   }
 
-  /* ===== ADMIN: Load Writing Submissions ===== */
-  async function loadWritingSubmissions() {
-    if (!document.getElementById('writing-sub-list')) return;
-    const listEl = document.getElementById('writing-sub-list');
-    listEl.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:13px;padding:24px">Đang tải...</div>';
+  // Stub kept so any stale references don't error
+  async function loadWritingSubmissions() { /* removed: admin no longer grades writing */ }
 
-    const filter = document.getElementById('writing-sub-filter')?.value || 'pending';
-    
-    // Load submissions with lesson and user info
-    let query = sb.from('writing_submissions')
-      .select('id, user_id, lesson_id, scheduled_date, submission_text, submitted_at, status, grade, xp_awarded')
-      .order('submitted_at', { ascending: false })
-      .limit(50);
-    if (filter === 'pending') query = query.eq('status', 'pending');
-
-    const [{ data: subs }, { data: usersData }, { data: lessonsData }] = await Promise.all([
-      query,
-      sb.from('users').select('id, name'),
-      sb.from('lessons').select('id, title'),
-    ]);
-
-    const userMap   = {};
-    (usersData   || []).forEach(u => userMap[u.id]   = u.name);
-    const lessonMap = {};
-    (lessonsData || []).forEach(l => lessonMap[l.id] = l.title);
-
-    if (!subs || !subs.length) {
-      listEl.innerHTML = `<div style="text-align:center;color:var(--text-muted);font-size:13px;padding:32px">${filter === 'pending' ? '✅ Không có bài viết nào chờ chấm' : 'Chưa có bài nào'}</div>`;
-      return;
-    }
-
-    listEl.innerHTML = subs.map(sub => {
-      const name = userMap[sub.user_id] || sub.user_id.slice(0,8);
-      const title = lessonMap[sub.lesson_id] || 'Bài viết';
-      const date = sub.scheduled_date || sub.submitted_at?.split('T')[0];
-      const submittedAt = sub.submitted_at ? new Date(sub.submitted_at).toLocaleString('vi-VN', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
-      
-      const isGraded = sub.status === 'graded';
-      const gradedBadge = isGraded
-        ? `<span class="writing-graded-badge ${sub.grade === 'pass' ? 'pass' : 'fail'}">${sub.grade === 'pass' ? '✅ Đạt' : '❌ Chưa đạt'} · +${sub.xp_awarded||0} XP</span>`
-        : '';
-
-      return `
-        <div class="writing-sub-row">
-          <div class="writing-sub-meta">👤 <strong>${esc(name)}</strong> · 📚 ${esc(title)} · 📅 ${esc(date||'')} · 🕐 ${esc(submittedAt)} ${gradedBadge}</div>
-          <div class="writing-sub-text">${esc(sub.submission_text || '').replace(/\n/g,'<br>')}</div>
-          ${!isGraded ? `
-            <div id="ai-feedback-${sub.id}" style="display:none;margin-bottom:10px;padding:12px 14px;background:var(--teal-glass);border:1px solid rgba(13,148,136,.2);border-radius:10px;font-size:13px;line-height:1.7;color:var(--text)"></div>
-            <div class="writing-grade-wrap">
-              <select class="writing-grade-select" id="grade-sel-${sub.id}">
-                <option value="pass">✅ Đạt</option>
-                <option value="fail">❌ Chưa đạt</option>
-              </select>
-              <input type="number" class="writing-grade-xp" id="grade-xp-${sub.id}" placeholder="XP" value="10" min="0" max="100">
-              <button class="writing-grade-btn ai-grade-btn" style="background:linear-gradient(135deg,var(--teal),var(--teal-mid));color:#fff" data-subid="${sub.id}" onclick="aiGradeWriting(this.dataset.subid)">✨ AI chấm</button>
-              <button class="writing-grade-btn" onclick="gradeWriting('${sub.id}','${sub.user_id}','${sub.lesson_id}')">💾 Lưu điểm</button>
-            </div>
-          ` : ''}
-        </div>
-      `;
-    }).join('');
-  }
-
-  async function gradeWriting(subId, userId, lessonId) {
-    const grade = document.getElementById(`grade-sel-${subId}`)?.value || 'pass';
-    const xp    = parseInt(document.getElementById(`grade-xp-${subId}`)?.value) || 0;
-
-    const btn = document.querySelector(`.writing-grade-btn[onclick*="${subId}"]`);
-    if (btn) { btn.disabled = true; btn.textContent = '...'; }
-
-    const { error } = await sb.from('writing_submissions').update({
-      status:     'graded',
-      grade:      grade,
-      xp_awarded: xp,
-      graded_at:  new Date().toISOString(),
-    }).eq('id', subId);
-
-    if (error) {
-      toast('Lỗi chấm điểm: ' + error.message, 'error');
-      if (btn) { btn.disabled = false; btn.textContent = '💾 Chấm điểm'; }
-      return;
-    }
-
-    toast(`✅ Đã chấm điểm · ${grade === 'pass' ? 'Đạt' : 'Chưa đạt'} · +${xp} XP`, 'success');
-    await loadWritingSubmissions();
-  }
-
-  async function aiGradeWriting(subId) {
-    const subRow = document.querySelector(`button[data-subid="${subId}"]`)?.closest('.writing-sub-row');
-    const text = subRow?.querySelector('.writing-sub-text')?.innerText?.trim() || '';
-    const provider = getAiProvider();
-    if (provider === 'groq' && !getGroqKey()) { toast('Vui lòng nhập Groq API Key trong Cài đặt AI.', 'error'); return; }
-    if (provider === 'gemini' && !getGeminiKey()) { toast('Vui lòng nhập Gemini API Key trong Cài đặt AI.', 'error'); return; }
-    if (provider === 'openrouter' && !getOpenRouterKey()) { toast('Vui lòng nhập OpenRouter API Key trong Cài đặt AI.', 'error'); return; }
-
-    const aiBtn = document.querySelector(`button[data-subid="${subId}"]`);
-    const feedbackEl = document.getElementById(`ai-feedback-${subId}`);
-    if (aiBtn) { aiBtn.disabled = true; aiBtn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px"></div> Đang chấm...'; }
-
-    const systemPrompt = `You are an English writing evaluator for Vietnamese employees. Return ONLY JSON, no markdown.
-Format: {"score":<0-100>,"grade":"pass or fail (pass if score>=50)","xp":<20 if score>=80, 15 if >=60, 10 if >=40, else 5>,"vocabulary":"<Vietnamese: 1-2 sentences about vocab>","grammar":"<Vietnamese: 1-2 sentences about grammar>","suggestion":"<Vietnamese: one improvement tip>","highlight":"<Vietnamese: one positive thing>"}`;
-
-    try {
-      const result = await callAI(systemPrompt, `Evaluate this English writing:\n\n${text}`, 800);
-      const gradeEl = document.getElementById(`grade-sel-${subId}`);
-      const xpEl    = document.getElementById(`grade-xp-${subId}`);
-      if (gradeEl) gradeEl.value = result.grade || 'pass';
-      if (xpEl)    xpEl.value   = result.xp    || 10;
-      const scoreColor = result.score >= 80 ? 'var(--green)' : result.score >= 50 ? 'var(--teal)' : 'var(--red)';
-      const providerLabels = { groq: '⚡ Groq AI', gemini: '✨ Gemini 2.5 Flash', openrouter: '🔀 ' + getOpenRouterModel() };
-      const providerLabel = providerLabels[getAiProvider()] || '✨ AI';
-      if (feedbackEl) {
-        feedbackEl.style.display = 'block';
-        feedbackEl.innerHTML = `
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
-            <span style="font-size:22px;font-weight:800;color:${scoreColor}">${result.score}/100</span>
-            <span style="font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;background:${result.grade==='pass'?'var(--green-light)':'var(--red-light)'};color:${result.grade==='pass'?'var(--green)':'var(--red)'}">
-              ${result.grade === 'pass' ? '✅ Đạt' : '❌ Chưa đạt'} · +${result.xp} XP
-            </span>
-            <span style="font-size:11px;color:var(--text-muted);margin-left:auto">${providerLabel}</span>
-          </div>
-          <div style="display:grid;gap:6px;font-size:13px">
-            <div><span style="font-weight:700;color:var(--teal)">📚 Từ vựng:</span> ${esc(result.vocabulary||'')}</div>
-            <div><span style="font-weight:700;color:var(--teal)">⚙️ Ngữ pháp:</span> ${esc(result.grammar||'')}</div>
-            <div><span style="font-weight:700;color:var(--green)">👍 Điểm tốt:</span> ${esc(result.highlight||'')}</div>
-            <div><span style="font-weight:700;color:#c2410c">💡 Gợi ý:</span> ${esc(result.suggestion||'')}</div>
-          </div>`;
-      }
-      if (aiBtn) { aiBtn.disabled = false; aiBtn.innerHTML = '✨ AI chấm lại'; }
-    } catch(err) {
-      toast('Lỗi AI: ' + (err?.message || String(err)), 'error');
-      if (aiBtn) { aiBtn.disabled = false; aiBtn.innerHTML = '✨ AI chấm'; }
-    }
-  }
 
 
   /* ===================================================================
