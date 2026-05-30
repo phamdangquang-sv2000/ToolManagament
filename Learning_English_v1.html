@@ -2455,6 +2455,52 @@ select {
   .speaking-nav-btn:hover { background: var(--teal-light); border-color: var(--teal); color: var(--teal); }
   .speaking-nav-btn:disabled { opacity: .4; cursor: not-allowed; }
 
+  /* ── Countdown overlay ── */
+  .sp-countdown-overlay {
+    position: absolute; inset: 0; border-radius: var(--radius);
+    background: rgba(255,255,255,.93); backdrop-filter: blur(4px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 10; gap: 6px; animation: fadeInScale .2s ease;
+  }
+  .sp-countdown-num {
+    font-size: 56px; font-weight: 900; font-family: var(--font-display);
+    color: var(--teal); line-height: 1;
+    animation: sp-pop .35s cubic-bezier(.34,1.56,.64,1);
+  }
+  .sp-countdown-label { font-size: 13px; color: var(--text-muted); font-weight: 600; }
+
+  /* ── Mic-ready pulse ring ── */
+  @keyframes sp-mic-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(13,148,136,.55); }
+    70%  { box-shadow: 0 0 0 14px rgba(13,148,136,0); }
+    100% { box-shadow: 0 0 0 0 rgba(13,148,136,0); }
+  }
+  .speaking-record-btn.mic-ready {
+    animation: sp-mic-pulse 1.1s ease-out infinite;
+  }
+
+  /* ── iOS/browser warning banner ── */
+  .sp-browser-warn {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: #fff7ed; border: 1.5px solid #fed7aa;
+    border-radius: 12px; padding: 12px 14px; margin-bottom: 14px;
+    font-size: 13px; color: #92400e; line-height: 1.55; text-align: left;
+  }
+  .sp-browser-warn .sp-warn-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── Mobile: bigger tap target ── */
+  @media (max-width: 639px) {
+    .speaking-record-btn { padding: 16px 28px; font-size: 17px; min-width: 210px; }
+    .sp-listen-btn       { padding: 10px 20px; font-size: 14px; }
+    .speaking-nav-btn    { padding: 12px 24px; font-size: 14px; }
+  }
+
+  /* ── Permission denied state ── */
+  .speaking-record-btn.perm-denied {
+    background: linear-gradient(135deg, #94a3b8, #cbd5e1);
+    box-shadow: none; cursor: not-allowed;
+  }
+
   /* ===== WRITING LESSON (Employee) ===== */
   .writing-lesson-wrap { animation: fadeIn .35s ease; }
   .writing-prompt-card {
@@ -4981,6 +5027,11 @@ function tryCloseLessonModal() {
     }
     window.vocabProgress = null; window.readingQuiz = null; window._fillBlankState = null;
     window.miniTest = null; window._speakingState = null; window._writingState = null;
+    // Dọn dẹp speaking nếu đang chạy
+    if (window._activeRecognition) { try { window._activeRecognition.abort(); } catch(e){} window._activeRecognition = null; }
+    if (window._activeRecognitionTimeout) { clearTimeout(window._activeRecognitionTimeout); window._activeRecognitionTimeout = null; }
+    if (window._spCountdownTimer) { clearInterval(window._spCountdownTimer); window._spCountdownTimer = null; }
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
     closeLessonModal();
     loadTodaySessions();
   } else {
@@ -5000,6 +5051,11 @@ function handleOverlayClick(e) {
       }
       window.vocabProgress = null; window.readingQuiz = null; window._fillBlankState = null;
       window.miniTest = null; window._speakingState = null; window._writingState = null;
+      // Dọn dẹp speaking nếu đang chạy
+      if (window._activeRecognition) { try { window._activeRecognition.abort(); } catch(e){} window._activeRecognition = null; }
+      if (window._activeRecognitionTimeout) { clearTimeout(window._activeRecognitionTimeout); window._activeRecognitionTimeout = null; }
+      if (window._spCountdownTimer) { clearInterval(window._spCountdownTimer); window._spCountdownTimer = null; }
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
       closeLessonModal();
       loadTodaySessions();
     } else {
@@ -5089,6 +5145,11 @@ async function endLesson() {
   activeSession = null;
   window.vocabProgress = null; window.readingQuiz = null; window._fillBlankState = null;
   window.miniTest = null; window._speakingState = null; window._writingState = null;
+  // Dọn dẹp speaking nếu đang chạy
+  if (window._activeRecognition) { try { window._activeRecognition.abort(); } catch(e){} window._activeRecognition = null; }
+  if (window._activeRecognitionTimeout) { clearTimeout(window._activeRecognitionTimeout); window._activeRecognitionTimeout = null; }
+  if (window._spCountdownTimer) { clearInterval(window._spCountdownTimer); window._spCountdownTimer = null; }
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
   toast('🎉 Tuyệt vời! Bạn đã hoàn thành bài học.', 'success');
   await loadTodaySessions();
   await loadLessons(); // refresh trạng thái mở khóa + rebuild allScheduleDays với data mới nhất
@@ -6331,7 +6392,26 @@ function renderLessonMgmtPage() {
   renderPagination('lesson-pagination', total, lessonPage);
 }
 
+/* ── Browser / platform helpers ─────────────────────────────────────────── */
+function _isIOS() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+function _isIOSChrome() {
+  return _isIOS() && /CriOS/.test(navigator.userAgent);
+}
+function _isIOSFirefox() {
+  return _isIOS() && /FxiOS/.test(navigator.userAgent);
+}
+function _isSamsungBrowser() {
+  return /SamsungBrowser/.test(navigator.userAgent);
+}
+/* Returns true when Web Speech API is reliably available */
+function _speechSupported() {
+  return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+}
+
 function getBestEnglishVoice() {
+  if (!window.speechSynthesis) return null;
   const voices = window.speechSynthesis.getVoices();
   if (!voices.length) return null;
   // Priority list: best Neural/Natural voices first
@@ -8917,7 +8997,20 @@ function refreshAttPopupIfOpen() {
       `<div class="sp-bar" style="animation-delay:${i*0.1}s"></div>`
     ).join('');
 
+    // Banner cảnh báo trình duyệt (iOS Chrome/Firefox)
+    const browserWarnHtml = (_isIOSChrome() || _isIOSFirefox()) ? `
+      <div class="sp-browser-warn" style="margin-bottom:16px">
+        <span class="sp-warn-icon">⚠️</span>
+        <div>
+          <strong>Ghi âm không hoạt động trên trình duyệt này.</strong><br>
+          <span style="font-size:12px;margin-top:2px;display:block">
+            Mở lại bằng <strong>Safari</strong> để luyện nói đầy đủ. Hoặc dùng chế độ gõ tay bên dưới.
+          </span>
+        </div>
+      </div>` : '';
+
     const html = `
+      ${browserWarnHtml}
       <div class="speaking-progress-wrap">
         <div class="speaking-progress-track">
           <div class="speaking-progress-fill" id="sp-prog-fill" style="width:0%"></div>
@@ -8972,17 +9065,34 @@ function refreshAttPopupIfOpen() {
     if (!st) return;
     const sentence = st.sentences[idx];
     const btn = document.getElementById(`sp-listen-btn-${idx}`);
-    if (!window.speechSynthesis) return;
+    if (!window.speechSynthesis) {
+      toast('Trình duyệt không hỗ trợ đọc văn bản.', 'error');
+      return;
+    }
     window.speechSynthesis.cancel();
+
     const utt = new SpeechSynthesisUtterance(sentence);
     utt.lang = 'en-US'; utt.rate = 0.88; utt.pitch = 1;
-    const v = getBestEnglishVoice();
-    if (v) utt.voice = v;
-    if (btn) { btn.classList.add('playing'); btn.textContent = '🔊 Đang phát...'; }
-    utt.onend = utt.onerror = () => {
-      if (btn) { btn.classList.remove('playing'); btn.textContent = '🔊 Nghe mẫu'; }
+
+    const doSpeak = () => {
+      const v = getBestEnglishVoice();
+      if (v) utt.voice = v;
+      if (btn) { btn.classList.add('playing'); btn.innerHTML = '🔊 Đang phát...'; }
+      utt.onend = utt.onerror = () => {
+        if (btn) { btn.classList.remove('playing'); btn.innerHTML = '🔊 Nghe mẫu'; }
+      };
+      // iOS: cancel + small delay prevents silent mode glitch
+      window.speechSynthesis.cancel();
+      setTimeout(() => window.speechSynthesis.speak(utt), _isIOS() ? 120 : 0);
     };
-    window.speechSynthesis.speak(utt);
+
+    if (window.speechSynthesis.getVoices().length) {
+      doSpeak();
+    } else {
+      window.speechSynthesis.onvoiceschanged = () => doSpeak();
+      // Force voices load on iOS
+      window.speechSynthesis.getVoices();
+    }
   }
 
   // ── Waveform helpers ───────────────────────────────────────────────────────
@@ -8998,58 +9108,143 @@ function refreshAttPopupIfOpen() {
   }
 
   // ── Global recognition refs ────────────────────────────────────────────────
-  window._activeRecognition = null;
+  window._activeRecognition    = null;
   window._activeRecognitionTimeout = null;
+  window._spCountdownTimer     = null;   // countdown interval handle
 
   function startSpeakingRecord(idx) {
     const st = window._speakingState;
     if (!st) return;
 
-    // Toggle: if already recording → stop
+    // ── Toggle: if already recording → stop gracefully ──────────────────────
     if (window._activeRecognition) {
       window._activeRecognition.stop();
       return;
     }
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
+    const btn      = document.getElementById(`sp-rec-btn-${idx}`);
+    const card     = document.getElementById(`sp-card-${idx}`);
+
+    // ── iOS Chrome / Firefox: Web Speech API bị chặn → fallback ────────────
+    if (_isIOSChrome() || _isIOSFirefox()) {
+      _showIOSBrowserWarning(idx);
+      return;
+    }
+
+    // ── Trình duyệt không hỗ trợ → fallback gõ tay ─────────────────────────
+    if (!_speechSupported()) {
       showSpeakingTextFallback(idx);
       return;
     }
 
+    // ── Kiểm tra permission trước (nếu Permissions API có sẵn) ──────────────
+    if (navigator.permissions && navigator.permissions.query) {
+      navigator.permissions.query({ name: 'microphone' }).then(result => {
+        if (result.state === 'denied') {
+          _handleMicDenied(idx);
+          return;
+        }
+        _startCountdownThenRecord(idx);
+      }).catch(() => _startCountdownThenRecord(idx)); // API không hỗ trợ → tiếp tục
+    } else {
+      _startCountdownThenRecord(idx);
+    }
+  }
+
+  // ── Countdown 3-2-1 rồi mới bật mic ────────────────────────────────────
+  function _startCountdownThenRecord(idx) {
+    const card = document.getElementById(`sp-card-${idx}`);
+    const btn  = document.getElementById(`sp-rec-btn-${idx}`);
+    if (btn) { btn.disabled = true; }
+
+    let count = 3;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'sp-countdown-overlay';
+    overlay.id = `sp-countdown-${idx}`;
+    overlay.innerHTML = `
+      <div class="sp-countdown-num" id="sp-cnum-${idx}">${count}</div>
+      <div class="sp-countdown-label">Chuẩn bị nói...</div>
+    `;
+    if (card) { card.style.position = 'relative'; card.appendChild(overlay); }
+
+    window._spCountdownTimer = setInterval(() => {
+      count--;
+      const numEl = document.getElementById(`sp-cnum-${idx}`);
+      if (count > 0) {
+        if (numEl) {
+          numEl.style.animation = 'none';
+          void numEl.offsetWidth; // reflow
+          numEl.style.animation = '';
+          numEl.textContent = count;
+        }
+      } else {
+        clearInterval(window._spCountdownTimer);
+        window._spCountdownTimer = null;
+        const ov = document.getElementById(`sp-countdown-${idx}`);
+        if (ov) ov.remove();
+        if (btn) { btn.disabled = false; }
+        _doStartRecognition(idx);
+      }
+    }, 900);
+  }
+
+  // ── Khởi động SpeechRecognition thực sự ─────────────────────────────────
+  function _doStartRecognition(idx) {
+    const st       = window._speakingState;
+    if (!st) return;
     const btn      = document.getElementById(`sp-rec-btn-${idx}`);
     const interimEl= document.getElementById(`sp-interim-${idx}`);
     const origWords= st.sentences[idx].trim().split(/\s+/);
 
-    if (btn) { btn.classList.add('recording'); btn.innerHTML = '⏹ Đang ghi — nhấn dừng'; }
-    showWave(idx);
-    if (interimEl) interimEl.textContent = '...';
-
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     recognition.lang            = 'en-US';
     recognition.continuous      = false;
-    recognition.interimResults  = true;   // ← nhận kết quả tạm thời realtime
+    recognition.interimResults  = true;
     recognition.maxAlternatives = 3;
-    window._activeRecognition = recognition;
+    window._activeRecognition   = recognition;
 
-    // Auto-stop sau 10s
+    // Auto-stop: iOS thường tự dừng sau ~7s, Android ~15s — dùng 12s làm chuẩn
+    const autoStopMs = _isIOS() ? 8000 : 12000;
     window._activeRecognitionTimeout = setTimeout(() => {
       if (window._activeRecognition === recognition) recognition.stop();
-    }, 10000);
+    }, autoStopMs);
 
-    let bestFinal = '';
+    let bestFinal      = '';
+    let allAlternatives= [];
+
+    // Hiện nút dừng ngay, nhưng chờ audiostart mới show wave + trạng thái thật
+    if (btn) {
+      btn.classList.add('recording');
+      btn.innerHTML = '⏳ Đang kết nối mic...';
+    }
+
+    recognition.onaudiostart = () => {
+      if (btn) {
+        btn.innerHTML = '⏹ Đang nghe — nhấn dừng';
+        btn.classList.add('mic-ready');
+      }
+      showWave(idx);
+      if (interimEl) interimEl.textContent = '...';
+    };
 
     recognition.onresult = (event) => {
       let interimText = '';
       let finalText   = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
-        const t = event.results[i][0].transcript;
-        if (event.results[i].isFinal) finalText += t;
-        else interimText += t;
+        if (event.results[i].isFinal) {
+          // Gom tất cả alternatives để chọn tốt nhất
+          for (let a = 0; a < event.results[i].length; a++) {
+            allAlternatives.push(event.results[i][a].transcript);
+          }
+          finalText += event.results[i][0].transcript;
+        } else {
+          interimText += event.results[i][0].transcript;
+        }
       }
       if (finalText) bestFinal = finalText;
 
-      // Live highlight: tô màu từng từ nghe được lên câu gốc
       const liveHeard = (bestFinal || interimText).toLowerCase();
       _highlightLive(idx, origWords, liveHeard);
       if (interimEl) interimEl.textContent = interimText || '';
@@ -9060,12 +9255,33 @@ function refreshAttPopupIfOpen() {
       window._activeRecognitionTimeout = null;
       window._activeRecognition = null;
       hideWave(idx);
-      if (btn) { btn.classList.remove('recording'); btn.innerHTML = '🎤 Bắt đầu ghi âm'; }
+      if (btn) {
+        btn.classList.remove('recording', 'mic-ready');
+        btn.innerHTML = '🎤 Bắt đầu ghi âm';
+        btn.disabled = false;
+      }
       if (interimEl) interimEl.textContent = '';
-      if (event.error === 'no-speech') {
-        toast('Không nghe thấy giọng nói. Hãy thử lại.', 'error');
-      } else if (event.error !== 'aborted') {
-        toast('Lỗi micro: ' + event.error, 'error');
+      _resetWordColors(idx, origWords);
+
+      switch (event.error) {
+        case 'not-allowed':
+        case 'service-not-allowed':
+          _handleMicDenied(idx);
+          break;
+        case 'no-speech':
+          toast('Không nghe thấy giọng nói. Hãy nói to và rõ hơn rồi thử lại.', 'error');
+          break;
+        case 'network':
+          toast('Lỗi mạng. Kiểm tra kết nối internet rồi thử lại.', 'error');
+          break;
+        case 'audio-capture':
+          toast('Không thể truy cập micro. Kiểm tra cài đặt thiết bị.', 'error');
+          break;
+        case 'aborted':
+          // User dừng chủ động — không cần toast
+          break;
+        default:
+          toast('Lỗi: ' + event.error, 'error');
       }
     };
 
@@ -9074,22 +9290,96 @@ function refreshAttPopupIfOpen() {
       window._activeRecognitionTimeout = null;
       window._activeRecognition = null;
       hideWave(idx);
-      if (btn) { btn.classList.remove('recording'); }
+      if (btn) {
+        btn.classList.remove('recording', 'mic-ready');
+        btn.disabled = false;
+      }
       if (interimEl) interimEl.textContent = '';
 
       if (bestFinal.trim()) {
-        // Chọn transcript tốt nhất trong các alternatives
-        const heard = bestFinal.trim().toLowerCase();
+        // Chọn transcript tốt nhất từ tất cả alternatives
+        const best = _pickBestTranscript(allAlternatives, st.sentences[idx]);
+        const heard = best.trim().toLowerCase();
         const { score, wordResults } = scorePronunciation(st.sentences[idx], heard);
-        markSpeakingDone(idx, score, st.sentences[idx], wordResults, bestFinal.trim());
+        markSpeakingDone(idx, score, st.sentences[idx], wordResults, best.trim());
       } else {
-        // Không có kết quả → reset về trạng thái ban đầu
-        if (btn) { btn.innerHTML = '🎤 Bắt đầu ghi âm'; btn.disabled = false; }
+        if (btn) { btn.innerHTML = '🎤 Bắt đầu ghi âm'; }
         _resetWordColors(idx, origWords);
       }
     };
 
-    recognition.start();
+    try {
+      recognition.start();
+    } catch(e) {
+      window._activeRecognition = null;
+      clearTimeout(window._activeRecognitionTimeout);
+      if (btn) { btn.classList.remove('recording', 'mic-ready'); btn.disabled = false; btn.innerHTML = '🎤 Bắt đầu ghi âm'; }
+      toast('Không thể bật micro. Vui lòng thử lại.', 'error');
+    }
+  }
+
+  // ── Chọn transcript tốt nhất trong các alternatives ─────────────────────
+  function _pickBestTranscript(alternatives, original) {
+    if (!alternatives.length) return '';
+    // Chọn alt có score cao nhất so với câu gốc
+    let best = alternatives[0];
+    let bestScore = -1;
+    for (const alt of alternatives) {
+      const { score } = scorePronunciation(original, alt.toLowerCase());
+      if (score > bestScore) { bestScore = score; best = alt; }
+    }
+    return best;
+  }
+
+  // ── Xử lý khi bị từ chối quyền micro ────────────────────────────────────
+  function _handleMicDenied(idx) {
+    const btn = document.getElementById(`sp-rec-btn-${idx}`);
+    const resultEl = document.getElementById(`sp-result-${idx}`);
+
+    if (btn) {
+      btn.classList.add('perm-denied');
+      btn.innerHTML = '🚫 Micro bị chặn';
+      btn.disabled = true;
+    }
+
+    if (resultEl) {
+      resultEl.innerHTML = `
+        <div class="sp-browser-warn" style="background:#fef2f2;border-color:#fca5a5;color:#991b1b">
+          <span class="sp-warn-icon">🚫</span>
+          <div>
+            <strong>Micro bị chặn.</strong> Để luyện nói, bạn cần cấp quyền micro cho trang này.<br>
+            <span style="font-size:12px;color:#7f1d1d;margin-top:4px;display:block">
+              Vào <strong>Cài đặt trình duyệt → Quyền riêng tư → Micro</strong> → cho phép trang này.
+              Sau đó tải lại trang.
+            </span>
+            <button onclick="showSpeakingTextFallback(${idx})" style="margin-top:8px;padding:6px 14px;border-radius:8px;border:1.5px solid #fca5a5;background:#fff;color:#991b1b;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body)">
+              ✍️ Chuyển sang gõ tay
+            </button>
+          </div>
+        </div>`;
+    }
+  }
+
+  // ── Cảnh báo iOS Chrome / Firefox ───────────────────────────────────────
+  function _showIOSBrowserWarning(idx) {
+    const resultEl = document.getElementById(`sp-result-${idx}`);
+    const btn = document.getElementById(`sp-rec-btn-${idx}`);
+    if (btn) btn.style.display = 'none';
+    if (resultEl) {
+      resultEl.innerHTML = `
+        <div class="sp-browser-warn">
+          <span class="sp-warn-icon">⚠️</span>
+          <div>
+            <strong>Tính năng ghi âm không hoạt động trên trình duyệt này (iOS Chrome / Firefox).</strong><br>
+            <span style="font-size:12px;margin-top:4px;display:block">
+              Vui lòng mở lại bằng <strong>Safari</strong> để luyện nói trên iPhone/iPad.
+            </span>
+            <button onclick="showSpeakingTextFallback(${idx})" style="margin-top:8px;padding:6px 14px;border-radius:8px;border:1.5px solid #fed7aa;background:#fff;color:#92400e;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body)">
+              ✍️ Dùng chế độ gõ tay
+            </button>
+          </div>
+        </div>`;
+    }
   }
 
   // Tô màu từng từ lên câu gốc theo interim/final transcript
@@ -9198,7 +9488,7 @@ function refreshAttPopupIfOpen() {
     if (!st) return;
 
     const btn = document.getElementById(`sp-rec-btn-${idx}`);
-    if (btn) { btn.classList.remove('recording'); btn.disabled = false; btn.innerHTML = '🎤 Ghi âm lại'; }
+    if (btn) { btn.classList.remove('recording', 'mic-ready'); btn.disabled = false; btn.innerHTML = '🎤 Ghi âm lại'; }
 
     const resultEl = document.getElementById(`sp-result-${idx}`);
     const pct = Math.round(score * 100);
@@ -9241,6 +9531,14 @@ function refreshAttPopupIfOpen() {
   }
 
   function speakingRetry(idx) {
+    // Hủy countdown nếu đang chạy
+    if (window._spCountdownTimer) {
+      clearInterval(window._spCountdownTimer);
+      window._spCountdownTimer = null;
+    }
+    const ov = document.getElementById(`sp-countdown-${idx}`);
+    if (ov) ov.remove();
+
     const st = window._speakingState;
     const card = document.getElementById(`sp-card-${idx}`);
     if (card) card.classList.remove('done-sentence');
@@ -9249,11 +9547,15 @@ function refreshAttPopupIfOpen() {
     const navEl = document.getElementById(`sp-nav-${idx}`);
     if (navEl) navEl.style.display = 'none';
     const btn = document.getElementById(`sp-rec-btn-${idx}`);
-    if (btn) { btn.style.display = ''; btn.classList.remove('recording'); btn.disabled = false; btn.innerHTML = '🎤 Bắt đầu ghi âm'; }
+    if (btn) {
+      btn.style.display = '';
+      btn.classList.remove('recording', 'mic-ready', 'perm-denied');
+      btn.disabled = false;
+      btn.innerHTML = '🎤 Bắt đầu ghi âm';
+    }
     const interimEl = document.getElementById(`sp-interim-${idx}`);
     if (interimEl) interimEl.textContent = '';
     hideWave(idx);
-    // Reset word colors
     if (st) {
       const origWords = st.sentences[idx].trim().split(/\s+/);
       _resetWordColors(idx, origWords);
