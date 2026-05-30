@@ -4168,12 +4168,10 @@ const App = {
               isCorrect = correctSet.size === userSet.size && [...correctSet].every(x=>userSet.has(x));
               if (isCorrect) { autoCalc = q.score||0; }
               // Partial scoring for multiple-choice
-              // correctHits/totalCorrect * score, trừ penalty mỗi đáp án sai, min = 0
+              // correctHits/totalCorrect * score (không penalty)
               if (q.type === 'multiple' && correctSet.size > 0) {
                 correctHits = [...userSet].filter(x => correctSet.has(x)).length;
-                const wrongHits = [...userSet].filter(x => !correctSet.has(x)).length;
-                const rawPartial = ((correctHits - wrongHits) / correctSet.size) * (q.score||0);
-                partialCalc = parseFloat(Math.max(0, rawPartial).toFixed(2));
+                partialCalc = parseFloat((correctHits / correctSet.size * (q.score||0)).toFixed(2));
               }
               autoScore += autoCalc;
             }
