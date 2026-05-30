@@ -2487,25 +2487,34 @@ document.addEventListener('keydown', e => {
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, size, size);
 
-    // Glow vàng phía sau bolt
-    const glow = ctx.createRadialGradient(90, 90, 10, 90, 90, 80);
-    glow.addColorStop(0, 'rgba(232,187,80,0.25)');
+    // Bolt vàng — căn giữa 180x180
+    // Bolt gốc nằm trong viewBox 32x32, dùng transform để scale + căn giữa
+    // Bolt points (từ SVG path): x: 9-23, y: 4-28 → width=14, height=24, center=(16,16)
+    const boltW = 14, boltH = 24;
+    const boltScale = Math.min(size * 0.55 / boltW, size * 0.55 / boltH); // ~4.1
+    const boltCX = size / 2;  // 90
+    const boltCY = size / 2;  // 90
+    // Hàm chuyển toạ độ bolt gốc → canvas (căn giữa)
+    const bx = x => boltCX + (x - 16) * boltScale;
+    const by = y => boltCY + (y - 16) * boltScale;
+
+    // Glow vàng phía sau bolt — căn đúng vào giữa bolt
+    const glow = ctx.createRadialGradient(boltCX, boltCY, 5, boltCX, boltCY, 80);
+    glow.addColorStop(0, 'rgba(232,187,80,0.35)');
     glow.addColorStop(1, 'rgba(232,187,80,0)');
     ctx.fillStyle = glow;
     ctx.fillRect(0, 0, size, size);
 
-    // Bolt vàng — căn giữa 180x180
-    const sc = 5.0, ox = 2, oy = 8;
     ctx.shadowColor = '#e8bb50';
-    ctx.shadowBlur = 22;
+    ctx.shadowBlur = 28;
     ctx.fillStyle = '#f5d278';
     ctx.beginPath();
-    ctx.moveTo((18+ox)*sc, (4 +oy)*sc);
-    ctx.lineTo((9 +ox)*sc, (17+oy)*sc);
-    ctx.lineTo((15.5+ox)*sc,(17+oy)*sc);
-    ctx.lineTo((14+ox)*sc, (28+oy)*sc);
-    ctx.lineTo((23+ox)*sc, (15+oy)*sc);
-    ctx.lineTo((16.5+ox)*sc,(15+oy)*sc);
+    ctx.moveTo(bx(18), by(4));
+    ctx.lineTo(bx(9),  by(17));
+    ctx.lineTo(bx(15.5), by(17));
+    ctx.lineTo(bx(14), by(28));
+    ctx.lineTo(bx(23), by(15));
+    ctx.lineTo(bx(16.5), by(15));
     ctx.closePath();
     ctx.fill();
 
