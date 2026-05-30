@@ -9021,36 +9021,94 @@ function refreshAttPopupIfOpen() {
     return { original: raw, corrected: '', notes: [] };
   }
 
+  // Highlight notes inside a text. mode='original' marks wrong words red strike,
+  // mode='correction' marks fixed words green. Uses a placeholder token strategy
+  // to safely combine literal substring matches with HTML escaping.
+  function highlightWritingText(text, notes, mode) {
+    if (!text) return '';
+    const items = (notes || [])
+      .map(n => mode === 'original' ? (n.original || '') : (n.correction || ''))
+      .filter(s => s && s.length >= 2)
+      // De-duplicate, then sort longest first so longer matches win
+      .filter((s, i, a) => a.indexOf(s) === i)
+      .sort((a, b) => b.length - a.length);
+
+    // Replace each match with a unique placeholder BEFORE escaping
+    const tokens = [];
+    let working = text;
+    items.forEach((needle, idx) => {
+      const token = `\u0001HL${idx}\u0001`;
+      // Case-insensitive, all occurrences, literal match
+      const re = new RegExp(needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+      let replaced = false;
+      working = working.replace(re, (m) => {
+        replaced = true;
+        tokens.push({ token, original: m });
+        return token;
+      });
+      if (!replaced) tokens.push({ token: null }); // keep index alignment
+    });
+
+    // Escape full text (placeholders are safe ASCII control chars)
+    let escaped = esc(working).replace(/\n/g, '<br>');
+
+    // Swap placeholders back as styled spans
+    const styleOriginal   = 'background:#fee2e2;color:var(--red);text-decoration:line-through;padding:1px 4px;border-radius:4px;font-weight:600';
+    const styleCorrection = 'background:#dcfce7;color:var(--green);padding:1px 4px;border-radius:4px;font-weight:600';
+    const style = mode === 'original' ? styleOriginal : styleCorrection;
+
+    tokens.forEach(t => {
+      if (!t.token) return;
+      // Token chars are control chars — they survive HTML escape unchanged
+      escaped = escaped.replace(
+        t.token,
+        `<mark style="${style}">${esc(t.original)}</mark>`
+      );
+    });
+
+    return escaped;
+  }
+
   function renderWritingReviewBlock(parsed) {
-    const notesHtml = (parsed.notes && parsed.notes.length) ? `
+    const notes = parsed.notes || [];
+    const notesHtml = notes.length ? `
       <div style="margin-top:14px">
-        <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">📚 GHI CHÚ TỪ AI</div>
+        <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">📚 GHI CHÚ TỪ AI (${notes.length})</div>
         <div style="display:flex;flex-direction:column;gap:8px">
-          ${parsed.notes.map(n => `
+          ${notes.map((n, i) => `
             <div style="background:#fff;border:1px solid var(--border-light);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.6">
-              <div><span style="color:var(--red);text-decoration:line-through">${esc(n.original||'')}</span> <span style="color:var(--text-muted)">→</span> <span style="color:var(--green);font-weight:600">${esc(n.correction||'')}</span></div>
-              ${n.explanation ? `<div style="margin-top:4px;color:var(--text-muted);font-size:12px">💡 ${esc(n.explanation)}</div>` : ''}
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <span style="font-size:11px;font-weight:700;color:var(--text-sub);background:var(--bg-2);padding:2px 7px;border-radius:6px">#${i+1}</span>
+                <span style="background:#fee2e2;color:var(--red);text-decoration:line-through;padding:1px 6px;border-radius:4px;font-weight:600">${esc(n.original||'')}</span>
+                <span style="color:var(--text-muted)">→</span>
+                <span style="background:#dcfce7;color:var(--green);padding:1px 6px;border-radius:4px;font-weight:600">${esc(n.correction||'')}</span>
+              </div>
+              ${n.explanation ? `<div style="margin-top:6px;color:var(--text-muted);font-size:12px">💡 ${esc(n.explanation)}</div>` : ''}
             </div>
           `).join('')}
         </div>
       </div>` : '';
 
+    const originalHtml  = highlightWritingText(parsed.original  || '', notes, 'original');
+    const correctedHtml = highlightWritingText(parsed.corrected || '', notes, 'correction');
+
     return `
       <div class="writing-submitted-notice" style="background:var(--teal-light);border-color:var(--teal-bright);color:var(--teal-dark)">
-        ✅ AI đã sửa bài cho bạn — hãy đọc kỹ để rút kinh nghiệm
+        ✅ AI đã sửa bài cho bạn — phần <span style="background:#fee2e2;color:var(--red);padding:1px 6px;border-radius:4px;font-weight:700">đỏ</span> là chỗ sai, phần <span style="background:#dcfce7;color:var(--green);padding:1px 6px;border-radius:4px;font-weight:700">xanh</span> là bản sửa
       </div>
       <div style="margin-top:14px">
-        <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">✏️ BÀI VIẾT CỦA BẠN</div>
-        <div style="background:var(--bg-2);border-radius:10px;padding:14px;font-size:14px;line-height:1.8;color:var(--text)">${esc(parsed.original || '').replace(/\n/g,'<br>')}</div>
+        <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">✏️ BÀI VIẾT CỦA BẠN (đã đánh dấu lỗi)</div>
+        <div style="background:var(--bg-2);border-radius:10px;padding:14px;font-size:14px;line-height:1.9;color:var(--text)">${originalHtml}</div>
       </div>
       ${parsed.corrected ? `
         <div style="margin-top:14px">
-          <div style="font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">✨ BẢN SỬA BỞI AI</div>
-          <div style="background:#fff;border:2px solid var(--teal-bright);border-radius:10px;padding:14px;font-size:14px;line-height:1.8;color:var(--text)">${esc(parsed.corrected).replace(/\n/g,'<br>')}</div>
+          <div style="font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">✨ BẢN SỬA BỞI AI (đã đánh dấu chỗ thay đổi)</div>
+          <div style="background:#fff;border:2px solid var(--teal-bright);border-radius:10px;padding:14px;font-size:14px;line-height:1.9;color:var(--text)">${correctedHtml}</div>
         </div>` : ''}
       ${notesHtml}
     `;
   }
+
 
   function renderWritingLesson(parsed, existingSub) {
     const prompt   = parsed.prompt   || 'Viết một đoạn văn bằng tiếng Anh.';
