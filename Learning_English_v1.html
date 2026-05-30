@@ -2356,10 +2356,14 @@ select {
 .lb-streak-badge { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 99px; padding: 2px 8px; font-size: 11px; font-weight: 700; color: #ea580c; flex-shrink: 0; }
 
   /* ===== SPEAKING LESSON ===== */
+  @keyframes sp-wave {
+    0%,100% { transform: scaleY(.3); } 50% { transform: scaleY(1); }
+  }
+  @keyframes sp-pop { 0%{transform:scale(.85);opacity:0} 60%{transform:scale(1.08)} 100%{transform:scale(1);opacity:1} }
   .speaking-sentence-card {
     background: var(--card); border-radius: var(--radius);
     border: 2px solid var(--border); box-shadow: var(--shadow);
-    padding: 28px 24px; text-align: center; margin-bottom: 16px;
+    padding: 24px 20px; text-align: center; margin-bottom: 16px;
     animation: fadeInScale .3s ease;
   }
   .speaking-sentence-card.active-sentence {
@@ -2369,55 +2373,84 @@ select {
     border-color: var(--green); background: var(--green-light);
   }
   .speaking-sentence-text {
-    font-size: 20px; font-weight: 700; color: var(--text);
-    font-family: var(--font-display); line-height: 1.5; margin-bottom: 16px;
+    font-size: 22px; font-weight: 700; color: var(--text);
+    font-family: var(--font-display); line-height: 1.6; margin-bottom: 16px;
+    letter-spacing: .01em;
   }
-  .speaking-word { display: inline; }
-  .speaking-word.match  { color: var(--green); font-weight: 800; }
-  .speaking-word.wrong  { color: var(--red); text-decoration: underline wavy var(--red); font-weight: 800; }
-  .speaking-word.missed { color: var(--red); opacity: .6; }
+  /* word-by-word tokens */
+  .sp-word { display: inline-block; padding: 2px 1px; border-radius: 4px; transition: all .2s; }
+  .sp-word.heard    { color: var(--text-muted); background: var(--bg-2); }
+  .sp-word.match    { color: var(--green); font-weight: 800; background: #dcfce7; border-radius:5px; animation: sp-pop .25s ease; }
+  .sp-word.wrong    { color: var(--red); font-weight: 800; text-decoration: underline wavy var(--red); background: #fee2e2; border-radius:5px; }
+  .sp-word.missed   { color: var(--red); opacity:.55; text-decoration: line-through; }
+  /* interim live preview */
+  .sp-interim { font-size:13px; color: var(--teal); min-height:20px; margin:6px 0 2px; font-style:italic; letter-spacing:.01em; }
+  /* waveform */
+  .sp-waveform {
+    display: flex; align-items: center; justify-content: center;
+    gap: 3px; height: 32px; margin: 8px 0;
+  }
+  .sp-bar {
+    width: 4px; border-radius: 99px;
+    background: linear-gradient(180deg, var(--teal-mid), var(--teal));
+    transform: scaleY(.3); transform-origin: bottom;
+    animation: sp-wave 1s ease-in-out infinite;
+    opacity: 0; transition: opacity .2s;
+  }
+  .sp-bar.active { opacity: 1; }
+  /* record button */
   .speaking-record-btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 13px 28px; border-radius: 99px; border: none; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 14px 32px; border-radius: 99px; border: none; cursor: pointer;
     background: linear-gradient(135deg, var(--teal), var(--teal-mid));
-    color: #fff; font-size: 15px; font-weight: 700;
-    box-shadow: 0 4px 16px rgba(13,148,136,.35);
-    transition: transform .2s, opacity .2s, box-shadow .2s;
-    font-family: var(--font-body);
+    color: #fff; font-size: 16px; font-weight: 700;
+    box-shadow: 0 4px 18px rgba(13,148,136,.38);
+    transition: transform .2s, box-shadow .2s;
+    font-family: var(--font-body); min-width: 190px;
   }
-  .speaking-record-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(13,148,136,.45); }
+  .speaking-record-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(13,148,136,.48); }
   .speaking-record-btn.recording {
     background: linear-gradient(135deg, #dc2626, #ef4444);
-    animation: pulse-dot .8s ease infinite;
     box-shadow: 0 4px 20px rgba(220,38,38,.45);
   }
   .speaking-record-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+  /* listen sample button */
+  .sp-listen-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 16px; border-radius: 99px; border: 1.5px solid var(--border);
+    background: #fff; color: var(--text-muted); font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all .15s; font-family: var(--font-body);
+    margin-bottom: 14px;
+  }
+  .sp-listen-btn:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
+  .sp-listen-btn.playing { color: var(--teal); border-color: var(--teal); background: var(--teal-light); }
+  /* score ring */
+  .sp-score-ring {
+    width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 900; border: 4px solid;
+    animation: sp-pop .3s ease;
+  }
+  .sp-score-ring.great { border-color: var(--green); color: var(--green); background: var(--green-light); }
+  .sp-score-ring.ok    { border-color: #f59e0b; color: #b45309; background: #fff7ed; }
+  .sp-score-ring.low   { border-color: var(--red); color: var(--red); background: var(--red-light); }
   .speaking-result-wrap { margin-top: 12px; font-size: 13px; }
   .speaking-score-badge {
     display: inline-flex; align-items: center; gap: 6px;
-    padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
-    margin-bottom: 8px;
+    padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 8px;
   }
   .speaking-score-badge.great { background: var(--green-light); color: var(--green); border: 1px solid #bbf7d0; }
   .speaking-score-badge.ok    { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
   .speaking-score-badge.low   { background: var(--red-light); color: var(--red); border: 1px solid #fca5a5; }
-  .speaking-heard-text { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
-  .speaking-progress-wrap {
-    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
-  }
-  .speaking-progress-track {
-    flex: 1; height: 7px; background: var(--bg-2); border-radius: 99px; overflow: hidden;
-  }
-  .speaking-progress-fill {
-    height: 100%; background: linear-gradient(90deg, var(--teal), var(--teal-mid));
-    border-radius: 99px; transition: width .4s cubic-bezier(.4,0,.2,1);
-  }
-  .speaking-nav-btns { display: flex; gap: 10px; justify-content: center; margin-top: 8px; }
+  .speaking-heard-text { font-size: 12px; color: var(--text-sub); line-height: 1.6; margin-top:4px; }
+  .speaking-progress-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .speaking-progress-track { flex: 1; height: 7px; background: var(--bg-2); border-radius: 99px; overflow: hidden; }
+  .speaking-progress-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--teal-mid)); border-radius: 99px; transition: width .4s cubic-bezier(.4,0,.2,1); }
+  .speaking-nav-btns { display: flex; gap: 10px; justify-content: center; margin-top: 12px; flex-wrap:wrap; }
   .speaking-nav-btn {
-    padding: 10px 20px; border-radius: 10px; border: 1.5px solid var(--border);
+    padding: 10px 22px; border-radius: 10px; border: 1.5px solid var(--border);
     background: #fff; color: var(--text); font-size: 13px; font-weight: 600;
-    cursor: pointer; transition: transform .15s, background .15s;
-    font-family: var(--font-body);
+    cursor: pointer; transition: transform .15s, background .15s; font-family: var(--font-body);
   }
   .speaking-nav-btn:hover { background: var(--teal-light); border-color: var(--teal); color: var(--teal); }
   .speaking-nav-btn:disabled { opacity: .4; cursor: not-allowed; }
@@ -8880,6 +8913,10 @@ function refreshAttPopupIfOpen() {
 
   function renderSpeakingLesson(sentences) {
     const total = sentences.length;
+    const waveHtml = Array.from({length: 7}, (_, i) =>
+      `<div class="sp-bar" style="animation-delay:${i*0.1}s"></div>`
+    ).join('');
+
     const html = `
       <div class="speaking-progress-wrap">
         <div class="speaking-progress-track">
@@ -8890,14 +8927,38 @@ function refreshAttPopupIfOpen() {
       ${sentences.map((s, i) => `
         <div class="speaking-sentence-card ${i === 0 ? 'active-sentence' : ''}" id="sp-card-${i}" style="${i > 0 ? 'display:none' : ''}">
           <div style="font-size:11px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">Câu ${i+1} / ${total}</div>
-          <div class="speaking-sentence-text" id="sp-text-${i}">${esc(s)}</div>
-          <div style="margin-top:12px">
-            <button class="speaking-record-btn" id="sp-rec-btn-${i}" onclick="startSpeakingRecord(${i})">🎤 Bắt đầu ghi âm</button>
+
+          <!-- Nút nghe mẫu -->
+          <button class="sp-listen-btn" id="sp-listen-btn-${i}" onclick="speakSample(${i})">
+            🔊 Nghe mẫu
+          </button>
+
+          <!-- Câu gốc — sẽ được tô màu realtime -->
+          <div class="speaking-sentence-text" id="sp-text-${i}">
+            ${s.trim().split(/\s+/).map((w,wi) =>
+              `<span class="sp-word" id="sp-w-${i}-${wi}">${esc(w)}</span>`
+            ).join(' ')}
           </div>
-          <div class="speaking-result-wrap" id="sp-result-${i}" style="margin-top:12px"></div>
+
+          <!-- Live interim text -->
+          <div class="sp-interim" id="sp-interim-${i}"></div>
+
+          <!-- Waveform (hiện khi đang ghi) -->
+          <div class="sp-waveform" id="sp-wave-${i}">${waveHtml}</div>
+
+          <!-- Nút ghi âm -->
+          <div style="margin-top:4px">
+            <button class="speaking-record-btn" id="sp-rec-btn-${i}" onclick="startSpeakingRecord(${i})">
+              🎤 Bắt đầu ghi âm
+            </button>
+          </div>
+
+          <div class="speaking-result-wrap" id="sp-result-${i}"></div>
           <div class="speaking-nav-btns" id="sp-nav-${i}" style="display:none">
             <button class="speaking-nav-btn" onclick="speakingRetry(${i})">🔄 Thử lại</button>
-            ${i < total - 1 ? `<button class="speaking-nav-btn" onclick="speakingNext(${i})" style="background:var(--teal-light);border-color:var(--teal);color:var(--teal)">Câu tiếp →</button>` : ''}
+            ${i < total - 1
+              ? `<button class="speaking-nav-btn" onclick="speakingNext(${i})" style="background:var(--teal-light);border-color:var(--teal);color:var(--teal);font-weight:700">Câu tiếp →</button>`
+              : ''}
           </div>
         </div>
       `).join('')}
@@ -8905,7 +8966,38 @@ function refreshAttPopupIfOpen() {
     return html;
   }
 
-  // Global ref to stop recognition from button click
+  // ── Nghe mẫu ──────────────────────────────────────────────────────────────
+  function speakSample(idx) {
+    const st = window._speakingState;
+    if (!st) return;
+    const sentence = st.sentences[idx];
+    const btn = document.getElementById(`sp-listen-btn-${idx}`);
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const utt = new SpeechSynthesisUtterance(sentence);
+    utt.lang = 'en-US'; utt.rate = 0.88; utt.pitch = 1;
+    const v = getBestEnglishVoice();
+    if (v) utt.voice = v;
+    if (btn) { btn.classList.add('playing'); btn.textContent = '🔊 Đang phát...'; }
+    utt.onend = utt.onerror = () => {
+      if (btn) { btn.classList.remove('playing'); btn.textContent = '🔊 Nghe mẫu'; }
+    };
+    window.speechSynthesis.speak(utt);
+  }
+
+  // ── Waveform helpers ───────────────────────────────────────────────────────
+  function showWave(idx) {
+    const w = document.getElementById(`sp-wave-${idx}`);
+    if (!w) return;
+    w.querySelectorAll('.sp-bar').forEach(b => b.classList.add('active'));
+  }
+  function hideWave(idx) {
+    const w = document.getElementById(`sp-wave-${idx}`);
+    if (!w) return;
+    w.querySelectorAll('.sp-bar').forEach(b => b.classList.remove('active'));
+  }
+
+  // ── Global recognition refs ────────────────────────────────────────────────
   window._activeRecognition = null;
   window._activeRecognitionTimeout = null;
 
@@ -8913,70 +9005,67 @@ function refreshAttPopupIfOpen() {
     const st = window._speakingState;
     if (!st) return;
 
-    // If already recording → STOP
+    // Toggle: if already recording → stop
     if (window._activeRecognition) {
       window._activeRecognition.stop();
-      window._activeRecognition = null;
-      if (window._activeRecognitionTimeout) {
-        clearTimeout(window._activeRecognitionTimeout);
-        window._activeRecognitionTimeout = null;
-      }
-      const btn = document.getElementById(`sp-rec-btn-${idx}`);
-      if (btn) { btn.classList.remove('recording'); btn.textContent = '🎤 Bắt đầu ghi âm'; btn.disabled = false; }
       return;
     }
 
-    // Check browser support
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      // iOS / unsupported browser: show manual text input fallback
       showSpeakingTextFallback(idx);
       return;
     }
 
-    const btn = document.getElementById(`sp-rec-btn-${idx}`);
-    if (btn) {
-      btn.classList.add('recording');
-      btn.textContent = '⏹ Nhấn để dừng';
-      btn.disabled = false; // Keep enabled so user can tap to stop
-    }
+    const btn      = document.getElementById(`sp-rec-btn-${idx}`);
+    const interimEl= document.getElementById(`sp-interim-${idx}`);
+    const origWords= st.sentences[idx].trim().split(/\s+/);
+
+    if (btn) { btn.classList.add('recording'); btn.innerHTML = '⏹ Đang ghi — nhấn dừng'; }
+    showWave(idx);
+    if (interimEl) interimEl.textContent = '...';
 
     const recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+    recognition.lang            = 'en-US';
+    recognition.continuous      = false;
+    recognition.interimResults  = true;   // ← nhận kết quả tạm thời realtime
+    recognition.maxAlternatives = 3;
     window._activeRecognition = recognition;
 
-    // Auto-stop after 8 seconds of recording (safety timeout)
+    // Auto-stop sau 10s
     window._activeRecognitionTimeout = setTimeout(() => {
-      if (window._activeRecognition === recognition) {
-        recognition.stop();
-      }
-    }, 8000);
+      if (window._activeRecognition === recognition) recognition.stop();
+    }, 10000);
 
-    let resultHandled = false;
+    let bestFinal = '';
 
     recognition.onresult = (event) => {
-      resultHandled = true;
-      clearTimeout(window._activeRecognitionTimeout);
-      window._activeRecognitionTimeout = null;
-      window._activeRecognition = null;
-      const heard = event.results[0][0].transcript.toLowerCase().trim();
-      const original = st.sentences[idx].toLowerCase();
-      const { score, wordResults } = scorePronunciation(original, heard);
-      markSpeakingDone(idx, score, st.sentences[idx], wordResults, heard);
+      let interimText = '';
+      let finalText   = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const t = event.results[i][0].transcript;
+        if (event.results[i].isFinal) finalText += t;
+        else interimText += t;
+      }
+      if (finalText) bestFinal = finalText;
+
+      // Live highlight: tô màu từng từ nghe được lên câu gốc
+      const liveHeard = (bestFinal || interimText).toLowerCase();
+      _highlightLive(idx, origWords, liveHeard);
+      if (interimEl) interimEl.textContent = interimText || '';
     };
 
     recognition.onerror = (event) => {
       clearTimeout(window._activeRecognitionTimeout);
       window._activeRecognitionTimeout = null;
       window._activeRecognition = null;
-      if (btn) { btn.classList.remove('recording'); btn.textContent = '🎤 Bắt đầu ghi âm'; btn.disabled = false; }
+      hideWave(idx);
+      if (btn) { btn.classList.remove('recording'); btn.innerHTML = '🎤 Bắt đầu ghi âm'; }
+      if (interimEl) interimEl.textContent = '';
       if (event.error === 'no-speech') {
         toast('Không nghe thấy giọng nói. Hãy thử lại.', 'error');
-      } else {
-        markSpeakingDone(idx, 0.5, st.sentences[idx], [], '(lỗi nhận diện)');
+      } else if (event.error !== 'aborted') {
+        toast('Lỗi micro: ' + event.error, 'error');
       }
     };
 
@@ -8984,14 +9073,43 @@ function refreshAttPopupIfOpen() {
       clearTimeout(window._activeRecognitionTimeout);
       window._activeRecognitionTimeout = null;
       window._activeRecognition = null;
+      hideWave(idx);
       if (btn) { btn.classList.remove('recording'); }
-      // If ended without result (e.g. user stopped manually before speaking)
-      if (!resultHandled) {
-        if (btn) { btn.textContent = '🎤 Bắt đầu ghi âm'; btn.disabled = false; }
+      if (interimEl) interimEl.textContent = '';
+
+      if (bestFinal.trim()) {
+        // Chọn transcript tốt nhất trong các alternatives
+        const heard = bestFinal.trim().toLowerCase();
+        const { score, wordResults } = scorePronunciation(st.sentences[idx], heard);
+        markSpeakingDone(idx, score, st.sentences[idx], wordResults, bestFinal.trim());
+      } else {
+        // Không có kết quả → reset về trạng thái ban đầu
+        if (btn) { btn.innerHTML = '🎤 Bắt đầu ghi âm'; btn.disabled = false; }
+        _resetWordColors(idx, origWords);
       }
     };
 
     recognition.start();
+  }
+
+  // Tô màu từng từ lên câu gốc theo interim/final transcript
+  function _highlightLive(idx, origWords, heardText) {
+    const clean = s => s.toLowerCase().replace(/[^a-z0-9'\s]/g, '').trim();
+    const heardWords = clean(heardText).split(/\s+/).filter(Boolean);
+    origWords.forEach((w, wi) => {
+      const el = document.getElementById(`sp-w-${idx}-${wi}`);
+      if (!el) return;
+      const ow = clean(w);
+      const found = heardWords.some(hw => hw === ow || levenshtein(hw, ow) <= 1);
+      el.className = 'sp-word ' + (found ? 'match' : 'heard');
+    });
+  }
+
+  function _resetWordColors(idx, origWords) {
+    origWords.forEach((w, wi) => {
+      const el = document.getElementById(`sp-w-${idx}-${wi}`);
+      if (el) el.className = 'sp-word';
+    });
   }
 
   function showSpeakingTextFallback(idx) {
@@ -8999,7 +9117,6 @@ function refreshAttPopupIfOpen() {
     if (!st) return;
     const resultEl = document.getElementById(`sp-result-${idx}`);
     const btn = document.getElementById(`sp-rec-btn-${idx}`);
-    // Hide mic button, show text input
     if (btn) btn.style.display = 'none';
     if (resultEl) {
       resultEl.innerHTML = `
@@ -9011,15 +9128,13 @@ function refreshAttPopupIfOpen() {
             placeholder="Gõ lại câu tiếng Anh..."
             autocomplete="off" autocapitalize="none" spellcheck="false"
             style="flex:1;padding:12px 14px;border:2px solid var(--border);border-radius:10px;
-                   font-size:16px;font-family:var(--font-body);outline:none;
-                   -webkit-appearance:none;touch-action:manipulation"
+                   font-size:16px;font-family:var(--font-body);outline:none;-webkit-appearance:none;touch-action:manipulation"
             onfocus="this.style.borderColor='var(--teal)'"
             onblur="this.style.borderColor='var(--border)'">
           <button onclick="submitSpeakingText(${idx})"
             style="padding:12px 18px;border-radius:10px;border:none;cursor:pointer;
                    background:linear-gradient(135deg,var(--teal),var(--teal-mid));color:#fff;
-                   font-size:14px;font-weight:700;font-family:var(--font-body);
-                   white-space:nowrap;flex-shrink:0">
+                   font-size:14px;font-weight:700;font-family:var(--font-body);white-space:nowrap;flex-shrink:0">
             ✓ Nộp
           </button>
         </div>
@@ -9030,34 +9145,48 @@ function refreshAttPopupIfOpen() {
   function submitSpeakingText(idx) {
     const st = window._speakingState;
     if (!st) return;
-    const input = document.getElementById(`sp-text-input-${idx}`);
-    const typed = (input?.value || '').trim();
+    const input  = document.getElementById(`sp-text-input-${idx}`);
+    const typed  = (input?.value || '').trim();
     if (!typed) { toast('Hãy gõ câu trước khi nộp.', 'error'); return; }
     const { score, wordResults } = scorePronunciation(st.sentences[idx], typed);
     markSpeakingDone(idx, score, st.sentences[idx], wordResults, typed);
   }
 
+  // ── Improved scoring: sequence-aware alignment ─────────────────────────────
   function scorePronunciation(original, heard) {
-    // Normalize both strings
-    const clean = s => s.toLowerCase().replace(/[^a-z0-9\s']/g, '').trim();
-    const origWords = clean(original).split(/\s+/).filter(Boolean);
+    const clean = s => s.toLowerCase().replace(/[^a-z0-9'\s]/g, '').trim();
+    const origWords  = clean(original).split(/\s+/).filter(Boolean);
     const heardWords = clean(heard).split(/\s+/).filter(Boolean);
-    
+
+    // Dynamic programming alignment (like diff / Duolingo)
+    // For each orig word, try to find best match in heard (in order, allow skip)
+    let hi = 0;
     let matched = 0;
     const wordResults = origWords.map(ow => {
-      // Check if this word was heard (fuzzy: exact or within 1 edit)
-      const found = heardWords.some(hw => hw === ow || levenshtein(hw, ow) <= 1);
-      if (found) matched++;
-      return { word: ow, ok: found };
+      // Look ahead up to 4 words in heard stream
+      for (let lookahead = 0; lookahead < 4 && hi + lookahead < heardWords.length; lookahead++) {
+        const hw = heardWords[hi + lookahead];
+        if (hw === ow || levenshtein(hw, ow) <= Math.floor(ow.length / 4)) {
+          hi += lookahead + 1;
+          matched++;
+          return { word: ow, ok: true };
+        }
+      }
+      return { word: ow, ok: false };
     });
-    
-    const score = origWords.length > 0 ? matched / origWords.length : 0;
+
+    // Bonus: if heard has extra words not in orig, slight penalty
+    const extraPenalty = Math.max(0, heardWords.length - origWords.length) * 0.03;
+    const rawScore = origWords.length > 0 ? matched / origWords.length : 0;
+    const score = Math.max(0, Math.min(1, rawScore - extraPenalty));
     return { score, wordResults };
   }
 
   function levenshtein(a, b) {
     const m = a.length, n = b.length;
-    const dp = Array.from({length: m+1}, (_, i) => Array.from({length: n+1}, (_, j) => i === 0 ? j : j === 0 ? i : 0));
+    if (Math.abs(m - n) > 3) return Math.abs(m - n);
+    const dp = Array.from({length: m+1}, (_, i) =>
+      Array.from({length: n+1}, (_, j) => i === 0 ? j : j === 0 ? i : 0));
     for (let i = 1; i <= m; i++)
       for (let j = 1; j <= n; j++)
         dp[i][j] = a[i-1] === b[j-1] ? dp[i-1][j-1] : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
@@ -9069,60 +9198,67 @@ function refreshAttPopupIfOpen() {
     if (!st) return;
 
     const btn = document.getElementById(`sp-rec-btn-${idx}`);
-    if (btn) { btn.classList.remove('recording'); btn.disabled = false; btn.textContent = '🎤 Ghi âm lại'; }
+    if (btn) { btn.classList.remove('recording'); btn.disabled = false; btn.innerHTML = '🎤 Ghi âm lại'; }
 
     const resultEl = document.getElementById(`sp-result-${idx}`);
     const pct = Math.round(score * 100);
-    let badgeClass = pct >= 80 ? 'great' : pct >= 50 ? 'ok' : 'low';
-    let badgeText  = pct >= 80 ? '🌟 Rất tốt!' : pct >= 50 ? '👌 Được rồi' : '😅 Thử lại';
+    const grade = pct >= 80 ? 'great' : pct >= 50 ? 'ok' : 'low';
+    const emoji = pct >= 80 ? '🌟' : pct >= 50 ? '👌' : '😅';
+    const msg   = pct >= 80 ? 'Rất tốt!' : pct >= 50 ? 'Được rồi' : 'Thử lại nha!';
 
-    // Build highlighted sentence
-    const highlighted = wordResults.length
-      ? wordResults.map(w => `<span class="speaking-word ${w.ok ? 'match' : 'wrong'}">${esc(w.word)}</span>`).join(' ')
-      : esc(original);
+    // Final word highlight
+    const origWords = original.trim().split(/\s+/);
+    if (wordResults.length) {
+      wordResults.forEach((w, wi) => {
+        const el = document.getElementById(`sp-w-${idx}-${wi}`);
+        if (el) el.className = 'sp-word ' + (w.ok ? 'match' : 'wrong');
+      });
+    }
 
     if (resultEl) {
       resultEl.innerHTML = `
-        <div class="speaking-score-badge ${badgeClass}">${badgeText} ${pct}%</div>
-        <div style="margin-bottom:8px;${wordResults.length ? '' : 'display:none'}">
-          <div style="font-size:11px;font-weight:700;color:var(--text-sub);margin-bottom:4px">KẾT QUẢ NHẬN DIỆN:</div>
-          <div style="font-size:15px;line-height:1.8">${highlighted}</div>
+        <div style="margin-top:10px">
+          <div class="sp-score-ring ${grade}">${pct}<span style="font-size:11px;font-weight:600">%</span></div>
+          <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">${emoji} ${msg}</div>
+          ${heard ? `<div class="speaking-heard-text">🗣 Nghe được: <em>"${esc(heard)}"</em></div>` : ''}
+          ${pct < 100 && wordResults.length
+            ? `<div style="margin-top:8px;font-size:12px;color:var(--text-sub)">
+                 Từ đúng: <strong style="color:var(--green)">${wordResults.filter(w=>w.ok).length}</strong> /
+                 ${wordResults.length} từ
+               </div>`
+            : ''}
         </div>
-        ${heard ? `<div class="speaking-heard-text">🗣 Đã nghe: <em>"${esc(heard)}"</em></div>` : ''}
       `;
     }
 
-    // Mark card as done (even if low score — let them proceed)
     const card = document.getElementById(`sp-card-${idx}`);
     if (card) card.classList.add('done-sentence');
     const navEl = document.getElementById(`sp-nav-${idx}`);
     if (navEl) navEl.style.display = 'flex';
 
-    // Update state
-    if (!st.done[idx]) {
-      st.done[idx] = true;
-      st.doneCount++;
-    }
+    if (!st.done[idx]) { st.done[idx] = true; st.doneCount++; }
     updateSpeakingProgress();
   }
 
   function speakingRetry(idx) {
+    const st = window._speakingState;
     const card = document.getElementById(`sp-card-${idx}`);
     if (card) card.classList.remove('done-sentence');
     const resultEl = document.getElementById(`sp-result-${idx}`);
     if (resultEl) resultEl.innerHTML = '';
     const navEl = document.getElementById(`sp-nav-${idx}`);
     if (navEl) navEl.style.display = 'none';
-    // Restore mic button visibility (may have been hidden by iOS fallback)
     const btn = document.getElementById(`sp-rec-btn-${idx}`);
-    if (btn) { btn.style.display = ''; btn.classList.remove('recording'); btn.disabled = false; btn.textContent = '🎤 Bắt đầu ghi âm'; }
-
-    // Revert state
-    const st = window._speakingState;
-    if (st && st.done[idx]) {
-      st.done[idx] = false;
-      st.doneCount = Math.max(0, st.doneCount - 1);
+    if (btn) { btn.style.display = ''; btn.classList.remove('recording'); btn.disabled = false; btn.innerHTML = '🎤 Bắt đầu ghi âm'; }
+    const interimEl = document.getElementById(`sp-interim-${idx}`);
+    if (interimEl) interimEl.textContent = '';
+    hideWave(idx);
+    // Reset word colors
+    if (st) {
+      const origWords = st.sentences[idx].trim().split(/\s+/);
+      _resetWordColors(idx, origWords);
     }
+    if (st && st.done[idx]) { st.done[idx] = false; st.doneCount = Math.max(0, st.doneCount - 1); }
     updateSpeakingProgress();
   }
 
@@ -9131,27 +9267,22 @@ function refreshAttPopupIfOpen() {
     if (!st) return;
     const nextIdx = idx + 1;
     if (nextIdx >= st.sentences.length) return;
-    
-    // Hide current, show next
-    const cur = document.getElementById(`sp-card-${idx}`);
+    const cur  = document.getElementById(`sp-card-${idx}`);
     const next = document.getElementById(`sp-card-${nextIdx}`);
-    if (cur) cur.style.display = 'none';
+    if (cur)  cur.style.display = 'none';
     if (next) { next.style.display = 'block'; next.classList.add('active-sentence'); next.scrollIntoView({behavior:'smooth',block:'center'}); }
-    
     st.current = nextIdx;
   }
 
   function updateSpeakingProgress() {
     const st = window._speakingState;
     if (!st) return;
-    const done = st.done.filter(Boolean).length;
+    const done  = st.done.filter(Boolean).length;
     const total = st.sentences.length;
-    
     const fill  = document.getElementById('sp-prog-fill');
     const label = document.getElementById('sp-prog-label');
     if (fill)  fill.style.width = (total ? (done/total*100) : 0) + '%';
     if (label) label.textContent = done + ' / ' + total;
-    
     const endBtn = document.getElementById('btn-end-lesson');
     const endLbl = document.getElementById('btn-end-lesson-label');
     if (endBtn && endLbl) {
