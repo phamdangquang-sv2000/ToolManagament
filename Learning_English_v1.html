@@ -3489,6 +3489,82 @@ select {
       </div>
       <div id="lesson-pagination"></div>
     </div>
+
+    <!-- ===== SETTINGS: API KEY ===== -->
+    <div style="margin-top:28px;background:var(--card);border-radius:var(--radius);border:1px solid var(--border-light);box-shadow:var(--shadow);overflow:hidden">
+      <div style="padding:18px 24px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;gap:10px">
+        <span style="font-size:18px">⚙️</span>
+        <div>
+          <div style="font-weight:700;font-size:15px">Cài đặt AI</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px">API Key dùng cho tính năng AI chấm writing và tạo bài điền từ</div>
+        </div>
+      </div>
+      <div style="padding:20px 24px;display:flex;flex-direction:column;gap:18px">
+
+        <!-- AI Provider Selector -->
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:8px">
+            AI Provider
+          </label>
+          <div style="display:flex;gap:8px">
+            <button id="ai-provider-groq" onclick="setAiProvider('groq')"
+              style="flex:1;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;font-size:13px;font-weight:700;font-family:var(--font-body);transition:.2s;background:var(--bg-2);color:var(--text-muted)">
+              ⚡ Groq
+            </button>
+            <button id="ai-provider-gemini" onclick="setAiProvider('gemini')"
+              style="flex:1;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;font-size:13px;font-weight:700;font-family:var(--font-body);transition:.2s;background:var(--bg-2);color:var(--text-muted)">
+              ✨ Gemini 2.5 Flash
+            </button>
+          </div>
+          <div id="ai-provider-status" style="margin-top:6px;font-size:12px;color:var(--text-muted)"></div>
+        </div>
+
+        <!-- Groq API Key -->
+        <div id="groq-key-section">
+          <label style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:8px">
+            Groq API Key
+            <a href="https://console.groq.com/keys" target="_blank" style="margin-left:8px;font-size:11px;color:var(--teal);font-weight:600;text-transform:none;letter-spacing:0">Lấy key miễn phí →</a>
+          </label>
+          <div style="display:flex;gap:10px;align-items:center">
+            <div style="position:relative;flex:1">
+              <input type="password" id="admin-groq-key" placeholder="gsk_..." autocomplete="off"
+                style="width:100%;padding:11px 44px 11px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:14px;font-family:var(--font-body);background:var(--bg-2);outline:none;transition:border-color .2s"
+                onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+              <button onclick="toggleGroqKeyVisibility()" title="Hiện/ẩn key"
+                style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);padding:0;width:auto;font-size:16px" id="groq-eye-btn">👁</button>
+            </div>
+            <button onclick="saveGroqKey()"
+              style="padding:11px 20px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--teal),var(--teal-mid));color:#fff;font-size:14px;font-weight:700;font-family:var(--font-body);white-space:nowrap;box-shadow:var(--shadow-teal)">
+              💾 Lưu
+            </button>
+          </div>
+          <div id="groq-key-status" style="margin-top:8px;font-size:12px;color:var(--text-muted)"></div>
+        </div>
+
+        <!-- Gemini API Key -->
+        <div id="gemini-key-section">
+          <label style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:8px">
+            Gemini API Key
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" style="margin-left:8px;font-size:11px;color:var(--teal);font-weight:600;text-transform:none;letter-spacing:0">Lấy key miễn phí →</a>
+          </label>
+          <div style="display:flex;gap:10px;align-items:center">
+            <div style="position:relative;flex:1">
+              <input type="password" id="admin-gemini-key" placeholder="AIza..." autocomplete="off"
+                style="width:100%;padding:11px 44px 11px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:14px;font-family:var(--font-body);background:var(--bg-2);outline:none;transition:border-color .2s"
+                onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+              <button onclick="toggleGeminiKeyVisibility()" title="Hiện/ẩn key"
+                style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted);padding:0;width:auto;font-size:16px" id="gemini-eye-btn">👁</button>
+            </div>
+            <button onclick="saveGeminiKey()"
+              style="padding:11px 20px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(135deg,#4285f4,#34a853);color:#fff;font-size:14px;font-weight:700;font-family:var(--font-body);white-space:nowrap;box-shadow:0 4px 14px rgba(66,133,244,.35)">
+              💾 Lưu
+            </button>
+          </div>
+          <div id="gemini-key-status" style="margin-top:8px;font-size:12px;color:var(--text-muted)"></div>
+        </div>
+
+      </div>
+    </div>
   </main>
 </div>
 <script>
@@ -3589,6 +3665,7 @@ function goTo(role) {
     showView('admin');
     loadAdminData();
     subscribeRealtime();
+    setTimeout(() => { loadGroqKeyToInput(); loadGeminiKeyToInput(); loadAiProviderSetting(); }, 100);
   } else {
     showView('employee');
     loadEmployeeData();
@@ -6703,14 +6780,15 @@ async function generateFillBlank() {
   const transcript = document.getElementById('lm-transcript-input').value.trim();
   if (!transcript) { toast('Vui lòng nhập transcript trước!', 'error'); return; }
 
-  const GROQ_API_KEY = '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';
+  const provider = getAiProvider();
+  if (provider === 'groq' && !getGroqKey()) { toast('Vui lòng nhập Groq API Key trong Cài đặt AI.', 'error'); return; }
+  if (provider === 'gemini' && !getGeminiKey()) { toast('Vui lòng nhập Gemini API Key trong Cài đặt AI.', 'error'); return; }
 
   const btn = document.getElementById('lm-gen-blank-btn');
   const origHtml = btn.innerHTML;
   btn.disabled = true;
-  btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;border-color:rgba(79,70,229,.3);border-top-color:var(--indigo)"></div> Đang tạo...';
+  btn.innerHTML = `<div class="spinner" style="width:14px;height:14px;border-width:2px;border-color:rgba(79,70,229,.3);border-top-color:var(--indigo)"></div> Đang tạo...`;
 
-  // Split transcript into lines, chunk ~20 lines each to avoid token issues
   const lines = transcript.split('\n').map(l => l.trim()).filter(Boolean);
   const CHUNK = 20;
   const chunks = [];
@@ -6719,20 +6797,7 @@ async function generateFillBlank() {
   const allSegments = [];
   const allBlanks   = [];
 
-  try {
-    for (let ci = 0; ci < chunks.length; ci++) {
-      btn.innerHTML = `<div class="spinner" style="width:14px;height:14px;border-width:2px;border-color:rgba(79,70,229,.3);border-top-color:var(--indigo)"></div> Đang tạo (${ci+1}/${chunks.length})...`;
-
-      const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
-      body: JSON.stringify({
-        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
-        max_tokens: 3000,
-        temperature: 0.1,
-        response_format: { type: 'json_object' },
-        messages: [
-          { role: 'system', content: `You create fill-in-the-blank exercises. The user gives you English text. You must return ONLY a JSON object, nothing else, no explanation, no markdown.
+  const systemPrompt = `You create fill-in-the-blank exercises. The user gives you English text. You must return ONLY a JSON object, nothing else, no explanation, no markdown.
 
 The JSON format is:
 {"segments":[{"text":"some words","blank":false},{"text":"word","blank":true,"answer":"word"}],"blanks":["word1","word2"]}
@@ -6743,18 +6808,12 @@ Rules:
 - blank:true = a single word to hide (about 15% of content words: nouns, verbs, adjectives, adverbs)
 - answer = the exact word
 - Do NOT blank articles (a, an, the), prepositions, conjunctions
-- Output JSON only. No other text.` },
-          { role: 'user', content: chunks[ci] }
-        ]
-      })
-    });
+- Output JSON only. No other text.`;
 
-      const data = await resp.json();
-      if (data.error) throw new Error(`Groq: ${data.error.message}`);
-      const raw = (data.choices?.[0]?.message?.content || '').trim();
-      const s = raw.indexOf('{'), e2 = raw.lastIndexOf('}');
-      if (s === -1 || e2 === -1) throw new Error(`Chunk ${ci+1}: Không tìm thấy JSON`);
-      const parsed = JSON.parse(raw.slice(s, e2 + 1));
+  try {
+    for (let ci = 0; ci < chunks.length; ci++) {
+      btn.innerHTML = `<div class="spinner" style="width:14px;height:14px;border-width:2px;border-color:rgba(79,70,229,.3);border-top-color:var(--indigo)"></div> Đang tạo (${ci+1}/${chunks.length})...`;
+      const parsed = await callAI(systemPrompt, chunks[ci], 3000);
       allSegments.push(...(parsed.segments || []));
       allBlanks.push(...(parsed.blanks || []));
     }
@@ -8595,13 +8654,15 @@ function refreshAttPopupIfOpen() {
           <div class="writing-sub-meta">👤 <strong>${esc(name)}</strong> · 📚 ${esc(title)} · 📅 ${esc(date||'')} · 🕐 ${esc(submittedAt)} ${gradedBadge}</div>
           <div class="writing-sub-text">${esc(sub.submission_text || '').replace(/\n/g,'<br>')}</div>
           ${!isGraded ? `
+            <div id="ai-feedback-${sub.id}" style="display:none;margin-bottom:10px;padding:12px 14px;background:var(--teal-glass);border:1px solid rgba(13,148,136,.2);border-radius:10px;font-size:13px;line-height:1.7;color:var(--text)"></div>
             <div class="writing-grade-wrap">
               <select class="writing-grade-select" id="grade-sel-${sub.id}">
                 <option value="pass">✅ Đạt</option>
                 <option value="fail">❌ Chưa đạt</option>
               </select>
               <input type="number" class="writing-grade-xp" id="grade-xp-${sub.id}" placeholder="XP" value="10" min="0" max="100">
-              <button class="writing-grade-btn" onclick="gradeWriting('${sub.id}','${sub.user_id}','${sub.lesson_id}')">💾 Chấm điểm</button>
+              <button class="writing-grade-btn ai-grade-btn" style="background:linear-gradient(135deg,var(--teal),var(--teal-mid));color:#fff" data-subid="${sub.id}" onclick="aiGradeWriting(this.dataset.subid)">✨ AI chấm</button>
+              <button class="writing-grade-btn" onclick="gradeWriting('${sub.id}','${sub.user_id}','${sub.lesson_id}')">💾 Lưu điểm</button>
             </div>
           ` : ''}
         </div>
@@ -8631,6 +8692,52 @@ function refreshAttPopupIfOpen() {
 
     toast(`✅ Đã chấm điểm · ${grade === 'pass' ? 'Đạt' : 'Chưa đạt'} · +${xp} XP`, 'success');
     await loadWritingSubmissions();
+  }
+
+  async function aiGradeWriting(subId) {
+    const subRow = document.querySelector(`button[data-subid="${subId}"]`)?.closest('.writing-sub-row');
+    const text = subRow?.querySelector('.writing-sub-text')?.innerText?.trim() || '';
+    const provider = getAiProvider();
+    if (provider === 'groq' && !getGroqKey()) { toast('Vui lòng nhập Groq API Key trong Cài đặt AI.', 'error'); return; }
+    if (provider === 'gemini' && !getGeminiKey()) { toast('Vui lòng nhập Gemini API Key trong Cài đặt AI.', 'error'); return; }
+
+    const aiBtn = document.querySelector(`button[data-subid="${subId}"]`);
+    const feedbackEl = document.getElementById(`ai-feedback-${subId}`);
+    if (aiBtn) { aiBtn.disabled = true; aiBtn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px"></div> Đang chấm...'; }
+
+    const systemPrompt = `You are an English writing evaluator for Vietnamese employees. Return ONLY JSON, no markdown.
+Format: {"score":<0-100>,"grade":"pass or fail (pass if score>=50)","xp":<20 if score>=80, 15 if >=60, 10 if >=40, else 5>,"vocabulary":"<Vietnamese: 1-2 sentences about vocab>","grammar":"<Vietnamese: 1-2 sentences about grammar>","suggestion":"<Vietnamese: one improvement tip>","highlight":"<Vietnamese: one positive thing>"}`;
+
+    try {
+      const result = await callAI(systemPrompt, `Evaluate this English writing:\n\n${text}`, 800);
+      const gradeEl = document.getElementById(`grade-sel-${subId}`);
+      const xpEl    = document.getElementById(`grade-xp-${subId}`);
+      if (gradeEl) gradeEl.value = result.grade || 'pass';
+      if (xpEl)    xpEl.value   = result.xp    || 10;
+      const scoreColor = result.score >= 80 ? 'var(--green)' : result.score >= 50 ? 'var(--teal)' : 'var(--red)';
+      const providerLabel = getAiProvider() === 'gemini' ? '✨ Gemini 2.5 Flash' : '✨ Groq AI';
+      if (feedbackEl) {
+        feedbackEl.style.display = 'block';
+        feedbackEl.innerHTML = `
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+            <span style="font-size:22px;font-weight:800;color:${scoreColor}">${result.score}/100</span>
+            <span style="font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;background:${result.grade==='pass'?'var(--green-light)':'var(--red-light)'};color:${result.grade==='pass'?'var(--green)':'var(--red)'}">
+              ${result.grade === 'pass' ? '✅ Đạt' : '❌ Chưa đạt'} · +${result.xp} XP
+            </span>
+            <span style="font-size:11px;color:var(--text-muted);margin-left:auto">${providerLabel}</span>
+          </div>
+          <div style="display:grid;gap:6px;font-size:13px">
+            <div><span style="font-weight:700;color:var(--teal)">📚 Từ vựng:</span> ${esc(result.vocabulary||'')}</div>
+            <div><span style="font-weight:700;color:var(--teal)">⚙️ Ngữ pháp:</span> ${esc(result.grammar||'')}</div>
+            <div><span style="font-weight:700;color:var(--green)">👍 Điểm tốt:</span> ${esc(result.highlight||'')}</div>
+            <div><span style="font-weight:700;color:#c2410c">💡 Gợi ý:</span> ${esc(result.suggestion||'')}</div>
+          </div>`;
+      }
+      if (aiBtn) { aiBtn.disabled = false; aiBtn.innerHTML = '✨ AI chấm lại'; }
+    } catch(err) {
+      toast('Lỗi AI: ' + (err?.message || String(err)), 'error');
+      if (aiBtn) { aiBtn.disabled = false; aiBtn.innerHTML = '✨ AI chấm'; }
+    }
   }
 
 
@@ -8792,6 +8899,190 @@ function refreshAttPopupIfOpen() {
     const remaining = grid?.querySelectorAll('.nb-flashcard').length - 1;
     const countEl = document.getElementById('nb-word-count');
     if (countEl && remaining >= 0) countEl.textContent = remaining + ' từ';
+  }
+
+  /* ===== AI PROVIDER SYSTEM ===== */
+
+  // Get current provider: 'groq' | 'gemini'
+  function getAiProvider() {
+    return window._aiProvider || localStorage.getItem('ai_provider') || 'groq';
+  }
+
+  function setAiProvider(provider) {
+    window._aiProvider = provider;
+    localStorage.setItem('ai_provider', provider);
+    sb.from('app_settings').upsert({ key: 'ai_provider', value: provider }, { onConflict: 'key' }).then(() => {});
+    renderAiProviderUI();
+    toast(`✅ Đã chọn ${provider === 'gemini' ? 'Gemini 2.5 Flash' : 'Groq'}`, 'success');
+  }
+
+  function renderAiProviderUI() {
+    const provider = getAiProvider();
+    const groqBtn    = document.getElementById('ai-provider-groq');
+    const geminiBtn  = document.getElementById('ai-provider-gemini');
+    const statusEl   = document.getElementById('ai-provider-status');
+    const activeStyle = 'background:linear-gradient(135deg,var(--teal),var(--teal-mid));color:#fff;border-color:var(--teal);box-shadow:var(--shadow-teal)';
+    const inactiveStyle = 'background:var(--bg-2);color:var(--text-muted);border-color:var(--border);box-shadow:none';
+    if (groqBtn)   groqBtn.style.cssText   += ';' + (provider === 'groq'   ? activeStyle : inactiveStyle);
+    if (geminiBtn) geminiBtn.style.cssText += ';' + (provider === 'gemini' ? activeStyle : inactiveStyle);
+    if (statusEl) statusEl.innerHTML = provider === 'gemini'
+      ? '<span style="color:#4285f4">✨ Đang dùng Gemini 2.5 Flash</span>'
+      : '<span style="color:var(--teal)">⚡ Đang dùng Groq (Llama 4)</span>';
+  }
+
+  /* ===== GROQ KEY HELPERS ===== */
+  function getGroqKey() {
+    return window._groqApiKey || localStorage.getItem('groq_api_key') || '';
+  }
+  async function saveGroqKey() {
+    const key = document.getElementById('admin-groq-key')?.value?.trim();
+    if (!key) { toast('Vui lòng nhập API Key', 'error'); return; }
+    const btn = document.querySelector('button[onclick="saveGroqKey()"]');
+    if (btn) { btn.disabled = true; btn.textContent = '...'; }
+    const { error } = await sb.from('app_settings').upsert({ key: 'groq_api_key', value: key }, { onConflict: 'key' });
+    if (btn) { btn.disabled = false; btn.textContent = '💾 Lưu'; }
+    if (error) { toast('Lỗi lưu key: ' + error.message, 'error'); return; }
+    window._groqApiKey = key;
+    localStorage.setItem('groq_api_key', key);
+    const status = document.getElementById('groq-key-status');
+    if (status) status.innerHTML = '<span style="color:var(--green)">✅ Đã lưu thành công</span>';
+    toast('✅ Đã lưu Groq API Key', 'success');
+  }
+  function toggleGroqKeyVisibility() {
+    const inp = document.getElementById('admin-groq-key');
+    const btn = document.getElementById('groq-eye-btn');
+    if (!inp) return;
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    if (btn) btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+  }
+  async function loadGroqKeyToInput() {
+    const inp = document.getElementById('admin-groq-key');
+    const status = document.getElementById('groq-key-status');
+    const cached = localStorage.getItem('groq_api_key');
+    if (cached && inp) { inp.value = cached; window._groqApiKey = cached; }
+    const { data } = await sb.from('app_settings').select('value').eq('key', 'groq_api_key').maybeSingle();
+    if (data?.value) {
+      window._groqApiKey = data.value;
+      localStorage.setItem('groq_api_key', data.value);
+      if (inp) inp.value = data.value;
+      if (status) status.innerHTML = '<span style="color:var(--teal)">🔑 Key đã được lưu</span>';
+    } else if (!cached) {
+      if (status) status.innerHTML = '<span style="color:var(--text-muted)">Chưa có key — nhập và lưu bên trên</span>';
+    }
+  }
+
+  /* ===== GEMINI KEY HELPERS ===== */
+  function getGeminiKey() {
+    return window._geminiApiKey || localStorage.getItem('gemini_api_key') || '';
+  }
+  async function saveGeminiKey() {
+    const key = document.getElementById('admin-gemini-key')?.value?.trim();
+    if (!key) { toast('Vui lòng nhập Gemini API Key', 'error'); return; }
+    const btn = document.querySelector('button[onclick="saveGeminiKey()"]');
+    if (btn) { btn.disabled = true; btn.textContent = '...'; }
+    const { error } = await sb.from('app_settings').upsert({ key: 'gemini_api_key', value: key }, { onConflict: 'key' });
+    if (btn) { btn.disabled = false; btn.textContent = '💾 Lưu'; }
+    if (error) { toast('Lỗi lưu key: ' + error.message, 'error'); return; }
+    window._geminiApiKey = key;
+    localStorage.setItem('gemini_api_key', key);
+    const status = document.getElementById('gemini-key-status');
+    if (status) status.innerHTML = '<span style="color:var(--green)">✅ Đã lưu thành công</span>';
+    toast('✅ Đã lưu Gemini API Key', 'success');
+  }
+  function toggleGeminiKeyVisibility() {
+    const inp = document.getElementById('admin-gemini-key');
+    const btn = document.getElementById('gemini-eye-btn');
+    if (!inp) return;
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    if (btn) btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+  }
+  async function loadGeminiKeyToInput() {
+    const inp = document.getElementById('admin-gemini-key');
+    const status = document.getElementById('gemini-key-status');
+    const cached = localStorage.getItem('gemini_api_key');
+    if (cached && inp) { inp.value = cached; window._geminiApiKey = cached; }
+    const { data } = await sb.from('app_settings').select('value').eq('key', 'gemini_api_key').maybeSingle();
+    if (data?.value) {
+      window._geminiApiKey = data.value;
+      localStorage.setItem('gemini_api_key', data.value);
+      if (inp) inp.value = data.value;
+      if (status) status.innerHTML = '<span style="color:#4285f4">🔑 Key đã được lưu</span>';
+    } else if (!cached) {
+      if (status) status.innerHTML = '<span style="color:var(--text-muted)">Chưa có key — nhập và lưu bên trên</span>';
+    }
+  }
+  async function loadAiProviderSetting() {
+    const cached = localStorage.getItem('ai_provider');
+    if (cached) window._aiProvider = cached;
+    const { data } = await sb.from('app_settings').select('value').eq('key', 'ai_provider').maybeSingle();
+    if (data?.value) {
+      window._aiProvider = data.value;
+      localStorage.setItem('ai_provider', data.value);
+    }
+    renderAiProviderUI();
+  }
+
+  /* ===== UNIFIED AI CALL (Groq OR Gemini) ===== */
+  // Returns parsed JSON object from AI. systemPrompt + userContent → object
+  async function callAI(systemPrompt, userContent, maxTokens) {
+    const provider = getAiProvider();
+    if (provider === 'gemini') {
+      return callGemini(systemPrompt, userContent, maxTokens);
+    } else {
+      return callGroqDirect(systemPrompt, userContent, maxTokens);
+    }
+  }
+
+  async function callGroqDirect(systemPrompt, userContent, maxTokens) {
+    const key = getGroqKey();
+    if (!key) throw new Error('Chưa có Groq API Key. Vui lòng nhập trong Cài đặt AI.');
+    const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+      body: JSON.stringify({
+        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+        max_tokens: maxTokens || 800,
+        temperature: 0.2,
+        response_format: { type: 'json_object' },
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userContent }
+        ]
+      })
+    });
+    const data = await resp.json();
+    if (data.error) throw new Error('Groq: ' + data.error.message);
+    const raw = (data.choices?.[0]?.message?.content || '').trim();
+    const s = raw.indexOf('{'), e2 = raw.lastIndexOf('}');
+    if (s === -1 || e2 === -1) throw new Error('Không parse được JSON từ Groq');
+    return JSON.parse(raw.slice(s, e2 + 1));
+  }
+
+  async function callGemini(systemPrompt, userContent, maxTokens) {
+    const key = getGeminiKey();
+    if (!key) throw new Error('Chưa có Gemini API Key. Vui lòng nhập trong Cài đặt AI.');
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          contents: [{ role: 'user', parts: [{ text: userContent }] }],
+          generationConfig: {
+            maxOutputTokens: maxTokens || 800,
+            temperature: 0.2,
+            responseMimeType: 'application/json'
+          }
+        })
+      }
+    );
+    const data = await resp.json();
+    if (data.error) throw new Error('Gemini: ' + data.error.message);
+    const raw = (data.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
+    const s = raw.indexOf('{'), e2 = raw.lastIndexOf('}');
+    if (s === -1 || e2 === -1) throw new Error('Không parse được JSON từ Gemini');
+    return JSON.parse(raw.slice(s, e2 + 1));
   }
 
   /* BOOT */
