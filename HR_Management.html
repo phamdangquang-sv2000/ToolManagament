@@ -3013,15 +3013,19 @@ function openFileSmart(url){
     window.open(url, "_blank", "noopener");
   }catch(e){ toast("Không mở được file: "+e.message,"error"); }
 }
-const ACC_FIELDS = ["id","heiway_account","pic_name","job_title","status","note"];
+const ACC_FIELDS        = ["id","heiway_account","pic_name","job_title","status","note"];
+const ACC_SEARCH_FIELDS = ["heiway_account","pic_name","job_title","status","note"]; // chỉ text — không có id (integer)
 const STATUS_OPTIONS_DEV = ["In Used","Backup","Returned","Broken","Spare"];
 
 // --- API ---
-async function apiList(urlFn, kw, filter, fields) {
+async function apiList(urlFn, kw, filter, fields, selectFields) {
+  // fields = dùng để build OR search (chỉ text columns)
+  // selectFields = dùng để ?select=... (có thể có id integer) — nếu không truyền thì dùng fields
   const parts = [];
   const k = (kw||"").trim();
   if (k) parts.push(`or=(${fields.map(f=>`${f}.ilike.*${k}*`).join(",")})`);
   if (filter && filter!=="All") parts.push(`status=eq.${encodeURIComponent(filter)}`);
+  if (selectFields && selectFields.length) parts.push(`select=${selectFields.join(",")}`);
   parts.push("order=stt.asc.nullslast,id.asc");
   const r = await fetch(urlFn("?"+parts.join("&")), {headers:_h()});
   if (!r.ok) throw new Error("HTTP "+r.status);
@@ -3224,7 +3228,7 @@ async function loadAccounts() {
   setConnDot("loading");
   try {
     const kw = document.getElementById("acc-search").value;
-    const rows = await apiList(_urlAcc, kw, accFilter, ACC_FIELDS);
+    const rows = await apiList(_urlAcc, kw, accFilter, ACC_SEARCH_FIELDS, ACC_FIELDS);
     allAccounts = rows; renderAccList(rows); updateAccStats(rows);
     setConnDot("ok");
   } catch(e) { setConnDot("err"); document.getElementById("acc-list").innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Lỗi tải</div><div class="empty-sub" style="color:#ff6b63;">${e.message}</div></div>`; }
@@ -3556,8 +3560,8 @@ function viewAcc(id){
   `;
   const f = document.getElementById("modal-footer");
   if (isAdmin) {
-    f.innerHTML = `<button class="btn btn-danger btn-sm" style="flex:1;" onclick="delAcc(${r.id})">Xóa</button>
-      <button class="btn btn-primary btn-sm" style="flex:1;" onclick="editAcc(${r.id})">Sửa</button>`;
+    f.innerHTML = `<button class="btn btn-ghost" style="flex:1;" onclick="closeModal()">Đóng</button>
+      <button class="btn btn-danger btn-sm" style="flex:1;" onclick="delAcc(${r.id})">Xóa</button>`;
   } else {
     f.innerHTML = `<button class="btn btn-ghost" style="flex:1;" onclick="closeModal()">Đóng</button>`;
   }
@@ -3573,17 +3577,8 @@ function delAcc(id){
 function accForm(r){
   return `
     <div class="form-field"><label class="form-label">Heiway Account *</label><input class="form-input" id="af-acc" value="${r?.heiway_account||""}"/></div>
-    <div class="form-field"><label class="form-label">PIC (Name)</label>
-      <div class="form-select-wrap">
-        <select class="form-input form-select" id="af-pic">
-          <option value="">-- Chọn nhân viên --</option>
-          ${allRecords.filter(e=>e.trang_thai==="Active"||e.trang_thai==="Probation").map(e=>`<option value="${(e.ho_ten||"").replace(/"/g,"&quot;")}" ${(r?.pic_name||"")===(e.ho_ten||"")?"selected":""}>${e.ho_ten||""}${e.trang_thai==="Probation"?" (Probation)":""}</option>`).join("")}
-        </select>
-      </div>
-    </div>
-    <div class="form-field"><label class="form-label">Job Title</label><input class="form-input" id="af-jt" value="${r?.job_title||""}"/></div>
     <div class="form-field"><label class="form-label">Status</label>
-      <select class="form-input" id="af-st">${STATUS_OPTIONS_DEV.map(o=>`<option ${o===(r?.status||"In Used")?"selected":""}>${o}</option>`).join("")}</select>
+      <select class="form-input" id="af-st">${STATUS_OPTIONS_DEV.map(o=>`<option ${o===(r?.status||"Backup")?"selected":""}>${o}</option>`).join("")}</select>
     </div>
     <div class="form-field"><label class="form-label">Note</label><textarea class="form-input" id="af-note" rows="2">${r?.note||""}</textarea></div>
   `;
@@ -3591,27 +3586,9 @@ function accForm(r){
 function readAccForm(){
   return {
     heiway_account: document.getElementById("af-acc").value.trim(),
-    pic_name: document.getElementById("af-pic").value.trim()||null,
-    job_title: document.getElementById("af-jt").value.trim()||null,
     status: document.getElementById("af-st").value,
     note: document.getElementById("af-note").value.trim()||null,
   };
-}
-async function editAcc(id){
-  const r = allAccounts.find(x=>x.id===id); if(!r) return;
-  await ensureEmployeeList();
-  document.getElementById("modal-title").textContent="Sửa Tài khoản";
-  document.getElementById("modal-body").innerHTML = accForm(r);
-  document.getElementById("modal-footer").innerHTML = `
-    <button class="btn btn-ghost" style="flex:1;" onclick="closeModal()">Hủy</button>
-    <button class="btn btn-primary" style="flex:1;" onclick="saveAcc(${id})">Lưu</button>`;
-  openModal();
-}
-async function saveAcc(id){
-  const data = readAccForm();
-  if (!data.heiway_account) { toast("Vui lòng nhập account","error"); return; }
-  try { await apiUpdate(_urlAcc, id, {...data, updated_at:new Date().toISOString()}); closeModal(); toast("Đã lưu","success"); loadAccounts(); }
-  catch(e){ toast("Lỗi: "+e.message,"error"); }
 }
 async function addAcc(){
   await ensureEmployeeList();
