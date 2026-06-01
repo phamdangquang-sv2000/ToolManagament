@@ -2183,7 +2183,7 @@ function viewDetail(id) {
     ["Ngày Sinh", r.ngay_sinh||"—"],
     ["SĐT", r.sdt||"—"],
     ["Email", r.email||"—"],
-    ["Tài Khoản", r.tai_khoan||"—"],
+    ["Tài Khoản", (() => { const a = allAccounts.find(x=>x.id===r.account_id); return a ? a.heiway_account : (r.tai_khoan||"—"); })()],
     ["Trạng Thái", r.trang_thai],
     ["Ngày Onboarding", r.ngay_vao||"—"],
     ["Ngày Leave", r.ngay_leave||"—"],
@@ -2340,126 +2340,124 @@ function buildForm(data={}) {
 }
 
 // Populate dropdown Tài Khoản từ bảng accounts
-// Hiển thị: heiway_account — pic_name (status)
-// Ưu tiên Backup trước (chưa gán), sau đó In Used, sau đó còn lại
-// Map trang_thai nhan vien -> status account tuong ung
-// Active / Probation -> In Used | Inactive -> Returned
+// VALUE của option = acc.id (integer) — không còn dùng text matching
+// Hiển thị: heiway_account (status nếu không phải Backup)
 function _mapTrangThaiToAccStatus(trang_thai) {
   if (!trang_thai) return null;
   if (trang_thai === "Inactive") return "Returned";
   return "In Used"; // Active, Probation
 }
 
-// Populate dropdown Tai Khoan:
-// Chi hien thi account co pic_name khop ho_ten VA status khop trang_thai nhan vien
-// Neu khong khop gi -> chi hien "-- Khong co --" (disabled chon)
-async function populateTaiKhoanSelect(currentVal, ho_ten, trang_thai) {
+// currentAccountId: số nguyên (accounts.id) hoặc "" / null khi chưa có
+async function populateTaiKhoanSelect(currentAccountId, ho_ten, trang_thai) {
   const sel = document.getElementById("f-tai_khoan");
   const meta = document.getElementById("f-tai_khoan-meta");
   if (!sel) return;
 
-  const isNewForm = !currentVal && !ho_ten; // Thêm mới: chưa có tên, chưa có giá trị
-  const targetStatus = _mapTrangThaiToAccStatus(trang_thai);
-  const name = (ho_ten || "").trim();
+  const currentId = currentAccountId ? parseInt(currentAccountId, 10) : null;
 
   sel.innerHTML = `<option value="">-- Đang tải... --</option>`;
   try {
-    const r = await fetch(_urlAcc("?order=heiway_account.asc"), { headers: _h() });
+    // Lấy tất cả accounts kèm id
+    const r = await fetch(_urlAcc("?select=id,heiway_account,pic_name,job_title,status&order=heiway_account.asc"), { headers: _h() });
     if (!r.ok) throw new Error("HTTP " + r.status);
     const allAcc = await r.json();
 
-    let matched;
-    if (isNewForm) {
-      // Thêm mới: chỉ hiển thị các tài khoản Backup (chưa gán cho ai)
-      matched = allAcc.filter(acc => (acc.status || "") === "Backup");
+    let options;
+    if (!currentId) {
+      // Thêm mới hoặc chưa có account → chỉ hiện Backup
+      const backups = allAcc.filter(acc => (acc.status || "") === "Backup");
+      if (backups.length === 0) {
+        sel.innerHTML = `<option value="">-- Không có --</option>`;
+        if (meta) meta.innerHTML = `<span style="color:#94A3B8;">Không có tài khoản Backup nào</span>`;
+        return;
+      }
+      options = backups;
     } else {
-      // Sửa: lọc theo pic_name khớp ho_ten VÀ status khớp trang_thai
-      matched = allAcc.filter(acc => {
-        const picMatch = name
-          ? (acc.pic_name || "").toLowerCase() === name.toLowerCase()
-          : false;
-        const statusMatch = targetStatus
-          ? (acc.status || "") === targetStatus
-          : false;
-        return picMatch && statusMatch;
-      });
-    }
-
-    if (matched.length === 0) {
-      sel.innerHTML = `<option value="">-- Không có --</option>`;
-      if (meta) meta.innerHTML = isNewForm
-        ? `<span style="color:#94A3B8;">Không có tài khoản Backup nào</span>`
-        : name
-          ? `<span style="color:#94A3B8;">Không tìm thấy tài khoản phù hợp cho "${name}" (${targetStatus||"?"})</span>`
-          : `<span style="color:#94A3B8;">Nhập Họ Tên để tìm tài khoản phù hợp</span>`;
-      return;
+      // Đang có account → hiện account hiện tại trước, rồi các Backup khác
+      const current = allAcc.filter(acc => acc.id === currentId);
+      const backups = allAcc.filter(acc =>
+        (acc.status || "") === "Backup" && acc.id !== currentId
+      );
+      options = [...current, ...backups];
     }
 
     sel.innerHTML = `<option value="">-- Không có --</option>` +
-      matched.map(acc => {
-        const label = isNewForm
-          ? acc.heiway_account  // Backup: không cần hiện status
+      options.map(acc => {
+        const label = acc.status === "Backup"
+          ? acc.heiway_account
           : `${acc.heiway_account} (${acc.status})`;
-        const selected = currentVal && acc.heiway_account &&
-          acc.heiway_account.toLowerCase() === currentVal.toLowerCase() ? " selected" : "";
-        return `<option value="${acc.heiway_account}"${selected}>${label}</option>`;
+        const selected = acc.id === currentId ? " selected" : "";
+        return `<option value="${acc.id}"${selected}>${label}</option>`;
       }).join("");
 
-    // Nếu chỉ 1 kết quả và chưa có currentVal -> tự động chọn
-    if (matched.length === 1 && !currentVal) {
-      sel.value = matched[0].heiway_account;
-    }
-
-    sel.onchange = () => _renderAccMeta(allAcc, sel.value, meta);
-    _renderAccMeta(allAcc, sel.value, meta);
+    sel.onchange = () => _renderAccMeta(allAcc, parseInt(sel.value)||null, meta);
+    _renderAccMeta(allAcc, currentId, meta);
   } catch(e) {
-    sel.innerHTML = `<option value="${currentVal||""}">${currentVal||"-- Lỗi tải --"}</option>`;
+    sel.innerHTML = `<option value="${currentId||""}">${currentId||"-- Lỗi tải --"}</option>`;
     if (meta) meta.textContent = "";
   }
 }
 
-function _renderAccMeta(rows, val, metaEl) {
+function _renderAccMeta(rows, accId, metaEl) {
   if (!metaEl) return;
-  if (!val) { metaEl.textContent = ""; return; }
-  const acc = rows.find(r => r.heiway_account && r.heiway_account.toLowerCase() === val.toLowerCase());
+  if (!accId) { metaEl.textContent = ""; return; }
+  const acc = rows.find(r => r.id === accId);
   if (!acc) { metaEl.textContent = ""; return; }
   const statusColor = acc.status === "In Used" ? "#34D399" : acc.status === "Returned" ? "#F87171" : "#94A3B8";
   metaEl.innerHTML = `<span style="color:${statusColor};font-weight:600;">${acc.status}</span>${acc.pic_name ? ` · ${acc.pic_name}` : ""}`;
 }
 
+// Ghi log vào bảng account_history
+async function _logAccountHistory(accountId, heiwayAccount, event, nhanSuId, hoTen, boPhan, coSo, note) {
+  if (!accountId) return;
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/account_history`, {
+      method: "POST",
+      headers: { ..._h(), "Prefer": "return=minimal" },
+      body: JSON.stringify({
+        account_id:     accountId,
+        heiway_account: heiwayAccount || "",
+        event,
+        nhan_su_id:     nhanSuId || null,
+        ho_ten:         hoTen    || null,
+        bo_phan:        boPhan   || null,
+        co_so:          coSo     || null,
+        note:           note     || null,
+        created_at:     new Date().toISOString(),
+      }),
+    });
+  } catch(e) {
+    console.warn("[history] Lỗi ghi account_history:", e);
+  }
+}
+
 // Re-populate khi ho_ten hoac trang_thai thay doi (dung cho form Add moi)
 function _watchTaiKhoanFilters(isNew) {
-  const hoTenEl    = document.getElementById("f-ho_ten");
-  const trangThaiEl = document.getElementById("f-trang_thai");
-  if (!hoTenEl || !trangThaiEl) return;
-  let _t = null;
-  const refresh = () => {
-    if (isNew) return; // Thêm mới: không re-filter theo tên, giữ nguyên danh sách Backup
-    clearTimeout(_t);
-    _t = setTimeout(() => {
-      populateTaiKhoanSelect("", hoTenEl.value.trim(), trangThaiEl.value);
-    }, 400);
-  };
-  hoTenEl.addEventListener("input", refresh);
-  trangThaiEl.addEventListener("change", refresh);
+  // Watcher không cần re-populate nữa vì dropdown đã luôn hiển thị đúng:
+  // - Không có account → hiện Backup list
+  // - Có account → hiện account hiện tại + Backup list
+  // Không cần làm gì khi tên/trạng thái thay đổi
 }
 
 function getFormPayload() {
   const g = id => document.getElementById(id)?.value.trim()||"";
+  const rawAccId = g("f-tai_khoan");
   return {
-    ho_ten:    g("f-ho_ten"),
-    gioi_tinh: g("f-gioi_tinh"),
-    chuc_danh: g("f-chuc_danh"),
-    bo_phan:   g("f-bo_phan"),
-    co_so:     g("f-co_so"),
-    ngay_sinh: g("f-ngay_sinh")||null,
-    sdt:       g("f-sdt")||null,
-    email:     g("f-email"),
-    tai_khoan: g("f-tai_khoan")||null,
-    trang_thai:g("f-trang_thai"),
-    ngay_vao:  g("f-ngay_vao")||null,
-    ngay_leave:g("f-ngay_leave")||null,
-    name_gsd:  g("f-name_gsd")||null,
+    ho_ten:     g("f-ho_ten"),
+    gioi_tinh:  g("f-gioi_tinh"),
+    chuc_danh:  g("f-chuc_danh"),
+    bo_phan:    g("f-bo_phan"),
+    co_so:      g("f-co_so"),
+    ngay_sinh:  g("f-ngay_sinh")||null,
+    sdt:        g("f-sdt")||null,
+    email:      g("f-email"),
+    tai_khoan:  null,        // deprecated — sẽ bỏ sau khi migration ổn định
+    account_id: rawAccId ? parseInt(rawAccId, 10) : null,
+    trang_thai: g("f-trang_thai"),
+    ngay_vao:   g("f-ngay_vao")||null,
+    ngay_leave: g("f-ngay_leave")||null,
+    name_gsd:   g("f-name_gsd")||null,
   };
 }
 
@@ -2504,7 +2502,7 @@ function editEmployee(id) {
       Cập nhật
     </button>`;
   openModal();
-  populateTaiKhoanSelect(r.tai_khoan || "", r.ho_ten || "", r.trang_thai || "Active");
+  populateTaiKhoanSelect(r.account_id || null, r.ho_ten || "", r.trang_thai || "Active");
   _watchTaiKhoanFilters(false);
 }
 
@@ -2521,21 +2519,21 @@ async function saveNew() {
     } catch(_) {}
 
     // Nếu chọn tài khoản Backup -> tự động cập nhật account: PIC Name, Job Title, Status
-    if (p.tai_khoan) {
+    if (p.account_id) {
       try {
-        const enc = encodeURIComponent(p.tai_khoan);
-        const r = await fetch(_urlAcc(`?heiway_account=ilike.${enc}&status=eq.Backup&limit=1`), { headers: _h() });
-        if (r.ok) {
-          const rows = await r.json();
-          if (rows.length > 0) {
-            const acc = rows[0];
-            await apiUpdate(_urlAcc, acc.id, {
-              pic_name: p.ho_ten || null,
-              job_title: p.bo_phan || null,
-              status: "In Used",
-              updated_at: new Date().toISOString(),
-            });
-          }
+        const acc = allAccounts.find(a => a.id === p.account_id);
+        if (acc && acc.status === "Backup") {
+          await apiUpdate(_urlAcc, acc.id, {
+            pic_name:   p.ho_ten || null,
+            job_title:  p.bo_phan || null,
+            status:     "In Used",
+            updated_at: new Date().toISOString(),
+          });
+          // Ghi lịch sử gán account
+          const insertedRow = Array.isArray(inserted) ? inserted[0] : inserted;
+          await _logAccountHistory(acc.id, acc.heiway_account, "assigned",
+            insertedRow?.id || null, p.ho_ten, p.bo_phan, p.co_so,
+            `Gán khi thêm nhân sự mới`);
         }
       } catch(e) {
         console.warn("[saveNew] Lỗi cập nhật tài khoản:", e);
@@ -2543,7 +2541,7 @@ async function saveNew() {
     }
 
     closeModal();
-    toast("Thêm nhân sự thành công" + (p.tai_khoan ? " — Tài khoản đã được cập nhật ✅" : ""), "success");
+    toast("Thêm nhân sự thành công" + (p.account_id ? " — Tài khoản đã được cập nhật ✅" : ""), "success");
     loadData();
   } catch(e) {
     showFormError("Lỗi: " + e.message);
@@ -2557,30 +2555,57 @@ async function saveEdit(id) {
   if (errs.length) { showFormError(errs[0]); return; }
   const oldRecord = allRecords.find(x=>x.id===id);
   const wasActive = oldRecord && oldRecord.trang_thai !== "Inactive";
-  const oldAcc = (oldRecord?.tai_khoan || "").trim();
-  const newAcc = (p.tai_khoan || "").trim();
+  const oldAccId = oldRecord?.account_id ? parseInt(oldRecord.account_id, 10) : null;
+  const newAccId = p.account_id;
+  const accChanged = oldAccId !== newAccId;
   try {
     await dbUpdate(id, p);
     try { await syncStatusToAttendance(p.ho_ten, p.trang_thai); } catch(_) {}
 
-    // Nếu vừa chuyển sang Inactive → xử lý tài khoản & thiết bị (logic cũ)
-    if (wasActive && p.trang_thai === "Inactive" && p.tai_khoan) {
-      try { await handleInactiveEmployee(p.tai_khoan, p.ho_ten); } catch(e) {
+    // Nếu vừa chuyển sang Inactive → xử lý tài khoản & thiết bị
+    if (wasActive && p.trang_thai === "Inactive" && oldAccId) {
+      try {
+        await handleInactiveEmployeeById(oldAccId, id, p.ho_ten, p.bo_phan, p.co_so);
+      } catch(e) {
         console.warn("[inactive] Lỗi xử lý tự động:", e);
       }
     }
-    // Nếu tài khoản bị xóa/thay đổi (không phải do Inactive đã xử lý trên)
-    else if (oldAcc && oldAcc.toLowerCase() !== newAcc.toLowerCase()) {
-      try { await _releaseAccountToBackup(oldAcc); } catch(e) {
-        console.warn("[saveEdit] Lỗi release account:", e);
+    // Tài khoản thay đổi (không phải do Inactive)
+    else if (accChanged) {
+      // Giải phóng account cũ về Backup (nếu có)
+      if (oldAccId) {
+        try {
+          await apiUpdate(_urlAcc, oldAccId, { pic_name: null, job_title: null, status: "Backup", updated_at: new Date().toISOString() });
+          const oldAcc = allAccounts.find(a => a.id === oldAccId);
+          await _logAccountHistory(oldAccId, oldAcc?.heiway_account || "", "released",
+            id, p.ho_ten, p.bo_phan, p.co_so, "Đổi tài khoản sang account khác");
+        } catch(e) { console.warn("[saveEdit] Lỗi release account cũ:", e); }
+      }
+      // Kích hoạt account mới từ Backup → In Used
+      if (newAccId) {
+        try {
+          const newAcc = allAccounts.find(a => a.id === newAccId);
+          if (newAcc) {
+            await apiUpdate(_urlAcc, newAccId, {
+              pic_name: p.ho_ten || null, job_title: p.bo_phan || null,
+              status: "In Used", updated_at: new Date().toISOString(),
+            });
+            await _logAccountHistory(newAccId, newAcc.heiway_account, "reactivated",
+              id, p.ho_ten, p.bo_phan, p.co_so, "Gán account mới khi chỉnh sửa nhân sự");
+          }
+        } catch(e) { console.warn("[saveEdit] Lỗi activate account mới:", e); }
       }
     }
 
     closeModal();
     if (wasActive && p.trang_thai === "Inactive") {
       toast("Đã chuyển Inactive — Tài khoản & Thiết bị đã được cập nhật tự động ✅", "success");
-    } else if (oldAcc && oldAcc.toLowerCase() !== newAcc.toLowerCase()) {
+    } else if (accChanged && oldAccId && newAccId) {
+      toast("Cập nhật thành công — Đã đổi tài khoản, tài khoản cũ về Backup ✅", "success");
+    } else if (accChanged && oldAccId && !newAccId) {
       toast("Cập nhật thành công — Tài khoản cũ đã chuyển về Backup ✅", "success");
+    } else if (accChanged && !oldAccId && newAccId) {
+      toast("Cập nhật thành công — Tài khoản đã được kích hoạt ✅", "success");
     } else {
       toast("Cập nhật thành công", "success");
     }
@@ -2590,105 +2615,100 @@ async function saveEdit(id) {
   }
 }
 
-// Giải phóng tài khoản về Backup: xóa pic_name, job_title, đổi status → Backup
-async function _releaseAccountToBackup(heiway_account) {
-  if (!heiway_account) return;
-  const enc = encodeURIComponent(heiway_account);
-  const r = await fetch(
-    _urlAcc(`?heiway_account=ilike.${enc}&status=eq.In Used&limit=1`),
-    { headers: _h() }
-  );
-  if (!r.ok) return;
-  const rows = await r.json();
-  if (!rows.length) return;
-  await apiUpdate(_urlAcc, rows[0].id, {
-    pic_name: null,
-    job_title: null,
-    status: "Backup",
+// Kích hoạt tài khoản Backup → In Used, gán pic_name + job_title (dùng id)
+async function _activateBackupAccount(accountId, ho_ten, bo_phan) {
+  if (!accountId) return;
+  const acc = allAccounts.find(a => a.id === accountId);
+  if (!acc || acc.status !== "Backup") return;
+  await apiUpdate(_urlAcc, accountId, {
+    pic_name:   ho_ten   || null,
+    job_title:  bo_phan  || null,
+    status:     "In Used",
+    updated_at: new Date().toISOString(),
+  });
+}
+
+// Giải phóng tài khoản về Backup (dùng id)
+async function _releaseAccountToBackup(accountId) {
+  if (!accountId) return;
+  const acc = allAccounts.find(a => a.id === accountId);
+  if (!acc) return;
+  await apiUpdate(_urlAcc, accountId, {
+    pic_name:   null,
+    job_title:  null,
+    status:     "Backup",
     updated_at: new Date().toISOString(),
   });
 }
 
 // ============================================================
-// XU LY TU DONG KHI NHAN VIEN CHUYEN SANG INACTIVE
+// XU LY TU DONG KHI NHAN VIEN CHUYEN SANG INACTIVE (by account_id)
 // ============================================================
-async function handleInactiveEmployee(heiway_account, ho_ten) {
+async function handleInactiveEmployeeById(accountId, nhanSuId, ho_ten, bo_phan, co_so) {
   const ts = new Date().toISOString();
-  // ilike: case-insensitive (SHRVN58@HEIWAY.NET == shrvn58@heiway.net)
-  const enc = encodeURIComponent(heiway_account);
+  const acc = allAccounts.find(a => a.id === accountId);
+  if (!acc) return;
 
-  // --- 1. TAI KHOAN: query theo heiway_account (ilike) ---
-  let accRows = [];
+  // --- 1. TAI KHOAN: đổi status → Returned, giữ nguyên pic_name/job_title/note ---
   try {
-    const r = await fetch(
-      _urlAcc(`?heiway_account=ilike.${enc}&status=not.in.(Returned,Backup)`),
-      { headers: _h() }
-    );
-    if (r.ok) accRows = await r.json();
-  } catch(e) { console.warn("[inactive] fetch acc error:", e); }
+    await apiUpdate(_urlAcc, acc.id, { status: "Returned", updated_at: ts });
+    // Ghi history: returned
+    await _logAccountHistory(acc.id, acc.heiway_account, "returned",
+      nhanSuId, ho_ten, bo_phan, co_so,
+      `Nhân viên chuyển Inactive`);
+  } catch(e) { console.warn("[inactive] update acc error:", e); }
 
-  for (const acc of accRows) {
-    // Ban goc: CHI doi status -> Returned, GIU NGUYEN pic_name, job_title, note
-    try {
-      await apiUpdate(_urlAcc, acc.id, { status: "Returned", updated_at: ts });
-    } catch(e) { console.warn("[inactive] update acc error:", e); }
-    // Tao ban Backup moi: giu heiway_account, cac field nguoi dung de trong
-    try {
-      const nextStt = (allAccounts.reduce((m,r)=>Math.max(m,r.stt||0),0) + 10) || 1;
-      await apiInsert(_urlAcc, {
-        heiway_account: acc.heiway_account,
-        pic_name: null, job_title: null, status: "Backup", note: null, stt: nextStt,
-      });
-    } catch(e) { console.warn("[inactive] insert acc backup error:", e); }
-  }
+  // Tạo bản Backup mới (cùng heiway_account, fields người dùng để trống)
+  try {
+    const nextStt = (allAccounts.reduce((m,r)=>Math.max(m,r.stt||0),0) + 10) || 1;
+    const newBackup = await apiInsert(_urlAcc, {
+      heiway_account: acc.heiway_account,
+      pic_name: null, job_title: null, status: "Backup", note: null, stt: nextStt,
+    });
+    // Ghi history: backup entry mới sẵn sàng tái sử dụng
+    const newAcc = Array.isArray(newBackup) ? newBackup[0] : newBackup;
+    if (newAcc?.id) {
+      await _logAccountHistory(newAcc.id, newAcc.heiway_account, "released",
+        null, null, null, null,
+        `Tạo Backup từ account của ${ho_ten || "nhân viên nghỉ"}`);
+    }
+  } catch(e) { console.warn("[inactive] insert acc backup error:", e); }
 
-  // --- 2. THIET BI ---
-  // Query bang or: match theo heiway_account HOAC ten nhan vien
-  // de khong bo sot du thiet bi luu theo truong nao
+  // --- 2. THIET BI (giữ nguyên: tìm theo heiway_account text vì laptops chưa có account_id) ---
+  const heiway_account = acc.heiway_account;
   let lapRows = [];
   try {
+    const enc = encodeURIComponent(heiway_account);
     const encName = encodeURIComponent(ho_ten || "");
     const orFilter = `or=(heiway_account.ilike.${enc}${ho_ten ? `,name.ilike.${encName}` : ""})`;
-    const r = await fetch(
-      _urlLap(`?${orFilter}&status=not.in.(Returned,Backup)`),
-      { headers: _h() }
-    );
+    const r = await fetch(_urlLap(`?${orFilter}&status=not.in.(Returned,Backup)`), { headers: _h() });
     if (r.ok) lapRows = await r.json();
   } catch(e) { console.warn("[inactive] fetch lap error:", e); }
 
   for (const lap of lapRows) {
-    // Ban goc: CHI doi status -> Returned, GIU NGUYEN toan bo thong tin cu
-    try {
-      await apiUpdate(_urlLap, lap.id, {
-        status: "Returned",
-        updated_at: ts,
-      });
-    } catch(e) { console.warn("[inactive] update lap error:", e); }
-    // Tao ban Backup moi: giu thong tin phan cung, cac field nguoi dung de trong
+    try { await apiUpdate(_urlLap, lap.id, { status: "Returned", updated_at: ts }); }
+    catch(e) { console.warn("[inactive] update lap error:", e); }
     try {
       const nextStt = (allLaptops.reduce((m,r)=>Math.max(m,r.stt||0),0) + 10) || 1;
-      // name la NOT NULL trong DB, dung "—" lam placeholder cho ban Backup
       await apiInsert(_urlLap, {
-        serial_number:  lap.serial_number,
-        laptop_drive_c: lap.laptop_drive_c,
-        wlan_guest:     lap.wlan_guest,
-        status:         "Backup",
-        name:           "—",
-        heiway_account: null,
-        job_title:      null,
-        note:           null,
-        bien_ban_url:   null,
-        bien_ban_files: null,
-        stt:            nextStt,
+        serial_number: lap.serial_number, laptop_drive_c: lap.laptop_drive_c,
+        wlan_guest: lap.wlan_guest, status: "Backup", name: "—",
+        heiway_account: null, job_title: null, note: null,
+        bien_ban_url: null, bien_ban_files: null, stt: nextStt,
       });
     } catch(e) { console.warn("[inactive] insert lap backup error:", e); }
   }
 
-  // Cap nhat local cache va re-render tab dang mo
   try { const rows = await apiList(_urlLap,"","",LAP_FIELDS); allLaptops = rows; } catch(_){}
   try { const rows = await apiList(_urlAcc,"","",ACC_FIELDS); allAccounts = rows; } catch(_){}
   if (currentTab === "laptop")  { try { renderLapList(allLaptops); updateLapStats(allLaptops); } catch(_){} }
   if (currentTab === "account") { try { renderAccList(allAccounts); updateAccStats(allAccounts); } catch(_){} }
+}
+
+// Legacy wrapper (giữ để backward compat với code chưa migrate)
+async function handleInactiveEmployee(heiway_account, ho_ten) {
+  const acc = allAccounts.find(a => a.heiway_account?.toLowerCase() === (heiway_account||"").toLowerCase());
+  if (acc) return handleInactiveEmployeeById(acc.id, null, ho_ten, null, null);
 }
 
 function deleteEmployee(id, name) {
@@ -2700,13 +2720,13 @@ function deleteEmployee(id, name) {
     try {
       // Nếu nhân viên có tài khoản -> giải phóng về Backup trước khi xóa
       const rec = allRecords.find(x=>x.id===id);
-      if (rec?.tai_khoan) {
-        try { await _releaseAccountToBackup(rec.tai_khoan); } catch(e) {
+      if (rec?.account_id) {
+        try { await _releaseAccountToBackup(rec.account_id); } catch(e) {
           console.warn("[delete] Lỗi release account:", e);
         }
       }
       await dbDelete(id);
-      toast("Đã xóa nhân sự" + (rec?.tai_khoan ? " — Tài khoản đã chuyển về Backup ✅" : ""), "success");
+      toast("Đã xóa nhân sự" + (rec?.account_id ? " — Tài khoản đã chuyển về Backup ✅" : ""), "success");
       loadData();
     } catch(e) {
       toast("Lỗi xóa: " + e.message, "error");
@@ -2993,7 +3013,7 @@ function openFileSmart(url){
     window.open(url, "_blank", "noopener");
   }catch(e){ toast("Không mở được file: "+e.message,"error"); }
 }
-const ACC_FIELDS = ["heiway_account","pic_name","job_title","status","note"];
+const ACC_FIELDS = ["id","heiway_account","pic_name","job_title","status","note"];
 const STATUS_OPTIONS_DEV = ["In Used","Backup","Returned","Broken","Spare"];
 
 // --- API ---
