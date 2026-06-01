@@ -3488,6 +3488,8 @@ async function editLap(id){
 async function saveLap(id){
   const data = readLapForm();
   if (!data.name) { toast("Vui lòng nhập tên","error"); return; }
+  const btn = document.querySelector("#modal-footer .btn-primary");
+  if (btn) { if (btn.disabled) return; btn.disabled = true; btn.textContent = "Đang lưu..."; }
   try {
     const newFile = await _maybeUploadBB(data.heiway_account || data.name);
     if (newFile) {
@@ -3509,7 +3511,10 @@ async function saveLap(id){
       emp?.id||null, data.name||null, emp?.bo_phan||data.job_title||null, emp?.co_so||null,
       `Cập nhật thiết bị — trạng thái: ${data.status||""}`);
     closeModal(); toast("Đã lưu","success"); loadLaptops();
-  } catch(e){ toast("Lỗi: "+e.message,"error"); }
+  } catch(e){
+    toast("Lỗi: "+e.message,"error");
+    if (btn) { btn.disabled = false; btn.textContent = "Lưu"; }
+  }
 }
 function lapFormAdd(){
   return `
@@ -3547,6 +3552,8 @@ async function addLap(){
 }
 async function createLap(){
   const data = readLapFormAdd();
+  const btn = document.querySelector("#modal-footer .btn-primary");
+  if (btn) { if (btn.disabled) return; btn.disabled = true; btn.textContent = "Đang tạo..."; }
   try {
     const nextStt = (allLaptops.reduce((m,r)=>Math.max(m, r.stt||0), 0) + 1) || 1;
     const inserted = await apiInsert(_urlLap, {...data, stt: nextStt});
@@ -3557,7 +3564,10 @@ async function createLap(){
         `Thêm thiết bị mới vào kho — trạng thái: ${data.status||""}`);
     }
     closeModal(); toast("Đã thêm","success"); loadLaptops();
-  } catch(e){ toast("Lỗi: "+e.message,"error"); }
+  } catch(e){
+    toast("Lỗi: "+e.message,"error");
+    if (btn) { btn.disabled = false; btn.textContent = "Tạo"; }
+  }
 }
 // Tải file biên bản về máy — hoạt động cả trên iPhone shortcut (standalone PWA)
 function isStandalone(){
@@ -3704,11 +3714,16 @@ async function addAcc(){
 async function createAcc(){
   const data = readAccForm();
   if (!data.heiway_account) { toast("Vui lòng nhập account","error"); return; }
+  const btn = document.querySelector("#modal-footer .btn-primary");
+  if (btn) { if (btn.disabled) return; btn.disabled = true; btn.textContent = "Đang tạo..."; }
   try {
     const nextStt = (allAccounts.reduce((m,r)=>Math.max(m, r.stt||0), 0) + 1) || 1;
     await apiInsert(_urlAcc, {...data, stt: nextStt});
     closeModal(); toast("Đã thêm","success"); loadAccounts();
-  } catch(e){ toast("Lỗi: "+e.message,"error"); }
+  } catch(e){
+    toast("Lỗi: "+e.message,"error");
+    if (btn) { btn.disabled = false; btn.textContent = "Tạo"; }
+  }
 }
 
 // --- Top Add button: label + visibility per tab ---
