@@ -2303,7 +2303,7 @@
 
       <!-- Filters + toggle -->
       <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
-        <select id="filter-month" class="field" style="width:160px;" onchange="loadAdminIncidents()">
+        <select id="filter-month" class="field" style="width:160px;" onchange="updateStatsForMonth(); loadAdminIncidents()">
           <option value="">All Months</option>
         </select>
         <select id="filter-severity" class="field" style="width:130px;" onchange="loadAdminIncidents()">
@@ -3301,28 +3301,48 @@ function filterEmployeeList() {
 
 // ── Admin: Stats ───────────────────────────────────────────
 async function loadStats() {
-  const now = new Date();
-  const ym  = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-
-  const { data } = await sb.from('incidents').select('severity, status, created_at, system');
+  const { data } = await sb.from('incidents').select('severity, status, created_at, start_time, system');
   if (!data) return;
+  _allStatsData = data; // cache for updateStatsForMonth
 
-  const thisMonth = d => d.created_at.startsWith(ym);
-  document.getElementById('stat-open').textContent     = data.filter(d => d.status !== 'Resolved').length;
-  document.getElementById('stat-p1').textContent       = data.filter(d => thisMonth(d) && d.severity === 'P1').length;
-  document.getElementById('stat-p2').textContent       = data.filter(d => thisMonth(d) && d.severity === 'P2').length;
-  document.getElementById('stat-resolved').textContent = data.filter(d => thisMonth(d) && d.status === 'Resolved').length;
+  // Populate month filter (based on start_time, fallback to created_at)
+  const monthsSet = new Set(data.map(d => {
+    const src = d.start_time || d.created_at;
+    return src ? src.slice(0,7) : null;
+  }).filter(Boolean));
+  const months = [...monthsSet].sort().reverse();
 
-  // Populate month filter
-  const months = [...new Set(data.map(d => d.created_at.slice(0,7)))].sort().reverse();
   const sel = document.getElementById('filter-month');
   const cur = sel.value;
+
+  // Auto-select most recent month if nothing selected
+  let selectedMonth = cur;
   sel.innerHTML = '<option value="">All Months</option>';
   months.forEach(m => {
     const [y, mo] = m.split('-');
     const label = new Date(+y, +mo-1, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
-    sel.innerHTML += `<option value="${m}" ${m === cur ? 'selected' : ''}>${label}</option>`;
+    sel.innerHTML += `<option value="${m}">${label}</option>`;
   });
+
+  // If no month was previously selected, default to the most recent
+  if (!selectedMonth && months.length > 0) {
+    selectedMonth = months[0];
+  }
+  if (selectedMonth) {
+    sel.value = selectedMonth;
+  }
+
+  // Filter data by selected month (use start_time, fallback created_at)
+  const inSelectedMonth = d => {
+    if (!selectedMonth) return true;
+    const src = d.start_time || d.created_at;
+    return src && src.slice(0,7) === selectedMonth;
+  };
+
+  document.getElementById('stat-open').textContent     = data.filter(d => inSelectedMonth(d) && d.status !== 'Resolved').length;
+  document.getElementById('stat-p1').textContent       = data.filter(d => inSelectedMonth(d) && d.severity === 'P1').length;
+  document.getElementById('stat-p2').textContent       = data.filter(d => inSelectedMonth(d) && d.severity === 'P2').length;
+  document.getElementById('stat-resolved').textContent = data.filter(d => inSelectedMonth(d) && d.status === 'Resolved').length;
 
   // Populate system filter (distinct from data)
   const systems = [...new Set(data.map(d => d.system).filter(Boolean))].sort((a,b) => a.localeCompare(b));
@@ -3341,6 +3361,28 @@ async function loadStats() {
   sevs.forEach(s => {
     sevSel.innerHTML += `<option value="${esc(s)}" ${s === sevCur ? 'selected' : ''}>${esc(s)}</option>`;
   });
+}
+
+// ── Admin: Re-calculate stat cards when month dropdown changes ──
+let _allStatsData = [];
+async function updateStatsForMonth() {
+  // Use cached data if available, else re-fetch
+  let data = _allStatsData;
+  if (!data.length) {
+    const res = await sb.from('incidents').select('severity, status, created_at, start_time, system');
+    data = res.data || [];
+    _allStatsData = data;
+  }
+  const selectedMonth = document.getElementById('filter-month').value;
+  const inMonth = d => {
+    if (!selectedMonth) return true;
+    const src = d.start_time || d.created_at;
+    return src && src.slice(0,7) === selectedMonth;
+  };
+  document.getElementById('stat-open').textContent     = data.filter(d => inMonth(d) && d.status !== 'Resolved').length;
+  document.getElementById('stat-p1').textContent       = data.filter(d => inMonth(d) && d.severity === 'P1').length;
+  document.getElementById('stat-p2').textContent       = data.filter(d => inMonth(d) && d.severity === 'P2').length;
+  document.getElementById('stat-resolved').textContent = data.filter(d => inMonth(d) && d.status === 'Resolved').length;
 }
 
 // ── Admin: Incident List ───────────────────────────────────
