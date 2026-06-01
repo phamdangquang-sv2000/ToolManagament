@@ -2300,7 +2300,10 @@ function buildForm(data={}) {
       <div class="form-grid" style="margin-top:10px;">
         <div class="form-field">
           <label class="form-label">Tài Khoản</label>
-          <input class="form-input" id="f-tai_khoan" type="text" value="${v("tai_khoan")}" placeholder="username"/>
+          <select class="form-input form-select" id="f-tai_khoan">
+            <option value="">-- Đang tải... --</option>
+          </select>
+          <div id="f-tai_khoan-meta" style="margin-top:5px;font-size:11px;color:var(--text-tertiary);min-height:14px;"></div>
         </div>
         <div class="form-field">
           <label class="form-label">Ngày Sinh (DD/MM/YYYY)</label>
@@ -2334,6 +2337,111 @@ function buildForm(data={}) {
     </div>
     <div id="form-error" style="display:none;padding:10px 14px;border-radius:10px;background:rgba(255,59,48,0.12);border:1px solid rgba(255,59,48,0.25);color:#ff6b63;font-size:13px;margin-top:4px;"></div>
   `;
+}
+
+// Populate dropdown Tài Khoản từ bảng accounts
+// Hiển thị: heiway_account — pic_name (status)
+// Ưu tiên Backup trước (chưa gán), sau đó In Used, sau đó còn lại
+// Map trang_thai nhan vien -> status account tuong ung
+// Active / Probation -> In Used | Inactive -> Returned
+function _mapTrangThaiToAccStatus(trang_thai) {
+  if (!trang_thai) return null;
+  if (trang_thai === "Inactive") return "Returned";
+  return "In Used"; // Active, Probation
+}
+
+// Populate dropdown Tai Khoan:
+// Chi hien thi account co pic_name khop ho_ten VA status khop trang_thai nhan vien
+// Neu khong khop gi -> chi hien "-- Khong co --" (disabled chon)
+async function populateTaiKhoanSelect(currentVal, ho_ten, trang_thai) {
+  const sel = document.getElementById("f-tai_khoan");
+  const meta = document.getElementById("f-tai_khoan-meta");
+  if (!sel) return;
+
+  const isNewForm = !currentVal && !ho_ten; // Thêm mới: chưa có tên, chưa có giá trị
+  const targetStatus = _mapTrangThaiToAccStatus(trang_thai);
+  const name = (ho_ten || "").trim();
+
+  sel.innerHTML = `<option value="">-- Đang tải... --</option>`;
+  try {
+    const r = await fetch(_urlAcc("?order=heiway_account.asc"), { headers: _h() });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const allAcc = await r.json();
+
+    let matched;
+    if (isNewForm) {
+      // Thêm mới: chỉ hiển thị các tài khoản Backup (chưa gán cho ai)
+      matched = allAcc.filter(acc => (acc.status || "") === "Backup");
+    } else {
+      // Sửa: lọc theo pic_name khớp ho_ten VÀ status khớp trang_thai
+      matched = allAcc.filter(acc => {
+        const picMatch = name
+          ? (acc.pic_name || "").toLowerCase() === name.toLowerCase()
+          : false;
+        const statusMatch = targetStatus
+          ? (acc.status || "") === targetStatus
+          : false;
+        return picMatch && statusMatch;
+      });
+    }
+
+    if (matched.length === 0) {
+      sel.innerHTML = `<option value="">-- Không có --</option>`;
+      if (meta) meta.innerHTML = isNewForm
+        ? `<span style="color:#94A3B8;">Không có tài khoản Backup nào</span>`
+        : name
+          ? `<span style="color:#94A3B8;">Không tìm thấy tài khoản phù hợp cho "${name}" (${targetStatus||"?"})</span>`
+          : `<span style="color:#94A3B8;">Nhập Họ Tên để tìm tài khoản phù hợp</span>`;
+      return;
+    }
+
+    sel.innerHTML = `<option value="">-- Không có --</option>` +
+      matched.map(acc => {
+        const label = isNewForm
+          ? acc.heiway_account  // Backup: không cần hiện status
+          : `${acc.heiway_account} (${acc.status})`;
+        const selected = currentVal && acc.heiway_account &&
+          acc.heiway_account.toLowerCase() === currentVal.toLowerCase() ? " selected" : "";
+        return `<option value="${acc.heiway_account}"${selected}>${label}</option>`;
+      }).join("");
+
+    // Nếu chỉ 1 kết quả và chưa có currentVal -> tự động chọn
+    if (matched.length === 1 && !currentVal) {
+      sel.value = matched[0].heiway_account;
+    }
+
+    sel.onchange = () => _renderAccMeta(allAcc, sel.value, meta);
+    _renderAccMeta(allAcc, sel.value, meta);
+  } catch(e) {
+    sel.innerHTML = `<option value="${currentVal||""}">${currentVal||"-- Lỗi tải --"}</option>`;
+    if (meta) meta.textContent = "";
+  }
+}
+
+function _renderAccMeta(rows, val, metaEl) {
+  if (!metaEl) return;
+  if (!val) { metaEl.textContent = ""; return; }
+  const acc = rows.find(r => r.heiway_account && r.heiway_account.toLowerCase() === val.toLowerCase());
+  if (!acc) { metaEl.textContent = ""; return; }
+  const statusColor = acc.status === "In Used" ? "#34D399" : acc.status === "Returned" ? "#F87171" : "#94A3B8";
+  metaEl.innerHTML = `<span style="color:${statusColor};font-weight:600;">${acc.status}</span>${acc.pic_name ? ` · ${acc.pic_name}` : ""}`;
+}
+
+// Re-populate khi ho_ten hoac trang_thai thay doi (dung cho form Add moi)
+function _watchTaiKhoanFilters(isNew) {
+  const hoTenEl    = document.getElementById("f-ho_ten");
+  const trangThaiEl = document.getElementById("f-trang_thai");
+  if (!hoTenEl || !trangThaiEl) return;
+  let _t = null;
+  const refresh = () => {
+    if (isNew) return; // Thêm mới: không re-filter theo tên, giữ nguyên danh sách Backup
+    clearTimeout(_t);
+    _t = setTimeout(() => {
+      populateTaiKhoanSelect("", hoTenEl.value.trim(), trangThaiEl.value);
+    }, 400);
+  };
+  hoTenEl.addEventListener("input", refresh);
+  trangThaiEl.addEventListener("change", refresh);
 }
 
 function getFormPayload() {
@@ -2380,6 +2488,8 @@ function showAddForm() {
       Lưu
     </button>`;
   openModal();
+  populateTaiKhoanSelect("", "", "Active");
+  _watchTaiKhoanFilters(true);
 }
 
 function editEmployee(id) {
@@ -2394,6 +2504,8 @@ function editEmployee(id) {
       Cập nhật
     </button>`;
   openModal();
+  populateTaiKhoanSelect(r.tai_khoan || "", r.ho_ten || "", r.trang_thai || "Active");
+  _watchTaiKhoanFilters(false);
 }
 
 async function saveNew() {
@@ -2407,8 +2519,31 @@ async function saveNew() {
       const row = Array.isArray(inserted) ? inserted[0] : inserted;
       await syncStatusToAttendance(row?.ho_ten || p.ho_ten, row?.trang_thai || p.trang_thai);
     } catch(_) {}
+
+    // Nếu chọn tài khoản Backup -> tự động cập nhật account: PIC Name, Job Title, Status
+    if (p.tai_khoan) {
+      try {
+        const enc = encodeURIComponent(p.tai_khoan);
+        const r = await fetch(_urlAcc(`?heiway_account=ilike.${enc}&status=eq.Backup&limit=1`), { headers: _h() });
+        if (r.ok) {
+          const rows = await r.json();
+          if (rows.length > 0) {
+            const acc = rows[0];
+            await apiUpdate(_urlAcc, acc.id, {
+              pic_name: p.ho_ten || null,
+              job_title: p.bo_phan || null,
+              status: "In Used",
+              updated_at: new Date().toISOString(),
+            });
+          }
+        }
+      } catch(e) {
+        console.warn("[saveNew] Lỗi cập nhật tài khoản:", e);
+      }
+    }
+
     closeModal();
-    toast("Thêm nhân sự thành công", "success");
+    toast("Thêm nhân sự thành công" + (p.tai_khoan ? " — Tài khoản đã được cập nhật ✅" : ""), "success");
     loadData();
   } catch(e) {
     showFormError("Lỗi: " + e.message);
@@ -2420,21 +2555,32 @@ async function saveEdit(id) {
   const p = getFormPayload();
   const errs = validateForm(p);
   if (errs.length) { showFormError(errs[0]); return; }
-  // Lưu trạng thái cũ trước khi update
   const oldRecord = allRecords.find(x=>x.id===id);
   const wasActive = oldRecord && oldRecord.trang_thai !== "Inactive";
+  const oldAcc = (oldRecord?.tai_khoan || "").trim();
+  const newAcc = (p.tai_khoan || "").trim();
   try {
     await dbUpdate(id, p);
     try { await syncStatusToAttendance(p.ho_ten, p.trang_thai); } catch(_) {}
-    // Nếu vừa chuyển sang Inactive → tự động xử lý tài khoản & thiết bị
+
+    // Nếu vừa chuyển sang Inactive → xử lý tài khoản & thiết bị (logic cũ)
     if (wasActive && p.trang_thai === "Inactive" && p.tai_khoan) {
       try { await handleInactiveEmployee(p.tai_khoan, p.ho_ten); } catch(e) {
         console.warn("[inactive] Lỗi xử lý tự động:", e);
       }
     }
+    // Nếu tài khoản bị xóa/thay đổi (không phải do Inactive đã xử lý trên)
+    else if (oldAcc && oldAcc.toLowerCase() !== newAcc.toLowerCase()) {
+      try { await _releaseAccountToBackup(oldAcc); } catch(e) {
+        console.warn("[saveEdit] Lỗi release account:", e);
+      }
+    }
+
     closeModal();
     if (wasActive && p.trang_thai === "Inactive") {
       toast("Đã chuyển Inactive — Tài khoản & Thiết bị đã được cập nhật tự động ✅", "success");
+    } else if (oldAcc && oldAcc.toLowerCase() !== newAcc.toLowerCase()) {
+      toast("Cập nhật thành công — Tài khoản cũ đã chuyển về Backup ✅", "success");
     } else {
       toast("Cập nhật thành công", "success");
     }
@@ -2442,6 +2588,25 @@ async function saveEdit(id) {
   } catch(e) {
     showFormError("Lỗi: " + e.message);
   }
+}
+
+// Giải phóng tài khoản về Backup: xóa pic_name, job_title, đổi status → Backup
+async function _releaseAccountToBackup(heiway_account) {
+  if (!heiway_account) return;
+  const enc = encodeURIComponent(heiway_account);
+  const r = await fetch(
+    _urlAcc(`?heiway_account=ilike.${enc}&status=eq.In Used&limit=1`),
+    { headers: _h() }
+  );
+  if (!r.ok) return;
+  const rows = await r.json();
+  if (!rows.length) return;
+  await apiUpdate(_urlAcc, rows[0].id, {
+    pic_name: null,
+    job_title: null,
+    status: "Backup",
+    updated_at: new Date().toISOString(),
+  });
 }
 
 // ============================================================
@@ -2533,8 +2698,15 @@ function deleteEmployee(id, name) {
   document.getElementById("confirm-msg").textContent = `Bạn có chắc muốn xóa "${name}"? Hành động này không thể hoàn tác.`;
   confirmCallback = async () => {
     try {
+      // Nếu nhân viên có tài khoản -> giải phóng về Backup trước khi xóa
+      const rec = allRecords.find(x=>x.id===id);
+      if (rec?.tai_khoan) {
+        try { await _releaseAccountToBackup(rec.tai_khoan); } catch(e) {
+          console.warn("[delete] Lỗi release account:", e);
+        }
+      }
       await dbDelete(id);
-      toast("Đã xóa nhân sự", "success");
+      toast("Đã xóa nhân sự" + (rec?.tai_khoan ? " — Tài khoản đã chuyển về Backup ✅" : ""), "success");
       loadData();
     } catch(e) {
       toast("Lỗi xóa: " + e.message, "error");
@@ -3113,7 +3285,14 @@ function delLap(id){
 }
 function lapForm(r){
   return `
-    <div class="form-field"><label class="form-label">Tên *</label><input class="form-input" id="lf-name" value="${r?.name||""}"/></div>
+    <div class="form-field"><label class="form-label">Tên <span class="req">*</span></label>
+      <div class="form-select-wrap">
+        <select class="form-input form-select" id="lf-name">
+          <option value="">-- Chọn nhân viên --</option>
+          ${allRecords.filter(e=>e.trang_thai==="Active"||e.trang_thai==="Probation").map(e=>`<option value="${(e.ho_ten||"").replace(/"/g,"&quot;")}" ${(r?.name||"")===(e.ho_ten||"")?"selected":""}>${e.ho_ten||""}${e.trang_thai==="Probation"?" (Probation)":""}</option>`).join("")}
+        </select>
+      </div>
+    </div>
     <div class="form-field"><label class="form-label">Heiway Account</label><input class="form-input" id="lf-acc" value="${r?.heiway_account||""}"/></div>
     <div class="form-field"><label class="form-label">Serial Number</label><input class="form-input" id="lf-sn" value="${r?.serial_number||""}"/></div>
     <div class="form-field"><label class="form-label">Laptop (Drive C)</label><input class="form-input" id="lf-dc" value="${r?.laptop_drive_c||""}"/></div>
@@ -3189,8 +3368,19 @@ async function _maybeUploadBB(ownerKey){
   const url = await uploadBienBan(f, ownerKey);
   return { url, name: f.name, uploaded_at: new Date().toISOString() };
 }
-function editLap(id){
+// Ensure allRecords contains all Active+Probation employees (for dropdowns)
+async function ensureEmployeeList(){
+  const hasValid = allRecords.some(e=>e.trang_thai==="Active"||e.trang_thai==="Probation");
+  if (hasValid) return;
+  try {
+    const r = await fetch(_url("?or=(trang_thai.eq.Active,trang_thai.eq.Probation)&order=ho_ten.asc"), {headers:_h()});
+    if (r.ok) { const rows = await r.json(); if(rows.length) allRecords = rows; }
+  } catch(_){}
+}
+
+async function editLap(id){
   const r = allLaptops.find(x=>x.id===id); if(!r) return;
+  await ensureEmployeeList();
   document.getElementById("modal-title").textContent="Sửa Thiết bị";
   document.getElementById("modal-body").innerHTML = lapForm(r);
   document.getElementById("modal-footer").innerHTML = `
@@ -3220,7 +3410,8 @@ async function saveLap(id){
     closeModal(); toast("Đã lưu","success"); loadLaptops();
   } catch(e){ toast("Lỗi: "+e.message,"error"); }
 }
-function addLap(){
+async function addLap(){
+  await ensureEmployeeList();
   document.getElementById("modal-title").textContent="Thêm Thiết bị";
   document.getElementById("modal-body").innerHTML = lapForm(null);
   document.getElementById("modal-footer").innerHTML = `
@@ -3362,7 +3553,14 @@ function delAcc(id){
 function accForm(r){
   return `
     <div class="form-field"><label class="form-label">Heiway Account *</label><input class="form-input" id="af-acc" value="${r?.heiway_account||""}"/></div>
-    <div class="form-field"><label class="form-label">PIC (Name)</label><input class="form-input" id="af-pic" value="${r?.pic_name||""}"/></div>
+    <div class="form-field"><label class="form-label">PIC (Name)</label>
+      <div class="form-select-wrap">
+        <select class="form-input form-select" id="af-pic">
+          <option value="">-- Chọn nhân viên --</option>
+          ${allRecords.filter(e=>e.trang_thai==="Active"||e.trang_thai==="Probation").map(e=>`<option value="${(e.ho_ten||"").replace(/"/g,"&quot;")}" ${(r?.pic_name||"")===(e.ho_ten||"")?"selected":""}>${e.ho_ten||""}${e.trang_thai==="Probation"?" (Probation)":""}</option>`).join("")}
+        </select>
+      </div>
+    </div>
     <div class="form-field"><label class="form-label">Job Title</label><input class="form-input" id="af-jt" value="${r?.job_title||""}"/></div>
     <div class="form-field"><label class="form-label">Status</label>
       <select class="form-input" id="af-st">${STATUS_OPTIONS_DEV.map(o=>`<option ${o===(r?.status||"In Used")?"selected":""}>${o}</option>`).join("")}</select>
@@ -3379,8 +3577,9 @@ function readAccForm(){
     note: document.getElementById("af-note").value.trim()||null,
   };
 }
-function editAcc(id){
+async function editAcc(id){
   const r = allAccounts.find(x=>x.id===id); if(!r) return;
+  await ensureEmployeeList();
   document.getElementById("modal-title").textContent="Sửa Tài khoản";
   document.getElementById("modal-body").innerHTML = accForm(r);
   document.getElementById("modal-footer").innerHTML = `
@@ -3394,7 +3593,8 @@ async function saveAcc(id){
   try { await apiUpdate(_urlAcc, id, {...data, updated_at:new Date().toISOString()}); closeModal(); toast("Đã lưu","success"); loadAccounts(); }
   catch(e){ toast("Lỗi: "+e.message,"error"); }
 }
-function addAcc(){
+async function addAcc(){
+  await ensureEmployeeList();
   document.getElementById("modal-title").textContent="Thêm Tài khoản";
   document.getElementById("modal-body").innerHTML = accForm(null);
   document.getElementById("modal-footer").innerHTML = `
