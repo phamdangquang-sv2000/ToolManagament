@@ -2445,78 +2445,79 @@ async function saveEdit(id) {
 }
 
 // ============================================================
-// XỬ LÝ TỰ ĐỘNG KHI NHÂN VIÊN CHUYỂN SANG INACTIVE
+// XU LY TU DONG KHI NHAN VIEN CHUYEN SANG INACTIVE
 // ============================================================
 async function handleInactiveEmployee(heiway_account) {
-  /* 1. Xử lý TÀI KHOẢN: tìm theo heiway_account */
-  const accResp = await fetch(
-    _urlAcc(`?heiway_account=eq.${encodeURIComponent(heiway_account)}&status=eq.In%20Used`),
-    { headers: _h() }
-  );
-  if (accResp.ok) {
-    const accRows = await accResp.json();
-    for (const acc of accRows) {
-      // Đổi trạng thái tài khoản hiện tại → Returned, xóa thông tin gắn với nhân viên
-      await apiUpdate(_urlAcc, acc.id, {
-        status: "Returned",
-        pic_name: null,
-        job_title: null,
-        note: null,
-        updated_at: new Date().toISOString(),
-      });
-      // Tạo bản backup mới: giữ heiway_account, status=Backup, còn lại trống
-      const nextSttAcc = (allAccounts.reduce((m,r)=>Math.max(m, r.stt||0), 0) + 1) || 1;
+  const ts = new Date().toISOString();
+  const enc = encodeURIComponent(heiway_account);
+
+  // --- 1. TAI KHOAN ---
+  // Tim tat ca account khop heiway_account, KHONG loc status de khong bo sot
+  // Chi xu ly nhung record chua phai Returned/Backup
+  let accRows = [];
+  try {
+    const r = await fetch(
+      _urlAcc(`?heiway_account=eq.${enc}&status=not.in.(Returned,Backup)`),
+      { headers: _h() }
+    );
+    if (r.ok) accRows = await r.json();
+  } catch(e) { console.warn("[inactive] fetch acc error:", e); }
+
+  for (const acc of accRows) {
+    // Ban goc: CHI doi status -> Returned, GIU NGUYEN pic_name, job_title, note
+    try {
+      await apiUpdate(_urlAcc, acc.id, { status: "Returned", updated_at: ts });
+    } catch(e) { console.warn("[inactive] update acc error:", e); }
+    // Tao ban Backup moi: giu heiway_account, cac field nguoi dung de trong
+    try {
+      const nextStt = (allAccounts.reduce((m,r)=>Math.max(m,r.stt||0),0) + 10) || 1;
       await apiInsert(_urlAcc, {
         heiway_account: acc.heiway_account,
-        pic_name: null,
-        job_title: null,
-        status: "Backup",
-        note: null,
-        stt: nextSttAcc,
+        pic_name: null, job_title: null, status: "Backup", note: null, stt: nextStt,
       });
-    }
+    } catch(e) { console.warn("[inactive] insert acc backup error:", e); }
   }
 
-  /* 2. Xử lý THIẾT BỊ (laptop): tìm theo heiway_account */
-  const lapResp = await fetch(
-    _urlLap(`?heiway_account=eq.${encodeURIComponent(heiway_account)}&status=eq.In%20Used`),
-    { headers: _h() }
-  );
-  if (lapResp.ok) {
-    const lapRows = await lapResp.json();
-    for (const lap of lapRows) {
-      // Đổi trạng thái thiết bị hiện tại → Returned, xóa thông tin gắn với nhân viên
+  // --- 2. THIET BI ---
+  // Tim theo heiway_account, KHONG loc status de bat dung thiet bi
+  // Chi xu ly record chua phai Returned/Backup
+  let lapRows = [];
+  try {
+    const r = await fetch(
+      _urlLap(`?heiway_account=eq.${enc}&status=not.in.(Returned,Backup)`),
+      { headers: _h() }
+    );
+    if (r.ok) lapRows = await r.json();
+  } catch(e) { console.warn("[inactive] fetch lap error:", e); }
+
+  for (const lap of lapRows) {
+    // Ban goc: CHI doi status -> Returned, GIU NGUYEN toan bo thong tin cu
+    try {
       await apiUpdate(_urlLap, lap.id, {
         status: "Returned",
-        name: null,
-        heiway_account: null,
-        job_title: null,
-        note: null,
-        bien_ban_url: null,
-        bien_ban_files: null,
-        updated_at: new Date().toISOString(),
+        updated_at: ts,
       });
-      // Tạo bản backup mới: giữ serial_number, laptop_drive_c, wlan_guest; còn lại trống
-      const nextSttLap = (allLaptops.reduce((m,r)=>Math.max(m, r.stt||0), 0) + 1) || 1;
+    } catch(e) { console.warn("[inactive] update lap error:", e); }
+    // Tao ban Backup moi: giu thong tin phan cung, cac field nguoi dung de trong
+    try {
+      const nextStt = (allLaptops.reduce((m,r)=>Math.max(m,r.stt||0),0) + 10) || 1;
       await apiInsert(_urlLap, {
         serial_number: lap.serial_number,
         laptop_drive_c: lap.laptop_drive_c,
         wlan_guest: lap.wlan_guest,
         status: "Backup",
-        name: null,
-        heiway_account: null,
-        job_title: null,
-        note: null,
-        bien_ban_url: null,
-        bien_ban_files: null,
-        stt: nextSttLap,
+        name: null, heiway_account: null, job_title: null, note: null,
+        bien_ban_url: null, bien_ban_files: null,
+        stt: nextStt,
       });
-    }
+    } catch(e) { console.warn("[inactive] insert lap backup error:", e); }
   }
 
-  // Reload lại các tab thiết bị & tài khoản nếu đang mở
-  if (typeof loadLaptops === "function") { try { await loadLaptops(); } catch(_) {} }
-  if (typeof loadAccounts === "function") { try { await loadAccounts(); } catch(_) {} }
+  // Cap nhat local cache va re-render tab dang mo
+  try { const rows = await apiList(_urlLap,"","",LAP_FIELDS); allLaptops = rows; } catch(_){}
+  try { const rows = await apiList(_urlAcc,"","",ACC_FIELDS); allAccounts = rows; } catch(_){}
+  if (currentTab === "laptop")  { try { renderLapList(allLaptops); updateLapStats(allLaptops); } catch(_){} }
+  if (currentTab === "account") { try { renderAccList(allAccounts); updateAccStats(allAccounts); } catch(_){} }
 }
 
 function deleteEmployee(id, name) {
