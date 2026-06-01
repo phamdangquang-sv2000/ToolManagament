@@ -2420,15 +2420,103 @@ async function saveEdit(id) {
   const p = getFormPayload();
   const errs = validateForm(p);
   if (errs.length) { showFormError(errs[0]); return; }
+  // Lưu trạng thái cũ trước khi update
+  const oldRecord = allRecords.find(x=>x.id===id);
+  const wasActive = oldRecord && oldRecord.trang_thai !== "Inactive";
   try {
     await dbUpdate(id, p);
     try { await syncStatusToAttendance(p.ho_ten, p.trang_thai); } catch(_) {}
+    // Nếu vừa chuyển sang Inactive → tự động xử lý tài khoản & thiết bị
+    if (wasActive && p.trang_thai === "Inactive" && p.tai_khoan) {
+      try { await handleInactiveEmployee(p.tai_khoan); } catch(e) {
+        console.warn("[inactive] Lỗi xử lý tự động:", e);
+      }
+    }
     closeModal();
-    toast("Cập nhật thành công", "success");
+    if (wasActive && p.trang_thai === "Inactive") {
+      toast("Đã chuyển Inactive — Tài khoản & Thiết bị đã được cập nhật tự động ✅", "success");
+    } else {
+      toast("Cập nhật thành công", "success");
+    }
     loadData();
   } catch(e) {
     showFormError("Lỗi: " + e.message);
   }
+}
+
+// ============================================================
+// XỬ LÝ TỰ ĐỘNG KHI NHÂN VIÊN CHUYỂN SANG INACTIVE
+// ============================================================
+async function handleInactiveEmployee(heiway_account) {
+  /* 1. Xử lý TÀI KHOẢN: tìm theo heiway_account */
+  const accResp = await fetch(
+    _urlAcc(`?heiway_account=eq.${encodeURIComponent(heiway_account)}&status=eq.In%20Used`),
+    { headers: _h() }
+  );
+  if (accResp.ok) {
+    const accRows = await accResp.json();
+    for (const acc of accRows) {
+      // Đổi trạng thái tài khoản hiện tại → Returned, xóa thông tin gắn với nhân viên
+      await apiUpdate(_urlAcc, acc.id, {
+        status: "Returned",
+        pic_name: null,
+        job_title: null,
+        note: null,
+        updated_at: new Date().toISOString(),
+      });
+      // Tạo bản backup mới: giữ heiway_account, status=Backup, còn lại trống
+      const nextSttAcc = (allAccounts.reduce((m,r)=>Math.max(m, r.stt||0), 0) + 1) || 1;
+      await apiInsert(_urlAcc, {
+        heiway_account: acc.heiway_account,
+        pic_name: null,
+        job_title: null,
+        status: "Backup",
+        note: null,
+        stt: nextSttAcc,
+      });
+    }
+  }
+
+  /* 2. Xử lý THIẾT BỊ (laptop): tìm theo heiway_account */
+  const lapResp = await fetch(
+    _urlLap(`?heiway_account=eq.${encodeURIComponent(heiway_account)}&status=eq.In%20Used`),
+    { headers: _h() }
+  );
+  if (lapResp.ok) {
+    const lapRows = await lapResp.json();
+    for (const lap of lapRows) {
+      // Đổi trạng thái thiết bị hiện tại → Returned, xóa thông tin gắn với nhân viên
+      await apiUpdate(_urlLap, lap.id, {
+        status: "Returned",
+        name: null,
+        heiway_account: null,
+        job_title: null,
+        note: null,
+        bien_ban_url: null,
+        bien_ban_files: null,
+        updated_at: new Date().toISOString(),
+      });
+      // Tạo bản backup mới: giữ serial_number, laptop_drive_c, wlan_guest; còn lại trống
+      const nextSttLap = (allLaptops.reduce((m,r)=>Math.max(m, r.stt||0), 0) + 1) || 1;
+      await apiInsert(_urlLap, {
+        serial_number: lap.serial_number,
+        laptop_drive_c: lap.laptop_drive_c,
+        wlan_guest: lap.wlan_guest,
+        status: "Backup",
+        name: null,
+        heiway_account: null,
+        job_title: null,
+        note: null,
+        bien_ban_url: null,
+        bien_ban_files: null,
+        stt: nextSttLap,
+      });
+    }
+  }
+
+  // Reload lại các tab thiết bị & tài khoản nếu đang mở
+  if (typeof loadLaptops === "function") { try { await loadLaptops(); } catch(_) {} }
+  if (typeof loadAccounts === "function") { try { await loadAccounts(); } catch(_) {} }
 }
 
 function deleteEmployee(id, name) {
