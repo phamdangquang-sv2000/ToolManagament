@@ -2432,6 +2432,30 @@ async function _logAccountHistory(accountId, heiwayAccount, event, nhanSuId, hoT
   }
 }
 
+// Ghi lịch sử thay đổi thiết bị vào bảng laptop_history
+async function _logLaptopHistory(laptopId, deviceName, event, nhanSuId, hoTen, boPhan, coSo, note) {
+  if (!laptopId) return;
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/laptop_history`, {
+      method: "POST",
+      headers: { ..._h(), "Prefer": "return=minimal" },
+      body: JSON.stringify({
+        laptop_id:   laptopId,
+        device_name: deviceName || "",
+        event,
+        nhan_su_id:  nhanSuId || null,
+        ho_ten:      hoTen    || null,
+        bo_phan:     boPhan   || null,
+        co_so:       coSo     || null,
+        note:        note     || null,
+        created_at:  new Date().toISOString(),
+      }),
+    });
+  } catch(e) {
+    console.warn("[lap-history] Lỗi ghi laptop_history:", e);
+  }
+}
+
 // Re-populate khi ho_ten hoac trang_thai thay doi (dung cho form Add moi)
 function _watchTaiKhoanFilters(isNew) {
   // Watcher không cần re-populate nữa vì dropdown đã luôn hiển thị đúng:
@@ -2674,28 +2698,47 @@ async function handleInactiveEmployeeById(accountId, nhanSuId, ho_ten, bo_phan, 
     }
   } catch(e) { console.warn("[inactive] insert acc backup error:", e); }
 
-  // --- 2. THIET BI (giữ nguyên: tìm theo heiway_account text vì laptops chưa có account_id) ---
-  const heiway_account = acc.heiway_account;
+  // --- 2. THIET BI: tìm theo account_id FK (ưu tiên), fallback theo heiway_account text ---
   let lapRows = [];
   try {
-    const enc = encodeURIComponent(heiway_account);
-    const encName = encodeURIComponent(ho_ten || "");
-    const orFilter = `or=(heiway_account.ilike.${enc}${ho_ten ? `,name.ilike.${encName}` : ""})`;
-    const r = await fetch(_urlLap(`?${orFilter}&status=not.in.(Returned,Backup)`), { headers: _h() });
-    if (r.ok) lapRows = await r.json();
+    // Ưu tiên: tìm qua account_id FK (chính xác)
+    const r1 = await fetch(_urlLap(`?account_id=eq.${accountId}&status=not.in.(Returned,Backup)`), { headers: _h() });
+    if (r1.ok) lapRows = await r1.json();
+    // Fallback: tìm thêm theo heiway_account text (cho thiết bị cũ chưa có account_id)
+    if (acc.heiway_account) {
+      const enc = encodeURIComponent(acc.heiway_account);
+      const encName = encodeURIComponent(ho_ten || "");
+      const orFilter = `or=(heiway_account.ilike.${enc}${ho_ten ? `,name.ilike.${encName}` : ""})`;
+      const r2 = await fetch(_urlLap(`?${orFilter}&status=not.in.(Returned,Backup)`), { headers: _h() });
+      if (r2.ok) {
+        const byText = await r2.json();
+        // Merge, tránh trùng id
+        const existIds = new Set(lapRows.map(x=>x.id));
+        byText.forEach(x=>{ if(!existIds.has(x.id)) lapRows.push(x); });
+      }
+    }
   } catch(e) { console.warn("[inactive] fetch lap error:", e); }
 
   for (const lap of lapRows) {
-    try { await apiUpdate(_urlLap, lap.id, { status: "Returned", updated_at: ts }); }
-    catch(e) { console.warn("[inactive] update lap error:", e); }
+    try {
+      await apiUpdate(_urlLap, lap.id, { status: "Returned", account_id: null, updated_at: ts });
+      await _logLaptopHistory(lap.id, lap.name||"", "returned",
+        nhanSuId, ho_ten, bo_phan, co_so, "Nhân viên chuyển Inactive");
+    } catch(e) { console.warn("[inactive] update lap error:", e); }
     try {
       const nextStt = (allLaptops.reduce((m,r)=>Math.max(m,r.stt||0),0) + 10) || 1;
-      await apiInsert(_urlLap, {
+      const newLap = await apiInsert(_urlLap, {
         serial_number: lap.serial_number, laptop_drive_c: lap.laptop_drive_c,
         wlan_guest: lap.wlan_guest, status: "Backup", name: "—",
-        heiway_account: null, job_title: null, note: null,
+        heiway_account: null, account_id: null, job_title: null, note: null,
         bien_ban_url: null, bien_ban_files: null, stt: nextStt,
       });
+      const nl = Array.isArray(newLap) ? newLap[0] : newLap;
+      if (nl?.id) {
+        await _logLaptopHistory(nl.id, "—", "released",
+          null, null, null, null,
+          `Tạo Backup từ thiết bị của ${ho_ten || "nhân viên nghỉ"}`);
+      }
     } catch(e) { console.warn("[inactive] insert lap backup error:", e); }
   }
 
@@ -2977,7 +3020,7 @@ let allLaptops = [];
 let allAccounts = [];
 let lapFilter = "All", accFilter = "All";
 let lapSearchT = null, accSearchT = null;
-const LAP_FIELDS = ["name","heiway_account","serial_number","laptop_drive_c","wlan_guest","job_title","status","note","bien_ban_url","bien_ban_files"];
+const LAP_FIELDS = ["name","heiway_account","account_id","serial_number","laptop_drive_c","wlan_guest","job_title","status","note","bien_ban_url","bien_ban_files"];
 // Helper: parse bien_ban_files JSON array, fallback to bien_ban_url for legacy
 function parseBienBanFiles(r){
   let files = [];
@@ -3032,7 +3075,7 @@ async function apiList(urlFn, kw, filter, fields, selectFields) {
   return r.json();
 }
 async function apiInsert(urlFn, data) {
-  const r = await fetch(urlFn(), {method:"POST", headers:_h(), body:JSON.stringify(data)});
+  const r = await fetch(urlFn(), {method:"POST", headers:{..._h(),"Prefer":"return=representation"}, body:JSON.stringify(data)});
   if (!r.ok) throw new Error(await r.text());
   return r.json();
 }
@@ -3303,25 +3346,53 @@ function viewLap(id){
 function delLap(id){
   const r = allLaptops.find(x=>x.id===id); if(!r) return;
   showConfirm("Xóa thiết bị?", r.name||"", async ()=>{
-    try { await apiDelete(_urlLap, id); closeModal(); toast("Đã xóa","success"); loadLaptops(); }
+    try {
+      await _logLaptopHistory(id, r.name||"", "deleted",
+        null, r.name||"", r.job_title||null, null, "Xóa thiết bị khỏi hệ thống");
+      await apiDelete(_urlLap, id);
+      closeModal(); toast("Đã xóa","success"); loadLaptops();
+    }
     catch(e){ toast("Lỗi: "+e.message,"error"); }
   });
 }
+function _lapFormAutoFill(sel) {
+  var opt = sel.options[sel.selectedIndex];
+  var nid = opt ? (opt.dataset.nid||"") : "";
+  var hw  = opt ? (opt.dataset.hw||"")  : "";
+  var jt  = opt ? (opt.dataset.jt||"")  : "";
+  var aid = opt ? (opt.dataset.aid||"") : "";
+  document.getElementById("lf-account-id").value = aid;
+  document.getElementById("lf-acc").value = hw;
+  document.getElementById("lf-jt").value  = jt;
+}
 function lapForm(r){
   return `
+    <input type="hidden" id="lf-account-id" value="${r?.account_id||""}"/>
     <div class="form-field"><label class="form-label">Tên <span class="req">*</span></label>
       <div class="form-select-wrap">
-        <select class="form-input form-select" id="lf-name">
+        <select class="form-input form-select" id="lf-name" onchange="_lapFormAutoFill(this)">
           <option value="">-- Chọn nhân viên --</option>
-          ${allRecords.filter(e=>e.trang_thai==="Active"||e.trang_thai==="Probation").map(e=>`<option value="${(e.ho_ten||"").replace(/"/g,"&quot;")}" ${(r?.name||"")===(e.ho_ten||"")?"selected":""}>${e.ho_ten||""}${e.trang_thai==="Probation"?" (Probation)":""}</option>`).join("")}
+          ${allRecords.filter(e=>e.trang_thai==="Active"||e.trang_thai==="Probation").map(e=>{
+            const acc = allAccounts.find(a=>a.id===e.account_id);
+            const hw  = (acc?.heiway_account||"").replace(/"/g,"&quot;");
+            const jt  = (e.bo_phan||"").replace(/"/g,"&quot;");
+            const aid = e.account_id||"";
+            return `<option value="${(e.ho_ten||"").replace(/"/g,"&quot;")}" data-nid="${e.id||""}" data-hw="${hw}" data-jt="${jt}" data-aid="${aid}" ${(r?.name||"")===(e.ho_ten||"")?"selected":""}>${e.ho_ten||""}${e.trang_thai==="Probation"?" (Probation)":""}</option>`;
+          }).join("")}
         </select>
       </div>
     </div>
-    <div class="form-field"><label class="form-label">Heiway Account</label><input class="form-input" id="lf-acc" value="${r?.heiway_account||""}"/></div>
+    <div class="form-field">
+      <label class="form-label" style="display:flex;align-items:center;gap:6px;">Heiway Account <span style="font-size:10px;padding:2px 7px;border-radius:20px;background:rgba(96,165,250,0.15);color:#60a5fa;font-weight:500;">tự điền</span></label>
+      <input class="form-input" id="lf-acc" value="${r?.heiway_account||""}" readonly style="opacity:0.7;cursor:default;"/>
+    </div>
     <div class="form-field"><label class="form-label">Serial Number</label><input class="form-input" id="lf-sn" value="${r?.serial_number||""}"/></div>
     <div class="form-field"><label class="form-label">Laptop (Drive C)</label><input class="form-input" id="lf-dc" value="${r?.laptop_drive_c||""}"/></div>
     <div class="form-field"><label class="form-label">WLAN / GUEST</label><input class="form-input" id="lf-wlan" value="${r?.wlan_guest||""}"/></div>
-    <div class="form-field"><label class="form-label">Job Title</label><input class="form-input" id="lf-jt" value="${r?.job_title||""}"/></div>
+    <div class="form-field">
+      <label class="form-label" style="display:flex;align-items:center;gap:6px;">Job Title <span style="font-size:10px;padding:2px 7px;border-radius:20px;background:rgba(96,165,250,0.15);color:#60a5fa;font-weight:500;">tự điền</span></label>
+      <input class="form-input" id="lf-jt" value="${r?.job_title||""}" readonly style="opacity:0.7;cursor:default;"/>
+    </div>
     <div class="form-field"><label class="form-label">Status</label>
       <select class="form-input" id="lf-st">${STATUS_OPTIONS_DEV.map(o=>`<option ${o===(r?.status||"In Used")?"selected":""}>${o}</option>`).join("")}</select>
     </div>
@@ -3351,8 +3422,10 @@ function lapForm(r){
   `;
 }
 function readLapForm(){
+  const rawAccId = document.getElementById("lf-account-id")?.value.trim();
   return {
     name: document.getElementById("lf-name").value.trim(),
+    account_id: rawAccId ? parseInt(rawAccId, 10) : null,
     heiway_account: document.getElementById("lf-acc").value.trim()||null,
     serial_number: document.getElementById("lf-sn").value.trim()||null,
     laptop_drive_c: document.getElementById("lf-dc").value.trim()||null,
@@ -3430,30 +3503,59 @@ async function saveLap(id){
       data.bien_ban_files = JSON.stringify(files);
       data.bien_ban_url = newFile.url; // keep latest as bien_ban_url for compat
     }
+    const emp = allRecords.find(e=>e.ho_ten===data.name);
     await apiUpdate(_urlLap, id, {...data, updated_at:new Date().toISOString()});
+    await _logLaptopHistory(id, data.name||"", "updated",
+      emp?.id||null, data.name||null, emp?.bo_phan||data.job_title||null, emp?.co_so||null,
+      `Cập nhật thiết bị — trạng thái: ${data.status||""}`);
     closeModal(); toast("Đã lưu","success"); loadLaptops();
   } catch(e){ toast("Lỗi: "+e.message,"error"); }
 }
+function lapFormAdd(){
+  return `
+    <div class="form-field"><label class="form-label">Serial Number</label><input class="form-input" id="lf-sn" placeholder="5CDXXXXXXX"/></div>
+    <div class="form-field"><label class="form-label">Laptop (Drive C)</label><input class="form-input" id="lf-dc" placeholder="VN1N0XXXXXXX"/></div>
+    <div class="form-field"><label class="form-label">WLAN / GUEST</label><input class="form-input" id="lf-wlan" placeholder=""/></div>
+    <div class="form-field"><label class="form-label">Status</label>
+      <select class="form-input" id="lf-st">${STATUS_OPTIONS_DEV.map(o=>`<option ${o==="Backup"?"selected":""}>${o}</option>`).join("")}</select>
+    </div>
+    <div class="form-field"><label class="form-label">Note</label><textarea class="form-input" id="lf-note" rows="2"></textarea></div>
+  `;
+}
+function readLapFormAdd(){
+  return {
+    name: "—",
+    account_id: null,
+    heiway_account: null,
+    serial_number: document.getElementById("lf-sn").value.trim()||null,
+    laptop_drive_c: document.getElementById("lf-dc").value.trim()||null,
+    wlan_guest: document.getElementById("lf-wlan").value.trim()||null,
+    job_title: null,
+    status: document.getElementById("lf-st").value,
+    note: document.getElementById("lf-note").value.trim()||null,
+    bien_ban_url: null,
+    bien_ban_files: null,
+  };
+}
 async function addLap(){
-  await ensureEmployeeList();
   document.getElementById("modal-title").textContent="Thêm Thiết bị";
-  document.getElementById("modal-body").innerHTML = lapForm(null);
+  document.getElementById("modal-body").innerHTML = lapFormAdd();
   document.getElementById("modal-footer").innerHTML = `
     <button class="btn btn-ghost" style="flex:1;" onclick="closeModal()">Hủy</button>
     <button class="btn btn-primary" style="flex:1;" onclick="createLap()">Tạo</button>`;
   openModal();
 }
 async function createLap(){
-  const data = readLapForm();
-  if (!data.name) { toast("Vui lòng nhập tên","error"); return; }
+  const data = readLapFormAdd();
   try {
-    const newFile = await _maybeUploadBB(data.heiway_account || data.name);
-    if (newFile) {
-      data.bien_ban_url = newFile.url;
-      data.bien_ban_files = JSON.stringify([newFile]);
-    }
     const nextStt = (allLaptops.reduce((m,r)=>Math.max(m, r.stt||0), 0) + 1) || 1;
-    await apiInsert(_urlLap, {...data, stt: nextStt});
+    const inserted = await apiInsert(_urlLap, {...data, stt: nextStt});
+    const newRow = Array.isArray(inserted) ? inserted[0] : inserted;
+    if (newRow?.id) {
+      await _logLaptopHistory(newRow.id, data.serial_number||"thiết bị mới", "released",
+        null, null, null, null,
+        `Thêm thiết bị mới vào kho — trạng thái: ${data.status||""}`);
+    }
     closeModal(); toast("Đã thêm","success"); loadLaptops();
   } catch(e){ toast("Lỗi: "+e.message,"error"); }
 }
