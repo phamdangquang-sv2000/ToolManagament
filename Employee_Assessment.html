@@ -79,6 +79,8 @@
   <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
   <!-- SortableJS: drag-and-drop questions -->
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <!-- html2pdf: PDF export for Certificate -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     /* =====================================================
        FONTS
@@ -4389,6 +4391,7 @@ const App = {
               <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
               Chấm lại
             </button>
+            ${r.pass_fail==='pass' ? `<button class="btn-action" style="gap:5px;color:#fff;border-color:transparent;background:linear-gradient(135deg,#7c6af7,#f857a6);margin-left:6px;" onclick="App.certificate.openFromResult('${r.attempt_id}')" title="Xem Certificate">🏆 Certificate</button>` : ''}
           </td>
         </tr>
       `).join('');
@@ -4603,6 +4606,9 @@ const App = {
           ? `<td><span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:rgba(255,60,60,0.15);border:1.5px solid rgba(255,60,60,0.45);border-radius:100px;font-size:11px;font-weight:700;color:#ff4444;" title="${r.fraud_notes||''}">🚨 Gian lận</span></td>`
           : `<td><span style="color:var(--text-muted);font-size:12px;">—</span></td>`;
 
+        const certBtn = r.pass_fail === 'pass'
+          ? ` <button onclick="App.certificate.openFromResult('${r.attempt_id}')" title="Xem Certificate" style="margin-left:6px;padding:3px 9px;border:none;border-radius:100px;font-size:11px;font-weight:700;color:#fff;background:linear-gradient(135deg,#7c6af7,#f857a6);cursor:pointer;">🏆</button>`
+          : '';
         return `<tr style="${r.is_fraud ? 'background:rgba(255,40,40,0.04);' : ''}">
           <td>
             <div style="font-weight:700;font-size:14px;">${r.employee_name}</div>
@@ -4611,7 +4617,7 @@ const App = {
           <td style="color:var(--text-secondary);">${r.project_name}</td>
           <td style="font-weight:600;">${r.test_name}</td>
           ${scoreCell}
-          <td>${resultBadge}</td>
+          <td>${resultBadge}${certBtn}</td>
           <td class="text-sm" style="color:var(--text-muted);">${dateStr}</td>
           ${fraudCell}
         </tr>`;
@@ -4728,7 +4734,8 @@ const App = {
               if (result) {
                 cardClass = result.pass_fail === 'pass' ? 'card-pass' : 'card-fail';
                 statusHtml = `<span class="badge ${result.pass_fail==='pass'?'badge-success':'badge-danger'}">${result.pass_fail==='pass'?'✓ PASS':'✗ FAIL'} · ${result.total_score} điểm</span>`;
-                actionHtml = attempt ? `<button class="btn btn-ghost btn-sm" onclick="App.exam.review('${attempt.id}')">👁 Xem lại bài</button>` : '';
+                actionHtml = (attempt ? `<button class="btn btn-ghost btn-sm" onclick="App.exam.review('${attempt.id}')">👁 Xem lại bài</button>` : '')
+                  + (result.pass_fail === 'pass' ? ` <button class="btn btn-sm" style="background:linear-gradient(135deg,#7c6af7,#f857a6);color:#fff;font-weight:700;" onclick="App.certificate.openFromResult('${result.attempt_id||attempt?.id||''}')">🏆 View Certificate</button>` : '');
               } else if (isCompleted) {
                 cardClass = '';
                 statusHtml = '<span class="badge badge-warning">📬 Đã nộp · Chờ chấm</span>';
@@ -6005,5 +6012,554 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
     document.body.appendChild(wave);
     wave.addEventListener('animationend', () => wave.remove());
   });
+})();
+</script>
+
+<!-- ============================================================
+     CERTIFICATE OF COMPLETION — ADDITIVE FEATURE (no logic change)
+     ============================================================ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  /* Certificate Modal */
+  .cert-modal-overlay {
+    position: fixed; inset: 0; z-index: 10000;
+    background: rgba(8,6,28,0.82); backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center;
+    padding: 24px; overflow: auto;
+  }
+  .cert-modal-overlay.open { display: flex; }
+  .cert-modal-box {
+    background: #ffffff; border-radius: 16px; max-width: 1240px; width: 100%;
+    box-shadow: 0 40px 120px rgba(0,0,0,0.6);
+    display: flex; flex-direction: column; max-height: 95vh; overflow: hidden;
+  }
+  .cert-modal-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 22px; border-bottom: 1px solid #ece8ff;
+    background: linear-gradient(135deg,#f7f5ff,#fff6fb);
+    font-family: 'Be Vietnam Pro', sans-serif;
+  }
+  .cert-modal-toolbar h3 {
+    margin: 0; font-family: 'Be Vietnam Pro', sans-serif; font-size: 16px; font-weight: 800;
+    color: #2a1e6b; letter-spacing: -0.2px;
+  }
+  .cert-modal-toolbar .cert-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .cert-btn {
+    border: none; cursor: pointer; padding: 8px 16px; border-radius: 8px;
+    font-size: 13px; font-weight: 700; font-family: 'Be Vietnam Pro', sans-serif;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .cert-btn:hover { transform: translateY(-1px); }
+  .cert-btn-primary { background: linear-gradient(135deg,#7c6af7,#f857a6); color: #fff; }
+  .cert-btn-secondary { background: #fff; color: #2a1e6b; border: 1.5px solid #d8d2f5; }
+  .cert-btn-ghost { background: transparent; color: #6b6890; }
+
+  .cert-modal-scroll { overflow: auto; padding: 28px; background: #1a0f3d; }
+
+  /* The certificate itself — A4 Landscape with deep purple frame */
+  #certificate-print-area {
+    width: 297mm; min-height: 210mm; margin: 0 auto;
+    background:
+      radial-gradient(ellipse at 0% 0%, rgba(124,106,247,0.25), transparent 40%),
+      radial-gradient(ellipse at 100% 100%, rgba(248,87,166,0.25), transparent 40%),
+      linear-gradient(135deg, #14082e 0%, #1f0d4a 50%, #14082e 100%);
+    position: relative; padding: 8mm; box-sizing: border-box;
+    color: #1a1340; font-family: 'Be Vietnam Pro', sans-serif;
+    box-shadow: 0 12px 60px rgba(124,106,247,0.35);
+    overflow: hidden;
+  }
+  /* Inner white card */
+  .cert-frame {
+    position: absolute; inset: 8mm;
+    background:
+      radial-gradient(circle at 15% 30%, rgba(124,106,247,0.04), transparent 35%),
+      radial-gradient(circle at 85% 70%, rgba(248,87,166,0.04), transparent 35%),
+      #fbfaff;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(124,106,247,0.5),
+                inset 0 0 0 1px rgba(248,87,166,0.25);
+  }
+  /* Subtle wave overlay */
+  .cert-frame::before {
+    content: ''; position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 8% 12%, rgba(91,63,209,0.18) 1px, transparent 2px) 0 0/14px 14px,
+      radial-gradient(circle at 50% 50%, rgba(91,63,209,0.1) 0.5px, transparent 1.5px) 0 0/8px 8px;
+    background-position: 0 0, 0 0;
+    width: 90px; height: 90px;
+    top: 30mm; left: 6mm;
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  /* Neon L-shaped corners with glow */
+  .cert-corner {
+    position: absolute; width: 80px; height: 80px; pointer-events: none; z-index: 5;
+  }
+  .cert-corner::before, .cert-corner::after {
+    content: ''; position: absolute;
+    background: linear-gradient(135deg,#a78bfa,#ec4899);
+    box-shadow: 0 0 14px rgba(167,139,250,0.85), 0 0 28px rgba(236,72,153,0.6);
+    border-radius: 2px;
+  }
+  .cert-corner::before { width: 100%; height: 3px; }
+  .cert-corner::after  { width: 3px; height: 100%; }
+  .cert-corner.tl { top: 3mm; left: 3mm; }
+  .cert-corner.tl::before { top: 0; left: 0; } .cert-corner.tl::after { top: 0; left: 0; }
+  .cert-corner.tr { top: 3mm; right: 3mm; }
+  .cert-corner.tr::before { top: 0; right: 0; } .cert-corner.tr::after { top: 0; right: 0; }
+  .cert-corner.bl { bottom: 3mm; left: 3mm; }
+  .cert-corner.bl::before { bottom: 0; left: 0; } .cert-corner.bl::after { bottom: 0; left: 0; }
+  .cert-corner.br { bottom: 3mm; right: 3mm; }
+  .cert-corner.br::before { bottom: 0; right: 0; } .cert-corner.br::after { bottom: 0; right: 0; }
+
+  .cert-inner {
+    position: relative; z-index: 2; padding: 14mm 18mm 12mm;
+    height: 100%; min-height: 194mm; display: flex; flex-direction: column;
+    font-family: 'Be Vietnam Pro', sans-serif;
+  }
+
+  /* Trophy top-left (pink/purple gradient) */
+  .cert-trophy-corner {
+    position: absolute; top: 9mm; left: 12mm;
+    font-size: 38px; z-index: 4;
+    filter: drop-shadow(0 4px 12px rgba(236,72,153,0.55));
+  }
+
+  /* PASS Medal top-right — laurel seal */
+  .cert-medal {
+    position: absolute; top: 8mm; right: 10mm; z-index: 4;
+    width: 110px; text-align: center;
+  }
+  .cert-medal-circle {
+    width: 110px; height: 110px; border-radius: 50%;
+    background:
+      radial-gradient(circle at 35% 30%, #d6f7e6 0%, #88e0b0 45%, #4cc888 75%, #2ba368 100%);
+    border: 4px solid #fff;
+    box-shadow:
+      0 0 0 2px rgba(67,233,123,0.4),
+      0 10px 24px rgba(43,163,104,0.45),
+      inset 0 -8px 14px rgba(0,0,0,0.12);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Be Vietnam Pro', sans-serif; font-weight: 900; font-size: 26px;
+    color: #08542f; letter-spacing: 2px;
+    position: relative;
+  }
+  .cert-medal-circle::before {
+    content: '★'; position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+    font-size: 11px; color: #08542f;
+  }
+  .cert-medal-circle::after {
+    content: '★ ★ ★'; position: absolute; bottom: 12px; left: 0; right: 0;
+    font-size: 9px; color: #08542f; letter-spacing: 3px;
+  }
+  /* Laurel branches via box-shadow trick — use simple inner ring */
+  .cert-medal-laurel {
+    position: absolute; inset: 8px; border-radius: 50%;
+    border: 1.5px solid rgba(8,84,47,0.4);
+    pointer-events: none;
+  }
+  .cert-medal-ribbons {
+    display: flex; justify-content: center; gap: 6px;
+    margin-top: -14px; position: relative; z-index: -1;
+  }
+  .cert-medal-ribbons span {
+    display: block; width: 22px; height: 38px;
+    background: linear-gradient(180deg, #4a2b8c, #1f0d4a);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+  }
+
+  /* Logo header */
+  .cert-header {
+    text-align: center; margin-top: 0; margin-bottom: 6mm;
+  }
+  .cert-logo-mark {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 58px; height: 58px;
+    background: linear-gradient(135deg,#7c6af7,#5f4ed8);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    color: #fff; font-weight: 900; font-size: 24px;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .cert-logo-mark::after {
+    content: '★'; position: absolute; top: 6px; right: 8px;
+    font-size: 10px; color: #ffd84a;
+  }
+  .cert-brand {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-weight: 800; font-size: 18px; letter-spacing: 3px;
+    color: #2a1e6b;
+  }
+  .cert-brand-tag {
+    font-size: 11px; color: #7a76a0; font-weight: 500;
+    letter-spacing: 4px; margin-top: 3px;
+  }
+
+  /* Title */
+  .cert-title {
+    text-align: center;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 78px; font-weight: 900; letter-spacing: 2px;
+    line-height: 1; margin-top: 4mm; margin-bottom: 4px;
+    background: linear-gradient(95deg,#5b3fd1 0%, #7c6af7 30%, #c8438f 70%, #e91e63 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .cert-title-sub {
+    text-align: center;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 18px; font-weight: 600; letter-spacing: 10px;
+    color: #5b3fd1; margin-bottom: 8mm; margin-top: 2mm;
+    display: flex; align-items: center; justify-content: center; gap: 16px;
+  }
+  .cert-title-sub::before, .cert-title-sub::after {
+    content: ''; height: 1.5px; width: 90px;
+    background: linear-gradient(90deg, transparent, #7c6af7);
+  }
+  .cert-title-sub::after { background: linear-gradient(90deg, #7c6af7, transparent); }
+
+  .cert-presented {
+    text-align: center;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 14px; font-weight: 500; letter-spacing: 5px;
+    color: #6b6890; text-transform: uppercase; margin-bottom: 6mm;
+  }
+
+  .cert-recipient {
+    text-align: center;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 64px; font-weight: 900;
+    color: #0f1144; letter-spacing: -1px;
+    margin: 0 8mm 5mm;
+    line-height: 1.05;
+  }
+
+  .cert-divider {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px; margin: 0 auto 6mm; max-width: 55%;
+  }
+  .cert-divider::before, .cert-divider::after {
+    content: ''; flex: 1; height: 1px; background: #d8d2f5;
+  }
+  .cert-divider span {
+    width: 7px; height: 7px; background: #c8438f;
+    transform: rotate(45deg);
+  }
+
+  .cert-for {
+    text-align: center;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 13px; font-weight: 500; letter-spacing: 4px;
+    color: #6b6890; text-transform: uppercase; margin-bottom: 4mm;
+  }
+  .cert-assessment-name {
+    text-align: center;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 28px; font-weight: 700;
+    color: #5b3fd1; margin-bottom: 9mm;
+  }
+
+  /* 5 Info cards — wider, taller, consistent */
+  .cert-info-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 14px; margin: 0 4mm 9mm;
+  }
+  .cert-info-card {
+    background: #fff;
+    border: 1px solid #ece8ff;
+    border-radius: 12px;
+    padding: 16px 14px;
+    min-height: 80px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 4px 14px rgba(124,106,247,0.1);
+    font-family: 'Be Vietnam Pro', sans-serif;
+  }
+  .cert-info-icon {
+    flex-shrink: 0;
+    width: 44px; height: 44px; border-radius: 10px;
+    background: linear-gradient(135deg,#7c6af7,#5f4ed8);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 20px;
+    box-shadow: 0 4px 10px rgba(124,106,247,0.35);
+  }
+  .cert-info-text { display: flex; flex-direction: column; min-width: 0; }
+  .cert-info-lbl {
+    font-size: 10px; font-weight: 700; letter-spacing: 1.8px;
+    color: #9b97c0; text-transform: uppercase;
+  }
+  .cert-info-val {
+    font-size: 13px; font-weight: 700; color: #2a1e6b;
+    margin-top: 3px; word-break: break-word; line-height: 1.25;
+  }
+
+  /* Bottom: EA seal with laurel + tagline */
+  .cert-footer-center {
+    text-align: center; margin-top: auto; margin-bottom: 6mm;
+    font-family: 'Be Vietnam Pro', sans-serif;
+  }
+  .cert-seal {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 64px; height: 64px; border-radius: 50%;
+    background: radial-gradient(circle at 30% 25%, #6b4ed8, #3d2c8f 70%, #1f0d4a);
+    color: #fff; font-weight: 900; font-size: 20px;
+    border: 2.5px solid #c8438f;
+    box-shadow: 0 6px 18px rgba(91,63,209,0.5),
+                inset 0 0 0 3px rgba(255,255,255,0.08);
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .cert-seal::before {
+    content: '★'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+    color: #ffd84a; font-size: 14px;
+    text-shadow: 0 2px 6px rgba(255,216,74,0.7);
+  }
+  .cert-tagline {
+    font-size: 14px; font-weight: 800; letter-spacing: 5px;
+    color: #5b3fd1; margin-bottom: 4px;
+  }
+  .cert-tagline-sub {
+    font-size: 12px; font-style: italic; color: #7a76a0;
+    letter-spacing: 0.3px;
+  }
+
+  /* Bottom chevron ribbon with stars */
+  .cert-bottom-ribbon {
+    position: absolute; bottom: 9mm; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 6px 36px;
+    background: linear-gradient(90deg, #4a2b8c 0%, #7c4ad8 50%, #c8438f 100%);
+    clip-path: polygon(6% 0, 94% 0, 100% 50%, 94% 100%, 6% 100%, 0 50%);
+    color: #ffd84a; font-size: 12px; letter-spacing: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 5;
+  }
+
+  /* Print rules */
+  @media print {
+    @page { size: A4 landscape; margin: 0; }
+    html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
+    body > *:not(#certificate-print-wrapper) { display: none !important; }
+    #certificate-print-wrapper {
+      position: static !important; display: block !important;
+      background: #fff !important; padding: 0 !important; margin: 0 !important;
+      width: auto !important; height: auto !important; max-height: none !important;
+      overflow: visible !important;
+    }
+    #certificate-print-wrapper .cert-modal-toolbar { display: none !important; }
+    #certificate-print-wrapper .cert-modal-box { box-shadow: none !important; border-radius: 0 !important; max-height: none !important; }
+    #certificate-print-wrapper .cert-modal-scroll { background: #fff !important; padding: 0 !important; overflow: visible !important; }
+    #certificate-print-area { box-shadow: none !important; margin: 0 auto !important; }
+  }
+</style>
+
+<script>
+(function() {
+  'use strict';
+
+  function ensureModal() {
+    if (document.getElementById('certificate-print-wrapper')) return;
+    const wrap = document.createElement('div');
+    wrap.id = 'certificate-print-wrapper';
+    wrap.className = 'cert-modal-overlay';
+    wrap.innerHTML = `
+      <div class="cert-modal-box">
+        <div class="cert-modal-toolbar">
+          <h3>🏆 Certificate of Completion</h3>
+          <div class="cert-actions">
+            <button class="cert-btn cert-btn-secondary" onclick="App.certificate.print()">🖨 Print</button>
+            <button class="cert-btn cert-btn-primary" onclick="App.certificate.download()">⬇ Download Certificate</button>
+            <button class="cert-btn cert-btn-ghost" onclick="App.certificate.close()">✕ Close</button>
+          </div>
+        </div>
+        <div class="cert-modal-scroll">
+          <div id="certificate-print-area"></div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(wrap);
+    wrap.addEventListener('click', (e) => { if (e.target === wrap) App.certificate.close(); });
+  }
+
+  function fmtDate(d) {
+    if (!d) return new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+    const dt = new Date(d);
+    if (isNaN(dt)) return String(d);
+    return dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  }
+
+  function renderCertificate(data) {
+    const area = document.getElementById('certificate-print-area');
+    if (!area) return;
+    const score = data.score_percentage != null ? data.score_percentage : (data.total_score ?? '—');
+    const passScore = data.pass_score != null ? data.pass_score : '—';
+    area.innerHTML = `
+      <div class="cert-frame"></div>
+      <div class="cert-corner tl"></div>
+      <div class="cert-corner tr"></div>
+      <div class="cert-corner bl"></div>
+      <div class="cert-corner br"></div>
+
+      <div class="cert-trophy-corner">🏆</div>
+      <div class="cert-medal">
+        <div class="cert-medal-circle"><div class="cert-medal-laurel"></div>PASS</div>
+        <div class="cert-medal-ribbons"><span></span><span></span></div>
+      </div>
+
+      <div class="cert-inner">
+        <div class="cert-header">
+          <div class="cert-logo-mark">EA</div>
+          <div class="cert-brand">EMPLOYEE ASSESSMENT</div>
+          <div class="cert-brand-tag">ASSESS · DEVELOP · EXCEL</div>
+        </div>
+
+        <div class="cert-title">CERTIFICATE</div>
+        <div class="cert-title-sub">OF COMPLETION</div>
+
+        <div class="cert-presented">This certificate is proudly presented to</div>
+        <div class="cert-recipient">${escapeHtml(data.employee_name || '—')}</div>
+
+        <div class="cert-divider"><span></span></div>
+
+        <div class="cert-for">For successfully passing</div>
+        <div class="cert-assessment-name">${escapeHtml(data.test_name || '—')}</div>
+
+        <div class="cert-info-grid">
+          <div class="cert-info-card">
+            <div class="cert-info-icon">📋</div>
+            <div class="cert-info-text">
+              <div class="cert-info-lbl">Project</div>
+              <div class="cert-info-val">${escapeHtml(data.project_name || '—')}</div>
+            </div>
+          </div>
+          <div class="cert-info-card">
+            <div class="cert-info-icon">📊</div>
+            <div class="cert-info-text">
+              <div class="cert-info-lbl">Score</div>
+              <div class="cert-info-val">${score}${data.score_percentage != null ? ' / 100' : ''}</div>
+            </div>
+          </div>
+          <div class="cert-info-card">
+            <div class="cert-info-icon">🎯</div>
+            <div class="cert-info-text">
+              <div class="cert-info-lbl">Passing Score</div>
+              <div class="cert-info-val">${passScore}${data.pass_score != null ? ' / 100' : ''}</div>
+            </div>
+          </div>
+          <div class="cert-info-card">
+            <div class="cert-info-icon">📅</div>
+            <div class="cert-info-text">
+              <div class="cert-info-lbl">Completion Date</div>
+              <div class="cert-info-val">${fmtDate(data.graded_at)}</div>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="cert-footer-center">
+          <div class="cert-seal">EA</div>
+          <div class="cert-tagline">BUILDING EXCELLENCE TOGETHER</div>
+          <div class="cert-tagline-sub">Empowering People. Elevating Performance.</div>
+        </div>
+      </div>
+
+      <div class="cert-bottom-ribbon">★ ★ ★</div>
+    `;
+    area.dataset.employeeName = data.employee_name || 'Employee';
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // Public API
+  window.App = window.App || {};
+  App.certificate = {
+    async openFromResult(attemptId) {
+      if (!attemptId) { App.toast?.show?.('Thiếu mã attempt.', 'error'); return; }
+      try {
+        ensureModal();
+        // Load result + related test for pass_score
+        const { data: result } = await db.from('exam_test_results')
+          .select('*').eq('attempt_id', attemptId).is('deleted_at', null).single();
+        if (!result || result.pass_fail !== 'pass') {
+          App.toast?.show?.('Certificate chỉ khả dụng cho kết quả PASS.', 'warning');
+          return;
+        }
+        let passScore = null;
+        if (result.test_id) {
+          const { data: test } = await db.from('exam_tests').select('pass_score').eq('id', result.test_id).single();
+          passScore = test?.pass_score ?? null;
+        }
+        renderCertificate({
+          attempt_id: result.attempt_id,
+          employee_name: result.employee_name,
+          employee_email: result.employee_email,
+          test_name: result.test_name,
+          project_name: result.project_name,
+          total_score: result.total_score,
+          score_percentage: result.score_percentage,
+          pass_score: passScore,
+          graded_at: result.created_at,
+        });
+        document.getElementById('certificate-print-wrapper').classList.add('open');
+      } catch (e) {
+        App.toast?.show?.('Không tải được Certificate: ' + (e.message || e), 'error');
+      }
+    },
+    show(data) { ensureModal(); renderCertificate(data || {}); document.getElementById('certificate-print-wrapper').classList.add('open'); },
+    close() { const w = document.getElementById('certificate-print-wrapper'); if (w) w.classList.remove('open'); },
+    print() { window.print(); },
+    async download() {
+      const area = document.getElementById('certificate-print-area');
+      if (!area) return;
+      const name = (area.dataset.employeeName || 'Employee').replace(/[^a-zA-Z0-9_\-]+/g, '');
+      const filename = `Certificate_${name || 'Employee'}`;
+
+      // A4 Landscape px
+      const A4_W = 1123, A4_H = 794;
+      try {
+        if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch(_){} }
+        App.toast?.show?.('Đang tạo PDF...', 'info');
+
+        // Load html2canvas dynamically if needed
+        if (typeof html2canvas === 'undefined') {
+          await new Promise((res, rej) => {
+            const s = document.createElement('script');
+            s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+            s.onload = res; s.onerror = rej;
+            document.head.appendChild(s);
+          });
+        }
+        // Capture certificate area to canvas
+        const canvas = await html2canvas(area, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#ffffff',
+          logging: false,
+          width: area.offsetWidth,
+          height: area.offsetHeight,
+          foreignObjectRendering: false,
+          imageTimeout: 0,
+          removeContainer: true,
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = imgData;
+        link.download = `Certificate_${name || 'Employee'}.png`;
+        link.click();
+        App.toast?.show?.('Tải ảnh thành công!', 'success');
+      } catch (e) {
+        App.toast?.show?.('Lỗi tạo PDF: ' + (e?.message || e), 'error');
+        console.error('[Certificate PDF]', e);
+      }
+    }
+  };
+
 })();
 </script>
