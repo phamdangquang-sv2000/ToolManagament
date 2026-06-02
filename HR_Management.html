@@ -3021,6 +3021,7 @@ let allAccounts = [];
 let lapFilter = "All", accFilter = "All";
 let lapSearchT = null, accSearchT = null;
 const LAP_FIELDS = ["name","heiway_account","account_id","serial_number","laptop_drive_c","wlan_guest","job_title","status","note","bien_ban_url","bien_ban_files"];
+const LAP_SEARCH_FIELDS = ["name","heiway_account","serial_number","laptop_drive_c","wlan_guest","job_title","status","note","bien_ban_url"];
 // Helper: parse bien_ban_files JSON array, fallback to bien_ban_url for legacy
 function parseBienBanFiles(r){
   let files = [];
@@ -3212,7 +3213,7 @@ async function loadLaptops() {
   setConnDot("loading");
   try {
     const kw = document.getElementById("lap-search").value;
-    const rows = await apiList(_urlLap, kw, lapFilter, LAP_FIELDS);
+    const rows = await apiList(_urlLap, kw, lapFilter, LAP_SEARCH_FIELDS);
     allLaptops = rows; renderLapList(rows); updateLapStats(rows);
     setConnDot("ok");
   } catch(e) { setConnDot("err"); document.getElementById("lap-list").innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Lỗi tải</div><div class="empty-sub" style="color:#ff6b63;">${e.message}</div></div>`; }
