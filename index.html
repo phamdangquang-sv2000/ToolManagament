@@ -1153,7 +1153,7 @@
     animation: ssoFadeUp .3s ease both;
   }
   .sso-footer {
-    margin-top: 24px; font-size: 11.5px; color: var(--text3); line-height: 1.6;
+    margin-top: 24px; font-size: 11.5px; color: rgba(255,255,255,0.85); line-height: 1.6;
     display: flex; align-items: center; justify-content: center; gap: 6px;
     animation: ssoFadeUp .6s .45s cubic-bezier(.16,1,.3,1) both;
   }
@@ -1231,10 +1231,7 @@
   <div id="sso-grid"></div>
   <div class="sso-card">
     <div class="sso-logo-wrap">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M13 2L4.5 13.5H11L10 22L19.5 10.5H13L13 2Z"
-          fill="#e8bb50" stroke="rgba(255,255,255,.3)" stroke-width=".8" stroke-linejoin="round"/>
-      </svg>
+      <img src="https://edsowiramriosgwfuewg.supabase.co/storage/v1/object/public/Video/L2.png" alt="L2 Logo" style="width:56px;height:56px;object-fit:contain;border-radius:12px;"/>
     </div>
     <div class="sso-title">Internal L2 Tools Hub</div>
     <div class="sso-subtitle">Đăng nhập bằng tài khoản Google công ty<br>để tiếp tục</div>
@@ -1487,8 +1484,10 @@
 // ════════════════════════════════════════
 // SUPABASE
 // ════════════════════════════════════════
-const SUPABASE_URL = 'https://edsowiramriosgwfuewg.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkc293aXJhbXJpb3Nnd2Z1ZXdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNDMzMDgsImV4cCI6MjA5MzgxOTMwOH0.aocvFLnJrl5LFPdxDf9zbhvT6HT7NpCEMFtiUr_M3gM';
+// Các giá trị được mã hoá Base64 để bảo vệ khỏi scraping thô
+const _d = s => atob(s);
+const SUPABASE_URL      = _d('aHR0cHM6Ly9lZHNvd2lyYW1yaW9zZ3dmdWV3Zy5zdXBhYmFzZS5jbw==');
+const SUPABASE_ANON_KEY = _d('ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SnBjM01pT2lKemRYQmhZbUZ6WlNJc0luSmxaaUk2SW1Wa2MyOTNhWEpoYlhKcGIzTm5kMloxWlhkbklpd2ljbTlzWlNJNkltRnViMjRpTENKcFlYUWlPakUzTnpneU5ETXpNRGdzSW1WNGNDSTZNakE1TXpneE9UTXdPSDAuYW9jdkZMbkpybDVMRlBkeERmOXpiaHZUNkhUN05wQ0VNRnRpVXJfTTNnTQ==');
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ════════════════════════════════════════
@@ -1497,7 +1496,7 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // ════════════════════════════════════════
 // SSO CONFIG — ⚙️ Điền thông tin của bạn vào đây
 // ════════════════════════════════════════
-const SSO_CLIENT_ID      = '544215815065-8in6pb922v58djk5cmqj74r4jnv6dhfu.apps.googleusercontent.com';
+const SSO_CLIENT_ID      = _d('NTQ0MjE1ODE1MDY1LThpbjZwYjkyMnY1OGRqazVjbXFqNzRyNGpudjZkaGZ1LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29t');
 // Giới hạn domain email — ví dụ: 'company.com'
 // Để null để cho phép mọi tài khoản Google
 const SSO_ALLOWED_DOMAIN = null;
@@ -1505,8 +1504,8 @@ const SSO_SESSION_KEY    = 'itHub_sso_token';
 const SSO_USER_KEY       = 'itHub_sso_user';
 
 // Supabase nhân sự (kiểm tra quyền truy cập)
-const HR_SUPABASE_URL      = 'https://rnsjiqbbeywgbnqsojce.supabase.co';
-const HR_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuc2ppcWJiZXl3Z2JucXNvamNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0OTExNjAsImV4cCI6MjA5MzA2NzE2MH0.1BrlS__GNAMFbBmudl6gUJwJ9j_zoDdAj9rtfhBkhdk';
+const HR_SUPABASE_URL      = _d('aHR0cHM6Ly9ybnNqaXFiYmV5d2dibnFzb2pjZS5zdXBhYmFzZS5jbw==');
+const HR_SUPABASE_ANON_KEY = _d('ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SnBjM01pT2lKemRYQmhZbUZ6WlNJc0luSmxaaUk2SW5KdWMycHBjV0ppWlhsM1oySnVjWE52YW1ObElpd2ljbTlzWlNJNkltRnViMjRpTENKcFlYUWlPakUzTnpjME9URXhOakFzSW1WNGNDSTZNakE1TXpBMk56RTJNSDAuMUJybFNfX0dOQU1GYkJtdWRsNmdVSndKOWpfem9EZEFqOXJ0ZmhCa2hkaw==');
 
 // ════════════════════════════════════════
 // SSO — GOOGLE OAUTH GATE
@@ -1520,14 +1519,14 @@ function ssoParseJWT(token) {
 }
 
 function ssoIsSessionValid() {
-  const token = sessionStorage.getItem(SSO_SESSION_KEY);
+  const token = localStorage.getItem(SSO_SESSION_KEY);
   if (!token) return false;
   const payload = ssoParseJWT(token);
   if (!payload) return false;
   // Kiểm tra hết hạn (exp là Unix timestamp giây)
   if (payload.exp && Date.now() / 1000 > payload.exp) {
-    sessionStorage.removeItem(SSO_SESSION_KEY);
-    sessionStorage.removeItem(SSO_USER_KEY);
+    localStorage.removeItem(SSO_SESSION_KEY);
+    localStorage.removeItem(SSO_USER_KEY);
     return false;
   }
   return true;
@@ -1601,8 +1600,8 @@ function ssoHandleCredential(response) {
       return;
     }
     // Được phép → lưu session & vào trang
-    sessionStorage.setItem(SSO_SESSION_KEY, response.credential);
-    sessionStorage.setItem(SSO_USER_KEY, JSON.stringify({
+    localStorage.setItem(SSO_SESSION_KEY, response.credential);
+    localStorage.setItem(SSO_USER_KEY, JSON.stringify({
       email:   payload.email   || '',
       name:    payload.name    || '',
       picture: payload.picture || ''
@@ -1708,7 +1707,7 @@ function ssoInit() {
   // Nếu session còn hạn → bypass gate
   if (ssoIsSessionValid()) {
     try {
-      const user = JSON.parse(sessionStorage.getItem(SSO_USER_KEY) || '{}');
+      const user = JSON.parse(localStorage.getItem(SSO_USER_KEY) || '{}');
       ssoRenderUserChip(user);
     } catch(e) {}
     return;
@@ -1718,8 +1717,8 @@ function ssoInit() {
 }
 
 function ssoSignOut() {
-  sessionStorage.removeItem(SSO_SESSION_KEY);
-  sessionStorage.removeItem(SSO_USER_KEY);
+  localStorage.removeItem(SSO_SESSION_KEY);
+  localStorage.removeItem(SSO_USER_KEY);
   if (typeof google !== 'undefined' && google.accounts) {
     google.accounts.id.disableAutoSelect();
   }
