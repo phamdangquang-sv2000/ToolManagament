@@ -11,6 +11,26 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<!-- PRE-AUTH: Chạy TRƯỚC CSS/render để ẩn gate ngay nếu đã đăng nhập (zero flash) -->
+<script>
+(function(){
+  try {
+    var raw = localStorage.getItem('itHub_sso_auth');
+    if (raw) {
+      var auth = JSON.parse(raw);
+      if (auth && auth.email && auth.exp && Date.now() < auth.exp) {
+        // Còn hạn → ẩn gate ngay bằng style inject trước khi CSS render
+        document.documentElement.style.setProperty('--gate-display', 'none');
+        // Tạo style tag ẩn gate ngay lập tức
+        var s = document.createElement('style');
+        s.id = 'pre-auth-style';
+        s.textContent = '#sso-gate{display:none!important}';
+        document.head.appendChild(s);
+      }
+    }
+  } catch(e) {}
+})();
+</script>
 <!-- Google Identity Services (SSO) -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
@@ -1011,7 +1031,7 @@
   #sso-gate {
     position: fixed; inset: 0; z-index: 9999;
     background: #080e1a;
-    display: flex; align-items: center; justify-content: center;
+    display: none; align-items: center; justify-content: center;
     flex-direction: column;
     font-family: var(--font);
     overflow: hidden;
@@ -1491,6 +1511,27 @@ const SUPABASE_ANON_KEY = _d('ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5Lm
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ════════════════════════════════════════
+// SSO_SESSIONS TABLE — tự động tạo nếu chưa có
+// Chạy SQL này 1 lần trong Supabase Dashboard > SQL Editor:
+/*
+  CREATE TABLE IF NOT EXISTS public.sso_sessions (
+    id            BIGSERIAL PRIMARY KEY,
+    email         TEXT NOT NULL,
+    session_token TEXT NOT NULL UNIQUE,
+    expires_at    TIMESTAMPTZ NOT NULL,
+    user_agent    TEXT,
+    last_seen     TIMESTAMPTZ DEFAULT now(),
+    created_at    TIMESTAMPTZ DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS idx_sso_sessions_email ON public.sso_sessions(email);
+  CREATE INDEX IF NOT EXISTS idx_sso_sessions_token ON public.sso_sessions(session_token);
+  ALTER TABLE public.sso_sessions ENABLE ROW LEVEL SECURITY;
+  CREATE POLICY "anon can upsert own session" ON public.sso_sessions
+    FOR ALL USING (true) WITH CHECK (true);
+*/
+// ════════════════════════════════════════
+
+// ════════════════════════════════════════
 // CONFIG
 // ════════════════════════════════════════
 // ════════════════════════════════════════
@@ -1511,6 +1552,10 @@ const HR_SUPABASE_ANON_KEY = _d('ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o
 // SSO — GOOGLE OAUTH GATE
 // ════════════════════════════════════════
 
+// ─── SESSION KEY dài hạn (không phụ thuộc JWT exp 1h) ───
+const SSO_AUTH_KEY = 'itHub_sso_auth';   // {email, exp:ms} — hạn 7 ngày
+const SSO_SESSION_TTL = 7 * 24 * 60 * 60 * 1000; // 7 ngày (ms)
+
 function ssoParseJWT(token) {
   try {
     const base64 = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
@@ -1518,29 +1563,81 @@ function ssoParseJWT(token) {
   } catch(e) { return null; }
 }
 
-function ssoIsSessionValid() {
-  const token = localStorage.getItem(SSO_SESSION_KEY);
-  if (!token) return false;
-  const payload = ssoParseJWT(token);
-  if (!payload) return false;
-  // Kiểm tra hết hạn (exp là Unix timestamp giây)
-  if (payload.exp && Date.now() / 1000 > payload.exp) {
-    localStorage.removeItem(SSO_SESSION_KEY);
-    localStorage.removeItem(SSO_USER_KEY);
-    return false;
+// Tạo session token ngẫu nhiên
+function ssoMakeToken() {
+  const arr = new Uint8Array(24);
+  crypto.getRandomValues(arr);
+  return Array.from(arr).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// Lưu auth entry dài hạn (7 ngày) + upsert lên Supabase sso_sessions
+async function ssoSaveSession(email, name, picture) {
+  const exp = Date.now() + SSO_SESSION_TTL;
+  const sessionToken = ssoMakeToken();
+
+  // 1. Lưu localStorage (instant, offline-safe)
+  localStorage.setItem(SSO_AUTH_KEY, JSON.stringify({ email, name, picture, exp, sessionToken }));
+  localStorage.setItem(SSO_USER_KEY, JSON.stringify({ email, name, picture }));
+
+  // 2. Upsert lên Supabase bảng sso_sessions (background, không block UI)
+  try {
+    const expISO = new Date(exp).toISOString();
+    const ua = navigator.userAgent.substring(0, 200);
+    await fetch(SUPABASE_URL + '/rest/v1/sso_sessions', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates',
+      },
+      body: JSON.stringify({
+        email,
+        session_token: sessionToken,
+        expires_at: expISO,
+        user_agent: ua,
+        last_seen: new Date().toISOString(),
+      })
+    });
+  } catch(e) {
+    // Không block login nếu Supabase lỗi
+    console.warn('sso_sessions upsert failed:', e);
   }
-  return true;
+}
+
+// Kiểm tra auth dài hạn — KHÔNG dùng JWT exp nữa
+function ssoIsSessionValid() {
+  try {
+    const raw = localStorage.getItem(SSO_AUTH_KEY);
+    if (!raw) return false;
+    const auth = JSON.parse(raw);
+    if (!auth || !auth.email || !auth.exp) return false;
+    if (Date.now() > auth.exp) {
+      // Hết 7 ngày → xóa hết
+      localStorage.removeItem(SSO_AUTH_KEY);
+      localStorage.removeItem(SSO_SESSION_KEY);
+      localStorage.removeItem(SSO_USER_KEY);
+      return false;
+    }
+    // Còn hạn → gia hạn thêm 7 ngày (rolling session)
+    auth.exp = Date.now() + SSO_SESSION_TTL;
+    localStorage.setItem(SSO_AUTH_KEY, JSON.stringify(auth));
+    return true;
+  } catch(e) { return false; }
 }
 
 function ssoShowGate() {
-  document.getElementById('sso-gate').style.display = 'flex';
+  const gate = document.getElementById('sso-gate');
+  gate.style.display = 'flex';
+  // trigger reflow để animation chạy đúng
+  gate.offsetHeight;
 }
 
 function ssoHideGate() {
   const gate = document.getElementById('sso-gate');
   gate.style.opacity = '0';
   gate.style.transition = 'opacity .3s ease';
-  setTimeout(() => { gate.style.display = 'none'; }, 300);
+  setTimeout(() => { gate.style.display = 'none'; gate.style.opacity = ''; gate.style.transition = ''; }, 320);
 }
 
 function ssoRenderUserChip(user) {
@@ -1599,15 +1696,17 @@ function ssoHandleCredential(response) {
       ssoShowError('Tài khoản ' + payload.email + ' không có trong danh sách nhân sự hoặc không còn Active. Vui lòng liên hệ quản trị viên.');
       return;
     }
-    // Được phép → lưu session & vào trang
+    // Được phép → lưu session dài hạn (7 ngày) & vào trang
+    // Vẫn lưu raw token để backup, nhưng session validity dùng SSO_AUTH_KEY
     localStorage.setItem(SSO_SESSION_KEY, response.credential);
-    localStorage.setItem(SSO_USER_KEY, JSON.stringify({
-      email:   payload.email   || '',
-      name:    payload.name    || '',
-      picture: payload.picture || ''
-    }));
-    ssoHideGate();
-    ssoRenderUserChip({ email: payload.email, name: payload.name, picture: payload.picture });
+    ssoSaveSession(payload.email, payload.name || '', payload.picture || '').then(() => {
+      ssoHideGate();
+      ssoRenderUserChip({ email: payload.email, name: payload.name, picture: payload.picture });
+    }).catch(() => {
+      // Vẫn cho vào dù Supabase ghi thất bại
+      ssoHideGate();
+      ssoRenderUserChip({ email: payload.email, name: payload.name, picture: payload.picture });
+    });
   }).catch(function(err) {
     ssoHideChecking();
     ssoShowError('Không thể kết nối hệ thống xác thực. Vui lòng thử lại. (' + (err.message || err) + ')');
@@ -1704,19 +1803,23 @@ function ssoStartGoogleLogin() {
 }
 
 function ssoInit() {
-  // Nếu session còn hạn → bypass gate
+  // Kiểm tra auth dài hạn (7 ngày) — không phụ thuộc JWT exp
   if (ssoIsSessionValid()) {
     try {
       const user = JSON.parse(localStorage.getItem(SSO_USER_KEY) || '{}');
-      ssoRenderUserChip(user);
+      if (user.email) {
+        ssoRenderUserChip(user);
+        // Gate đã display:none theo CSS mặc định — không cần làm gì thêm
+        return;
+      }
     } catch(e) {}
-    return;
   }
-  // Chưa login → hiện gate
+  // Chưa login hoặc hết hạn → hiện gate
   ssoShowGate();
 }
 
 function ssoSignOut() {
+  localStorage.removeItem(SSO_AUTH_KEY);
   localStorage.removeItem(SSO_SESSION_KEY);
   localStorage.removeItem(SSO_USER_KEY);
   if (typeof google !== 'undefined' && google.accounts) {
