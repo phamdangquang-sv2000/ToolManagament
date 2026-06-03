@@ -1551,7 +1551,14 @@ function ssoRenderUserChip(user) {
   const avatarPh = document.getElementById('sso-avatar-placeholder');
   const emailEl = document.getElementById('sso-dropdown-email');
 
-  nameEl.textContent = user.name ? user.name.split(' ')[0] : user.email.split('@')[0];
+  // Lấy tên riêng (phần cuối) cho tiếng Việt, decode unicode nếu cần
+  function decodeName(str) {
+    try { return decodeURIComponent(escape(str)); } catch(e) { return str; }
+  }
+  const rawName = user.name || '';
+  const parts = rawName.trim().split(' ');
+  const displayName = parts.length > 1 ? parts[parts.length - 1] : (parts[0] || user.email.split('@')[0]);
+  nameEl.textContent = displayName;
   emailEl.textContent = user.email;
 
   if (user.picture) {
