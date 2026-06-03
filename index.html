@@ -1590,6 +1590,7 @@ async function ssoSaveSession(email, name, picture) {
         'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
         'Content-Type': 'application/json',
         'Prefer': 'resolution=merge-duplicates',
+        'x-session-token': sessionToken,
       },
       body: JSON.stringify({
         email,

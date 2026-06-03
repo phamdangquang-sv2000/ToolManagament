@@ -95,7 +95,8 @@
     headers: {
       'apikey': SUPABASE_ANON_KEY,
       'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-      'Accept': 'application/json'
+      'Accept': 'application/json',
+      'x-session-token': auth.sessionToken
     },
     signal: ctrl ? ctrl.signal : undefined,
     cache: 'no-store'
@@ -123,7 +124,8 @@
             'apikey': SUPABASE_ANON_KEY,
             'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
             'Content-Type': 'application/json',
-            'Prefer': 'return=minimal'
+            'Prefer': 'return=minimal',
+            'x-session-token': auth.sessionToken
           },
           body: JSON.stringify({ last_seen: new Date().toISOString() })
         }).catch(function () {});
