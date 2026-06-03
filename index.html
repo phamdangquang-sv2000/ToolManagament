@@ -11,6 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<!-- Google Identity Services (SSO) -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
   :root {
     /* Deep Navy × Glassmorphism × Champagne Gold */
@@ -1004,9 +1006,165 @@
     font-size: 11px; color: var(--text3); font-family: var(--mono);
     letter-spacing: .05em; margin-top: -10px;
   }
+
+  /* ══════════════ SSO GATE ══════════════ */
+  #sso-gate {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    font-family: var(--font);
+  }
+  #sso-gate::before {
+    content: '';
+    position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+    background-size: 52px 52px;
+    mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, black 0%, transparent 100%);
+  }
+  .sso-card {
+    position: relative; z-index: 1;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 24px;
+    padding: 48px 44px 40px;
+    width: 100%; max-width: 400px; margin: 16px;
+    box-shadow: 0 32px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(232,187,80,.08);
+    backdrop-filter: blur(20px);
+    text-align: center;
+    animation: ssoFadeIn .4s ease;
+  }
+  @keyframes ssoFadeIn {
+    from { opacity:0; transform: translateY(16px) scale(.97); }
+    to   { opacity:1; transform: translateY(0) scale(1); }
+  }
+  .sso-logo-wrap {
+    width: 64px; height: 64px; margin: 0 auto 20px;
+    background: linear-gradient(135deg, #1a2a4a, #0a1020);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid rgba(232,187,80,.2);
+    box-shadow: 0 0 32px rgba(232,187,80,.12);
+  }
+  .sso-logo-wrap svg { width: 32px; height: 32px; }
+  .sso-title {
+    font-size: 20px; font-weight: 700; color: var(--text);
+    margin-bottom: 6px; letter-spacing: -.01em;
+  }
+  .sso-subtitle {
+    font-size: 13px; color: var(--text2); margin-bottom: 32px; line-height: 1.5;
+  }
+  .sso-google-btn {
+    width: 100%; padding: 13px 20px;
+    background: #fff; color: #1f2937;
+    border: none; border-radius: 12px;
+    font-size: 14px; font-weight: 600;
+    font-family: var(--font);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: background .15s, box-shadow .15s, transform .1s;
+    box-shadow: 0 2px 12px rgba(0,0,0,.25);
+  }
+  .sso-google-btn:hover {
+    background: #f3f4f6;
+    box-shadow: 0 4px 20px rgba(0,0,0,.35);
+    transform: translateY(-1px);
+  }
+  .sso-google-btn:active { transform: translateY(0); }
+  .sso-google-btn svg { flex-shrink: 0; }
+  .sso-error {
+    margin-top: 16px; padding: 10px 14px;
+    background: rgba(252,129,129,.08); border: 1px solid rgba(252,129,129,.22);
+    border-radius: 10px; font-size: 13px; color: var(--red);
+    display: none; font-weight: 500; line-height: 1.4;
+  }
+  .sso-footer {
+    margin-top: 20px; font-size: 11px; color: var(--text3); line-height: 1.5;
+  }
+  /* User chip in topbar */
+  .sso-user-chip {
+    display: flex; align-items: center; gap: 7px;
+    padding: 3px 10px 3px 4px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 20px; cursor: pointer;
+    transition: background .15s;
+    position: relative;
+  }
+  .sso-user-chip:hover { background: rgba(255,255,255,.1); }
+  .sso-user-avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    object-fit: cover; border: 1px solid rgba(232,187,80,.3);
+    flex-shrink: 0;
+  }
+  .sso-user-avatar-placeholder {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent3), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #1a1200;
+    flex-shrink: 0;
+  }
+  .sso-user-name {
+    font-size: 12px; font-weight: 600; color: var(--text);
+    max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .sso-signout-dropdown {
+    position: absolute; top: calc(100% + 8px); right: 0;
+    background: rgba(15,26,46,.98);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 12px; padding: 6px;
+    min-width: 180px;
+    box-shadow: 0 16px 40px rgba(0,0,0,.5);
+    backdrop-filter: blur(20px);
+    display: none; z-index: 500;
+  }
+  .sso-signout-dropdown.open { display: block; animation: ssoFadeIn .15s ease; }
+  .sso-dropdown-email {
+    padding: 8px 10px 10px;
+    font-size: 11px; color: var(--text3);
+    border-bottom: 1px solid rgba(255,255,255,.07); margin-bottom: 4px;
+    word-break: break-all;
+  }
+  .sso-dropdown-btn {
+    width: 100%; padding: 8px 10px;
+    background: none; border: none; border-radius: 8px;
+    font-size: 13px; color: var(--red); font-family: var(--font);
+    cursor: pointer; text-align: left; display: flex; align-items: center; gap: 8px;
+    transition: background .12s;
+  }
+  .sso-dropdown-btn:hover { background: rgba(252,129,129,.08); }
+  @keyframes ssoSpin { to { transform: rotate(360deg); } }
+  .sso-google-btn:disabled { opacity: .75; cursor: not-allowed; transform: none !important; }
 </style>
 </head>
 <body>
+
+<!-- ══════ SSO GATE ══════ -->
+<div id="sso-gate">
+  <div class="sso-card">
+    <div class="sso-logo-wrap">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M13 2L4.5 13.5H11L10 22L19.5 10.5H13L13 2Z"
+          fill="#e8bb50" stroke="rgba(255,255,255,.25)" stroke-width=".8" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="sso-title">Internal L2 Tools Hub</div>
+    <div class="sso-subtitle">Đăng nhập bằng tài khoản Google công ty<br>để tiếp tục</div>
+    <button class="sso-google-btn" onclick="ssoStartGoogleLogin()">
+      <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+        <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+        <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+      </svg>
+      Đăng nhập với Google
+    </button>
+    <div class="sso-error" id="sso-error"></div>
+    <div class="sso-footer">Chỉ tài khoản nội bộ mới có thể truy cập</div>
+  </div>
+</div>
 
 <!-- ── Toast Container ── -->
 <div id="toast-container"></div>
@@ -1072,6 +1230,18 @@
         <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
       </svg>
     </button>
+    <div class="sso-user-chip" id="sso-user-chip" style="display:none" onclick="ssoToggleDropdown(event)">
+      <div class="sso-user-avatar-placeholder" id="sso-avatar-placeholder"></div>
+      <img class="sso-user-avatar" id="sso-avatar-img" style="display:none" alt="avatar"/>
+      <span class="sso-user-name" id="sso-user-name"></span>
+      <div class="sso-signout-dropdown" id="sso-dropdown">
+        <div class="sso-dropdown-email" id="sso-dropdown-email"></div>
+        <button class="sso-dropdown-btn" onclick="ssoSignOut()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Đăng xuất
+        </button>
+      </div>
+    </div>
     <button class="btn-icon" id="adminBtn" title="Admin panel" onclick="handleAdminBtn()">⚙️</button>
   </div>
 </div>
@@ -1238,6 +1408,234 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // ════════════════════════════════════════
 // CONFIG
 // ════════════════════════════════════════
+// ════════════════════════════════════════
+// SSO CONFIG — ⚙️ Điền thông tin của bạn vào đây
+// ════════════════════════════════════════
+const SSO_CLIENT_ID      = '544215815065-8in6pb922v58djk5cmqj74r4jnv6dhfu.apps.googleusercontent.com';
+// Giới hạn domain email — ví dụ: 'company.com'
+// Để null để cho phép mọi tài khoản Google
+const SSO_ALLOWED_DOMAIN = null;
+const SSO_SESSION_KEY    = 'itHub_sso_token';
+const SSO_USER_KEY       = 'itHub_sso_user';
+
+// Supabase nhân sự (kiểm tra quyền truy cập)
+const HR_SUPABASE_URL      = 'https://rnsjiqbbeywgbnqsojce.supabase.co';
+const HR_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuc2ppcWJiZXl3Z2JucXNvamNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0OTExNjAsImV4cCI6MjA5MzA2NzE2MH0.1BrlS__GNAMFbBmudl6gUJwJ9j_zoDdAj9rtfhBkhdk';
+
+// ════════════════════════════════════════
+// SSO — GOOGLE OAUTH GATE
+// ════════════════════════════════════════
+
+function ssoParseJWT(token) {
+  try {
+    const base64 = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+    return JSON.parse(atob(base64));
+  } catch(e) { return null; }
+}
+
+function ssoIsSessionValid() {
+  const token = sessionStorage.getItem(SSO_SESSION_KEY);
+  if (!token) return false;
+  const payload = ssoParseJWT(token);
+  if (!payload) return false;
+  // Kiểm tra hết hạn (exp là Unix timestamp giây)
+  if (payload.exp && Date.now() / 1000 > payload.exp) {
+    sessionStorage.removeItem(SSO_SESSION_KEY);
+    sessionStorage.removeItem(SSO_USER_KEY);
+    return false;
+  }
+  return true;
+}
+
+function ssoShowGate() {
+  document.getElementById('sso-gate').style.display = 'flex';
+}
+
+function ssoHideGate() {
+  const gate = document.getElementById('sso-gate');
+  gate.style.opacity = '0';
+  gate.style.transition = 'opacity .3s ease';
+  setTimeout(() => { gate.style.display = 'none'; }, 300);
+}
+
+function ssoRenderUserChip(user) {
+  const chip = document.getElementById('sso-user-chip');
+  const nameEl = document.getElementById('sso-user-name');
+  const avatarImg = document.getElementById('sso-avatar-img');
+  const avatarPh = document.getElementById('sso-avatar-placeholder');
+  const emailEl = document.getElementById('sso-dropdown-email');
+
+  nameEl.textContent = user.name ? user.name.split(' ')[0] : user.email.split('@')[0];
+  emailEl.textContent = user.email;
+
+  if (user.picture) {
+    avatarImg.src = user.picture;
+    avatarImg.style.display = 'block';
+    avatarPh.style.display = 'none';
+  } else {
+    avatarPh.textContent = (user.name || user.email)[0].toUpperCase();
+    avatarPh.style.display = 'flex';
+    avatarImg.style.display = 'none';
+  }
+  chip.style.display = 'flex';
+}
+
+function ssoToggleDropdown(e) {
+  e.stopPropagation();
+  const dd = document.getElementById('sso-dropdown');
+  dd.classList.toggle('open');
+}
+
+// Đóng dropdown khi click ra ngoài
+document.addEventListener('click', function() {
+  const dd = document.getElementById('sso-dropdown');
+  if (dd) dd.classList.remove('open');
+});
+
+function ssoHandleCredential(response) {
+  const payload = ssoParseJWT(response.credential);
+  if (!payload || !payload.email) {
+    ssoShowError('Không thể xác thực token. Vui lòng thử lại.');
+    return;
+  }
+  // Hiện trạng thái đang kiểm tra
+  ssoShowChecking(payload.email);
+  // Kiểm tra email trong bảng nhan_su (Supabase HR)
+  ssoCheckNhanSu(payload.email).then(function(allowed) {
+    if (!allowed) {
+      ssoHideChecking();
+      ssoShowError('Tài khoản ' + payload.email + ' không có trong danh sách nhân sự hoặc không còn Active. Vui lòng liên hệ quản trị viên.');
+      return;
+    }
+    // Được phép → lưu session & vào trang
+    sessionStorage.setItem(SSO_SESSION_KEY, response.credential);
+    sessionStorage.setItem(SSO_USER_KEY, JSON.stringify({
+      email:   payload.email   || '',
+      name:    payload.name    || '',
+      picture: payload.picture || ''
+    }));
+    ssoHideGate();
+    ssoRenderUserChip({ email: payload.email, name: payload.name, picture: payload.picture });
+  }).catch(function(err) {
+    ssoHideChecking();
+    ssoShowError('Không thể kết nối hệ thống xác thực. Vui lòng thử lại. (' + (err.message || err) + ')');
+  });
+}
+
+async function ssoCheckNhanSu(email) {
+  const url = HR_SUPABASE_URL + '/rest/v1/nhan_su?email=eq.' + encodeURIComponent(email) + '&trang_thai=eq.Active&select=email,trang_thai&limit=1';
+  const res = await fetch(url, {
+    headers: {
+      'apikey': HR_SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + HR_SUPABASE_ANON_KEY,
+    }
+  });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const data = await res.json();
+  return Array.isArray(data) && data.length > 0;
+}
+
+function ssoShowChecking(email) {
+  const btn = document.querySelector('.sso-google-btn');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1f2937" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10" stroke-opacity=".2"/><path d="M12 2a10 10 0 0 1 10 10" style="animation:ssoSpin .8s linear infinite;transform-origin:center"/></svg> Đang kiểm tra quyền truy cập...';
+  }
+  const err = document.getElementById('sso-error');
+  if (err) err.style.display = 'none';
+}
+
+function ssoHideChecking() {
+  const btn = document.querySelector('.sso-google-btn');
+  if (btn) {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg> Đăng nhập với Google';
+  }
+}
+
+function ssoShowError(msg) {
+  const el = document.getElementById('sso-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function ssoStartGoogleLogin() {
+  // Dùng OAuth2 popup redirect — không phụ thuộc One Tap / FedCM
+  const params = new URLSearchParams({
+    client_id:     SSO_CLIENT_ID,
+    redirect_uri:  window.location.origin + window.location.pathname,
+    response_type: 'token id_token',
+    scope:         'openid email profile',
+    nonce:         Math.random().toString(36).slice(2),
+    prompt:        'select_account',
+  });
+  const w = 500, h = 600;
+  const left = Math.round((screen.width - w) / 2);
+  const top  = Math.round((screen.height - h) / 2);
+  const popup = window.open(
+    'https://accounts.google.com/o/oauth2/v2/auth?' + params.toString(),
+    'google_sso',
+    `width=${w},height=${h},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes`
+  );
+  if (!popup) {
+    ssoShowError('Trình duyệt đã chặn popup. Vui lòng cho phép popup cho trang này và thử lại.');
+    return;
+  }
+  // Lắng nghe kết quả từ popup (redirect về cùng origin)
+  const timer = setInterval(function() {
+    try {
+      if (!popup || popup.closed) {
+        clearInterval(timer);
+        return;
+      }
+      const url = popup.location.href;
+      if (url && url.indexOf(window.location.origin) === 0) {
+        clearInterval(timer);
+        popup.close();
+        // Parse fragment hash: #id_token=...&access_token=...
+        const hash = popup.location.hash || url.split('#')[1] || '';
+        const result = {};
+        hash.replace(/^#/, '').split('&').forEach(part => {
+          const [k, v] = part.split('=');
+          if (k) result[decodeURIComponent(k)] = decodeURIComponent(v || '');
+        });
+        if (result.id_token) {
+          ssoHandleCredential({ credential: result.id_token });
+        } else {
+          ssoShowError('Đăng nhập thất bại hoặc bị huỷ. Vui lòng thử lại.');
+        }
+      }
+    } catch(e) {
+      // cross-origin, chờ tiếp
+    }
+  }, 300);
+}
+
+function ssoInit() {
+  // Nếu session còn hạn → bypass gate
+  if (ssoIsSessionValid()) {
+    try {
+      const user = JSON.parse(sessionStorage.getItem(SSO_USER_KEY) || '{}');
+      ssoRenderUserChip(user);
+    } catch(e) {}
+    return;
+  }
+  // Chưa login → hiện gate
+  ssoShowGate();
+}
+
+function ssoSignOut() {
+  sessionStorage.removeItem(SSO_SESSION_KEY);
+  sessionStorage.removeItem(SSO_USER_KEY);
+  if (typeof google !== 'undefined' && google.accounts) {
+    google.accounts.id.disableAutoSelect();
+  }
+  location.reload();
+}
+
+// Chạy SSO ngay khi script load
+ssoInit();
+
 const ADMIN_PASSWORD_HASH = '8b85ce9a68ea550e7cd7417fc9c94fe9e53cb6e151bc094d0c3053bb2533e9e3';
 const STORAGE_KEY = 'itHub_apps_v2';
 
