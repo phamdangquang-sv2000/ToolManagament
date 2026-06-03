@@ -1693,7 +1693,7 @@ function ssoHandleCredential(response) {
   ssoCheckNhanSu(payload.email).then(function(allowed) {
     if (!allowed) {
       ssoHideChecking();
-      ssoShowError('Tài khoản ' + payload.email + ' không có trong danh sách nhân sự hoặc không còn Active. Vui lòng liên hệ quản trị viên.');
+      ssoShowError('Tài khoản ' + payload.email + ' không có trong danh sách nhân sự L2 hoặc không còn Active / Probation. Vui lòng liên hệ quản trị viên.');
       return;
     }
     // Được phép → lưu session dài hạn (7 ngày) & vào trang
@@ -1714,7 +1714,7 @@ function ssoHandleCredential(response) {
 }
 
 async function ssoCheckNhanSu(email) {
-  const url = HR_SUPABASE_URL + '/rest/v1/nhan_su?email=eq.' + encodeURIComponent(email) + '&trang_thai=eq.Active&select=email,trang_thai&limit=1';
+  const url = HR_SUPABASE_URL + '/rest/v1/nhan_su?email=eq.' + encodeURIComponent(email) + '&bo_phan=eq.L2&trang_thai=in.(Active,Probation)&select=email,trang_thai&limit=1';
   const res = await fetch(url, {
     headers: {
       'apikey': HR_SUPABASE_ANON_KEY,
