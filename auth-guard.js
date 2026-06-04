@@ -67,10 +67,10 @@
 
   showOverlay('Đang xác thực phiên đăng nhập...');
 
-  // ===== 1) CHECK LOCAL =====
+  // ===== 1) CHECK LOCAL (localStorage + sessionStorage fallback) =====
   var auth = null;
   try {
-    var raw = localStorage.getItem(AUTH_KEY);
+    var raw = localStorage.getItem(AUTH_KEY) || sessionStorage.getItem(AUTH_KEY);
     if (raw) auth = JSON.parse(raw);
   } catch (e) {}
 
@@ -82,8 +82,9 @@
   }
 
   // ===== 2) VALIDATE VỚI SUPABASE (sso_sessions) =====
+  // Dùng header x-session-token để RLS policy lọc đúng row
   var url = SUPABASE_URL + '/rest/v1/sso_sessions'
-    + '?select=email,expires_at'
+    + '?select=email,expires_at,session_token'
     + '&email=eq.' + encodeURIComponent(auth.email)
     + '&session_token=eq.' + encodeURIComponent(auth.sessionToken)
     + '&limit=1';
@@ -113,6 +114,10 @@
       var row = rows[0];
       if (!row.expires_at || new Date(row.expires_at).getTime() < Date.now()) {
         return redirectLogin('session-expired');
+      }
+      // Double-check session_token khớp (defense in depth)
+      if (row.session_token && row.session_token !== auth.sessionToken) {
+        return redirectLogin('session-token-mismatch');
       }
       // OK -> cập nhật last_seen (background, không chặn)
       try {
