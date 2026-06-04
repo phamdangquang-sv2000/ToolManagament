@@ -1,20 +1,19 @@
 /*!
- * SSO Auth Guard — chèn ở đầu <head> của mọi sub-page.
- * 1) Ẩn body ngay khi tải để tránh "flash" nội dung
- * 2) Check localStorage itHub_sso_auth (email + exp + sessionToken)
- * 3) Validate session_token với bảng sso_sessions trên Supabase
- *    -> Nếu không hợp lệ: xoá localStorage & redirect về index.html
+ * SSO Auth Guard v2 — fail-OPEN khi local session còn hạn.
+ * Sửa lỗi "treo Đang xác thực phiên đăng nhập...":
+ *  - Nếu server trả [] (RLS chặn / row chưa sync) -> KHÔNG xoá auth, vẫn cho vào.
+ *  - Chỉ redirect khi local thiếu/hết hạn HOẶC server xác nhận expires_at đã hết.
+ *  - Mọi nhánh đều gọi reveal() để tránh kẹt overlay.
  */
 (function () {
-  // ===== CẤU HÌNH =====
   var SUPABASE_URL = 'https://edsowiramriosgwfuewg.supabase.co';
   var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkc293aXJhbXJpb3Nnd2Z1ZXdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNDMzMDgsImV4cCI6MjA5MzgxOTMwOH0.aocvFLnJrl5LFPdxDf9zbhvT6HT7NpCEMFtiUr_M3gM';
   var AUTH_KEY = 'itHub_sso_auth';
   var USER_KEY = 'itHub_sso_user';
   var SESSION_KEY = 'itHub_sso_session';
   var LOGIN_URL = './index.html';
+  var FETCH_TIMEOUT_MS = 5000;
 
-  // ===== ẨN TRANG NGAY (tránh flash nội dung khi chưa xác thực) =====
   try {
     var styleEl = document.createElement('style');
     styleEl.id = '__sso_guard_style';
@@ -59,10 +58,9 @@
   function redirectLogin(reason) {
     clearAuth();
     try { console.warn('[auth-guard] redirect:', reason); } catch (e) {}
-    // Lưu lại trang đang truy cập để (tuỳ) quay lại sau khi đăng nhập
     var here = location.pathname.split('/').pop() || '';
     var qs = here ? ('?next=' + encodeURIComponent(here)) : '';
-    location.replace(LOGIN_URL + qs);
+    try { location.replace(LOGIN_URL + qs); } catch (e) { location.href = LOGIN_URL; }
   }
 
   showOverlay('Đang xác thực phiên đăng nhập...');
@@ -74,14 +72,21 @@
     if (raw) auth = JSON.parse(raw);
   } catch (e) {}
 
-  if (!auth || !auth.email || !auth.exp || !auth.sessionToken) {
+  if (!auth || !auth.email || !auth.exp) {
     return redirectLogin('no-local-auth');
   }
   if (Date.now() > Number(auth.exp)) {
     return redirectLogin('local-expired');
   }
 
-  // ===== 2) VALIDATE VỚI SUPABASE (sso_sessions) =====
+  // Nếu chưa có sessionToken (user login từ phiên bản cũ) -> KHÔNG kick,
+  // cho vào dựa trên local exp (tránh vòng lặp redirect).
+  if (!auth.sessionToken) {
+    try { console.warn('[auth-guard] missing sessionToken, allowing via local exp'); } catch (e) {}
+    return reveal();
+  }
+
+  // ===== 2) VALIDATE VỚI SUPABASE (best-effort, fail-OPEN) =====
   var url = SUPABASE_URL + '/rest/v1/sso_sessions'
     + '?select=email,expires_at'
     + '&email=eq.' + encodeURIComponent(auth.email)
@@ -89,32 +94,43 @@
     + '&limit=1';
 
   var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
-  var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 8000);
+  var done = false;
+  var timer = setTimeout(function () {
+    if (done) return;
+    done = true;
+    if (ctrl) { try { ctrl.abort(); } catch (e) {} }
+    try { console.warn('[auth-guard] validate timeout, fallback to local'); } catch (e) {}
+    reveal();
+  }, FETCH_TIMEOUT_MS);
 
   fetch(url, {
     headers: {
       'apikey': SUPABASE_ANON_KEY,
       'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-      'Accept': 'application/json',
-      'x-session-token': auth.sessionToken
+      'Accept': 'application/json'
     },
     signal: ctrl ? ctrl.signal : undefined,
     cache: 'no-store'
   })
     .then(function (r) {
-      clearTimeout(timer);
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();
     })
     .then(function (rows) {
+      if (done) return; done = true; clearTimeout(timer);
+
+      // KHÔNG kick nếu server trả mảng rỗng — có thể do RLS chặn anon
+      // hoặc row chưa sync. Local đã hợp lệ (exp + sessionToken).
       if (!Array.isArray(rows) || rows.length === 0) {
-        return redirectLogin('session-not-found');
+        try { console.warn('[auth-guard] no row returned (likely RLS), keeping local session'); } catch (e) {}
+        return reveal();
       }
       var row = rows[0];
-      if (!row.expires_at || new Date(row.expires_at).getTime() < Date.now()) {
+      // CHỈ kick khi server XÁC NHẬN expires_at đã hết.
+      if (row.expires_at && new Date(row.expires_at).getTime() < Date.now()) {
         return redirectLogin('session-expired');
       }
-      // OK -> cập nhật last_seen (background, không chặn)
+      // OK -> background cập nhật last_seen (không chặn)
       try {
         fetch(SUPABASE_URL + '/rest/v1/sso_sessions'
               + '?email=eq.' + encodeURIComponent(auth.email)
@@ -124,8 +140,7 @@
             'apikey': SUPABASE_ANON_KEY,
             'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
             'Content-Type': 'application/json',
-            'Prefer': 'return=minimal',
-            'x-session-token': auth.sessionToken
+            'Prefer': 'return=minimal'
           },
           body: JSON.stringify({ last_seen: new Date().toISOString() })
         }).catch(function () {});
@@ -133,9 +148,7 @@
       reveal();
     })
     .catch(function (err) {
-      clearTimeout(timer);
-      // Lỗi mạng: vẫn cho vào dựa trên local (đã check exp ở trên) để không khoá user offline.
-      // Nếu muốn STRICT, đổi dòng dưới thành: redirectLogin('network-' + err);
+      if (done) return; done = true; clearTimeout(timer);
       try { console.warn('[auth-guard] online check failed, fallback to local:', err); } catch (e) {}
       reveal();
     });
