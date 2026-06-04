@@ -1575,10 +1575,8 @@ async function ssoSaveSession(email, name, picture) {
   const exp = Date.now() + SSO_SESSION_TTL;
   const sessionToken = ssoMakeToken();
 
-  // 1. Lưu localStorage (instant, offline-safe) + sessionStorage fallback
-  const authPayload = JSON.stringify({ email, name, picture, exp, sessionToken });
-  localStorage.setItem(SSO_AUTH_KEY, authPayload);
-  try { sessionStorage.setItem(SSO_AUTH_KEY, authPayload); } catch(e) {}
+  // 1. Lưu localStorage (instant, offline-safe)
+  localStorage.setItem(SSO_AUTH_KEY, JSON.stringify({ email, name, picture, exp, sessionToken }));
   localStorage.setItem(SSO_USER_KEY, JSON.stringify({ email, name, picture }));
 
   // 2. Upsert lên Supabase bảng sso_sessions (background, không block UI)
@@ -1755,13 +1753,9 @@ function ssoShowError(msg) {
 
 function ssoStartGoogleLogin() {
   // Dùng OAuth2 popup redirect — không phụ thuộc One Tap / FedCM
-  // Dùng redirect_uri trỏ về /oauth-callback.html để tránh COOP block window.closed
-  const callbackUrl = window.location.origin
-    + window.location.pathname.replace(/\/[^/]*$/, '/') + 'oauth-callback.html';
-
   const params = new URLSearchParams({
     client_id:     SSO_CLIENT_ID,
-    redirect_uri:  callbackUrl,
+    redirect_uri:  window.location.origin + window.location.pathname,
     response_type: 'token id_token',
     scope:         'openid email profile',
     nonce:         Math.random().toString(36).slice(2),
@@ -1779,26 +1773,34 @@ function ssoStartGoogleLogin() {
     ssoShowError('Trình duyệt đã chặn popup. Vui lòng cho phép popup cho trang này và thử lại.');
     return;
   }
-
-  // Lắng nghe kết quả qua postMessage từ oauth-callback.html (tránh COOP window.closed)
-  function onOAuthMessage(event) {
-    if (event.origin !== window.location.origin) return;
-    if (!event.data || event.data.type !== 'GOOGLE_OAUTH_RESULT') return;
-    window.removeEventListener('message', onOAuthMessage);
-    clearTimeout(popupTimeout);
-    try { popup.close(); } catch(e) {}
-    if (event.data.id_token) {
-      ssoHandleCredential({ credential: event.data.id_token });
-    } else {
-      ssoShowError('Đăng nhập thất bại hoặc bị huỷ. Vui lòng thử lại.');
+  // Lắng nghe kết quả từ popup (redirect về cùng origin)
+  const timer = setInterval(function() {
+    try {
+      if (!popup || popup.closed) {
+        clearInterval(timer);
+        return;
+      }
+      const url = popup.location.href;
+      if (url && url.indexOf(window.location.origin) === 0) {
+        clearInterval(timer);
+        popup.close();
+        // Parse fragment hash: #id_token=...&access_token=...
+        const hash = popup.location.hash || url.split('#')[1] || '';
+        const result = {};
+        hash.replace(/^#/, '').split('&').forEach(part => {
+          const [k, v] = part.split('=');
+          if (k) result[decodeURIComponent(k)] = decodeURIComponent(v || '');
+        });
+        if (result.id_token) {
+          ssoHandleCredential({ credential: result.id_token });
+        } else {
+          ssoShowError('Đăng nhập thất bại hoặc bị huỷ. Vui lòng thử lại.');
+        }
+      }
+    } catch(e) {
+      // cross-origin, chờ tiếp
     }
-  }
-  window.addEventListener('message', onOAuthMessage);
-
-  // Timeout 3 phút nếu user đóng popup mà không hoàn thành
-  const popupTimeout = setTimeout(function() {
-    window.removeEventListener('message', onOAuthMessage);
-  }, 180000);
+  }, 300);
 }
 
 function ssoInit() {
