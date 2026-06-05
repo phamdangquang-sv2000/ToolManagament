@@ -1025,6 +1025,58 @@ tr:hover td{background:rgba(13,148,136,.03)}
   #s-employees .filters-row .input{
     max-width:100% !important;
   }
+
+  /* ── KHO FILE OT: mobile fixes ── */
+  /* Stat cards: 2x2 grid thay vì 4 cột */
+  #otf-stats{
+    grid-template-columns:repeat(2,1fr) !important;
+    gap:.65rem !important;
+  }
+  #otf-stats .stat-value{
+    font-size:1.3rem !important;
+  }
+
+  /* Filter bar: xếp dọc, full width */
+  #s-ot-files .filters-row{
+    flex-direction:column;
+    align-items:stretch;
+    gap:.5rem;
+  }
+  #s-ot-files .filters-row select,
+  #s-ot-files .filters-row input{
+    max-width:100% !important;
+    width:100% !important;
+  }
+  #s-ot-files .filters-row > div[style*="margin-left:auto"]{
+    margin-left:0 !important;
+  }
+  #otf-btn-upload{
+    width:100%;
+    justify-content:center;
+  }
+}
+
+/* FAB upload cho mobile (ot-files) */
+#otf-fab-upload{
+  display:none;
+  position:fixed;
+  bottom:calc(56px + env(safe-area-inset-bottom) + .6rem);
+  right:.75rem;
+  z-index:35;
+  width:2.75rem;height:2.75rem;
+  border-radius:50%;
+  background:linear-gradient(135deg,#0d9488,#14b8a6);
+  color:#fff;
+  border:none;cursor:pointer;
+  box-shadow:0 4px 16px rgba(13,148,136,.45);
+  font-size:1.3rem;line-height:1;
+  align-items:center;justify-content:center;
+  transition:transform .2s,box-shadow .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+#otf-fab-upload:active{transform:scale(.92);}
+@media (max-width:1023px){
+  #otf-fab-upload.visible{ display:flex !important; }
 }
 </style>
 </head>
@@ -1053,6 +1105,11 @@ tr:hover td{background:rgba(13,148,136,.03)}
     </button>
   </div>
 </div>
+
+<!-- FAB: Upload File OT (mobile) -->
+<button id="otf-fab-upload" onclick="otfOpenUpload()" title="Upload File OT">
+  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+</button>
 
 <!-- Bottom navigation -->
 <div id="mob-nav">
@@ -1100,6 +1157,9 @@ tr:hover td{background:rgba(13,148,136,.03)}
   </div>
   <div class="mob-drawer-item" id="mdi-tet" onclick="mobGo('tet');closeMobDrawer()">
     <span style="font-size:1.1rem">🏠</span><span>Nghỉ Tết</span>
+  </div>
+  <div class="mob-drawer-item" id="mdi-ot-files" onclick="mobGo('ot-files');closeMobDrawer()">
+    <span style="font-size:1.1rem">📁</span><span>Kho File OT</span>
   </div>
   <div style="height:1px;background:var(--border);margin:.5rem 0;"></div>
   <div class="mob-drawer-item" onclick="toggleDark();closeMobDrawer()">
@@ -1250,6 +1310,9 @@ tr:hover td{background:rgba(13,148,136,.03)}
       <p class="nav-section-label">Công cụ</p>
       <div class="nav-link" data-s="calendar" onclick="go('calendar')">
         <span class="nav-icon">📋</span>Lịch Đăng Ký Làm
+      </div>
+      <div class="nav-link" data-s="ot-files" onclick="go('ot-files')">
+        <span class="nav-icon">📁</span>Kho File OT
       </div>
     </nav>
 
@@ -1712,6 +1775,116 @@ CREATE TABLE hr_leave_requests (<br>
         <div id="sch-table-wrap" style="display:none"></div>
       </div>
     </div>
+
+    <!-- ═══════════════════════════════════════════════
+         KHO FILE OT — MODULE MỚI (Additive Only)
+    ═══════════════════════════════════════════════ -->
+    <div id="s-ot-files" class="section">
+
+      <!-- Stat cards -->
+      <div id="otf-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem">
+        <div class="card stat-card" style="padding:1.1rem">
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <div class="stat-icon" style="background:linear-gradient(135deg,rgba(13,148,136,.1),rgba(20,184,166,.08))">
+              <span style="font-size:1.2rem">📁</span>
+            </div>
+            <div>
+              <div class="label" style="margin-bottom:.15rem">Tổng số file</div>
+              <div class="stat-value" id="otf-stat-total">0</div>
+            </div>
+          </div>
+        </div>
+        <div class="card stat-card" style="padding:1.1rem">
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <div class="stat-icon" style="background:linear-gradient(135deg,rgba(59,130,246,.1),rgba(99,102,241,.08))">
+              <span style="font-size:1.2rem">📅</span>
+            </div>
+            <div>
+              <div class="label" style="margin-bottom:.15rem">Năm hiện tại</div>
+              <div class="stat-value" id="otf-stat-year">0</div>
+            </div>
+          </div>
+        </div>
+        <div class="card stat-card" style="padding:1.1rem">
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <div class="stat-icon" style="background:linear-gradient(135deg,rgba(245,158,11,.1),rgba(251,191,36,.08))">
+              <span style="font-size:1.2rem">🗓️</span>
+            </div>
+            <div>
+              <div class="label" style="margin-bottom:.15rem">Tháng này</div>
+              <div class="stat-value" id="otf-stat-month">0</div>
+            </div>
+          </div>
+        </div>
+        <div class="card stat-card" style="padding:1.1rem">
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <div class="stat-icon" style="background:linear-gradient(135deg,rgba(16,185,129,.1),rgba(5,150,105,.08))">
+              <span style="font-size:1.2rem">💾</span>
+            </div>
+            <div>
+              <div class="label" style="margin-bottom:.15rem">Dung lượng</div>
+              <div class="stat-value" id="otf-stat-size" style="font-size:1.1rem">0 MB</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter + Actions bar -->
+      <div class="card" style="padding:1rem;margin-bottom:1rem">
+        <div class="filters-row" style="margin-bottom:0">
+          <select id="otf-f-year" class="input" style="max-width:120px" onchange="otfRender()">
+            <option value="">Tất cả năm</option>
+          </select>
+          <select id="otf-f-month" class="input" style="max-width:130px" onchange="otfRender()">
+            <option value="">Tất cả tháng</option>
+            <option value="1">Tháng 01</option><option value="2">Tháng 02</option>
+            <option value="3">Tháng 03</option><option value="4">Tháng 04</option>
+            <option value="5">Tháng 05</option><option value="6">Tháng 06</option>
+            <option value="7">Tháng 07</option><option value="8">Tháng 08</option>
+            <option value="9">Tháng 09</option><option value="10">Tháng 10</option>
+            <option value="11">Tháng 11</option><option value="12">Tháng 12</option>
+          </select>
+          <input id="otf-f-search" type="text" class="input" placeholder="🔍 Tìm kiếm tên file..." style="max-width:240px" oninput="otfRender()">
+          <div style="margin-left:auto">
+            <button id="otf-btn-upload" class="btn btn-primary btn-sm" onclick="otfOpenUpload()" style="display:none">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Upload File
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- File list table -->
+      <div class="card p-0">
+        <div class="tw mob-table-hide">
+          <table>
+            <thead>
+              <tr>
+                <th>Tên File</th>
+                <th>Tháng</th>
+                <th>Năm</th>
+                <th>Loại</th>
+                <th>Dung lượng</th>
+                <th>Ngày Upload</th>
+                <th>Người Upload</th>
+                <th id="otf-th-action" style="display:none">Hành động</th>
+                <th id="otf-th-action-emp">Hành động</th>
+              </tr>
+            </thead>
+            <tbody id="otf-body">
+              <tr><td colspan="9" style="text-align:center;padding:2.5rem;color:var(--text-3);font-size:.875rem;font-weight:500">
+                <div class="spinner" style="border-top-color:var(--indigo);border-color:var(--border);margin:0 auto .75rem;width:1.5rem;height:1.5rem;border-width:3px"></div>
+                Đang tải...
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Mobile cards -->
+        <div id="otf-card-list" class="mob-card-show" style="display:none;padding:.75rem"></div>
+      </div>
+
+    </div>
+    <!-- END KHO FILE OT -->
 
   </main>
 </div>
@@ -2697,7 +2870,8 @@ function updateLyLabel() {
 // ============ NAVIGATION ============
 const PAGE_NAMES = {
   dashboard:'Dashboard', employees:'Nhân viên', leaves:'Nghỉ phép',
-  warnings:'Warning', attendance:'Đi trễ / Về sớm', tet:'Nghỉ Tết', calendar:'Lịch Đăng Ký Làm'
+  warnings:'Warning', attendance:'Đi trễ / Về sớm', tet:'Nghỉ Tết', calendar:'Lịch Đăng Ký Làm',
+  'ot-files':'📁 Kho File OT'
 };
 
 const LEAVE_YEAR_PAGES = new Set(['dashboard','employees','leaves']);
@@ -4829,8 +5003,658 @@ document.addEventListener('DOMContentLoaded', async () => {
   </div>
 </div>
 
+<!-- ========================================
+     KHO FILE OT — MODALS
+======================================== -->
+<!-- Upload Modal -->
+<div id="m-otf-upload" class="modal-bd hidden">
+  <div class="modal-box fade" onclick="event.stopPropagation()">
+    <h3 class="font-extrabold text-lg mb-5 tracking-tight" style="color:var(--text-1)">📁 Upload File OT</h3>
+    <div class="space-y-4">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div>
+          <label class="label">Năm *</label>
+          <select id="otf-up-year" class="input">
+            <option value="">-- Chọn năm --</option>
+          </select>
+        </div>
+        <div>
+          <label class="label">Tháng *</label>
+          <select id="otf-up-month" class="input">
+            <option value="">-- Chọn tháng --</option>
+            <option value="1">Tháng 01</option><option value="2">Tháng 02</option>
+            <option value="3">Tháng 03</option><option value="4">Tháng 04</option>
+            <option value="5">Tháng 05</option><option value="6">Tháng 06</option>
+            <option value="7">Tháng 07</option><option value="8">Tháng 08</option>
+            <option value="9">Tháng 09</option><option value="10">Tháng 10</option>
+            <option value="11">Tháng 11</option><option value="12">Tháng 12</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="label">Chọn file *</label>
+        <div id="otf-drop-zone" style="border:2px dashed var(--border);border-radius:.75rem;padding:1.5rem;text-align:center;cursor:pointer;transition:border .2s,background .2s;background:var(--surface2)" onclick="document.getElementById('otf-file-input').click()" ondragover="event.preventDefault();this.style.borderColor='var(--indigo)';this.style.background='var(--indigo-light)'" ondragleave="this.style.borderColor='var(--border)';this.style.background='var(--surface2)'" ondrop="otfOnDrop(event)">
+          <div style="font-size:2rem;margin-bottom:.5rem">📄</div>
+          <div style="font-size:.85rem;font-weight:600;color:var(--text-2)">Kéo thả file vào đây hoặc click để chọn</div>
+          <div style="font-size:.72rem;color:var(--text-3);margin-top:.25rem">PDF, XLS, XLSX, CSV, DOC, DOCX (tối đa 50MB)</div>
+        </div>
+        <input id="otf-file-input" type="file" accept=".pdf,.xls,.xlsx,.csv,.doc,.docx" style="display:none" onchange="otfOnFileSelect(this)">
+        <div id="otf-file-selected" style="display:none;margin-top:.5rem;padding:.5rem .75rem;background:var(--surface3);border-radius:.5rem;font-size:.8rem;color:var(--text-2);display:flex;align-items:center;gap:.5rem">
+          <span style="font-size:1rem">📄</span>
+          <span id="otf-file-name-display"></span>
+          <span id="otf-file-size-display" style="color:var(--text-3);margin-left:auto"></span>
+        </div>
+      </div>
+      <div id="otf-up-progress" style="display:none">
+        <div style="display:flex;justify-content:space-between;margin-bottom:.35rem;font-size:.75rem;font-weight:600;color:var(--text-2)">
+          <span>Đang upload...</span><span id="otf-progress-pct">0%</span>
+        </div>
+        <div class="prog"><div id="otf-progress-bar" class="prog-fill" style="background:linear-gradient(90deg,var(--indigo),#14b8a6);width:0%"></div></div>
+      </div>
+    </div>
+    <div class="flex gap-2.5 mt-6 justify-end">
+      <button onclick="closeModal('m-otf-upload')" class="btn btn-secondary">Hủy</button>
+      <button id="otf-up-btn" onclick="otfDoUpload()" class="btn btn-primary">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Upload
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="m-otf-edit" class="modal-bd hidden">
+  <div class="modal-box fade" onclick="event.stopPropagation()">
+    <h3 class="font-extrabold text-lg mb-5 tracking-tight" style="color:var(--text-1)">✏️ Chỉnh sửa thông tin file</h3>
+    <input type="hidden" id="otf-edit-id">
+    <div class="space-y-4">
+      <div>
+        <label class="label">Tên hiển thị *</label>
+        <input id="otf-edit-name" type="text" class="input" placeholder="Tên file hiển thị...">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div>
+          <label class="label">Năm *</label>
+          <select id="otf-edit-year" class="input">
+          </select>
+        </div>
+        <div>
+          <label class="label">Tháng *</label>
+          <select id="otf-edit-month" class="input">
+            <option value="1">Tháng 01</option><option value="2">Tháng 02</option>
+            <option value="3">Tháng 03</option><option value="4">Tháng 04</option>
+            <option value="5">Tháng 05</option><option value="6">Tháng 06</option>
+            <option value="7">Tháng 07</option><option value="8">Tháng 08</option>
+            <option value="9">Tháng 09</option><option value="10">Tháng 10</option>
+            <option value="11">Tháng 11</option><option value="12">Tháng 12</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="flex gap-2.5 mt-6 justify-end">
+      <button onclick="closeModal('m-otf-edit')" class="btn btn-secondary">Hủy</button>
+      <button onclick="otfDoEdit()" class="btn btn-primary">Lưu thay đổi</button>
+    </div>
+  </div>
+</div>
+
 <script>
-const NS_URL=_d('GlsMPj1MYE48FAANPAcXIydIFhADJQkaFQMSJk8aPzMTTRk9K1gsDg==');
+// ══════════════════════════════════════════════════════════
+//  KHO FILE OT — Toàn bộ module mới, độc lập hoàn toàn
+// ══════════════════════════════════════════════════════════
+
+// ── State riêng của module ──
+const OTF = {
+  files: [],
+  loaded: false,
+  selectedFile: null,
+};
+
+const OTF_BUCKET = 'File_OT';   // Bucket đã tạo trong Supabase Storage
+const OTF_TABLE  = 'file_ot';   // Bảng mới trong Supabase DB
+
+// ── Build danh sách năm động: 2 năm trước → 2 năm sau so với năm hiện tại ──
+// Tự động bao gồm bất kỳ năm nào đã có file trong DB
+function otfBuildYearOptions() {
+  const curYear = new Date().getFullYear();
+  // Base range: 2 năm trước → 2 năm sau
+  const minYear = curYear - 2;
+  const maxYear = curYear + 2;
+
+  // Gom thêm các năm từ dữ liệu thực tế (phòng khi file cũ hơn range)
+  const yearsInData = new Set(OTF.files.map(f => f.year).filter(Boolean));
+  const allYears = new Set();
+  for (let y = minYear; y <= maxYear; y++) allYears.add(y);
+  yearsInData.forEach(y => allYears.add(y));
+  const sortedYears = Array.from(allYears).sort((a, b) => a - b);
+
+  // ── Filter dropdown: "Tất cả năm" + danh sách năm ──
+  const filterSel = document.getElementById('otf-f-year');
+  if (filterSel) {
+    const prevVal = filterSel.value;
+    filterSel.innerHTML = '<option value="">Tất cả năm</option>' +
+      sortedYears.map(y => `<option value="${y}"${y === curYear ? ' selected' : ''}>${y}</option>`).join('');
+    // Khôi phục lựa chọn trước nếu còn hợp lệ
+    if (prevVal && sortedYears.includes(parseInt(prevVal))) filterSel.value = prevVal;
+  }
+
+  // ── Upload dropdown: "-- Chọn năm --" + danh sách, mặc định năm hiện tại ──
+  const upSel = document.getElementById('otf-up-year');
+  if (upSel) {
+    upSel.innerHTML = '<option value="">-- Chọn năm --</option>' +
+      sortedYears.map(y => `<option value="${y}">${y}</option>`).join('');
+    upSel.value = String(curYear); // Auto-select năm hiện tại
+  }
+
+  // ── Edit dropdown: danh sách năm (không có "Chọn") ──
+  const editSel = document.getElementById('otf-edit-year');
+  if (editSel) {
+    editSel.innerHTML = sortedYears.map(y => `<option value="${y}">${y}</option>`).join('');
+  }
+}
+
+// ── Tháng dạng chữ ──
+function otfMonthName(m) {
+  return ['01','02','03','04','05','06','07','08','09','10','11','12'][parseInt(m)-1] || String(m).padStart(2,'0');
+}
+
+// ── Format dung lượng ──
+function otfFmtSize(bytes) {
+  if (!bytes) return '—';
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/(1024*1024)).toFixed(2) + ' MB';
+}
+
+// ── Icon theo loại file ──
+function otfFileIcon(type) {
+  if (!type) return '📄';
+  const t = type.toLowerCase();
+  if (t.includes('pdf')) return '📕';
+  if (t.includes('sheet') || t.includes('excel') || t.includes('xls') || t.includes('csv')) return '📗';
+  if (t.includes('word') || t.includes('doc')) return '📘';
+  return '📄';
+}
+
+// ── Load danh sách file từ Supabase ──
+async function otfLoad() {
+  try {
+    const { data, error } = await db.from(OTF_TABLE).select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    OTF.files = data || [];
+    OTF.loaded = true;
+    otfBuildYearOptions(); // Rebuild năm động sau khi có dữ liệu thực tế
+  } catch(e) {
+    OTF.files = [];
+    OTF.loaded = true;
+    console.warn('[KhoFileOT] otfLoad error:', e.message);
+  }
+}
+
+// ── Render thống kê ──
+function otfRenderStats() {
+  const now = new Date();
+  const curYear = now.getFullYear();
+  const curMonth = now.getMonth() + 1;
+
+  const total = OTF.files.length;
+  const yearCount = OTF.files.filter(f => f.year === curYear).length;
+  const monthCount = OTF.files.filter(f => f.year === curYear && f.month === curMonth).length;
+  const totalSize = OTF.files.reduce((s, f) => s + (f.file_size || 0), 0);
+
+  const el = id => document.getElementById(id);
+  if (el('otf-stat-total')) el('otf-stat-total').textContent = total;
+  if (el('otf-stat-year'))  el('otf-stat-year').textContent  = yearCount;
+  if (el('otf-stat-month')) el('otf-stat-month').textContent = monthCount;
+  if (el('otf-stat-size'))  el('otf-stat-size').textContent  = otfFmtSize(totalSize);
+}
+
+// ── Render danh sách file ──
+function otfRender() {
+  otfRenderStats();
+
+  const q  = (document.getElementById('otf-f-search')?.value || '').toLowerCase().trim();
+  const fy = document.getElementById('otf-f-year')?.value  || '';
+  const fm = document.getElementById('otf-f-month')?.value || '';
+
+  let list = OTF.files;
+  if (fy) list = list.filter(f => String(f.year) === fy);
+  if (fm) list = list.filter(f => String(f.month) === fm);
+  if (q)  list = list.filter(f => (f.file_name || '').toLowerCase().includes(q));
+
+  const isAdmin = S.isAdmin;
+  const tbody = document.getElementById('otf-body');
+  const cardList = document.getElementById('otf-card-list');
+
+  // Admin vs Employee column headers
+  const thAdmin = document.getElementById('otf-th-action');
+  const thEmp   = document.getElementById('otf-th-action-emp');
+  if (thAdmin) thAdmin.style.display = isAdmin ? '' : 'none';
+  if (thEmp)   thEmp.style.display   = isAdmin ? 'none' : '';
+
+  if (!list.length) {
+    if (tbody) tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:2.5rem;color:var(--text-3);font-size:.875rem;font-weight:500">Không có file nào</td></tr>`;
+    if (cardList) cardList.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--text-3);font-size:.85rem;font-weight:500">Không có file nào</div>`;
+    return;
+  }
+
+  // ── Desktop table rows ──
+  if (tbody) {
+    tbody.innerHTML = list.map(f => {
+      const adminActions = isAdmin ? `
+        <button class="btn btn-secondary btn-sm" onclick="otfOpenEdit('${f.id}')" title="Sửa">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="otfConfirmDelete('${f.id}')" title="Xóa">🗑️</button>
+      ` : '';
+      return `<tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:.5rem">
+            <span style="font-size:1.1rem">${otfFileIcon(f.file_type)}</span>
+            <span style="font-weight:600;color:var(--text-1);max-width:200px;overflow:hidden;text-overflow:ellipsis" title="${escAttr(f.file_name)}">${escAttr(f.file_name)}</span>
+          </div>
+        </td>
+        <td><span class="badge bg-teal">T${otfMonthName(f.month)}</span></td>
+        <td><span class="badge bg-indigo">${f.year}</span></td>
+        <td style="color:var(--text-2);font-size:.75rem">${f.file_type ? f.file_type.split('/').pop().toUpperCase() : '—'}</td>
+        <td style="color:var(--text-2);font-size:.8rem">${otfFmtSize(f.file_size)}</td>
+        <td style="color:var(--text-2);font-size:.8rem">${f.created_at ? fmtD(f.created_at.split('T')[0]) : '—'}</td>
+        <td style="color:var(--text-2);font-size:.8rem">${escAttr(f.uploaded_by || '—')}</td>
+        ${isAdmin
+          ? `<td><div style="display:flex;gap:.3rem;flex-wrap:wrap">
+              <button class="btn btn-secondary btn-sm" onclick="otfView('${f.id}')" title="Xem">👁</button>
+              <button class="btn btn-secondary btn-sm" onclick="otfDownload('${f.id}')" title="Download">⬇️</button>
+              <button class="btn btn-secondary btn-sm" onclick="otfOpenEdit('${f.id}')" title="Sửa">✏️</button>
+              <button class="btn btn-danger btn-sm" onclick="otfConfirmDelete('${f.id}')" title="Xóa">🗑️</button>
+             </div></td>`
+          : `<td><div style="display:flex;gap:.3rem">
+              <button class="btn btn-secondary btn-sm" onclick="otfView('${f.id}')">👁 Xem</button>
+              <button class="btn btn-secondary btn-sm" onclick="otfDownload('${f.id}')">⬇️ Tải</button>
+             </div></td>`
+        }
+      </tr>`;
+    }).join('');
+  }
+
+  // ── Mobile cards ──
+  if (cardList) {
+    cardList.innerHTML = list.map(f => {
+      const adminBtns = isAdmin ? `
+        <button class="btn btn-secondary btn-sm" onclick="otfOpenEdit('${f.id}')">✏️ Sửa</button>
+        <button class="btn btn-danger btn-sm" onclick="otfConfirmDelete('${f.id}')">🗑️ Xóa</button>
+      ` : '';
+      return `<div class="mob-row-card">
+        <div class="mob-row-card-header">
+          <div style="display:flex;align-items:center;gap:.5rem;flex:1;min-width:0">
+            <span style="font-size:1.2rem;flex-shrink:0">${otfFileIcon(f.file_type)}</span>
+            <span class="mob-row-card-name">${escAttr(f.file_name)}</span>
+          </div>
+          <span class="badge bg-teal" style="flex-shrink:0">T${otfMonthName(f.month)}/${f.year}</span>
+        </div>
+        <div class="mob-row-card-body" style="margin-bottom:.5rem">
+          <div class="mob-row-card-field">
+            <span class="mob-row-card-label">Loại</span>
+            <span class="mob-row-card-val">${f.file_type ? f.file_type.split('/').pop().toUpperCase() : '—'}</span>
+          </div>
+          <div class="mob-row-card-field">
+            <span class="mob-row-card-label">Dung lượng</span>
+            <span class="mob-row-card-val">${otfFmtSize(f.file_size)}</span>
+          </div>
+          <div class="mob-row-card-field">
+            <span class="mob-row-card-label">Ngày upload</span>
+            <span class="mob-row-card-val">${f.created_at ? fmtD(f.created_at.split('T')[0]) : '—'}</span>
+          </div>
+          <div class="mob-row-card-field">
+            <span class="mob-row-card-label">Người upload</span>
+            <span class="mob-row-card-val">${escAttr(f.uploaded_by || '—')}</span>
+          </div>
+        </div>
+        <div class="mob-row-card-actions">
+          <button class="btn btn-secondary btn-sm" onclick="otfView('${f.id}')">👁 Xem</button>
+          <button class="btn btn-secondary btn-sm" onclick="otfDownload('${f.id}')">⬇️ Tải</button>
+          ${adminBtns}
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+
+// ── Init khi vào section ──
+async function otfInit() {
+  // Show/hide upload button for admin
+  const uploadBtn = document.getElementById('otf-btn-upload');
+  if (uploadBtn) uploadBtn.style.display = S.isAdmin ? 'inline-flex' : 'none';
+
+  // Show/hide FAB upload (mobile admin)
+  const fabUpload = document.getElementById("otf-fab-upload");
+  if (fabUpload) {
+    if (S.isAdmin) fabUpload.classList.add("visible");
+    else fabUpload.classList.remove("visible");
+  }
+
+  // Build năm dynamic ngay (base range) trước khi load data
+  otfBuildYearOptions();
+
+  if (!OTF.loaded) {
+    const tbody = document.getElementById('otf-body');
+    if (tbody) tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:2.5rem;color:var(--text-3);font-size:.875rem">
+      <div class="spinner" style="border-top-color:var(--indigo);border-color:var(--border);margin:0 auto .75rem;width:1.5rem;height:1.5rem;border-width:3px"></div>Đang tải...
+    </td></tr>`;
+    await otfLoad();
+  }
+  otfRender();
+}
+
+// ── Get signed URL for a file ──
+async function otfGetUrl(fileUrl) {
+  // fileUrl lưu ở dạng path trong bucket: "year/month/filename"
+  try {
+    const { data, error } = await db.storage.from(OTF_BUCKET).createSignedUrl(fileUrl, 3600);
+    if (error) throw error;
+    return data.signedUrl;
+  } catch(e) {
+    // Thử public URL nếu bucket là public
+    const { data } = db.storage.from(OTF_BUCKET).getPublicUrl(fileUrl);
+    return data?.publicUrl || null;
+  }
+}
+
+// ── Xem file ──
+async function otfView(id) {
+  const f = OTF.files.find(x => x.id === id);
+  if (!f) return;
+  try {
+    const url = await otfGetUrl(f.file_url);
+    if (!url) { toast('Không lấy được URL file', 'error'); return; }
+    window.open(url, '_blank');
+  } catch(e) {
+    toast('Lỗi: ' + e.message, 'error');
+  }
+}
+
+// ── Download file ──
+async function otfDownload(id) {
+  const f = OTF.files.find(x => x.id === id);
+  if (!f) return;
+  try {
+    const url = await otfGetUrl(f.file_url);
+    if (!url) { toast('Không lấy được URL file', 'error'); return; }
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = f.file_name;
+    a.click();
+  } catch(e) {
+    toast('Lỗi: ' + e.message, 'error');
+  }
+}
+
+// ── Mở modal upload ──
+function otfOpenUpload() {
+  if (!S.isAdmin) return;
+  // Reset form
+  document.getElementById('otf-up-year').value = '';
+  document.getElementById('otf-up-month').value = '';
+  OTF.selectedFile = null;
+  // Rebuild năm và auto-select năm + tháng hiện tại
+  otfBuildYearOptions();
+  const curMonth = new Date().getMonth() + 1;
+  document.getElementById('otf-up-month').value = String(curMonth);
+  document.getElementById('otf-file-input').value = '';
+  OTF.selectedFile = null;
+  const sel = document.getElementById('otf-file-selected');
+  if (sel) sel.style.display = 'none';
+  const prog = document.getElementById('otf-up-progress');
+  if (prog) prog.style.display = 'none';
+  const btn = document.getElementById('otf-up-btn');
+  if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Upload'; }
+  openModal('m-otf-upload');
+}
+
+function otfOnFileSelect(input) {
+  const file = input.files[0];
+  if (!file) return;
+  OTF.selectedFile = file;
+  const nameEl = document.getElementById('otf-file-name-display');
+  const sizeEl = document.getElementById('otf-file-size-display');
+  const sel    = document.getElementById('otf-file-selected');
+  if (nameEl) nameEl.textContent = file.name;
+  if (sizeEl) sizeEl.textContent = otfFmtSize(file.size);
+  if (sel)    sel.style.display = 'flex';
+}
+
+function otfOnDrop(e) {
+  e.preventDefault();
+  const zone = document.getElementById('otf-drop-zone');
+  if (zone) { zone.style.borderColor = 'var(--border)'; zone.style.background = 'var(--surface2)'; }
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  const allowed = ['application/pdf','application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','text/csv','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+  const allowedExt = ['.pdf','.xls','.xlsx','.csv','.doc','.docx'];
+  const ext = '.' + file.name.split('.').pop().toLowerCase();
+  if (!allowed.includes(file.type) && !allowedExt.includes(ext)) {
+    toast('Chỉ hỗ trợ PDF, XLS, XLSX, CSV, DOC, DOCX', 'warn'); return;
+  }
+  OTF.selectedFile = file;
+  const nameEl = document.getElementById('otf-file-name-display');
+  const sizeEl = document.getElementById('otf-file-size-display');
+  const sel    = document.getElementById('otf-file-selected');
+  if (nameEl) nameEl.textContent = file.name;
+  if (sizeEl) sizeEl.textContent = otfFmtSize(file.size);
+  if (sel)    sel.style.display = 'flex';
+}
+
+// ── Thực hiện upload ──
+async function otfDoUpload() {
+  if (!S.isAdmin) return;
+  const year  = document.getElementById('otf-up-year').value;
+  const month = document.getElementById('otf-up-month').value;
+  const file  = OTF.selectedFile;
+
+  if (!year)  { toast('Vui lòng chọn năm!', 'warn'); return; }
+  if (!month) { toast('Vui lòng chọn tháng!', 'warn'); return; }
+  if (!file)  { toast('Vui lòng chọn file!', 'warn'); return; }
+
+  const btn  = document.getElementById('otf-up-btn');
+  const prog = document.getElementById('otf-up-progress');
+  const bar  = document.getElementById('otf-progress-bar');
+  const pct  = document.getElementById('otf-progress-pct');
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Đang upload...';
+  if (prog) prog.style.display = 'block';
+  if (bar)  bar.style.width = '10%';
+  if (pct)  pct.textContent = '10%';
+
+  try {
+    // Tên file duy nhất trong bucket
+    const ts  = Date.now();
+    const ext = file.name.split('.').pop();
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const storagePath = `${year}/${String(month).padStart(2,'0')}/${ts}_${safeName}`;
+
+    if (bar) bar.style.width = '30%';
+    if (pct) pct.textContent = '30%';
+
+    // Upload file lên storage
+    const { error: upErr } = await db.storage.from(OTF_BUCKET).upload(storagePath, file, {
+      cacheControl: '3600',
+      upsert: false,
+      contentType: file.type || 'application/octet-stream'
+    });
+    if (upErr) throw new Error('Upload storage: ' + upErr.message);
+
+    if (bar) bar.style.width = '70%';
+    if (pct) pct.textContent = '70%';
+
+    // Xác định người upload
+    const uploaderName = S.session ? 'Admin' : 'Nhân viên';
+
+    // Lưu metadata vào DB
+    const { error: dbErr } = await db.from(OTF_TABLE).insert({
+      file_name:   file.name,
+      file_url:    storagePath,
+      year:        parseInt(year),
+      month:       parseInt(month),
+      file_size:   file.size,
+      file_type:   file.type || ('application/' + ext),
+      uploaded_by: uploaderName,
+    });
+    if (dbErr) {
+      // Xóa file đã upload nếu DB lỗi
+      await db.storage.from(OTF_BUCKET).remove([storagePath]);
+      throw new Error('Lưu DB: ' + dbErr.message);
+    }
+
+    if (bar) bar.style.width = '100%';
+    if (pct) pct.textContent = '100%';
+
+    toast('✓ Upload thành công!', 'success');
+    closeModal('m-otf-upload');
+    OTF.loaded = false;
+    await otfLoad();
+    otfRender();
+  } catch(e) {
+    toast('Lỗi upload: ' + e.message, 'error');
+    if (bar) bar.style.width = '0%';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Upload';
+    if (prog) prog.style.display = 'none';
+  }
+}
+
+// ── Mở modal chỉnh sửa ──
+function otfOpenEdit(id) {
+  if (!S.isAdmin) return;
+  const f = OTF.files.find(x => x.id === id);
+  if (!f) return;
+  document.getElementById('otf-edit-id').value = f.id;
+  document.getElementById('otf-edit-name').value = f.file_name || '';
+  document.getElementById('otf-edit-year').value = String(f.year);
+  document.getElementById('otf-edit-month').value = String(f.month);
+  openModal('m-otf-edit');
+}
+
+// ── Lưu chỉnh sửa ──
+async function otfDoEdit() {
+  if (!S.isAdmin) return;
+  const id    = document.getElementById('otf-edit-id').value;
+  const name  = document.getElementById('otf-edit-name').value.trim();
+  const year  = document.getElementById('otf-edit-year').value;
+  const month = document.getElementById('otf-edit-month').value;
+  if (!name)  { toast('Nhập tên file!', 'warn'); return; }
+  if (!year)  { toast('Chọn năm!', 'warn'); return; }
+  if (!month) { toast('Chọn tháng!', 'warn'); return; }
+
+  try {
+    const { error } = await db.from(OTF_TABLE).update({
+      file_name:  name,
+      year:       parseInt(year),
+      month:      parseInt(month),
+      updated_at: new Date().toISOString(),
+    }).eq('id', id);
+    if (error) throw error;
+    toast('Đã lưu thay đổi!', 'success');
+    closeModal('m-otf-edit');
+    OTF.loaded = false;
+    await otfLoad();
+    otfRender();
+  } catch(e) {
+    toast('Lỗi: ' + e.message, 'error');
+  }
+}
+
+// ── Xác nhận xóa ──
+function otfConfirmDelete(id) {
+  if (!S.isAdmin) return;
+  const f = OTF.files.find(x => x.id === id);
+  if (!f) return;
+  confirmDel(`Xóa file "${f.file_name}"? Thao tác này không thể hoàn tác.`, () => otfDoDelete(id));
+}
+
+// ── Thực hiện xóa ──
+async function otfDoDelete(id) {
+  if (!S.isAdmin) return;
+  const f = OTF.files.find(x => x.id === id);
+  if (!f) return;
+  try {
+    // Xóa file trong storage trước
+    if (f.file_url) {
+      await db.storage.from(OTF_BUCKET).remove([f.file_url]);
+    }
+    // Xóa record trong DB
+    const { error } = await db.from(OTF_TABLE).delete().eq('id', id);
+    if (error) throw error;
+    toast('Đã xóa file!', 'success');
+    OTF.loaded = false;
+    await otfLoad();
+    otfRender();
+  } catch(e) {
+    toast('Lỗi xóa: ' + e.message, 'error');
+  }
+}
+
+// ── Đóng modal khi click ngoài ──
+document.addEventListener('click', function(e) {
+  ['m-otf-upload','m-otf-edit'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && e.target === el) closeModal(id);
+  });
+});
+
+// ══════════════════════════════════════════════════════════
+//  PATCH go() để hỗ trợ tab ot-files — Additive Only
+// ══════════════════════════════════════════════════════════
+(function() {
+  const _origGo = go;
+  window.go = function(name) {
+    if (name === 'ot-files') {
+      // Thực hiện navigation thủ công cho tab mới
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      const sec = document.getElementById('s-ot-files');
+      if (sec) sec.classList.add('active');
+      const link = document.querySelector('.nav-link[data-s="ot-files"]');
+      if (link) link.classList.add('active');
+      document.getElementById('page-title').textContent = '📁 Kho File OT';
+      localStorage.setItem('hr_tab', 'ot-files');
+      const mobTitle = document.getElementById('mob-title');
+      if (mobTitle) mobTitle.textContent = 'Kho File OT';
+      const lyLabel = document.getElementById('ly-label');
+      if (lyLabel) lyLabel.textContent = '';
+      // Sync mobile nav: highlight "Thêm" button
+      const moreBtn = document.getElementById('mnb-more');
+      ['dashboard','employees','leaves','calendar'].forEach(t => {
+        const btn = document.getElementById('mnb-' + t);
+        if (btn) btn.classList.remove('active');
+      });
+      if (moreBtn) moreBtn.classList.add('active');
+      ['warnings','attendance','tet'].forEach(t => {
+        const el = document.getElementById('mdi-' + t);
+        if (el) el.classList.remove('active');
+      });
+      const mdiOtf = document.getElementById('mdi-ot-files');
+      if (mdiOtf) mdiOtf.classList.add('active');
+      // Init module
+      otfInit();
+      return;
+    }
+    // Hide FAB upload when leaving ot-files
+    const fabUpload = document.getElementById("otf-fab-upload");
+    if (fabUpload) fabUpload.classList.remove("visible");
+    _origGo(name);
+  };
+})();
+
+// ── Restore session: nếu tab cũ là ot-files thì load lại ──
+// (Đây là additive — chỉ bổ sung, không can thiệp luồng cũ)
+const _origTryRestoreSession = typeof tryRestoreSession === 'function' ? tryRestoreSession : null;
+
+// ── Đảm bảo tab ot-files được hỗ trợ khi khởi tạo ──
+document.addEventListener('DOMContentLoaded', function() {
+  // Add ot-files vào validTabs check trong enterApp (không sửa code cũ)
+  // Chỉ đảm bảo rằng nếu savedTab === 'ot-files' thì go() sẽ xử lý đúng
+});
+</script>
+<script>
 const NS_KEY=_d('F1YyJiwxLAgBEzkuAAw8cAxYKAQoJSpcGSo4dSgCOhskbDJ3YBM2Kz4ZQCo8ORwLOFU5NQkSFS8AMyIKEiAkCR51EQd4PyErOxlBFyUVIgsrazkbUhFKIw8KKQ0XCCcNHmYROScVIlg9ICAuYz8YBzdTU0MIBzsjCjApEggmIAZBYQItfjkbJDY0GSYmPxgXdlIiPlcGEihPJAsCUycwBkBiMH5gRw0TIiksOBI4NAwEUyMaFC8UXx08OzQrUCAcCEA8Kg8cdhM6HBslPh4RKg==');
 
 let _syncRows = []; // cache rows từ nguồn
