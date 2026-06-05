@@ -1867,8 +1867,7 @@ CREATE TABLE hr_leave_requests (<br>
                 <th>Dung lượng</th>
                 <th>Ngày Upload</th>
                 <th>Người Upload</th>
-                <th id="otf-th-action" style="display:none">Hành động</th>
-                <th id="otf-th-action-emp">Hành động</th>
+                <th id="otf-th-action">Hành động</th>
               </tr>
             </thead>
             <tbody id="otf-body">
@@ -5158,6 +5157,31 @@ function otfMonthName(m) {
   return ['01','02','03','04','05','06','07','08','09','10','11','12'][parseInt(m)-1] || String(m).padStart(2,'0');
 }
 
+// ── Rút gọn MIME type thành tên ngắn ──
+function otfFileExt(type, fileName) {
+  if (!type && !fileName) return '—';
+  // Ưu tiên lấy từ tên file
+  if (fileName) {
+    const ext = fileName.split('.').pop().toUpperCase();
+    if (ext && ext.length <= 5) return ext;
+  }
+  if (!type) return '—';
+  const map = {
+    'pdf': 'PDF',
+    'sheet': 'XLSX', 'excel': 'XLS', 'xls': 'XLS', 'xlsx': 'XLSX', 'csv': 'CSV',
+    'word': 'DOCX', 'doc': 'DOC', 'docx': 'DOCX',
+    'vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'XLSX',
+    'vnd.ms-excel': 'XLS',
+    'vnd.openxmlformats-officedocument.wordprocessingml.document': 'DOCX',
+    'vnd.ms-word': 'DOC',
+  };
+  const t = type.toLowerCase();
+  for (const [k, v] of Object.entries(map)) {
+    if (t.includes(k)) return v;
+  }
+  return t.split('/').pop().toUpperCase().slice(0, 6);
+}
+
 // ── Format dung lượng ──
 function otfFmtSize(bytes) {
   if (!bytes) return '—';
@@ -5226,11 +5250,10 @@ function otfRender() {
   const tbody = document.getElementById('otf-body');
   const cardList = document.getElementById('otf-card-list');
 
-  // Admin vs Employee column headers
+  // Action column header always visible (single th now)
   const thAdmin = document.getElementById('otf-th-action');
-  const thEmp   = document.getElementById('otf-th-action-emp');
-  if (thAdmin) thAdmin.style.display = isAdmin ? '' : 'none';
-  if (thEmp)   thEmp.style.display   = isAdmin ? 'none' : '';
+  if (thAdmin) thAdmin.style.display = '';
+  // Remove old emp-th reference (no longer exists)
 
   if (!list.length) {
     if (tbody) tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:2.5rem;color:var(--text-3);font-size:.875rem;font-weight:500">Không có file nào</td></tr>`;
@@ -5254,7 +5277,7 @@ function otfRender() {
         </td>
         <td><span class="badge bg-teal">T${otfMonthName(f.month)}</span></td>
         <td><span class="badge bg-indigo">${f.year}</span></td>
-        <td style="color:var(--text-2);font-size:.75rem">${f.file_type ? f.file_type.split('/').pop().toUpperCase() : '—'}</td>
+        <td style="color:var(--text-2);font-size:.75rem">${otfFileExt(f.file_type, f.file_name)}</td>
         <td style="color:var(--text-2);font-size:.8rem">${otfFmtSize(f.file_size)}</td>
         <td style="color:var(--text-2);font-size:.8rem">${f.created_at ? fmtD(f.created_at.split('T')[0]) : '—'}</td>
         <td style="color:var(--text-2);font-size:.8rem">${escAttr(f.uploaded_by || '—')}</td>
@@ -5292,7 +5315,7 @@ function otfRender() {
         <div class="mob-row-card-body" style="margin-bottom:.5rem">
           <div class="mob-row-card-field">
             <span class="mob-row-card-label">Loại</span>
-            <span class="mob-row-card-val">${f.file_type ? f.file_type.split('/').pop().toUpperCase() : '—'}</span>
+            <span class="mob-row-card-val">${otfFileExt(f.file_type, f.file_name)}</span>
           </div>
           <div class="mob-row-card-field">
             <span class="mob-row-card-label">Dung lượng</span>
