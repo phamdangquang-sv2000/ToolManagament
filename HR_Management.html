@@ -1367,6 +1367,18 @@
     background: rgba(255,255,255,0.06);
     border-radius: 5px;
   }
+  .device-card .dev-note {
+    display: flex; align-items: flex-start; gap: 5px;
+    margin-top: 5px;
+    font-size: 11px; line-height: 1.4;
+  }
+  .device-card .dev-note-icon { flex-shrink: 0; font-size: 11px; margin-top: 1px; }
+  .device-card .dev-note-text {
+    overflow: hidden; display: -webkit-box;
+    -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    color: rgba(255,255,255,0.45);
+    font-style: italic;
+  }
 
 </style>
 </head>
@@ -3258,6 +3270,7 @@ function renderAccList(rows) {
           ${r.pic_name?`<span>${r.pic_name}</span>`:""}
           ${r.job_title?`<span>· ${r.job_title}</span>`:""}
         </div>
+        ${r.note?`<div class="dev-note"><span class="dev-note-icon">📝</span><span class="dev-note-text">${r.note}</span></div>`:""}
       </div>
       ${devStatusBadge(r.status)}
     </div>`;
@@ -3675,6 +3688,7 @@ function viewAcc(id){
   const f = document.getElementById("modal-footer");
   if (isAdmin) {
     f.innerHTML = `<button class="btn btn-ghost" style="flex:1;" onclick="closeModal()">Đóng</button>
+      <button style="flex:1;background:linear-gradient(135deg,#3b82f6,#6366f1)!important;color:#fff!important;font-weight:600;border:none;padding:10px 16px;border-radius:12px;font-size:14px;cursor:pointer;" onclick="editAccNote(${r.id})">✏️ Sửa Note</button>
       <button class="btn btn-danger btn-sm" style="flex:1;" onclick="delAcc(${r.id})">Xóa</button>`;
   } else {
     f.innerHTML = `<button class="btn btn-ghost" style="flex:1;" onclick="closeModal()">Đóng</button>`;
@@ -3687,6 +3701,34 @@ function delAcc(id){
     try { await apiDelete(_urlAcc, id); closeModal(); toast("Đã xóa","success"); loadAccounts(); }
     catch(e){ toast("Lỗi: "+e.message,"error"); }
   });
+}
+function editAccNote(id){
+  const r = allAccounts.find(x=>x.id===id); if(!r) return;
+  document.getElementById("modal-title").textContent = "Sửa Note – " + (r.heiway_account||"");
+  document.getElementById("modal-body").innerHTML = `
+    <div style="margin-bottom:10px;font-size:13px;color:var(--text-secondary);">Chỉ chỉnh sửa phần ghi chú cho tài khoản này.</div>
+    <div class="form-field">
+      <label class="form-label">📝 Note</label>
+      <textarea class="form-input" id="an-note" rows="4" placeholder="Nhập ghi chú...">${r.note||""}</textarea>
+    </div>
+  `;
+  document.getElementById("modal-footer").innerHTML = `
+    <button class="btn btn-ghost" style="flex:1;" onclick="viewAcc(${r.id})">← Quay lại</button>
+    <button class="btn btn-primary" style="flex:1;" onclick="saveAccNote(${r.id})">Lưu Note</button>
+  `;
+}
+async function saveAccNote(id){
+  const r = allAccounts.find(x=>x.id===id); if(!r) return;
+  const note = document.getElementById("an-note").value.trim() || null;
+  const btn = document.querySelector("#modal-footer .btn-primary");
+  if (btn) { if (btn.disabled) return; btn.disabled = true; btn.textContent = "Đang lưu..."; }
+  try {
+    await apiUpdate(_urlAcc, id, { note });
+    closeModal(); toast("Đã cập nhật note","success"); loadAccounts();
+  } catch(e){
+    toast("Lỗi: "+e.message,"error");
+    if (btn) { btn.disabled = false; btn.textContent = "Lưu Note"; }
+  }
 }
 function accForm(r){
   return `
