@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VoteFlow — Nền tảng bình chọn trực tuyến</title>
+<title>Quick Vote — Nền tảng bình chọn trực tuyến</title>
 <meta name="description" content="Hệ thống bình chọn hiện đại, thời gian thực" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
@@ -40,8 +40,8 @@
   --shadow-md:     0 6px 24px rgba(15,23,42,0.08);
   --shadow-lg:     0 18px 48px rgba(15,23,42,0.12);
   --shadow-glow:   0 0 32px rgba(124,111,255,0.18);
-  --font-display:  'Plus Jakarta Sans', sans-serif;
-  --font-body:     'Inter', sans-serif;
+  --font-display:  'Be Vietnam Pro', 'Plus Jakarta Sans', sans-serif;
+  --font-body:     'Be Vietnam Pro', 'Inter', sans-serif;
   --ease-out:      cubic-bezier(0.22,1,0.36,1);
   --ease-spring:   cubic-bezier(0.34,1.56,0.64,1);
 }
@@ -2917,10 +2917,13 @@ const Voting = {
         .map(l => (l.name || '').trim().toLowerCase())
     );
 
-    // Filter out employees whose name already appears in the options list
+    // Get current logged-in employee id to exclude self
+    const selfId = EmployeeAuth.session?.employee?.id;
+
+    // Filter out employees whose name already appears in the options list, and exclude self
     employees = employees.filter(e => {
       const n = (e.name || '').trim().toLowerCase();
-      return n && !existingNames.has(n);
+      return n && !existingNames.has(n) && e.id !== selfId;
     });
 
     // Build a nice filterable list instead of a plain <select>
