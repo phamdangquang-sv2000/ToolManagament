@@ -2895,17 +2895,19 @@ const Voting = {
 
   async _showOtherChoiceModal(eventId, locationId) {
     // Load employee list from hr_employees:
-    // - Only active employees (is_active = true)
-    // - Department = 'L2'
+    // - Active employees only (is_active != false, filtered client-side)
     // - Exclude names already present as vote options (A, B, C, D...)
     let employees = [];
     try {
       const { data } = await sb.from('hr_employees')
-        .select('id,name,email,department,is_active')
-        .eq('is_active', true)
-        .eq('department', 'L2')
+        .select('id,name,email,is_active')
+        .not('name', 'is', null)
         .order('name', { ascending: true });
-      employees = (data || []).filter(e => e.name || e.email);
+      // Filter active client-side (handles boolean true AND string 'true')
+      employees = (data || []).filter(e =>
+        (e.name || '').trim() &&
+        e.is_active !== false && e.is_active !== 'false' && e.is_active !== 0
+      );
     } catch(e) { employees = []; }
 
     // Build set of existing option names (lowercased) to exclude duplicates
