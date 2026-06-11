@@ -344,11 +344,11 @@ h1,h2,h3,h4,h5 { font-family: var(--font-display); }
 }
 .auth-logo-icon {
   width: 40px; height:40px;
-  background: var(--c-grad1);
   border-radius: 10px;
   display:flex; align-items:center; justify-content:center;
-  font-size:20px;
+  overflow: hidden;
 }
+.auth-logo-icon img { width:100%; height:100%; object-fit:cover; display:block; }
 .auth-logo-text { font-family:var(--font-display); font-size:22px; font-weight:800; }
 .auth-title { font-size:26px; font-weight:800; text-align:center; margin-bottom:6px; }
 .auth-subtitle { color:var(--c-muted); text-align:center; font-size:14px; margin-bottom:28px; }
@@ -385,12 +385,12 @@ h1,h2,h3,h4,h5 { font-family: var(--font-display); }
 }
 .sidebar-logo-icon {
   width:36px; height:36px;
-  background: var(--c-grad1);
   border-radius:10px;
   display:flex; align-items:center; justify-content:center;
-  font-size:16px;
+  overflow:hidden;
   box-shadow: 0 4px 12px rgba(124,111,255,0.3);
 }
+.sidebar-logo-icon img { width:100%; height:100%; object-fit:cover; display:block; }
 .sidebar-logo-text { font-family:var(--font-display); font-weight:800; font-size:17px; letter-spacing:-.02em; }
 .sidebar-nav { flex:1; display:flex; flex-direction:column; gap:3px; padding:8px 12px; }
 .sidebar-item {
@@ -1163,7 +1163,7 @@ canvas { max-height:280px; }
         document.getElementById('landing-page').classList.remove('hidden');
       " style="position:absolute;top:16px;left:16px;font-size:13px;color:var(--c-muted);padding:6px 10px;">← Quay lại</button>
       <div class="auth-logo">
-        <div class="auth-logo-icon">🗳️</div>
+        <div class="auth-logo-icon"><img src="https://edsowiramriosgwfuewg.supabase.co/storage/v1/object/public/Video/vote2.png" alt="VoteFlow" /></div>
         <span class="auth-logo-text">VoteFlow</span>
       </div>
       <h1 class="auth-title">Đăng nhập Admin</h1>
@@ -1191,7 +1191,7 @@ canvas { max-height:280px; }
   <div id="emp-auth-page" class="hidden">
     <div class="auth-card">
       <div class="auth-logo">
-        <div class="auth-logo-icon">🗳️</div>
+        <div class="auth-logo-icon"><img src="https://edsowiramriosgwfuewg.supabase.co/storage/v1/object/public/Video/vote2.png" alt="VoteFlow" /></div>
         <span class="auth-logo-text">VoteFlow</span>
       </div>
 
@@ -1202,7 +1202,7 @@ canvas { max-height:280px; }
         <div class="auth-form">
           <div class="form-group">
             <label class="form-label">Mã NV hoặc Email</label>
-            <input type="text" id="emp-identifier" autocomplete="username" placeholder="EMP001 hoặc you@company.vn" />
+            <input type="text" id="emp-identifier" autocomplete="username" placeholder="shrvnxxx@heiway.net" />
           </div>
           <button class="btn btn-primary w-full btn-lg" id="emp-identifier-btn">Tiếp tục</button>
           <p id="emp-identifier-err" class="text-sm" style="color:var(--c-error);text-align:center;display:none;"></p>
@@ -1268,7 +1268,7 @@ canvas { max-height:280px; }
     <!-- Sidebar -->
     <aside class="admin-sidebar" id="admin-sidebar">
       <div class="sidebar-logo">
-        <div class="sidebar-logo-icon">🗳️</div>
+        <div class="sidebar-logo-icon"><img src="https://edsowiramriosgwfuewg.supabase.co/storage/v1/object/public/Video/vote2.png" alt="VoteFlow" /></div>
         <span class="sidebar-logo-text">VoteFlow</span>
       </div>
       <nav class="sidebar-nav">
@@ -1482,7 +1482,7 @@ canvas { max-height:280px; }
   <div id="landing-page" class="hidden">
     <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(124,111,255,0.10) 0%, transparent 70%);">
       <div style="text-align:center;max-width:420px;width:100%;">
-        <div style="font-size:56px;margin-bottom:16px;">🗳️</div>
+        <div style="margin-bottom:16px;"><img src="https://edsowiramriosgwfuewg.supabase.co/storage/v1/object/public/Video/vote2.png" alt="VoteFlow" style="width:72px;height:72px;object-fit:contain;margin:0 auto;display:block;" /></div>
         <h1 style="font-family:var(--font-display);font-size:32px;font-weight:800;margin-bottom:8px;">VoteFlow</h1>
         <p style="color:var(--c-muted);font-size:15px;margin-bottom:40px;">Nền tảng bình chọn trực tuyến thời gian thực</p>
         <div style="display:flex;flex-direction:column;gap:14px;">
@@ -2682,6 +2682,9 @@ const Voting = {
     };
     update(); setInterval(update, 1000);
   },
+  // Tracks which option the employee has highlighted (but not yet submitted)
+  _pendingVoteId: null,
+
   renderLocations(locs, event) {
     const grid = document.getElementById('voting-locations-grid');
     grid.className = ''; // remove grid class, use flex column
@@ -2692,21 +2695,46 @@ const Voting = {
 
     const palette = ['#7c6fff','#ff6b9d','#22d3a0','#f59e0b','#0ea5e9','#a78bfa','#fb7185','#34d399'];
     const hasVoted = State.votedLocations.size > 0;
-    const myVote   = [...State.votedLocations][0];
 
-    // Sort by name (A. B. C. D.) - stable even without sort_order column
     const sorted = [...locs].sort((a,b)=>(a.sort_order??99)-(b.sort_order??99));
     const total  = sorted.reduce((s,l)=>s+(l.vote_count||0),0);
 
+    // Reset pending when re-rendering after a real vote
+    if (hasVoted) Voting._pendingVoteId = null;
+
     grid.innerHTML = '<div class="vote-options-grid" id="vote-options-inner">' +
       sorted.map((l,i)=>{
-        const voted   = State.votedLocations.has(l.id);
-        const color   = palette[i % palette.length];
-        const nameStr = l.name; // strip "A. "
-        const label   = l.label || String.fromCharCode(65+i);
-        const pct     = total ? Math.round((l.vote_count||0)/total*100) : 0;
+        const voted     = State.votedLocations.has(l.id);
+        const isPending = !hasVoted && Voting._pendingVoteId === l.id;
+        const color     = palette[i % palette.length];
+        const nameStr   = l.name;
+        const label     = l.label || String.fromCharCode(65+i);
+        const pct       = total ? Math.round((l.vote_count||0)/total*100) : 0;
+
+        // Border/bg highlight for pending selection
+        const cardStyle = isPending
+          ? `border-color:${color};background:${color}12;`
+          : '';
+
+        // Right-side action
+        let actionHtml;
+        if (voted) {
+          actionHtml = `<div style="font-size:24px;">✅</div>`;
+        } else if (hasVoted) {
+          actionHtml = `<div style="font-size:20px;opacity:0.3;">○</div>`;
+        } else if (isPending) {
+          actionHtml = `<div style="width:26px;height:26px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>`;
+        } else {
+          actionHtml = `<div style="width:24px;height:24px;border-radius:50%;border:2px solid var(--c-border);flex-shrink:0;"></div>`;
+        }
+
         return `
-          <div class="vote-option-card${voted?' voted':''}" id="loc-card-${l.id}" style="animation-delay:${i*0.08}s">
+          <div class="vote-option-card${voted?' voted':''}"
+               id="loc-card-${l.id}"
+               style="animation-delay:${i*0.08}s;cursor:${hasVoted?'default':'pointer'};${cardStyle}"
+               ${!hasVoted ? `onclick="Voting.selectOption('${event.id}','${l.id}')"` : ''}>
             <div class="option-letter" style="background:${color};box-shadow:0 4px 16px ${color}55;">${label}</div>
             <div style="flex:1;min-width:0;">
               <div style="font-size:17px;font-weight:700;font-family:var(--font-display);margin-bottom:3px;">${sanitize(nameStr)}</div>
@@ -2719,26 +2747,110 @@ const Voting = {
                   <span style="font-size:12px;color:var(--c-muted);min-width:32px;"><span id="vc-${l.id}">${fmtNum(l.vote_count||0)}</span> phiếu</span>` : ''}
               </div>
             </div>
-            <div style="flex-shrink:0;">
-              ${voted
-                ? `<div style="font-size:24px;">✅</div>`
-                : hasVoted
-                  ? `<div style="font-size:20px;opacity:0.3;">○</div>`
-                  : `<button class="vote-btn" id="vbtn-${l.id}"
-                       onclick="Voting.handleVote('${event.id}','${l.id}')"
-                       style="padding:10px 20px;border-radius:99px;">
-                       Chọn
-                     </button>`
-              }
-            </div>
+            <div style="flex-shrink:0;">${actionHtml}</div>
           </div>`;
       }).join('') + '</div>';
+
+    // Render the submit bar if there's a pending selection and not yet voted
+    if (!hasVoted) {
+      Voting._renderSubmitBar(event.id, sorted);
+    }
   },
-  async handleVote(eventId, locationId) {
-    const btn = document.getElementById('vbtn-'+locationId);
-    if (!btn || btn.disabled) return;
-    btn.disabled = true;
-    btn.textContent = '⏳';
+
+  _renderSubmitBar(eventId, sorted) {
+    // Remove existing bar
+    const old = document.getElementById('vote-submit-bar');
+    if (old) old.remove();
+
+    if (!Voting._pendingVoteId) return;
+
+    const loc = sorted.find(l => l.id === Voting._pendingVoteId);
+    if (!loc) return;
+
+    const bar = document.createElement('div');
+    bar.id = 'vote-submit-bar';
+    bar.style.cssText = [
+      'position:fixed', 'bottom:0', 'left:0', 'right:0',
+      'background:#fff', 'border-top:1.5px solid var(--c-border)',
+      'box-shadow:0 -8px 32px rgba(15,23,42,0.10)',
+      'padding:16px 24px', 'display:flex', 'align-items:center',
+      'justify-content:space-between', 'gap:16px', 'z-index:500',
+      'animation:toast-in .25s var(--ease-spring)'
+    ].join(';');
+
+    bar.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+        <div style="font-size:13px;color:var(--c-muted);white-space:nowrap;">Đã chọn:</div>
+        <div style="font-size:15px;font-weight:700;font-family:var(--font-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${sanitize(loc.name)}</div>
+      </div>
+      <button id="vote-submit-btn" class="btn btn-primary"
+        style="flex-shrink:0;padding:12px 28px;font-size:15px;border-radius:99px;"
+        onclick="Voting.submitPendingVote('${eventId}')">
+        🗳️ Bầu chọn
+      </button>`;
+
+    document.getElementById('voting-page').appendChild(bar);
+    // Add padding to prevent bar covering last card
+    const body = document.getElementById('voting-locations-grid');
+    if (body) body.style.paddingBottom = '80px';
+  },
+
+  selectOption(eventId, locationId) {
+    if (State.votedLocations.size > 0) return; // already voted, locked
+
+    // Toggle: clicking same option deselects
+    if (Voting._pendingVoteId === locationId) {
+      Voting._pendingVoteId = null;
+    } else {
+      Voting._pendingVoteId = locationId;
+    }
+
+    // Re-render just the option cards (not full re-fetch, fast)
+    const sorted = [...State.currentLocations].sort((a,b)=>(a.sort_order??99)-(b.sort_order??99));
+    const palette = ['#7c6fff','#ff6b9d','#22d3a0','#f59e0b','#0ea5e9','#a78bfa','#fb7185','#34d399'];
+
+    sorted.forEach((l, i) => {
+      const card = document.getElementById('loc-card-'+l.id);
+      if (!card) return;
+      const isPending = Voting._pendingVoteId === l.id;
+      const color = palette[i % palette.length];
+      if (isPending) {
+        card.style.borderColor = color;
+        card.style.background = color + '12';
+      } else {
+        card.style.borderColor = '';
+        card.style.background = '';
+      }
+      // Update checkmark area
+      const actionDiv = card.querySelector('div[style*="flex-shrink:0"]');
+      if (actionDiv) {
+        if (isPending) {
+          actionDiv.innerHTML = `<div style="width:26px;height:26px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>`;
+        } else {
+          actionDiv.innerHTML = `<div style="width:24px;height:24px;border-radius:50%;border:2px solid var(--c-border);flex-shrink:0;"></div>`;
+        }
+      }
+    });
+
+    // Update submit bar
+    Voting._renderSubmitBar(eventId, sorted);
+  },
+
+  async submitPendingVote(eventId) {
+    const locationId = Voting._pendingVoteId;
+    if (!locationId) return;
+
+    const loc = State.currentLocations.find(l => l.id === locationId);
+    const isOther = loc && /lựa chọn khác/i.test(loc.name);
+    if (isOther) {
+      Voting._showOtherChoiceModal(eventId, locationId);
+      return;
+    }
+
+    const submitBtn = document.getElementById('vote-submit-btn');
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '⏳ Đang ghi nhận...'; }
 
     const voterId = getVoterIdentifier(eventId);
     const empSession = EmployeeAuth.session;
@@ -2747,32 +2859,171 @@ const Voting = {
       await API.castVote(eventId, locationId, voterId, voterName);
       markVotedLocal(eventId, locationId);
       State.votedLocations.add(locationId);
+      Voting._pendingVoteId = null;
 
-      // Update UI
-      const vcEl  = document.getElementById('vc-'+locationId);
-      const card  = document.getElementById('loc-card-'+locationId);
-      const event = State.currentEvent;
+      const bar = document.getElementById('vote-submit-bar');
+      if (bar) bar.remove();
 
-      // Re-render toàn bộ để hiện kết quả
       const updatedLocs = await API.getOptions(eventId);
       State.currentLocations = updatedLocs;
-      Voting.renderLocations(updatedLocs, event);
+      Voting.renderLocations(updatedLocs, State.currentEvent);
 
-      // Confetti
       Confetti.run();
-      Toast.show('Đã ghi nhận lựa chọn của bạn! 🎉','success');
+      Toast.show('Đã ghi nhận lựa chọn của bạn! 🎉', 'success');
     } catch(e) {
-      btn.disabled = false;
-      btn.textContent = '🗳️ Bình chọn';
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '🗳️ Bầu chọn'; }
       if (e.message === 'duplicate') {
-        Toast.show('Bạn đã bình chọn rồi!','warning');
+        Toast.show('Bạn đã bình chọn rồi!', 'warning');
         markVotedLocal(eventId, locationId);
         State.votedLocations.add(locationId);
-        btn.className = 'vote-btn voted-btn';
-        btn.textContent = '✅ Đã bình chọn';
-        btn.disabled = true;
+        Voting._pendingVoteId = null;
+        const bar = document.getElementById('vote-submit-bar');
+        if (bar) bar.remove();
+        const updatedLocs = await API.getOptions(eventId);
+        State.currentLocations = updatedLocs;
+        Voting.renderLocations(updatedLocs, State.currentEvent);
       } else {
-        Toast.show('Lỗi: '+e.message,'error');
+        Toast.show('Lỗi: ' + e.message, 'error');
+      }
+    }
+  },
+
+  // Legacy handleVote kept for compatibility but now just calls selectOption
+  async handleVote(eventId, locationId) {
+    Voting.selectOption(eventId, locationId);
+  },
+
+  async _showOtherChoiceModal(eventId, locationId) {
+    // Load employee list from hr_employees:
+    // - Only active employees (is_active = true)
+    // - Department = 'L2'
+    // - Exclude names already present as vote options (A, B, C, D...)
+    let employees = [];
+    try {
+      const { data } = await sb.from('hr_employees')
+        .select('id,name,email,department,is_active')
+        .eq('is_active', true)
+        .eq('department', 'L2')
+        .order('name', { ascending: true });
+      employees = (data || []).filter(e => e.name || e.email);
+    } catch(e) { employees = []; }
+
+    // Build set of existing option names (lowercased) to exclude duplicates
+    const existingNames = new Set(
+      State.currentLocations
+        .filter(l => !/lựa chọn khác/i.test(l.name))
+        .map(l => (l.name || '').trim().toLowerCase())
+    );
+
+    // Filter out employees whose name already appears in the options list
+    employees = employees.filter(e => {
+      const n = (e.name || '').trim().toLowerCase();
+      return n && !existingNames.has(n);
+    });
+
+    // Build a nice filterable list instead of a plain <select>
+    const listItems = employees.map(e => {
+      const display = sanitize(e.name || e.email || '');
+      return `<div class="emp-picker-item" onclick="Voting._pickEmployee('${(e.name || e.email || '').replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--c-grad1);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;">${display[0]||'?'}</div>
+        <span style="font-size:14px;font-weight:500;">${display}</span>
+      </div>`;
+    }).join('');
+
+    const html = `
+      <div class="modal-header">
+        <span class="modal-title">Lựa chọn khác</span>
+        <button class="btn btn-ghost btn-icon" onclick="Modal.close()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="color:var(--c-muted);font-size:14px;margin-bottom:12px;">Bạn đã chọn <strong>Lựa chọn khác</strong>. Vui lòng nhập tên hoặc chọn từ danh sách bên dưới:</p>
+
+        <div class="form-group" style="margin-bottom:8px;">
+          <label class="form-label">Tên người được đề xuất <span style="color:var(--c-error);">*</span></label>
+          <input id="other-choice-input" placeholder="Nhập hoặc tìm tên..." style="font-size:15px;"
+            oninput="Voting._filterEmpList(this.value)" autocomplete="off" />
+        </div>
+        <p id="other-choice-err" style="color:var(--c-error);font-size:13px;display:none;margin-top:-4px;margin-bottom:8px;"></p>
+
+        ${employees.length ? `
+        <div style="border:1px solid var(--c-border);border-radius:var(--radius-md);overflow:hidden;margin-top:4px;">
+          <div style="padding:8px 12px;background:var(--c-surface2);font-size:11px;font-weight:700;color:var(--c-muted);text-transform:uppercase;letter-spacing:.05em;">
+            Danh sách nhân viên (${employees.length})
+          </div>
+          <div id="emp-picker-list" style="max-height:220px;overflow-y:auto;">${listItems}</div>
+        </div>
+        <style>
+          .emp-picker-item{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--c-border);transition:background .15s;}
+          .emp-picker-item:last-child{border-bottom:none;}
+          .emp-picker-item:hover{background:rgba(124,111,255,0.07);}
+          .emp-picker-item.hidden{display:none;}
+        </style>` : `<p style="color:var(--c-muted);font-size:13px;margin-top:4px;">Không có nhân viên nào phù hợp. Vui lòng nhập tên thủ công.</p>`}
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="Modal.close()">Huỷ</button>
+        <button class="btn btn-primary" onclick="Voting._confirmOtherChoice('${eventId}','${locationId}')">✅ Xác nhận</button>
+      </div>
+    `;
+    Modal.open(html);
+    setTimeout(() => document.getElementById('other-choice-input')?.focus(), 100);
+  },
+
+  _pickEmployee(name) {
+    const input = document.getElementById('other-choice-input');
+    if (input) { input.value = name; input.focus(); }
+    // Highlight all, clear filter
+    document.querySelectorAll('.emp-picker-item').forEach(el => el.classList.remove('hidden'));
+  },
+
+  _filterEmpList(query) {
+    const q = query.toLowerCase().trim();
+    document.querySelectorAll('.emp-picker-item').forEach(el => {
+      const text = el.textContent.toLowerCase();
+      el.classList.toggle('hidden', q.length > 0 && !text.includes(q));
+    });
+  },
+
+  async _confirmOtherChoice(eventId, locationId) {
+    const nameVal = document.getElementById('other-choice-input')?.value?.trim();
+    const errEl = document.getElementById('other-choice-err');
+    if (!nameVal) {
+      if (errEl) { errEl.textContent = 'Vui lòng nhập tên hoặc chọn từ danh sách.'; errEl.style.display = ''; }
+      document.getElementById('other-choice-input')?.focus();
+      return;
+    }
+    if (errEl) errEl.style.display = 'none';
+
+    const confirmBtn = document.querySelector('.modal .btn-primary');
+    if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.textContent = '⏳ Đang ghi nhận...'; }
+
+    Modal.close();
+
+    Voting._pendingVoteId = null;
+    const bar = document.getElementById('vote-submit-bar');
+    if (bar) bar.remove();
+
+    const voterId = getVoterIdentifier(eventId);
+    try {
+      await API.castVote(eventId, locationId, voterId, nameVal);
+      markVotedLocal(eventId, locationId);
+      State.votedLocations.add(locationId);
+
+      const updatedLocs = await API.getOptions(eventId);
+      State.currentLocations = updatedLocs;
+      Voting.renderLocations(updatedLocs, State.currentEvent);
+
+      Confetti.run();
+      Toast.show('Đã ghi nhận: ' + nameVal + ' 🎉', 'success');
+    } catch(e) {
+      if (e.message === 'duplicate') {
+        Toast.show('Bạn đã bình chọn rồi!', 'warning');
+        markVotedLocal(eventId, locationId);
+        State.votedLocations.add(locationId);
+        const updatedLocs = await API.getOptions(eventId);
+        State.currentLocations = updatedLocs;
+        Voting.renderLocations(updatedLocs, State.currentEvent);
+      } else {
+        Toast.show('Lỗi: ' + e.message, 'error');
       }
     }
   },
@@ -2814,6 +3065,9 @@ const Voting = {
     State.currentEvent = null;
     State.currentLocations = [];
     State.votedLocations = new Set();
+    Voting._pendingVoteId = null;
+    const bar = document.getElementById('vote-submit-bar');
+    if (bar) bar.remove();
     document.getElementById('voting-tabs').style.display = 'none';
     document.getElementById('voting-panel-results').style.display = 'none';
     document.getElementById('voting-panel-vote').style.display = '';
@@ -3367,7 +3621,7 @@ const EmployeeAuth = {
           // Header
           const header = document.createElement('div');
           header.style.cssText = 'text-align:center;margin-bottom:32px;';
-          header.innerHTML = '<div style="font-size:48px;margin-bottom:16px;">🗳️</div>'
+          header.innerHTML = '<div style="margin-bottom:16px;"><img src="https://edsowiramriosgwfuewg.supabase.co/storage/v1/object/public/Video/vote2.png" alt="VoteFlow" style="width:72px;height:72px;object-fit:contain;margin:0 auto;display:block;" /></div>'
             + '<h1 style="font-family:var(--font-display);font-size:26px;font-weight:800;margin-bottom:8px;">Chọn sự kiện bình chọn</h1>'
             + '<p style="color:var(--c-muted);font-size:14px;margin-bottom:28px;">Có ' + activeEvents.length + ' sự kiện đang mở. Chọn sự kiện bạn muốn tham gia:</p>';
           inner.appendChild(header);
@@ -3523,7 +3777,7 @@ const EmployeeAuth = {
           document.getElementById('landing-page').innerHTML = `
             <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;">
               <div style="text-align:center;">
-                <div style="font-size:56px;margin-bottom:16px;">🗳️</div>
+                <div style="margin-bottom:16px;"><img src="https://edsowiramriosgwfuewg.supabase.co/storage/v1/object/public/Video/vote2.png" alt="VoteFlow" style="width:72px;height:72px;object-fit:contain;margin:0 auto;display:block;" /></div>
                 <h1 style="font-family:var(--font-display);font-size:26px;font-weight:800;margin-bottom:8px;">Chưa có sự kiện nào</h1>
                 <p style="color:var(--c-muted);margin-bottom:24px;">Ban tổ chức chưa mở sự kiện bình chọn nào.<br/>Vui lòng quay lại sau.</p>
                 <button class="btn btn-ghost btn-sm" onclick="EmployeeAuth.logout();Router.go().catch(console.error);">🚪 Đăng xuất</button>
