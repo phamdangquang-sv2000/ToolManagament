@@ -1908,8 +1908,10 @@ const Admin = {
     document.getElementById('logout-btn').onclick = () => Auth.logout();
     document.getElementById('save-config-btn').onclick = () => Admin.saveConfig();
     document.getElementById('create-event-btn').onclick = () => Admin.showEventModal();
+    document.getElementById('refresh-dashboard-btn')?.addEventListener('click', () => Admin.loadDashboard());
+    document.getElementById('add-location-btn')?.addEventListener('click', () => Admin.showLocationModal(''));
     document.getElementById('export-csv-btn')?.addEventListener('click', () => Admin.exportCSV());
-    document.getElementById('export-history-csv-btn').onclick = () => Admin.exportHistoryCSV();
+    document.getElementById('export-history-csv-btn')?.addEventListener('click', () => Admin.exportHistoryCSV());
     document.getElementById('refresh-history-btn').onclick = () => Admin.loadHistorySection();
     document.getElementById('results-event-filter')?.addEventListener('change', e => Admin.loadResults(e.target.value));
   },
@@ -2577,6 +2579,17 @@ const Admin = {
 // ============================================================
 const Voting = {
   async init(eventId) {
+    // Reset toàn bộ state trước khi load event mới — tránh data cũ từ event trước
+    State.votedLocations  = new Set();
+    State.myNominatedName = null;
+    State.currentEvent    = null;
+    State.currentLocations= [];
+    Voting._pendingVoteId = null;
+    const oldBar = document.getElementById('vote-submit-bar');
+    if (oldBar) oldBar.remove();
+    // Clear countdown interval nếu còn
+    if (Voting._countdownTimer) { clearInterval(Voting._countdownTimer); Voting._countdownTimer = null; }
+
     State.deviceId    = getOrSetDeviceId();
     State.fingerprint = await getBrowserFingerprint();
 
@@ -2709,7 +2722,7 @@ const Voting = {
       const d = Math.floor(diff/864e5), h=Math.floor(diff%864e5/36e5), m=Math.floor(diff%36e5/6e4), s=Math.floor(diff%6e4/1e3);
       el.innerHTML = [['d',d],['h',h],['m',m],['s',s]].map(([u,v])=>`<div class="countdown-unit"><div class="countdown-num">${String(v).padStart(2,'0')}</div><div class="countdown-label">${u}</div></div>`).join('');
     };
-    update(); setInterval(update, 1000);
+    update(); Voting._countdownTimer = setInterval(update, 1000);
   },
   // Tracks which option the employee has highlighted (but not yet submitted)
   _pendingVoteId: null,
@@ -2773,7 +2786,7 @@ const Voting = {
                 <div style="flex:1;height:6px;background:var(--c-surface2);border-radius:99px;overflow:hidden;">
                   <div id="vprog-${l.id}" style="height:100%;border-radius:99px;background:${color};width:${hasVoted?pct:0}%;transition:width .8s var(--ease-out);"></div>
                 </div>
-                ${hasVoted ? `<span style="font-size:13px;font-weight:700;color:${color};min-width:36px;text-align:right;">${pct}%</span>
+                ${hasVoted ? `<span id="vpct-${l.id}" style="font-size:13px;font-weight:700;color:${color};min-width:36px;text-align:right;">${pct}%</span>
                   <span style="font-size:12px;color:var(--c-muted);min-width:32px;"><span id="vc-${l.id}">${fmtNum(l.vote_count||0)}</span> phiếu</span>` : ''}
               </div>
             </div>
@@ -3033,17 +3046,18 @@ const Voting = {
     const confirmBtn = document.querySelector('.modal .btn-primary');
     if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.textContent = '⏳ Đang ghi nhận...'; }
 
-    Modal.close();
-
-    Voting._pendingVoteId = null;
-    const bar = document.getElementById('vote-submit-bar');
-    if (bar) bar.remove();
-
     const voterId = getVoterIdentifier(eventId);
     const empSession2 = EmployeeAuth.session;
     const voterNameSelf = empSession2?.employee?.full_name || empSession2?.employee?.name || null;
     try {
       await API.castVote(eventId, locationId, voterId, voterNameSelf, nameVal);
+
+      // Chỉ close modal và dọn UI sau khi vote thành công
+      Modal.close();
+      Voting._pendingVoteId = null;
+      const bar = document.getElementById('vote-submit-bar');
+      if (bar) bar.remove();
+
       markVotedLocal(eventId, locationId);
       State.votedLocations.add(locationId);
       State.myNominatedName = nameVal;
@@ -3055,7 +3069,13 @@ const Voting = {
       Confetti.run();
       Toast.show('Đã ghi nhận: ' + nameVal + ' 🎉', 'success');
     } catch(e) {
+      // Re-enable button để user có thể thử lại (modal vẫn còn mở)
+      if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.textContent = '✅ Xác nhận'; }
       if (e.message === 'duplicate') {
+        Modal.close();
+        Voting._pendingVoteId = null;
+        const dupBar = document.getElementById('vote-submit-bar');
+        if (dupBar) dupBar.remove();
         Toast.show('Bạn đã bình chọn rồi!', 'warning');
         markVotedLocal(eventId, locationId);
         State.votedLocations.add(locationId);
@@ -3063,9 +3083,11 @@ const Voting = {
         State.currentLocations = updatedLocs;
         Voting.renderLocations(updatedLocs, State.currentEvent);
       } else if (e.message === 'self_vote') {
-        Toast.show('Bạn không thể bầu cho chính mình!', 'warning');
+        if (errEl) { errEl.textContent = 'Bạn không thể bầu cho chính mình!'; errEl.style.display = ''; }
+        else Toast.show('Bạn không thể bầu cho chính mình!', 'warning');
       } else {
-        Toast.show('Lỗi: ' + e.message, 'error');
+        if (errEl) { errEl.textContent = 'Lỗi: ' + e.message + '. Vui lòng thử lại.'; errEl.style.display = ''; }
+        else Toast.show('Lỗi: ' + e.message, 'error');
       }
     }
   },
@@ -3084,8 +3106,11 @@ const Voting = {
         State.currentLocations = locs;
         const total = locs.reduce((s,l)=>s+(l.vote_count||0),0);
         locs.forEach(l=>{
+          const pct = total ? Math.round((l.vote_count||0)/total*100) : 0;
           const prog = document.getElementById('vprog-'+l.id);
-          if (prog) prog.style.width = (total?Math.round((l.vote_count||0)/total*100):0)+'%';
+          if (prog) prog.style.width = pct+'%';
+          const pctEl = document.getElementById('vpct-'+l.id);
+          if (pctEl) pctEl.textContent = pct+'%';
         });
       })
       .subscribe();
@@ -3102,6 +3127,7 @@ const Voting = {
       window._eventPickerResultsChannels.forEach(ch => sb.removeChannel(ch));
       window._eventPickerResultsChannels = [];
     }
+    if (Voting._countdownTimer) { clearInterval(Voting._countdownTimer); Voting._countdownTimer = null; }
     Object.values(State.charts).forEach(c => { try { c.destroy(); } catch(e){} });
     State.charts = {};
     State.currentEvent = null;
@@ -3111,6 +3137,15 @@ const Voting = {
     Voting._pendingVoteId = null;
     const bar = document.getElementById('vote-submit-bar');
     if (bar) bar.remove();
+    // Clear banner và meta để không còn dữ liệu event cũ
+    const metaEl = document.getElementById('voting-meta');
+    if (metaEl) metaEl.innerHTML = '';
+    const bannerTitle = document.getElementById('voting-banner-title');
+    if (bannerTitle) bannerTitle.textContent = '';
+    const bannerDesc = document.getElementById('voting-banner-desc');
+    if (bannerDesc) bannerDesc.textContent = '';
+    const bannerImg = document.getElementById('voting-banner-img');
+    if (bannerImg) { bannerImg.src = ''; bannerImg.style.display = 'none'; }
     document.getElementById('voting-tabs').style.display = 'none';
     document.getElementById('voting-panel-results').style.display = 'none';
     document.getElementById('voting-panel-vote').style.display = '';
@@ -3352,6 +3387,7 @@ const EmployeeAuth = {
   logout() {
     sessionStorage.removeItem(EMP_SESSION_KEY);
     this.session = null;
+    this._bound = false; // reset để _bind() chạy lại khi đăng nhập lại
     // Cleanup event picker realtime channel
     if (window._eventPickerChannel) { sb.removeChannel(window._eventPickerChannel); window._eventPickerChannel = null; }
     // Restore landing-page về nội dung gốc (tránh bị kẹt ở event-picker HTML)
