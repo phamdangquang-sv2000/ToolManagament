@@ -1556,6 +1556,7 @@ const State = {
   realtimeChannel: null,
   charts:          {},
   votedLocations:  new Set(),
+  myNominatedName: null,   // tên người được đề xuất khi chọn "Lựa chọn khác"
   antiDupMethod:   'localStorage',
   deviceId:        null,
   fingerprint:     null,
@@ -2632,13 +2633,14 @@ const Voting = {
       // Check voted (dùng employee ID nếu có, fallback localStorage)
       const voterIdentifier = getVoterIdentifier(eventId);
       const { data: myVotes } = await sb.from('votes')
-        .select('option_id')
+        .select('option_id, nominated_name')
         .eq('event_id', eventId)
         .eq('voter_identifier', voterIdentifier);
       if (myVotes && myVotes.length) {
         myVotes.forEach(v => {
           State.votedLocations.add(v.option_id);
           markVotedLocal(eventId, v.option_id);
+          if (v.nominated_name) State.myNominatedName = v.nominated_name;
         });
       } else {
         // Supabase xác nhận không có vote → clear localStorage cache để tránh stale state
@@ -2765,6 +2767,7 @@ const Voting = {
             <div class="option-letter" style="background:${color};box-shadow:0 4px 16px ${color}55;">${label}</div>
             <div style="flex:1;min-width:0;">
               <div style="font-size:17px;font-weight:700;font-family:var(--font-display);margin-bottom:3px;">${sanitize(nameStr)}</div>
+              ${(voted && /lựa chọn khác/i.test(nameStr) && State.myNominatedName) ? `<div style="font-size:14px;font-weight:600;color:${color};margin-bottom:4px;">→ ${sanitize(State.myNominatedName)}</div>` : ''}
               ${l.description ? `<div style="font-size:13px;color:var(--c-muted);margin-bottom:10px;">${sanitize(l.description)}</div>` : '<div style="margin-bottom:10px;"></div>'}
               <div style="display:flex;align-items:center;gap:12px;">
                 <div style="flex:1;height:6px;background:var(--c-surface2);border-radius:99px;overflow:hidden;">
@@ -3043,6 +3046,7 @@ const Voting = {
       await API.castVote(eventId, locationId, voterId, voterNameSelf, nameVal);
       markVotedLocal(eventId, locationId);
       State.votedLocations.add(locationId);
+      State.myNominatedName = nameVal;
 
       const updatedLocs = await API.getOptions(eventId);
       State.currentLocations = updatedLocs;
@@ -3103,6 +3107,7 @@ const Voting = {
     State.currentEvent = null;
     State.currentLocations = [];
     State.votedLocations = new Set();
+    State.myNominatedName = null;
     Voting._pendingVoteId = null;
     const bar = document.getElementById('vote-submit-bar');
     if (bar) bar.remove();
