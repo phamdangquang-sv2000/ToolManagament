@@ -1571,7 +1571,18 @@ function sanitize(str) {
 }
 function fmtDate(ts) {
   if (!ts) return '—';
-  return new Date(ts).toLocaleString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  return new Date(ts).toLocaleString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', timeZone:'Asia/Ho_Chi_Minh' });
+}
+// Convert UTC/ISO timestamp to Vietnam local time string for datetime-local input (YYYY-MM-DDTHH:mm)
+function toVNLocal(ts) {
+  if (!ts) return '';
+  const d = new Date(ts);
+  // offset VN = UTC+7
+  const vnMs = d.getTime() + 7 * 60 * 60 * 1000;
+  const vn = new Date(vnMs);
+  const pad = n => String(n).padStart(2, '0');
+  return vn.getUTCFullYear() + '-' + pad(vn.getUTCMonth()+1) + '-' + pad(vn.getUTCDate())
+    + 'T' + pad(vn.getUTCHours()) + ':' + pad(vn.getUTCMinutes());
 }
 function fmtNum(n) {
   return Number(n ?? 0).toLocaleString('vi-VN');
@@ -2051,8 +2062,8 @@ const Admin = {
         <div class="form-group"><label class="form-label">Câu hỏi / Tiêu đề *</label><input id="ev-title" placeholder="Vd: Bầu chọn địa điểm tổ chức tiệc cuối năm" value="${sanitize(ev?.title||'')}" /></div>
         <div class="form-group"><label class="form-label">Mô tả thêm</label><textarea id="ev-desc" rows="2" placeholder="Thông tin bổ sung về cuộc bầu chọn...">${sanitize(ev?.description||'')}</textarea></div>
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Bắt đầu</label><input type="datetime-local" id="ev-start" value="${ev?.start_date?.slice(0,16)||''}" /></div>
-          <div class="form-group"><label class="form-label">Kết thúc</label><input type="datetime-local" id="ev-end" value="${ev?.end_date?.slice(0,16)||''}" /></div>
+          <div class="form-group"><label class="form-label">Bắt đầu</label><input type="datetime-local" id="ev-start" value="${ev?.start_date ? toVNLocal(ev.start_date) : ''}" /></div>
+          <div class="form-group"><label class="form-label">Kết thúc</label><input type="datetime-local" id="ev-end" value="${ev?.end_date ? toVNLocal(ev.end_date) : ''}" /></div>
         </div>
 
         <div style="margin-top:4px;">
@@ -2139,8 +2150,8 @@ const Admin = {
     const payload = {
       title:          document.getElementById('ev-title').value.trim(),
       description:    document.getElementById('ev-desc').value.trim(),
-      start_date:     document.getElementById('ev-start').value || null,
-      end_date:       document.getElementById('ev-end').value || null,
+      start_date:     document.getElementById('ev-start').value ? new Date(document.getElementById('ev-start').value + ':00+07:00').toISOString() : null,
+      end_date:       document.getElementById('ev-end').value ? new Date(document.getElementById('ev-end').value + ':00+07:00').toISOString() : null,
       allow_multiple_votes: false,
       active:         document.getElementById('ev-active').checked,
       public_results: document.getElementById('ev-public').checked,
