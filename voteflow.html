@@ -1775,24 +1775,31 @@ const API = {
     if (error) throw error;
   },
   /* Votes */
-  async castVote(eventId, locationId, voterIdentifier, voterName) {
+  async castVote(eventId, locationId, voterIdentifier, voterName, nominatedName = null) {
     // Check duplicate
     const { data: existing } = await sb.from('votes')
       .select('id').eq('event_id', eventId).eq('voter_identifier', voterIdentifier).maybeSingle();
     const event = await API.getActiveEvent(eventId);
     if (existing && !event?.allow_multiple_votes) throw new Error('duplicate');
-    // Insert vote (voter_name column – add if missing via ALTER TABLE)
+    // Validate self_vote: không cho đề xuất chính mình qua "Lựa chọn khác"
+    if (nominatedName) {
+      const empSession = EmployeeAuth && EmployeeAuth.session;
+      const selfName = empSession?.employee?.full_name || empSession?.employee?.name || null;
+      if (selfName && nominatedName.trim().toLowerCase() === selfName.trim().toLowerCase()) {
+        throw new Error('self_vote');
+      }
+    }
+    // Insert vote — voter_name = tên người bầu, nominated_name = tên được đề xuất (chỉ với Lựa chọn khác)
     const insertData = { event_id: eventId, option_id: locationId, voter_identifier: voterIdentifier };
     if (voterName) insertData.voter_name = voterName;
+    if (nominatedName) insertData.nominated_name = nominatedName;
     const { error: vErr } = await sb.from('votes').insert(insertData);
     if (vErr) throw vErr;
-    // Increment counter via RPC
-    const { error: rErr } = await sb.rpc('increment_vote', { loc_id: locationId });
-    if (rErr) {
-      // Fallback: manual increment
-      const { data: loc } = await sb.from('vote_options').select('vote_count').eq('id', locationId).maybeSingle();
-      await sb.from('vote_options').update({ vote_count: (loc?.vote_count || 0) + 1 }).eq('id', locationId);
-    }
+    // Sync vote_count = COUNT(*) từ bảng votes (tránh race condition)
+    const { count } = await sb.from('votes')
+      .select('id', { count: 'exact', head: true })
+      .eq('option_id', locationId);
+    await sb.from('vote_options').update({ vote_count: count || 0 }).eq('id', locationId);
   },
   async getVoteStats(eventId) {
     const { data, error } = await sb.from('vote_options').select('id,name,vote_count').eq('event_id', eventId).order('vote_count', { ascending:false });
@@ -2409,7 +2416,7 @@ const Admin = {
 
     // Load votes joined with employee info and location name
     const { data: votes, error } = await sb.from('votes')
-      .select('id, created_at, voter_identifier, voter_name, option_id, vote_options(label, name)')
+      .select('id, created_at, voter_identifier, voter_name, nominated_name, option_id, vote_options(label, name)')
       .eq('event_id', eventId)
       .order('created_at', { ascending: false });
 
@@ -2430,14 +2437,22 @@ const Admin = {
     Admin._historyData = (votes||[]).map(v => {
       const empId = v.voter_identifier?.startsWith('emp_') ? v.voter_identifier.replace('emp_','') : null;
       const emp   = empId ? empMap[empId] : null;
-      // vote_options has label+name directly
+      const isOther = /lựa chọn khác/i.test(v.vote_options?.name || '');
+      // emp_name = tên người bầu (từ hr_employees hoặc voter_name)
+      const voterDisplayName = emp?.name || v.voter_name || (empId ? '(Không tìm thấy)' : 'Khách');
+      // option_name: nếu là "Lựa chọn khác" thì hiển thị tên được đề xuất kèm theo
+      const baseOptionName = v.vote_options ? (v.vote_options.label+'. '+v.vote_options.name) : (v.option_id||'?');
+      const optionNameDisplay = (isOther && v.nominated_name)
+        ? baseOptionName + ' → ' + v.nominated_name
+        : baseOptionName;
       return {
-        id:          v.id,
-        emp_name:    v.voter_name || emp?.name || (empId ? '(Không tìm thấy)' : 'Khách'),
-        emp_email:   emp?.email || v.voter_identifier || '—',
+        id:           v.id,
+        emp_name:     voterDisplayName,
+        emp_email:    emp?.email || v.voter_identifier || '—',
         option_label: v.vote_options?.label || v.option_id?.slice(0,4) || '?',
-        option_name:  v.vote_options ? (v.vote_options.label+'. '+v.vote_options.name) : (v.option_id||'?'),
-        voted_at:    v.created_at,
+        option_name:  optionNameDisplay,
+        nominated_name: v.nominated_name || null,
+        voted_at:     v.created_at,
       };
     });
 
@@ -2489,8 +2504,9 @@ const Admin = {
         <td>
           <span class="option-badge" style="background:${color}22;color:${color};">
             <span style="font-weight:900;">${sanitize(v.option_label)}</span>
-            <span>${sanitize(v.option_name.replace(/^[A-Z]\.\s*/,''))}</span>
+            <span>${sanitize(v.option_name.replace(/^[A-Z]\.\s*/,'').replace(/ → .*/,''))}</span>
           </span>
+          ${v.nominated_name ? `<div style="font-size:12px;color:var(--c-muted);margin-top:3px;">→ ${sanitize(v.nominated_name)}</div>` : ''}
         </td>
         <td class="text-sm text-muted">${fmtDate(v.voted_at)}</td>
       </tr>`;
@@ -2499,8 +2515,8 @@ const Admin = {
 
   async exportHistoryCSV() {
     if (!Admin._historyData.length) { Toast.show('Không có dữ liệu để xuất','warning'); return; }
-    const rows = [['Nhân viên','Email','Lựa chọn','Thời gian'],
-      ...Admin._historyData.map(v => [v.emp_name, v.emp_email, v.option_name, fmtDate(v.voted_at)])];
+    const rows = [['Nhân viên','Email','Lựa chọn','Người được đề xuất','Thời gian'],
+      ...Admin._historyData.map(v => [v.emp_name, v.emp_email, v.option_name.replace(/ → .*/,''), v.nominated_name||'', fmtDate(v.voted_at)])];
     const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
     const a = document.createElement('a');
     a.href = 'data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
@@ -2867,7 +2883,7 @@ const Voting = {
     const empSession = EmployeeAuth.session;
     const voterName = empSession?.employee?.full_name || empSession?.employee?.name || null;
     try {
-      await API.castVote(eventId, locationId, voterId, voterName);
+      await API.castVote(eventId, locationId, voterId, voterName, null);
       markVotedLocal(eventId, locationId);
       State.votedLocations.add(locationId);
       Voting._pendingVoteId = null;
@@ -2893,6 +2909,8 @@ const Voting = {
         const updatedLocs = await API.getOptions(eventId);
         State.currentLocations = updatedLocs;
         Voting.renderLocations(updatedLocs, State.currentEvent);
+      } else if (e.message === 'self_vote') {
+        Toast.show('Bạn không thể bầu cho chính mình!', 'warning');
       } else {
         Toast.show('Lỗi: ' + e.message, 'error');
       }
@@ -3019,8 +3037,10 @@ const Voting = {
     if (bar) bar.remove();
 
     const voterId = getVoterIdentifier(eventId);
+    const empSession2 = EmployeeAuth.session;
+    const voterNameSelf = empSession2?.employee?.full_name || empSession2?.employee?.name || null;
     try {
-      await API.castVote(eventId, locationId, voterId, nameVal);
+      await API.castVote(eventId, locationId, voterId, voterNameSelf, nameVal);
       markVotedLocal(eventId, locationId);
       State.votedLocations.add(locationId);
 
@@ -3038,6 +3058,8 @@ const Voting = {
         const updatedLocs = await API.getOptions(eventId);
         State.currentLocations = updatedLocs;
         Voting.renderLocations(updatedLocs, State.currentEvent);
+      } else if (e.message === 'self_vote') {
+        Toast.show('Bạn không thể bầu cho chính mình!', 'warning');
       } else {
         Toast.show('Lỗi: ' + e.message, 'error');
       }
