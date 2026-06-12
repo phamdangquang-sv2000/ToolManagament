@@ -4004,12 +4004,12 @@ const PublicResultsAll = {
   async init() {
     try {
       const { data: events, error } = await sb.from('voting_events')
-        .select('*').eq('active', true).order('created_at', { ascending: false });
+        .select('*').order('created_at', { ascending: false });
       if (error) throw error;
 
       const container = document.getElementById('pub-all-container');
       if (!events || !events.length) {
-        container.innerHTML = '<div style="text-align:center;padding:48px;color:var(--c-muted);font-size:15px;">Hiện chưa có cuộc bình chọn nào đang mở.</div>';
+        container.innerHTML = '<div style="text-align:center;padding:48px;color:var(--c-muted);font-size:15px;">Chưa có cuộc bình chọn nào.</div>';
         return;
       }
 
@@ -4033,6 +4033,12 @@ const PublicResultsAll = {
           <div>
             <div style="font-size:17px;font-weight:700;letter-spacing:-.02em;">${sanitize(ev.title)}</div>
             ${ev.description ? `<div style="font-size:13px;color:var(--c-muted);margin-top:3px;">${sanitize(ev.description)}</div>` : ''}
+            <div style="margin-top:6px;">
+              ${ev.active
+                ? '<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;background:rgba(34,211,160,0.15);color:#22d3a0;padding:3px 9px;border-radius:99px;">● Đang mở</span>'
+                : '<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;background:rgba(244,63,94,0.12);color:#f43f5e;padding:3px 9px;border-radius:99px;">○ Đã đóng</span>'
+              }
+            </div>
           </div>
           <div id="pub-all-total-${ev.id}" style="background:linear-gradient(135deg,#7c6fff,#ff6b9d);color:#fff;font-size:13px;font-weight:700;padding:5px 14px;border-radius:20px;white-space:nowrap;">
             ${fmtNum(total)} phiếu
