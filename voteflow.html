@@ -1325,7 +1325,10 @@ canvas { max-height:280px; }
             <h1>Sự kiện</h1>
             <p>Quản lý các cuộc bình chọn</p>
           </div>
-          <button class="btn btn-primary btn-sm" id="create-event-btn">+ Tạo sự kiện</button>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <button class="btn btn-secondary btn-sm" onclick="Admin.copyAllResultsLink()" title="Copy link xem kết quả tất cả sự kiện">🔗 Link kết quả tổng</button>
+            <button class="btn btn-primary btn-sm" id="create-event-btn">+ Tạo sự kiện</button>
+          </div>
         </div>
         <div class="events-grid" id="events-grid"></div>
       </div>
@@ -1504,6 +1507,25 @@ canvas { max-height:280px; }
       </div>
     </div>
   </div>
+  <!-- PUBLIC ALL RESULTS PAGE -->
+  <div id="public-all-results-page" class="hidden">
+    <div style="min-height:100vh;background:var(--c-bg);padding:32px 16px;">
+      <div style="max-width:760px;margin:0 auto;">
+        <div style="text-align:center;margin-bottom:36px;">
+          <img src="https://edsowiramriosgwfuewg.supabase.co/storage/v1/object/public/Video/vote2.png" alt="VoteFlow" style="width:52px;height:52px;object-fit:contain;margin:0 auto 12px;display:block;" />
+          <h1 style="font-family:var(--font-display);font-size:26px;font-weight:800;letter-spacing:-.03em;">Kết quả tổng hợp</h1>
+          <p style="color:var(--c-muted);font-size:14px;margin-top:6px;">Tất cả cuộc bình chọn đang diễn ra</p>
+          <div style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--c-success);">
+            <span class="live-dot"></span> Cập nhật thời gian thực
+          </div>
+        </div>
+        <div id="pub-all-container">
+          <div style="text-align:center;padding:48px;color:var(--c-muted);">Đang tải kết quả…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- PUBLIC RESULT PAGE -->
   <div id="public-result-page" class="hidden">
     <div class="public-result-wrap">
@@ -2025,6 +2047,10 @@ const Admin = {
         </div>
       `).join('');
     } catch(err) { Toast.show('Lỗi tải sự kiện','error'); console.error(err); }
+  },
+  copyAllResultsLink() {
+    const url = `${location.origin}${location.pathname}?results=all`;
+    navigator.clipboard.writeText(url).then(() => Toast.show('Đã sao chép link kết quả tổng!', 'success'));
   },
   copyLink(id) {
     const url = `${location.origin}${location.pathname}?event=${id}`;
@@ -3256,11 +3282,17 @@ const Router = {
     const resultsId= params.get('results');
 
     // Hide all pages
-    ['auth-page','admin-page','voting-page','landing-page','emp-auth-page','public-result-page'].forEach(id=>{
+    ['auth-page','admin-page','voting-page','landing-page','emp-auth-page','public-result-page','public-all-results-page'].forEach(id=>{
       document.getElementById(id).classList.add('hidden');
     });
 
     // Public results page — no login needed
+    if (resultsId === 'all') {
+      document.getElementById('public-all-results-page').classList.remove('hidden');
+      await PublicResultsAll.init();
+      return;
+    }
+
     if (resultsId) {
       document.getElementById('public-result-page').classList.remove('hidden');
       await PublicResults.init(resultsId);
@@ -3963,7 +3995,112 @@ const PublicResults = {
   }
 };
 
-window.PublicResults = PublicResults;
+// ============================================================
+// PUBLIC ALL RESULTS MODULE
+// ============================================================
+const PublicResultsAll = {
+  _channels: [],
+
+  async init() {
+    try {
+      const { data: events, error } = await sb.from('voting_events')
+        .select('*').eq('active', true).order('created_at', { ascending: false });
+      if (error) throw error;
+
+      const container = document.getElementById('pub-all-container');
+      if (!events || !events.length) {
+        container.innerHTML = '<div style="text-align:center;padding:48px;color:var(--c-muted);font-size:15px;">Hiện chưa có cuộc bình chọn nào đang mở.</div>';
+        return;
+      }
+
+      container.innerHTML = '';
+      const palette = ['#7c6fff','#ff6b9d','#22d3a0','#f59e0b','#0ea5e9','#a78bfa','#fb7185','#34d399'];
+
+      for (const ev of events) {
+        const { data: opts } = await sb.from('vote_options')
+          .select('*').eq('event_id', ev.id).order('sort_order', { ascending: true });
+        const options = opts || [];
+        const total = options.reduce((s, o) => s + (o.vote_count || 0), 0);
+
+        const card = document.createElement('div');
+        card.id = 'pub-all-card-' + ev.id;
+        card.style.cssText = 'background:#fff;border:1.5px solid var(--c-border);border-radius:20px;overflow:hidden;margin-bottom:24px;box-shadow:0 4px 16px rgba(15,23,42,0.06);';
+
+        // Header
+        const header = document.createElement('div');
+        header.style.cssText = 'padding:20px 24px 16px;border-bottom:1px solid var(--c-border);background:linear-gradient(135deg,rgba(124,111,255,0.05) 0%,rgba(255,107,157,0.03) 100%);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;';
+        header.innerHTML = `
+          <div>
+            <div style="font-size:17px;font-weight:700;letter-spacing:-.02em;">${sanitize(ev.title)}</div>
+            ${ev.description ? `<div style="font-size:13px;color:var(--c-muted);margin-top:3px;">${sanitize(ev.description)}</div>` : ''}
+          </div>
+          <div id="pub-all-total-${ev.id}" style="background:linear-gradient(135deg,#7c6fff,#ff6b9d);color:#fff;font-size:13px;font-weight:700;padding:5px 14px;border-radius:20px;white-space:nowrap;">
+            ${fmtNum(total)} phiếu
+          </div>`;
+        card.appendChild(header);
+
+        // Options list
+        const body = document.createElement('div');
+        body.style.cssText = 'padding:20px 24px;display:flex;flex-direction:column;gap:12px;';
+
+        options.forEach((o, i) => {
+          const pct = total ? Math.round((o.vote_count || 0) / total * 100) : 0;
+          const color = palette[i % palette.length];
+          const label = o.label || String.fromCharCode(65 + i);
+
+          const row = document.createElement('div');
+          row.style.cssText = 'display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:12px;';
+
+          row.innerHTML = `
+            <div style="width:32px;height:32px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;">${sanitize(label)}</div>
+            <div>
+              <div style="font-size:14px;font-weight:600;margin-bottom:4px;">${sanitize(o.name)}</div>
+              <div style="height:6px;background:var(--c-surface2);border-radius:99px;overflow:hidden;">
+                <div id="pub-all-bar-${o.id}" style="height:100%;border-radius:99px;background:${color};width:${pct}%;transition:width .8s;"></div>
+              </div>
+            </div>
+            <div id="pub-all-pct-${o.id}" style="font-size:13px;font-weight:700;color:${color};text-align:right;min-width:36px;">${pct}%</div>
+            <div id="pub-all-cnt-${o.id}" style="font-size:12px;color:var(--c-muted);text-align:right;min-width:48px;">${fmtNum(o.vote_count || 0)}</div>`;
+          body.appendChild(row);
+        });
+
+        card.appendChild(body);
+        container.appendChild(card);
+
+        // Realtime subscription per event
+        const ch = sb.channel('pub-all-' + ev.id)
+          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'vote_options', filter: `event_id=eq.${ev.id}` }, (payload) => {
+            const updated = payload.new;
+            // update in-memory options
+            const idx = options.findIndex(o => o.id === updated.id);
+            if (idx >= 0) options[idx] = Object.assign({}, options[idx], updated);
+            const newTotal = options.reduce((s, o) => s + (o.vote_count || 0), 0);
+            options.forEach((o, i) => {
+              const pct = newTotal ? Math.round((o.vote_count || 0) / newTotal * 100) : 0;
+              const barEl = document.getElementById('pub-all-bar-' + o.id);
+              const pctEl = document.getElementById('pub-all-pct-' + o.id);
+              const cntEl = document.getElementById('pub-all-cnt-' + o.id);
+              if (barEl) barEl.style.width = pct + '%';
+              if (pctEl) pctEl.textContent = pct + '%';
+              if (cntEl) countUp(cntEl, o.vote_count || 0);
+            });
+            const totalEl = document.getElementById('pub-all-total-' + ev.id);
+            if (totalEl) totalEl.textContent = fmtNum(newTotal) + ' phiếu';
+          })
+          .subscribe();
+        this._channels.push(ch);
+      }
+    } catch(e) {
+      const container = document.getElementById('pub-all-container');
+      if (container) container.innerHTML = '<div style="text-align:center;padding:48px;color:var(--c-error);">Không thể tải kết quả. Vui lòng thử lại.</div>';
+      console.error('[PublicResultsAll]', e);
+    }
+  }
+};
+
+window.PublicResultsAll = PublicResultsAll;
+
+
 
 document.addEventListener('DOMContentLoaded', () => {
   window._landingPageOriginal = document.getElementById('landing-page').innerHTML;
