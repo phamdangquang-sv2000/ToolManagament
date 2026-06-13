@@ -1502,6 +1502,12 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./supabase-config.js"></script>
 <script>
+if (!window.SUPABASE_CONFIG) {
+  document.documentElement.innerHTML = '<body style="margin:0;background:#0b1220;color:#fff;font-family:monospace;padding:40px;line-height:1.6"><h2 style="color:#f59e0b">Loi cau hinh</h2><p>Khong tai duoc <code>supabase-config.js</code> (404).</p><p>Hay upload file <b>supabase-config.js</b> vao CUNG thu muc voi cac file HTML roi F5 lai.</p></body>';
+  throw new Error('supabase-config.js not loaded - upload it next to the HTML files');
+}
+</script>
+<script>
 // ════════════════════════════════════════
 // SUPABASE
 // ════════════════════════════════════════
