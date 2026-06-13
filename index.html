@@ -1500,14 +1500,15 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase-config.js"></script>
 <script>
 // ════════════════════════════════════════
 // SUPABASE
 // ════════════════════════════════════════
 // Các giá trị được mã hoá Base64 để bảo vệ khỏi scraping thô
 const _d = s => atob(s);
-const SUPABASE_URL      = _d('aHR0cHM6Ly9lZHNvd2lyYW1yaW9zZ3dmdWV3Zy5zdXBhYmFzZS5jbw==');
-const SUPABASE_ANON_KEY = _d('ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SnBjM01pT2lKemRYQmhZbUZ6WlNJc0luSmxaaUk2SW1Wa2MyOTNhWEpoYlhKcGIzTm5kMloxWlhkbklpd2ljbTlzWlNJNkltRnViMjRpTENKcFlYUWlPakUzTnpneU5ETXpNRGdzSW1WNGNDSTZNakE1TXpneE9UTXdPSDAuYW9jdkZMbkpybDVMRlBkeERmOXpiaHZUNkhUN05wQ0VNRnRpVXJfTTNnTQ==');
+const SUPABASE_URL      = window.SUPABASE_CONFIG['index.html'].url;
+const SUPABASE_ANON_KEY = window.SUPABASE_CONFIG['index.html'].key;
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ════════════════════════════════════════
@@ -1545,8 +1546,8 @@ const SSO_SESSION_KEY    = 'itHub_sso_token';
 const SSO_USER_KEY       = 'itHub_sso_user';
 
 // Supabase nhân sự (kiểm tra quyền truy cập)
-const HR_SUPABASE_URL      = _d('aHR0cHM6Ly9ybnNqaXFiYmV5d2dibnFzb2pjZS5zdXBhYmFzZS5jbw==');
-const HR_SUPABASE_ANON_KEY = _d('ZXlKaGJHY2lPaUpJVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SnBjM01pT2lKemRYQmhZbUZ6WlNJc0luSmxaaUk2SW5KdWMycHBjV0ppWlhsM1oySnVjWE52YW1ObElpd2ljbTlzWlNJNkltRnViMjRpTENKcFlYUWlPakUzTnpjME9URXhOakFzSW1WNGNDSTZNakE1TXpBMk56RTJNSDAuMUJybFNfX0dOQU1GYkJtdWRsNmdVSndKOWpfem9EZEFqOXJ0ZmhCa2hkaw==');
+const HR_SUPABASE_URL      = window.SUPABASE_CONFIG['index.html'].hr.url;
+const HR_SUPABASE_ANON_KEY = window.SUPABASE_CONFIG['index.html'].hr.key;
 
 // ════════════════════════════════════════
 // SSO — GOOGLE OAUTH GATE
