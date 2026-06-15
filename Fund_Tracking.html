@@ -15,13 +15,6 @@
 <!-- CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./supabase-config.js"></script>
-<script>
-if (!window.SUPABASE_CONFIG) {
-  document.documentElement.innerHTML = '<body style="margin:0;background:#0b1220;color:#fff;font-family:monospace;padding:40px;line-height:1.6"><h2 style="color:#f59e0b">Loi cau hinh</h2><p>Khong tai duoc <code>supabase-config.js</code> (404).</p><p>Hay upload file <b>supabase-config.js</b> vao CUNG thu muc voi cac file HTML roi F5 lai.</p></body>';
-  throw new Error('supabase-config.js not loaded - upload it next to the HTML files');
-}
-</script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 
 <style>
@@ -775,8 +768,8 @@ if (!window.SUPABASE_CONFIG) {
 </div>
 
 <script>
-const SUPABASE_URL = window.SUPABASE_CONFIG['Fund_Tracking.html'].url;
-const SUPABASE_ANON_KEY = window.SUPABASE_CONFIG['Fund_Tracking.html'].key;
+const SUPABASE_URL = 'https://edsowiramriosgwfuewg.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkc293aXJhbXJpb3Nnd2Z1ZXdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNDMzMDgsImV4cCI6MjA5MzgxOTMwOH0.aocvFLnJrl5LFPdxDf9zbhvT6HT7NpCEMFtiUr_M3gM';
 
 const isConfigured = SUPABASE_URL.startsWith('https://') && SUPABASE_ANON_KEY.length > 20;
 const sb = isConfigured ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;

@@ -11,13 +11,6 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script>tailwind.config={darkMode:'class'}</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./supabase-config.js"></script>
-<script>
-if (!window.SUPABASE_CONFIG) {
-  document.documentElement.innerHTML = '<body style="margin:0;background:#0b1220;color:#fff;font-family:monospace;padding:40px;line-height:1.6"><h2 style="color:#f59e0b">Loi cau hinh</h2><p>Khong tai duoc <code>supabase-config.js</code> (404).</p><p>Hay upload file <b>supabase-config.js</b> vao CUNG thu muc voi cac file HTML roi F5 lai.</p></body>';
-  throw new Error('supabase-config.js not loaded - upload it next to the HTML files');
-}
-</script>
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
@@ -2099,8 +2092,10 @@ CREATE TABLE hr_leave_requests (<br>
 
 <script>
 // ============ CONFIG ============
-const SUPA_URL = window.SUPABASE_CONFIG['Work_Attendance_Summary.html'].url;
-const SUPA_KEY = window.SUPABASE_CONFIG['Work_Attendance_Summary.html'].key;
+const _k='r/xNNvOaNzsgUvuAB1awaKxiziqCaiJC';
+function _d(b){const k=_k,e=atob(b),r=new Uint8Array(e.length);for(let i=0;i<e.length;i++)r[i]=e.charCodeAt(i)^k.charCodeAt(i%k.length);return new TextDecoder().decode(r);}
+const SUPA_URL=_d('GlsMPj1MYE4rHgAIIh8HIC9DCBgSLA8PDwwGJE8aPzMTTRk9K1gsDg==');
+const SUPA_KEY=_d('F1YyJiwxLAgBEzkuAAw8cAxYKAQoJSpcGSo4dSgCOhskbDJ3YBM2Kz4ZQCo8ORwLOFU5NQkSFS8AMyIKEiAkCR51EQd4PyI3JRlBXmYXLQsqUzk9ESlLJxQNQxlQMxInHGYROScVIlg9ICAuYz8YBzdTU0MIBzsjCjApEggmIAZBYQIpNzgLLDQ3NwAmPxgXdlIiPlcGEihPJAskGSYeDgVgMH5gFyACODw/CR8EGXQOdzETGQ8eUAALGTU1XwIXRWEIDQs7CRUnLwE4GEUSDA==');
 const MAX_FAIL=5,LOCK_MS=5*60*1000,SESS_MS=30*60*1000;
 const { createClient } = supabase;
 const db = createClient(SUPA_URL, SUPA_KEY);
