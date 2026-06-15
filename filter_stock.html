@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Filter Stock → Upload CSV</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green: #1D9E75; --green-light: #E1F5EE; --green-dark: #085041;
+    --border: #e2e8f0; --bg: #f8fafc; --white: #ffffff;
+    --text: #1e293b; --muted: #64748b; --danger: #dc2626; --danger-bg: #fef2f2;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 24px 16px; }
+  .container { max-width: 860px; margin: 0 auto; }
+
+  h1 { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+
+  .card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  .card-title { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px; }
+
+  /* Upload zone */
+  .upload-zone { border: 2px dashed var(--border); border-radius: 10px; padding: 32px 20px; text-align: center; cursor: pointer; transition: .15s; background: var(--bg); }
+  .upload-zone:hover { border-color: var(--green); background: var(--green-light); }
+  .upload-zone.active { border-color: var(--green); background: var(--green-light); }
+  .upload-zone.done { border-color: var(--green); background: var(--green-light); border-style: solid; }
+  .upload-icon { font-size: 36px; margin-bottom: 8px; }
+  .upload-label { font-size: 14px; font-weight: 600; color: var(--text); }
+  .upload-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .upload-zone.done .upload-label { color: var(--green-dark); }
+  #file-input { display: none; }
+
+  /* Grid config */
+  .grid { display: grid; gap: 12px; }
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  @media (max-width: 600px) { .grid-2, .grid-3 { grid-template-columns: 1fr 1fr; } }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 12px; font-weight: 500; color: var(--muted); }
+  .field input { height: 36px; border: 1px solid var(--border); border-radius: 8px; padding: 0 10px; font-size: 13px; color: var(--text); background: var(--white); width: 100%; transition: border-color .15s; }
+  .field input:focus { outline: none; border-color: var(--green); }
+
+  /* Stats */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+  .stat { background: var(--bg); border-radius: 8px; padding: 12px; text-align: center; }
+  .stat-num { font-size: 24px; font-weight: 700; color: var(--green); }
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* Table */
+  .tbl-wrap { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; max-height: 320px; overflow-y: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  thead { position: sticky; top: 0; z-index: 1; }
+  th { background: #f1f5f9; padding: 8px 10px; text-align: left; font-weight: 600; color: var(--muted); border-bottom: 1px solid var(--border); white-space: nowrap; }
+  td { padding: 6px 10px; border-bottom: 1px solid var(--border); color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f8fafc; }
+  .tag { display: inline-block; background: var(--green-light); color: var(--green-dark); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+
+  /* Buttons */
+  .btn-row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px; }
+  .btn { height: 38px; padding: 0 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: var(--white); color: var(--text); display: inline-flex; align-items: center; gap: 6px; transition: .15s; }
+  .btn:hover { background: var(--bg); }
+  .btn:disabled { opacity: .35; cursor: not-allowed; }
+  .btn.primary { background: var(--green); color: white; border-color: var(--green); }
+  .btn.primary:hover:not(:disabled) { background: #178a64; }
+
+  /* Error / info */
+  .msg { font-size: 12px; padding: 8px 12px; border-radius: 8px; margin-top: 10px; display: none; }
+  .msg.err { background: var(--danger-bg); color: var(--danger); display: block; }
+  .msg.ok { background: var(--green-light); color: var(--green-dark); display: block; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📦 Filter Stock → Upload CSV</h1>
+  <p class="subtitle">Upload file filter stock, điền thông tin, tải CSV đúng template.</p>
+
+  <!-- Upload -->
+  <div class="card">
+    <div class="card-title">1. Chọn file Filter Stock (.xlsx)</div>
+    <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()"
+         ondragover="event.preventDefault();this.classList.add('active')"
+         ondragleave="this.classList.remove('active')"
+         ondrop="handleDrop(event)">
+      <div class="upload-icon">📂</div>
+      <div class="upload-label" id="upload-label">Nhấn để chọn hoặc kéo thả file vào đây</div>
+      <div class="upload-sub" id="upload-sub">Hỗ trợ .xlsx — file Filter_stock từ Microsoft Forms</div>
+    </div>
+    <input type="file" id="file-input" accept=".xlsx,.xls" onchange="loadFile(this.files[0])">
+    <div class="msg" id="err-msg"></div>
+  </div>
+
+  <!-- Config -->
+  <div class="card">
+    <div class="card-title">2. Thông tin upload (chỉnh khi cần)</div>
+    <div class="grid grid-2" style="margin-bottom:12px">
+      <div class="field"><label>TenantID</label><input id="tenant" value="210449c9-76b3-478e-953c-6af29c429129"></div>
+      <div class="field"><label>Environment</label><input id="env" value="DISLite_PROD_12"></div>
+    </div>
+    <div class="grid grid-3">
+      <div class="field"><label>BatchName</label><input id="batch" value="DIEUCHINH"></div>
+      <div class="field"><label>PostingDate</label><input type="date" id="date"></div>
+      <div class="field"><label>LocationCode</label><input id="loc" value="F"></div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="btn-row" style="margin-bottom:16px">
+    <button class="btn" id="btn-filter" disabled onclick="doFilter()">🔍 Lọc & xem trước</button>
+    <button class="btn primary" id="btn-dl" disabled onclick="doDownload()">⬇️ Tải CSV</button>
+  </div>
+
+  <!-- Results -->
+  <div class="card hidden" id="result-card">
+    <div class="card-title">3. Kết quả — chỉ hiển thị SKU có số lượng > 0</div>
+    <div class="stats">
+      <div class="stat"><div class="stat-num" id="s-npp">0</div><div class="stat-label">NPP có đơn</div></div>
+      <div class="stat"><div class="stat-num" id="s-sku">0</div><div class="stat-label">Dòng sẽ xuất</div></div>
+      <div class="stat"><div class="stat-num" id="s-skip">0</div><div class="stat-label">SKU bỏ qua (trống / 0)</div></div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th style="width:90px">Company</th>
+          <th style="width:140px">Tên NPP</th>
+          <th style="width:95px">ItemNo</th>
+          <th>Sản phẩm</th>
+          <th style="width:55px;text-align:right">Qty</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+let state = { headers: [], dataRows: [], filtered: [], itemCols: [] };
+document.getElementById('date').value = new Date().toISOString().split('T')[0];
+
+function showErr(msg) {
+  const el = document.getElementById('err-msg');
+  el.className = 'msg err';
+  el.textContent = msg;
+}
+function clearErr() { document.getElementById('err-msg').className = 'msg'; }
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('active');
+  if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+}
+
+function loadFile(file) {
+  if (!file) return;
+  if (!file.name.match(/\.xlsx?$/i)) { showErr('Chỉ hỗ trợ file .xlsx hoặc .xls'); return; }
+  clearErr();
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      // Use sheet_to_json with header:1 to get all cells including trailing empties
+      const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+
+      // Find header row
+      let hIdx = raw.findIndex(r => r.some(c => String(c).includes('Mã Code')));
+      if (hIdx === -1) hIdx = raw.findIndex(r => r.some(c => String(c).includes('Sub-Distributor')));
+      if (hIdx === -1) { showErr('Không tìm thấy hàng tiêu đề — kiểm tra file.'); return; }
+
+      const headers = raw[hIdx];
+      // Pad each data row to same length as headers
+      const dataRows = raw.slice(hIdx + 1).filter(r => {
+        const code = String(r[3] || '').trim();
+        return code !== '' && !isNaN(Number(code));
+      }).map(r => {
+        while (r.length < headers.length) r.push('');
+        return r;
+      });
+
+      // Extract item columns
+      const itemCols = [];
+      headers.forEach((h, i) => {
+        if (i < 5) return;
+        const m = String(h).match(/(\d{7,8})\s*$/);
+        if (m) itemCols.push({ i, code: m[1], name: String(h).replace(/\s*-\s*\d+\s*$/, '').trim() });
+      });
+
+      state = { headers, dataRows, filtered: [], itemCols };
+
+      const dz = document.getElementById('drop-zone');
+      dz.classList.remove('active');
+      dz.classList.add('done');
+      document.getElementById('upload-label').textContent = '✅ ' + file.name;
+      document.getElementById('upload-sub').textContent = dataRows.length + ' NPP tìm thấy · ' + itemCols.length + ' SKU trong form';
+      document.getElementById('btn-filter').disabled = false;
+      document.getElementById('result-card').classList.add('hidden');
+      document.getElementById('btn-dl').disabled = true;
+    } catch(err) {
+      showErr('Lỗi đọc file: ' + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function doFilter() {
+  const { dataRows, itemCols } = state;
+  const filtered = [];
+  let skipped = 0;
+  const nppSet = new Set();
+
+  dataRows.forEach(row => {
+    const rawCode = row[3];
+    const company = String(typeof rawCode === 'number' ? Math.round(rawCode) : rawCode).trim();
+    const nppName = String(row[4] || '').trim();
+    itemCols.forEach(({ i, code, name }) => {
+      const val = row[i];
+      const qty = parseFloat(val);
+      if (val !== '' && !isNaN(qty) && qty > 0) {
+        filtered.push({ company, nppName, code, name, qty: Math.round(qty) });
+        nppSet.add(company);
+      } else {
+        skipped++;
+      }
+    });
+  });
+
+  state.filtered = filtered;
+  document.getElementById('s-npp').textContent = nppSet.size;
+  document.getElementById('s-sku').textContent = filtered.length;
+  document.getElementById('s-skip').textContent = skipped;
+
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+  let lastCompany = '';
+  filtered.forEach(r => {
+    const tr = document.createElement('tr');
+    const companyCell = r.company !== lastCompany
+      ? `<td><span class="tag">${r.company}</span></td><td title="${r.nppName}" style="color:#475569">${r.nppName}</td>`
+      : `<td></td><td></td>`;
+    lastCompany = r.company;
+    tr.innerHTML = companyCell + `<td>${r.code}</td><td title="${r.name}" style="color:#475569">${r.name}</td><td style="text-align:right;font-weight:600">${r.qty}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('result-card').classList.remove('hidden');
+  document.getElementById('btn-dl').disabled = filtered.length === 0;
+}
+
+function doDownload() {
+  const tenant = document.getElementById('tenant').value.trim();
+  const env = document.getElementById('env').value.trim();
+  const batch = document.getElementById('batch').value.trim();
+  const date = document.getElementById('date').value;
+  const loc = document.getElementById('loc').value.trim();
+  const entry = 'Positive Adjmt.';
+
+  const lines = ['TenantID,Enviroment,Company,BatchName,PostingDate,EntryType,ItemNo,LocationCode,Quantity'];
+  state.filtered.forEach(r => {
+    lines.push([tenant, env, r.company, batch, date, entry, r.code, loc, r.qty].join(','));
+  });
+
+  const blob = new Blob([lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Upload_stock-' + date + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+</script>
+</body>
+</html>
