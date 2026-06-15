@@ -1926,8 +1926,16 @@ async function loadData(showSkeleton=true) {
   setConnDot("loading");
   const kw = document.getElementById("search-input").value;
   try {
-    const records = await dbSearch(kw, currentFilter);
+    // Luôn tải danh mục account đầy đủ cùng nhân sự. Trước đây allAccounts chỉ
+    // được nạp khi mở tab Tài khoản, nên màn Chi tiết có thể hiện "—" dù
+    // nhan_su.account_id đã được gán. Không để bộ lọc/tìm kiếm của tab account
+    // làm mất dữ liệu dùng để đối chiếu ở màn Chi tiết.
+    const [records, accounts] = await Promise.all([
+      dbSearch(kw, currentFilter),
+      apiList(_urlAcc, "", "All", ACC_SEARCH_FIELDS, ACC_FIELDS),
+    ]);
     allRecords = records;
+    allAccounts = accounts;
     renderList(records);
     updateStats(records);
     setConnDot("ok");
@@ -2197,7 +2205,13 @@ function viewDetail(id) {
     ["Ngày Sinh", r.ngay_sinh||"—"],
     ["SĐT", r.sdt||"—"],
     ["Email", r.email||"—"],
-    ["Tài Khoản", (() => { const a = allAccounts.find(x=>x.id===r.account_id); return a ? a.heiway_account : (r.tai_khoan||"—"); })()],
+    ["Tài Khoản", (() => {
+      const accountId = Number(r.account_id);
+      const a = Number.isFinite(accountId)
+        ? allAccounts.find(x => Number(x.id) === accountId)
+        : null;
+      return a?.heiway_account || r.tai_khoan || "—";
+    })()],
     ["Trạng Thái", r.trang_thai],
     ["Ngày Onboarding", r.ngay_vao||"—"],
     ["Ngày Leave", r.ngay_leave||"—"],
@@ -3287,8 +3301,13 @@ async function loadAccounts() {
   setConnDot("loading");
   try {
     const kw = document.getElementById("acc-search").value;
-    const rows = await apiList(_urlAcc, kw, accFilter, ACC_SEARCH_FIELDS, ACC_FIELDS);
-    allAccounts = rows; renderAccList(rows); updateAccStats(rows);
+    const [rows, fullRows] = await Promise.all([
+      apiList(_urlAcc, kw, accFilter, ACC_SEARCH_FIELDS, ACC_FIELDS),
+      apiList(_urlAcc, "", "All", ACC_SEARCH_FIELDS, ACC_FIELDS),
+    ]);
+    // rows chỉ phục vụ giao diện đang lọc; cache đối chiếu nhân sự luôn đầy đủ.
+    allAccounts = fullRows;
+    renderAccList(rows); updateAccStats(rows);
     setConnDot("ok");
   } catch(e) { setConnDot("err"); document.getElementById("acc-list").innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Lỗi tải</div><div class="empty-sub" style="color:#ff6b63;">${e.message}</div></div>`; }
 }
