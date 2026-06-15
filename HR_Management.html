@@ -22,6 +22,13 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./supabase-config.js"></script>
+<script>
+if (!window.SUPABASE_CONFIG) {
+  document.documentElement.innerHTML = '<body style="margin:0;background:#0b1220;color:#fff;font-family:monospace;padding:40px;line-height:1.6"><h2 style="color:#f59e0b">Loi cau hinh</h2><p>Khong tai duoc <code>supabase-config.js</code> (404).</p><p>Hay upload file <b>supabase-config.js</b> vao CUNG thu muc voi cac file HTML roi F5 lai.</p></body>';
+  throw new Error('supabase-config.js not loaded - upload it next to the HTML files');
+}
+</script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
@@ -1631,14 +1638,8 @@
 // CONFIG (URL + anon key encoded — anon key vẫn public theo design,
 // chỉ tránh đọc trực tiếp khi nhìn source. Bảo mật thật: RLS + Auth.)
 // ============================================================
-const _d = s => atob(s.join(""));
-const SUPABASE_URL = _d(['aHR0cHM6Ly9ybnNqaXFiYmV5','d2dibnFzb2pjZS5zdXBhYmFz','ZS5jbw==']);
-const SUPABASE_KEY = _d([
-  'ZXlKaGJHY2lPaUpJVXpJMU5p','SXNJblI1Y0NJNklrcFhWQ0o5','LmV5SnBjM01pT2lKemRYQmhZ',
-  'bUZ6WlNJc0luSmxaaUk2SW5K','dWMycHBjV0ppWlhsM1oySnVj','WE52YW1ObElpd2ljbTlzWlNJ',
-  'NkltRnViMjRpTENKcFlYUWlP','akUzTnpjME9URXhOakFzSW1W','NGNDSTZNakE1TXpBMk56RTJN',
-  'SDAuMUJybFNfX0dOQU1GYkJt','dWRsNmdVSndKOWpfem9EZEFq','OXJ0ZmhCa2hkaw=='
-]);
+const SUPABASE_URL = window.SUPABASE_CONFIG['HR_Management.html'].url;
+const SUPABASE_KEY = window.SUPABASE_CONFIG['HR_Management.html'].key;
 // Admin allowlist: chỉ những email này (sau khi đăng nhập Supabase Auth thành công)
 // mới được nâng quyền admin. Thêm email mới vào mảng nếu cần.
 const ADMIN_EMAILS = ["adminl2@gmail.com"];
@@ -1647,8 +1648,8 @@ const ADMIN_EMAILS = ["adminl2@gmail.com"];
 // SYNC sang Work_Attendance Supabase (bảng hr_employees, cột is_active)
 // Khớp theo ho_ten (nhan_su) === name (hr_employees)
 // ============================================================
-const WA_SUPABASE_URL = 'https://edsowiramriosgwfuewg.supabase.co';
-const WA_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkc293aXJhbXJpb3Nnd2Z1ZXdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNDMzMDgsImV4cCI6MjA5MzgxOTMwOH0.aocvFLnJrl5LFPdxDf9zbhvT6HT7NpCEMFtiUr_M3gM';
+const WA_SUPABASE_URL = window.SUPABASE_CONFIG['HR_Management.html'].wa.url;
+const WA_SUPABASE_KEY = window.SUPABASE_CONFIG['HR_Management.html'].wa.key;
 
 // Map trạng thái nhan_su -> is_active của hr_employees
 // Active / Probation => true (đang làm việc), Inactive => false (đã nghỉ)
