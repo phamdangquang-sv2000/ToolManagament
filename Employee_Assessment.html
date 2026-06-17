@@ -87,7 +87,6 @@ if (!window.SUPABASE_CONFIG) {
   <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
   <!-- SortableJS: drag-and-drop questions -->
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-  <!-- html2pdf: PDF export for Certificate -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     /* =====================================================
@@ -1727,11 +1726,6 @@ if (!window.SUPABASE_CONFIG) {
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
         Cài đặt
       </button>
-      <button class="nav-item nav-item-recycle" data-view="recycle" onclick="App.admin.navigate('recycle')" style="color:var(--danger);margin-top:4px;">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-        Recycle Bin
-        <span id="recycle-badge" class="nav-badge hidden" style="background:var(--danger);"></span>
-      </button>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info">
@@ -2338,7 +2332,6 @@ const App = {
           App.screen.show('admin');
           App.admin.navigate('dashboard');
           App.grading._preloadBadge();
-          App.recycleBin.init().catch(e => console.warn('RecycleBin init:', e));
           setTimeout(() => { try { App.realtime.subscribe(); } catch(e) { console.warn('Realtime unavailable:', e); } }, 500);
           return;
         } else {
@@ -2552,7 +2545,6 @@ const App = {
       App.screen.show('admin');
       App.admin.navigate('dashboard');
       App.grading._preloadBadge();
-      App.recycleBin.init().catch(e => console.warn('RecycleBin init:', e));
       App.toast.show('Đăng nhập thành công!', 'success');
       setTimeout(() => { try { App.realtime.subscribe(); } catch(e) { console.warn('Realtime unavailable:', e); } }, 500);
     },
@@ -3004,7 +2996,7 @@ const App = {
     navigate(view) {
       App.state.currentView = view;
       document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.view === view));
-      const titles = { dashboard:'Dashboard', projects:'Quản lý dự án', tests:'Bài thi', employees:'Nhân viên', assignments:'Phân công', grading:'Chấm điểm', results:'Kết quả', settings:'Cài đặt', recycle:'🗑️ Recycle Bin' };
+      const titles = { dashboard:'Dashboard', projects:'Quản lý dự án', tests:'Bài thi', employees:'Nhân viên', assignments:'Phân công', grading:'Chấm điểm', results:'Kết quả', settings:'Cài đặt' };
       document.getElementById('topbar-title').textContent = titles[view] || view;
       const contentEl = document.getElementById('admin-content');
       contentEl.innerHTML = App.views[view] ? App.views[view].render() : '<div>404</div>';
@@ -3241,13 +3233,6 @@ const App = {
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input type="text" placeholder="Tìm nhân viên..." oninput="App.employees.search(this.value)">
             </div>
-            <div style="display:flex;align-items:center;gap:10px;">
-              <span id="employees-sync-status" style="font-size:12px;color:var(--text-muted);"></span>
-              <button id="employees-sync-btn" class="btn btn-secondary btn-sm" onclick="App.employees.sync()" title="Lấy dữ liệu mới nhất từ hr_employees" style="display:flex;align-items:center;gap:6px;">
-                <svg id="employees-sync-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-                Sync
-              </button>
-            </div>
           </div>
           <div class="table-wrap">
             <table><thead><tr>
@@ -3435,39 +3420,6 @@ const App = {
       },
       load() {}
     },
-
-    recycle: {
-      render() {
-        return `
-          <div class="recycle-header">
-            <div>
-              <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-                <span style="font-size:22px;">🗑️</span>
-                <span style="font-size:16px;font-weight:700;color:var(--text-primary);">Recycle Bin</span>
-                <span id="recycle-count-badge" style="padding:2px 10px;background:rgba(255,88,88,0.15);border:1px solid rgba(255,88,88,0.30);border-radius:100px;font-size:12px;color:#ff8585;font-weight:600;"></span>
-              </div>
-              <div style="font-size:12px;color:var(--text-muted);">Dữ liệu đã xóa — khôi phục hoặc xóa vĩnh viễn tại đây.</div>
-            </div>
-            <button class="btn btn-danger btn-sm" id="recycle-clear-btn" onclick="App.recycleBin.clearAll()" style="display:none;">
-              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
-              Xóa tất cả vĩnh viễn
-            </button>
-          </div>
-          <div class="recycle-tabs" style="margin-bottom:18px;">
-            <button class="recycle-tab active" data-rtype="all" onclick="App.recycleBin.filterType('all',this)">Tất cả</button>
-            <button class="recycle-tab" data-rtype="test" onclick="App.recycleBin.filterType('test',this)">Bài thi</button>
-            <button class="recycle-tab" data-rtype="project" onclick="App.recycleBin.filterType('project',this)">Dự án</button>
-            <button class="recycle-tab" data-rtype="assignment" onclick="App.recycleBin.filterType('assignment',this)">Phân công</button>
-            <button class="recycle-tab" data-rtype="question" onclick="App.recycleBin.filterType('question',this)">Câu hỏi</button>
-          </div>
-          <div id="recycle-list"></div>
-        `;
-      },
-      load() {
-        // render() là async — gọi sau khi DOM đã có #recycle-list
-        setTimeout(() => App.recycleBin.render(), 0);
-      }
-    }
   },
 
   /* =========================================================
@@ -3546,7 +3498,6 @@ const App = {
     delete(id, name) {
       App.modal.confirm('Chuyển vào Recycle Bin', `Dự án "${name}" sẽ được chuyển vào Recycle Bin. Bạn có thể khôi phục sau.`, async () => {
         await db.from('exam_projects').update({ deleted_at: new Date().toISOString() }).eq('id', id);
-        App.recycleBin.addItem({ id, type: 'project', name, deleted_at: new Date().toISOString() });
         App.toast.show('Đã chuyển dự án vào Recycle Bin.', 'warning');
         App.views.projects.load();
       });
@@ -3680,7 +3631,6 @@ const App = {
       App.modal.confirm('Chuyển vào Recycle Bin', `Bài thi "${name}" sẽ được chuyển vào Recycle Bin. Bạn có thể khôi phục sau.`, async () => {
         try {
           await db.from('exam_tests').update({ deleted_at: new Date().toISOString() }).eq('id', id);
-          App.recycleBin.addItem({ id, type: 'test', name, deleted_at: new Date().toISOString() });
           App.toast.show('Đã chuyển bài thi vào Recycle Bin.', 'warning');
           App.views.tests.load();
         } catch (e) {
@@ -3718,47 +3668,6 @@ const App = {
       App.util.renderPagination('employees-pagination', t, () => App.employees.render_table());
     },
     search(val) { App.state.tables.employees.search = val.toLowerCase(); App.state.tables.employees.page = 1; App.employees.render_table(); },
-    async sync() {
-      const btn = document.getElementById('employees-sync-btn');
-      const icon = document.getElementById('employees-sync-icon');
-      const statusEl = document.getElementById('employees-sync-status');
-      if (!btn) return;
-
-      // Trạng thái loading
-      btn.disabled = true;
-      if (icon) icon.style.animation = 'spin 0.8s linear infinite';
-      if (statusEl) statusEl.textContent = 'Đang sync...';
-
-      try {
-        const prevCount = App.state.tables.employees.data.length;
-        const { data, error } = await db.from('hr_employees').select('*').eq('is_active', true).order('name');
-        if (error) throw error;
-
-        App.state.tables.employees.data = data || [];
-        App.employees.render_table();
-
-        const newCount = (data || []).length;
-        const diff = newCount - prevCount;
-        const now = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-
-        if (diff > 0) {
-          if (statusEl) statusEl.innerHTML = `<span style="color:var(--success)">+${diff} mới · ${now}</span>`;
-          App.toast.show(`Sync thành công — thêm ${diff} nhân viên mới`, 'success');
-        } else if (diff < 0) {
-          if (statusEl) statusEl.innerHTML = `<span style="color:var(--warning)">${diff} đã xóa · ${now}</span>`;
-          App.toast.show(`Sync thành công — ${Math.abs(diff)} nhân viên đã bị vô hiệu hóa`, 'warning');
-        } else {
-          if (statusEl) statusEl.innerHTML = `<span style="color:var(--text-muted)">Cập nhật lúc ${now}</span>`;
-          App.toast.show(`Đã đồng bộ — ${newCount} nhân viên, không có thay đổi`, 'info');
-        }
-      } catch (e) {
-        if (statusEl) statusEl.innerHTML = `<span style="color:var(--danger)">Sync thất bại</span>`;
-        App.toast.show('Sync thất bại: ' + (e.message || 'Lỗi không xác định'), 'error');
-      } finally {
-        btn.disabled = false;
-        if (icon) icon.style.animation = '';
-      }
-    },
   },
 
   /* =========================================================
@@ -3860,7 +3769,6 @@ const App = {
       App.modal.confirm('Chuyển vào Recycle Bin', 'Phân công này sẽ được chuyển vào Recycle Bin.', async () => {
         const asgn = App.state.tables.assignments.data.find(x => x.id === id);
         await db.from('exam_test_assignments').update({ deleted_at: new Date().toISOString() }).eq('id', id);
-        App.recycleBin.addItem({ id, type: 'assignment', name: asgn ? `${asgn.test_name} → ${asgn.employee_name}` : id, deleted_at: new Date().toISOString() });
         App.toast.show('Đã chuyển phân công vào Recycle Bin.', 'warning');
         App.views.assignments.load();
       });
@@ -3997,7 +3905,6 @@ const App = {
     async deleteQuestion(id) {
       const q = App.questions.questionList.find(x => x.id === id);
       await db.from('exam_questions').update({ deleted_at: new Date().toISOString() }).eq('id', id);
-      App.recycleBin.addItem({ id, type: 'question', name: q ? (q.question_text?.substring(0,60) + (q.question_text?.length > 60 ? '...' : '')) : id, deleted_at: new Date().toISOString() });
       App.toast.show('Câu hỏi đã chuyển vào Recycle Bin.', 'warning');
       await App.questions.load();
       await db.from('exam_tests').update({ question_count: App.questions.questionList.length }).eq('id', App.questions.currentTestId);
@@ -4394,13 +4301,7 @@ const App = {
           <td><strong>${r.total_score||0}</strong> (${r.score_percentage||0}%)</td>
           <td>${r.pass_fail==='pass'?'<span class="badge badge-success">PASS</span>':'<span class="badge badge-danger">FAIL</span>'}</td>
           <td class="text-sm text-muted">${App.util.formatDate(r.created_at)}</td>
-          <td>
-            <button class="btn-action" style="gap:5px;color:var(--warning);border-color:rgba(255,210,0,0.25);background:rgba(255,210,0,0.07);" onclick="App.viewResults.regrade('${r.id}','${r.attempt_id}','${(r.employee_name||'').replace(/'/g,'&#39;')}','${(r.test_name||'').replace(/'/g,'&#39;')}')" title="Chấm lại bài này">
-              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
-              Chấm lại
-            </button>
-            ${r.pass_fail==='pass' ? `<button class="btn-action" style="gap:5px;color:#fff;border-color:transparent;background:linear-gradient(135deg,#7c6af7,#f857a6);margin-left:6px;" onclick="App.certificate.openFromResult('${r.attempt_id}')" title="Xem Certificate">🏆 Certificate</button>` : ''}
-          </td>
+          <td></td>
         </tr>
       `).join('');
       App.util.renderPagination('admin-results-pagination', t, () => App.viewResults.render_table());
@@ -4415,47 +4316,6 @@ const App = {
       let filtered = [...t.data];
       if (f) filtered = filtered.filter(r=>r.pass_fail===f);
       t.filtered = filtered; t.page = 1; App.viewResults.render_table();
-    },
-
-    regrade(resultId, attemptId, employeeName, testName) {
-      App.modal.confirm(
-        '🔄 Chấm lại bài thi',
-        `Bạn muốn chấm lại bài của "${employeeName}" — "${testName}"?\n\n⚠️ Kết quả cũ sẽ bị xóa và bài thi sẽ trở về trạng thái chờ chấm.`,
-        async () => {
-          try {
-            // 1. Xóa result cũ (soft delete)
-            await db.from('exam_test_results')
-              .update({ deleted_at: new Date().toISOString() })
-              .eq('id', resultId);
-
-            // 2. Reset attempt về submitted để có thể chấm lại
-            await db.from('exam_exam_attempts')
-              .update({ status: 'submitted' })
-              .eq('id', attemptId);
-
-            // 3. Reset assignment về in_progress
-            const { data: attempt } = await db.from('exam_exam_attempts')
-              .select('test_id, employee_id').eq('id', attemptId).single();
-            if (attempt) {
-              await db.from('exam_test_assignments')
-                .update({ status: 'in_progress' })
-                .eq('test_id', attempt.test_id)
-                .eq('employee_id', attempt.employee_id);
-            }
-
-            App.toast.show('Đã reset. Mở modal chấm điểm...', 'warning');
-
-            // 4. Reload results table
-            await App.views.results.load();
-
-            // 5. Mở ngay modal chấm điểm
-            await App.grading.openGrade(attemptId);
-
-          } catch(e) {
-            App.toast.show('Lỗi chấm lại: ' + e.message, 'error');
-          }
-        }
-      );
     }
   },
 
@@ -4614,9 +4474,6 @@ const App = {
           ? `<td><span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:rgba(255,60,60,0.15);border:1.5px solid rgba(255,60,60,0.45);border-radius:100px;font-size:11px;font-weight:700;color:#ff4444;" title="${r.fraud_notes||''}">🚨 Gian lận</span></td>`
           : `<td><span style="color:var(--text-muted);font-size:12px;">—</span></td>`;
 
-        const certBtn = r.pass_fail === 'pass'
-          ? ` <button onclick="App.certificate.openFromResult('${r.attempt_id}')" title="Xem Certificate" style="margin-left:6px;padding:3px 9px;border:none;border-radius:100px;font-size:11px;font-weight:700;color:#fff;background:linear-gradient(135deg,#7c6af7,#f857a6);cursor:pointer;">🏆</button>`
-          : '';
         return `<tr style="${r.is_fraud ? 'background:rgba(255,40,40,0.04);' : ''}">
           <td>
             <div style="font-weight:700;font-size:14px;">${r.employee_name}</div>
@@ -4625,7 +4482,7 @@ const App = {
           <td style="color:var(--text-secondary);">${r.project_name}</td>
           <td style="font-weight:600;">${r.test_name}</td>
           ${scoreCell}
-          <td>${resultBadge}${certBtn}</td>
+          <td>${resultBadge}</td>
           <td class="text-sm" style="color:var(--text-muted);">${dateStr}</td>
           ${fraudCell}
         </tr>`;
@@ -4742,8 +4599,7 @@ const App = {
               if (result) {
                 cardClass = result.pass_fail === 'pass' ? 'card-pass' : 'card-fail';
                 statusHtml = `<span class="badge ${result.pass_fail==='pass'?'badge-success':'badge-danger'}">${result.pass_fail==='pass'?'✓ PASS':'✗ FAIL'} · ${result.total_score} điểm</span>`;
-                actionHtml = (attempt ? `<button class="btn btn-ghost btn-sm" onclick="App.exam.review('${attempt.id}')">👁 Xem lại bài</button>` : '')
-                  + (result.pass_fail === 'pass' ? ` <button class="btn btn-sm" style="background:linear-gradient(135deg,#7c6af7,#f857a6);color:#fff;font-weight:700;" onclick="App.certificate.openFromResult('${result.attempt_id||attempt?.id||''}')">🏆 View Certificate</button>` : '');
+                actionHtml = attempt ? `<button class="btn btn-ghost btn-sm" onclick="App.exam.review('${attempt.id}')">👁 Xem lại bài</button>` : '';
               } else if (isCompleted) {
                 cardClass = '';
                 statusHtml = '<span class="badge badge-warning">📬 Đã nộp · Chờ chấm</span>';
@@ -5655,230 +5511,6 @@ const App = {
        deleted_at  timestamptz
        deleted_by  text  (tuỳ chọn)
        meta        jsonb (tuỳ chọn)
-     ========================================================= */
-  recycleBin: {
-    _filter: 'all',
-    _cache: [],          // cache local để render nhanh, tự refresh khi load
-
-    // ── helpers ──────────────────────────────────────────────
-    _updateBadge(count) {
-      const badge = document.getElementById('recycle-badge');
-      if (!badge) return;
-      if (count > 0) { badge.textContent = count; badge.classList.remove('hidden'); }
-      else { badge.classList.add('hidden'); }
-    },
-    _typeLabel(type) {
-      return { test:'📋 Bài thi', project:'📁 Dự án', assignment:'📄 Phân công', question:'❓ Câu hỏi' }[type] || type;
-    },
-    _typeIcon(type) {
-      const colors = { test:'rgba(124,106,247,0.15)', project:'rgba(79,172,254,0.15)', assignment:'rgba(255,210,0,0.15)', question:'rgba(67,233,123,0.15)' };
-      const emojis = { test:'📋', project:'📁', assignment:'📄', question:'❓' };
-      return `<div class="recycle-item-icon" style="background:${colors[type]||'rgba(255,255,255,0.08)'};">${emojis[type]||'📌'}</div>`;
-    },
-
-    // ── Đọc tất cả items từ Supabase ─────────────────────────
-    async _loadFromDB() {
-      try {
-        const { data, error } = await db
-          .from('exam_recycle_bin')
-          .select('*')
-          .order('deleted_at', { ascending: false });
-        if (error) throw error;
-        this._cache = (data || []).map(r => ({
-          id:         r.item_id,
-          type:       r.item_type,
-          name:       r.item_name,
-          deleted_at: r.deleted_at,
-          _row_id:    r.id,           // UUID của row trong exam_recycle_bin
-        }));
-        this._updateBadge(this._cache.length);
-        return this._cache;
-      } catch(e) {
-        console.error('RecycleBin _loadFromDB:', e);
-        return [];
-      }
-    },
-
-    // ── Thêm item vào Recycle Bin (gọi khi xóa mềm) ─────────
-    async addItem(item) {
-      try {
-        const payload = {
-          item_id:    item.id,
-          item_type:  item.type,
-          item_name:  item.name,
-          deleted_at: item.deleted_at || new Date().toISOString(),
-        };
-        // upsert → tránh duplicate nếu double-click
-        const { error } = await db
-          .from('exam_recycle_bin')
-          .upsert(payload, { onConflict: 'item_id,item_type' });
-        if (error) throw error;
-
-        // Cập nhật cache & badge ngay lập tức (không cần chờ reload)
-        const exists = this._cache.find(x => x.id === item.id && x.type === item.type);
-        if (!exists) {
-          this._cache.unshift({ ...item, deleted_at: payload.deleted_at });
-          this._updateBadge(this._cache.length);
-        }
-      } catch(e) {
-        console.error('RecycleBin addItem:', e);
-      }
-    },
-
-    // ── Filter tabs ───────────────────────────────────────────
-    filterType(type, btn) {
-      this._filter = type;
-      document.querySelectorAll('.recycle-tab').forEach(t => t.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-      this._renderFromCache();
-    },
-
-    // ── Render từ cache (không gọi DB) ────────────────────────
-    _renderFromCache() {
-      const list = document.getElementById('recycle-list');
-      const countBadge = document.getElementById('recycle-count-badge');
-      const clearBtn = document.getElementById('recycle-clear-btn');
-      if (!list) return;
-
-      const items = this._cache;
-      const filtered = this._filter === 'all' ? items : items.filter(x => x.type === this._filter);
-
-      if (countBadge) countBadge.textContent = `${items.length} mục`;
-      if (clearBtn) clearBtn.style.display = items.length > 0 ? '' : 'none';
-
-      if (!filtered.length) {
-        list.innerHTML = `<div class="recycle-empty">
-          <svg width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="display:block;margin:0 auto 12px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-          <div style="font-size:15px;font-weight:600;margin-bottom:4px;">Recycle Bin trống</div>
-          <div style="font-size:13px;">Chưa có dữ liệu nào được chuyển vào đây.</div>
-        </div>`;
-        return;
-      }
-
-      list.innerHTML = filtered.map(item => {
-        const d = new Date(item.deleted_at);
-        const dateStr = d.toLocaleString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
-        const safeName = (item.name||'').replace(/'/g, '&#39;');
-        return `<div class="recycle-item" data-id="${item.id}" data-type="${item.type}">
-          ${this._typeIcon(item.type)}
-          <div class="recycle-item-info">
-            <div class="recycle-item-name" title="${safeName}">${item.name}</div>
-            <div class="recycle-item-meta">${this._typeLabel(item.type)} &nbsp;·&nbsp; Xóa lúc ${dateStr}</div>
-          </div>
-          <div class="recycle-item-actions">
-            <button class="btn-restore" onclick="App.recycleBin.restore('${item.id}','${item.type}')">
-              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
-              Khôi phục
-            </button>
-            <button class="btn-perm-delete" onclick="App.recycleBin.permanentDelete('${item.id}','${item.type}','${safeName}')">
-              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
-              Xóa vĩnh viễn
-            </button>
-          </div>
-        </div>`;
-      }).join('');
-    },
-
-    // ── render() — load DB rồi hiển thị ──────────────────────
-    async render() {
-      const list = document.getElementById('recycle-list');
-      if (list) list.innerHTML = `<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:13px;">Đang tải...</div>`;
-      await this._loadFromDB();
-      this._renderFromCache();
-    },
-
-    // ── Khôi phục item ────────────────────────────────────────
-    async restore(id, type) {
-      const item = this._cache.find(x => x.id === id && x.type === type);
-      try {
-        const tableMap = { test:'exam_tests', project:'exam_projects', assignment:'exam_test_assignments', question:'exam_questions' };
-        const table = tableMap[type];
-        if (table) await db.from(table).update({ deleted_at: null }).eq('id', id);
-
-        // Xóa khỏi exam_recycle_bin
-        await db.from('exam_recycle_bin')
-          .delete()
-          .eq('item_id', id)
-          .eq('item_type', type);
-
-        // Cập nhật cache
-        this._cache = this._cache.filter(x => !(x.id === id && x.type === type));
-        this._updateBadge(this._cache.length);
-        App.toast.show(`Đã khôi phục ${this._typeLabel(type)}: ${item?.name||id}`, 'success');
-        this._renderFromCache();
-
-        if (type === 'test' && App.state.currentView === 'tests') App.views.tests.load();
-        if (type === 'project' && App.state.currentView === 'projects') App.views.projects.load();
-        if (type === 'assignment' && App.state.currentView === 'assignments') App.views.assignments.load();
-      } catch(e) {
-        App.toast.show('Lỗi khôi phục: ' + e.message, 'error');
-      }
-    },
-
-    // ── Xóa vĩnh viễn 1 item ─────────────────────────────────
-    async permanentDelete(id, type, name) {
-      App.modal.confirm('⚠️ Xóa vĩnh viễn', `"${name}" sẽ bị xóa vĩnh viễn và KHÔNG THỂ khôi phục. Tiếp tục?`, async () => {
-        try {
-          await this._hardDelete(id, type);
-
-          // Xóa khỏi exam_recycle_bin
-          await db.from('exam_recycle_bin')
-            .delete()
-            .eq('item_id', id)
-            .eq('item_type', type);
-
-          this._cache = this._cache.filter(x => !(x.id === id && x.type === type));
-          this._updateBadge(this._cache.length);
-          App.toast.show('Đã xóa vĩnh viễn.', 'success');
-          this._renderFromCache();
-        } catch(e) {
-          App.toast.show('Lỗi: ' + e.message, 'error');
-        }
-      });
-    },
-
-    // ── Xóa tất cả trong Recycle Bin ─────────────────────────
-    clearAll() {
-      const items = this._cache;
-      if (!items.length) return;
-      App.modal.confirm('⚠️ Xóa tất cả vĩnh viễn', `Xóa vĩnh viễn ${items.length} mục trong Recycle Bin? Hành động này KHÔNG THỂ hoàn tác.`, async () => {
-        for (const item of items) {
-          try { await this._hardDelete(item.id, item.type); } catch(e) {}
-        }
-        // Xóa toàn bộ rows trong exam_recycle_bin
-        await db.from('exam_recycle_bin').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-        this._cache = [];
-        this._updateBadge(0);
-        App.toast.show('Đã dọn sạch Recycle Bin.', 'success');
-        this._renderFromCache();
-      });
-    },
-
-    // ── Hard delete dữ liệu gốc ───────────────────────────────
-    async _hardDelete(id, type) {
-      if (type === 'test') {
-        const { data: attempts } = await db.from('exam_exam_attempts').select('id').eq('test_id', id);
-        const attemptIds = (attempts || []).map(a => a.id);
-        if (attemptIds.length) await db.from('exam_test_answers').delete().in('attempt_id', attemptIds);
-        await db.from('exam_test_results').delete().eq('test_id', id);
-        await db.from('exam_exam_attempts').delete().eq('test_id', id);
-        await db.from('exam_test_assignments').delete().eq('test_id', id);
-        await db.from('exam_questions').delete().eq('test_id', id);
-        await db.from('exam_tests').delete().eq('id', id);
-      } else if (type === 'project') {
-        await db.from('exam_projects').delete().eq('id', id);
-      } else if (type === 'assignment') {
-        await db.from('exam_test_assignments').delete().eq('id', id);
-      } else if (type === 'question') {
-        await db.from('exam_questions').delete().eq('id', id);
-      }
-    },
-
-    // ── init: load badge khi khởi động app ───────────────────
-    async init() {
-      await this._loadFromDB();
-    }
-  },
 
   /* =========================================================
      REALTIME
@@ -6020,554 +5652,5 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
     document.body.appendChild(wave);
     wave.addEventListener('animationend', () => wave.remove());
   });
-})();
-</script>
-
-<!-- ============================================================
-     CERTIFICATE OF COMPLETION — ADDITIVE FEATURE (no logic change)
-     ============================================================ -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<style>
-  /* Certificate Modal */
-  .cert-modal-overlay {
-    position: fixed; inset: 0; z-index: 10000;
-    background: rgba(8,6,28,0.82); backdrop-filter: blur(8px);
-    display: none; align-items: center; justify-content: center;
-    padding: 24px; overflow: auto;
-  }
-  .cert-modal-overlay.open { display: flex; }
-  .cert-modal-box {
-    background: #ffffff; border-radius: 16px; max-width: 1240px; width: 100%;
-    box-shadow: 0 40px 120px rgba(0,0,0,0.6);
-    display: flex; flex-direction: column; max-height: 95vh; overflow: hidden;
-  }
-  .cert-modal-toolbar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 22px; border-bottom: 1px solid #ece8ff;
-    background: linear-gradient(135deg,#f7f5ff,#fff6fb);
-    font-family: 'Be Vietnam Pro', sans-serif;
-  }
-  .cert-modal-toolbar h3 {
-    margin: 0; font-family: 'Be Vietnam Pro', sans-serif; font-size: 16px; font-weight: 800;
-    color: #2a1e6b; letter-spacing: -0.2px;
-  }
-  .cert-modal-toolbar .cert-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-  .cert-btn {
-    border: none; cursor: pointer; padding: 8px 16px; border-radius: 8px;
-    font-size: 13px; font-weight: 700; font-family: 'Be Vietnam Pro', sans-serif;
-    display: inline-flex; align-items: center; gap: 6px;
-    transition: transform .15s ease, box-shadow .15s ease;
-  }
-  .cert-btn:hover { transform: translateY(-1px); }
-  .cert-btn-primary { background: linear-gradient(135deg,#7c6af7,#f857a6); color: #fff; }
-  .cert-btn-secondary { background: #fff; color: #2a1e6b; border: 1.5px solid #d8d2f5; }
-  .cert-btn-ghost { background: transparent; color: #6b6890; }
-
-  .cert-modal-scroll { overflow: auto; padding: 28px; background: #1a0f3d; }
-
-  /* The certificate itself — A4 Landscape with deep purple frame */
-  #certificate-print-area {
-    width: 297mm; min-height: 210mm; margin: 0 auto;
-    background:
-      radial-gradient(ellipse at 0% 0%, rgba(124,106,247,0.25), transparent 40%),
-      radial-gradient(ellipse at 100% 100%, rgba(248,87,166,0.25), transparent 40%),
-      linear-gradient(135deg, #14082e 0%, #1f0d4a 50%, #14082e 100%);
-    position: relative; padding: 8mm; box-sizing: border-box;
-    color: #1a1340; font-family: 'Be Vietnam Pro', sans-serif;
-    box-shadow: 0 12px 60px rgba(124,106,247,0.35);
-    overflow: hidden;
-  }
-  /* Inner white card */
-  .cert-frame {
-    position: absolute; inset: 8mm;
-    background:
-      radial-gradient(circle at 15% 30%, rgba(124,106,247,0.04), transparent 35%),
-      radial-gradient(circle at 85% 70%, rgba(248,87,166,0.04), transparent 35%),
-      #fbfaff;
-    border-radius: 2px;
-    box-shadow: 0 0 0 1px rgba(124,106,247,0.5),
-                inset 0 0 0 1px rgba(248,87,166,0.25);
-  }
-  /* Subtle wave overlay */
-  .cert-frame::before {
-    content: ''; position: absolute; inset: 0;
-    background:
-      radial-gradient(circle at 8% 12%, rgba(91,63,209,0.18) 1px, transparent 2px) 0 0/14px 14px,
-      radial-gradient(circle at 50% 50%, rgba(91,63,209,0.1) 0.5px, transparent 1.5px) 0 0/8px 8px;
-    background-position: 0 0, 0 0;
-    width: 90px; height: 90px;
-    top: 30mm; left: 6mm;
-    opacity: 0.6;
-    pointer-events: none;
-  }
-
-  /* Neon L-shaped corners with glow */
-  .cert-corner {
-    position: absolute; width: 80px; height: 80px; pointer-events: none; z-index: 5;
-  }
-  .cert-corner::before, .cert-corner::after {
-    content: ''; position: absolute;
-    background: linear-gradient(135deg,#a78bfa,#ec4899);
-    box-shadow: 0 0 14px rgba(167,139,250,0.85), 0 0 28px rgba(236,72,153,0.6);
-    border-radius: 2px;
-  }
-  .cert-corner::before { width: 100%; height: 3px; }
-  .cert-corner::after  { width: 3px; height: 100%; }
-  .cert-corner.tl { top: 3mm; left: 3mm; }
-  .cert-corner.tl::before { top: 0; left: 0; } .cert-corner.tl::after { top: 0; left: 0; }
-  .cert-corner.tr { top: 3mm; right: 3mm; }
-  .cert-corner.tr::before { top: 0; right: 0; } .cert-corner.tr::after { top: 0; right: 0; }
-  .cert-corner.bl { bottom: 3mm; left: 3mm; }
-  .cert-corner.bl::before { bottom: 0; left: 0; } .cert-corner.bl::after { bottom: 0; left: 0; }
-  .cert-corner.br { bottom: 3mm; right: 3mm; }
-  .cert-corner.br::before { bottom: 0; right: 0; } .cert-corner.br::after { bottom: 0; right: 0; }
-
-  .cert-inner {
-    position: relative; z-index: 2; padding: 14mm 18mm 12mm;
-    height: 100%; min-height: 194mm; display: flex; flex-direction: column;
-    font-family: 'Be Vietnam Pro', sans-serif;
-  }
-
-  /* Trophy top-left (pink/purple gradient) */
-  .cert-trophy-corner {
-    position: absolute; top: 9mm; left: 12mm;
-    font-size: 38px; z-index: 4;
-    filter: drop-shadow(0 4px 12px rgba(236,72,153,0.55));
-  }
-
-  /* PASS Medal top-right — laurel seal */
-  .cert-medal {
-    position: absolute; top: 8mm; right: 10mm; z-index: 4;
-    width: 110px; text-align: center;
-  }
-  .cert-medal-circle {
-    width: 110px; height: 110px; border-radius: 50%;
-    background:
-      radial-gradient(circle at 35% 30%, #d6f7e6 0%, #88e0b0 45%, #4cc888 75%, #2ba368 100%);
-    border: 4px solid #fff;
-    box-shadow:
-      0 0 0 2px rgba(67,233,123,0.4),
-      0 10px 24px rgba(43,163,104,0.45),
-      inset 0 -8px 14px rgba(0,0,0,0.12);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Be Vietnam Pro', sans-serif; font-weight: 900; font-size: 26px;
-    color: #08542f; letter-spacing: 2px;
-    position: relative;
-  }
-  .cert-medal-circle::before {
-    content: '★'; position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
-    font-size: 11px; color: #08542f;
-  }
-  .cert-medal-circle::after {
-    content: '★ ★ ★'; position: absolute; bottom: 12px; left: 0; right: 0;
-    font-size: 9px; color: #08542f; letter-spacing: 3px;
-  }
-  /* Laurel branches via box-shadow trick — use simple inner ring */
-  .cert-medal-laurel {
-    position: absolute; inset: 8px; border-radius: 50%;
-    border: 1.5px solid rgba(8,84,47,0.4);
-    pointer-events: none;
-  }
-  .cert-medal-ribbons {
-    display: flex; justify-content: center; gap: 6px;
-    margin-top: -14px; position: relative; z-index: -1;
-  }
-  .cert-medal-ribbons span {
-    display: block; width: 22px; height: 38px;
-    background: linear-gradient(180deg, #4a2b8c, #1f0d4a);
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 72%, 0 100%);
-    box-shadow: 0 3px 6px rgba(0,0,0,0.3);
-  }
-
-  /* Logo header */
-  .cert-header {
-    text-align: center; margin-top: 0; margin-bottom: 6mm;
-  }
-  .cert-logo-mark {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 58px; height: 58px;
-    background: linear-gradient(135deg,#7c6af7,#5f4ed8);
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    color: #fff; font-weight: 900; font-size: 24px;
-    font-family: 'Be Vietnam Pro', sans-serif;
-    margin-bottom: 8px;
-    position: relative;
-  }
-  .cert-logo-mark::after {
-    content: '★'; position: absolute; top: 6px; right: 8px;
-    font-size: 10px; color: #ffd84a;
-  }
-  .cert-brand {
-    font-family: 'Be Vietnam Pro', sans-serif;
-    font-weight: 800; font-size: 18px; letter-spacing: 3px;
-    color: #2a1e6b;
-  }
-  .cert-brand-tag {
-    font-size: 11px; color: #7a76a0; font-weight: 500;
-    letter-spacing: 4px; margin-top: 3px;
-  }
-
-  /* Title */
-  .cert-title {
-    text-align: center;
-    font-family: 'Be Vietnam Pro', sans-serif;
-    font-size: 78px; font-weight: 900; letter-spacing: 2px;
-    line-height: 1; margin-top: 4mm; margin-bottom: 4px;
-    background: linear-gradient(95deg,#5b3fd1 0%, #7c6af7 30%, #c8438f 70%, #e91e63 100%);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
-  .cert-title-sub {
-    text-align: center;
-    font-family: 'Be Vietnam Pro', sans-serif;
-    font-size: 18px; font-weight: 600; letter-spacing: 10px;
-    color: #5b3fd1; margin-bottom: 8mm; margin-top: 2mm;
-    display: flex; align-items: center; justify-content: center; gap: 16px;
-  }
-  .cert-title-sub::before, .cert-title-sub::after {
-    content: ''; height: 1.5px; width: 90px;
-    background: linear-gradient(90deg, transparent, #7c6af7);
-  }
-  .cert-title-sub::after { background: linear-gradient(90deg, #7c6af7, transparent); }
-
-  .cert-presented {
-    text-align: center;
-    font-family: 'Be Vietnam Pro', sans-serif;
-    font-size: 14px; font-weight: 500; letter-spacing: 5px;
-    color: #6b6890; text-transform: uppercase; margin-bottom: 6mm;
-  }
-
-  .cert-recipient {
-    text-align: center;
-    font-family: 'Be Vietnam Pro', sans-serif;
-    font-size: 64px; font-weight: 900;
-    color: #0f1144; letter-spacing: -1px;
-    margin: 0 8mm 5mm;
-    line-height: 1.05;
-  }
-
-  .cert-divider {
-    display: flex; align-items: center; justify-content: center;
-    gap: 8px; margin: 0 auto 6mm; max-width: 55%;
-  }
-  .cert-divider::before, .cert-divider::after {
-    content: ''; flex: 1; height: 1px; background: #d8d2f5;
-  }
-  .cert-divider span {
-    width: 7px; height: 7px; background: #c8438f;
-    transform: rotate(45deg);
-  }
-
-  .cert-for {
-    text-align: center;
-    font-family: 'Be Vietnam Pro', sans-serif;
-    font-size: 13px; font-weight: 500; letter-spacing: 4px;
-    color: #6b6890; text-transform: uppercase; margin-bottom: 4mm;
-  }
-  .cert-assessment-name {
-    text-align: center;
-    font-family: 'Be Vietnam Pro', sans-serif;
-    font-size: 28px; font-weight: 700;
-    color: #5b3fd1; margin-bottom: 9mm;
-  }
-
-  /* 5 Info cards — wider, taller, consistent */
-  .cert-info-grid {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 14px; margin: 0 4mm 9mm;
-  }
-  .cert-info-card {
-    background: #fff;
-    border: 1px solid #ece8ff;
-    border-radius: 12px;
-    padding: 16px 14px;
-    min-height: 80px;
-    display: flex; align-items: center; gap: 12px;
-    box-shadow: 0 4px 14px rgba(124,106,247,0.1);
-    font-family: 'Be Vietnam Pro', sans-serif;
-  }
-  .cert-info-icon {
-    flex-shrink: 0;
-    width: 44px; height: 44px; border-radius: 10px;
-    background: linear-gradient(135deg,#7c6af7,#5f4ed8);
-    display: flex; align-items: center; justify-content: center;
-    color: #fff; font-size: 20px;
-    box-shadow: 0 4px 10px rgba(124,106,247,0.35);
-  }
-  .cert-info-text { display: flex; flex-direction: column; min-width: 0; }
-  .cert-info-lbl {
-    font-size: 10px; font-weight: 700; letter-spacing: 1.8px;
-    color: #9b97c0; text-transform: uppercase;
-  }
-  .cert-info-val {
-    font-size: 13px; font-weight: 700; color: #2a1e6b;
-    margin-top: 3px; word-break: break-word; line-height: 1.25;
-  }
-
-  /* Bottom: EA seal with laurel + tagline */
-  .cert-footer-center {
-    text-align: center; margin-top: auto; margin-bottom: 6mm;
-    font-family: 'Be Vietnam Pro', sans-serif;
-  }
-  .cert-seal {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 64px; height: 64px; border-radius: 50%;
-    background: radial-gradient(circle at 30% 25%, #6b4ed8, #3d2c8f 70%, #1f0d4a);
-    color: #fff; font-weight: 900; font-size: 20px;
-    border: 2.5px solid #c8438f;
-    box-shadow: 0 6px 18px rgba(91,63,209,0.5),
-                inset 0 0 0 3px rgba(255,255,255,0.08);
-    margin-bottom: 10px;
-    position: relative;
-  }
-  .cert-seal::before {
-    content: '★'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
-    color: #ffd84a; font-size: 14px;
-    text-shadow: 0 2px 6px rgba(255,216,74,0.7);
-  }
-  .cert-tagline {
-    font-size: 14px; font-weight: 800; letter-spacing: 5px;
-    color: #5b3fd1; margin-bottom: 4px;
-  }
-  .cert-tagline-sub {
-    font-size: 12px; font-style: italic; color: #7a76a0;
-    letter-spacing: 0.3px;
-  }
-
-  /* Bottom chevron ribbon with stars */
-  .cert-bottom-ribbon {
-    position: absolute; bottom: 9mm; left: 50%; transform: translateX(-50%);
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-    padding: 6px 36px;
-    background: linear-gradient(90deg, #4a2b8c 0%, #7c4ad8 50%, #c8438f 100%);
-    clip-path: polygon(6% 0, 94% 0, 100% 50%, 94% 100%, 6% 100%, 0 50%);
-    color: #ffd84a; font-size: 12px; letter-spacing: 6px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    z-index: 5;
-  }
-
-  /* Print rules */
-  @media print {
-    @page { size: A4 landscape; margin: 0; }
-    html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
-    body > *:not(#certificate-print-wrapper) { display: none !important; }
-    #certificate-print-wrapper {
-      position: static !important; display: block !important;
-      background: #fff !important; padding: 0 !important; margin: 0 !important;
-      width: auto !important; height: auto !important; max-height: none !important;
-      overflow: visible !important;
-    }
-    #certificate-print-wrapper .cert-modal-toolbar { display: none !important; }
-    #certificate-print-wrapper .cert-modal-box { box-shadow: none !important; border-radius: 0 !important; max-height: none !important; }
-    #certificate-print-wrapper .cert-modal-scroll { background: #fff !important; padding: 0 !important; overflow: visible !important; }
-    #certificate-print-area { box-shadow: none !important; margin: 0 auto !important; }
-  }
-</style>
-
-<script>
-(function() {
-  'use strict';
-
-  function ensureModal() {
-    if (document.getElementById('certificate-print-wrapper')) return;
-    const wrap = document.createElement('div');
-    wrap.id = 'certificate-print-wrapper';
-    wrap.className = 'cert-modal-overlay';
-    wrap.innerHTML = `
-      <div class="cert-modal-box">
-        <div class="cert-modal-toolbar">
-          <h3>🏆 Certificate of Completion</h3>
-          <div class="cert-actions">
-            <button class="cert-btn cert-btn-secondary" onclick="App.certificate.print()">🖨 Print</button>
-            <button class="cert-btn cert-btn-primary" onclick="App.certificate.download()">⬇ Download Certificate</button>
-            <button class="cert-btn cert-btn-ghost" onclick="App.certificate.close()">✕ Close</button>
-          </div>
-        </div>
-        <div class="cert-modal-scroll">
-          <div id="certificate-print-area"></div>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(wrap);
-    wrap.addEventListener('click', (e) => { if (e.target === wrap) App.certificate.close(); });
-  }
-
-  function fmtDate(d) {
-    if (!d) return new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
-    const dt = new Date(d);
-    if (isNaN(dt)) return String(d);
-    return dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
-  }
-
-  function renderCertificate(data) {
-    const area = document.getElementById('certificate-print-area');
-    if (!area) return;
-    const score = data.score_percentage != null ? data.score_percentage : (data.total_score ?? '—');
-    const passScore = data.pass_score != null ? data.pass_score : '—';
-    area.innerHTML = `
-      <div class="cert-frame"></div>
-      <div class="cert-corner tl"></div>
-      <div class="cert-corner tr"></div>
-      <div class="cert-corner bl"></div>
-      <div class="cert-corner br"></div>
-
-      <div class="cert-trophy-corner">🏆</div>
-      <div class="cert-medal">
-        <div class="cert-medal-circle"><div class="cert-medal-laurel"></div>PASS</div>
-        <div class="cert-medal-ribbons"><span></span><span></span></div>
-      </div>
-
-      <div class="cert-inner">
-        <div class="cert-header">
-          <div class="cert-logo-mark">EA</div>
-          <div class="cert-brand">EMPLOYEE ASSESSMENT</div>
-          <div class="cert-brand-tag">ASSESS · DEVELOP · EXCEL</div>
-        </div>
-
-        <div class="cert-title">CERTIFICATE</div>
-        <div class="cert-title-sub">OF COMPLETION</div>
-
-        <div class="cert-presented">This certificate is proudly presented to</div>
-        <div class="cert-recipient">${escapeHtml(data.employee_name || '—')}</div>
-
-        <div class="cert-divider"><span></span></div>
-
-        <div class="cert-for">For successfully passing</div>
-        <div class="cert-assessment-name">${escapeHtml(data.test_name || '—')}</div>
-
-        <div class="cert-info-grid">
-          <div class="cert-info-card">
-            <div class="cert-info-icon">📋</div>
-            <div class="cert-info-text">
-              <div class="cert-info-lbl">Project</div>
-              <div class="cert-info-val">${escapeHtml(data.project_name || '—')}</div>
-            </div>
-          </div>
-          <div class="cert-info-card">
-            <div class="cert-info-icon">📊</div>
-            <div class="cert-info-text">
-              <div class="cert-info-lbl">Score</div>
-              <div class="cert-info-val">${score}${data.score_percentage != null ? ' / 100' : ''}</div>
-            </div>
-          </div>
-          <div class="cert-info-card">
-            <div class="cert-info-icon">🎯</div>
-            <div class="cert-info-text">
-              <div class="cert-info-lbl">Passing Score</div>
-              <div class="cert-info-val">${passScore}${data.pass_score != null ? ' / 100' : ''}</div>
-            </div>
-          </div>
-          <div class="cert-info-card">
-            <div class="cert-info-icon">📅</div>
-            <div class="cert-info-text">
-              <div class="cert-info-lbl">Completion Date</div>
-              <div class="cert-info-val">${fmtDate(data.graded_at)}</div>
-            </div>
-          </div>
-        </div>
-
-
-        <div class="cert-footer-center">
-          <div class="cert-seal">EA</div>
-          <div class="cert-tagline">BUILDING EXCELLENCE TOGETHER</div>
-          <div class="cert-tagline-sub">Empowering People. Elevating Performance.</div>
-        </div>
-      </div>
-
-      <div class="cert-bottom-ribbon">★ ★ ★</div>
-    `;
-    area.dataset.employeeName = data.employee_name || 'Employee';
-  }
-
-  function escapeHtml(s) {
-    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
-
-  // Public API
-  window.App = window.App || {};
-  App.certificate = {
-    async openFromResult(attemptId) {
-      if (!attemptId) { App.toast?.show?.('Thiếu mã attempt.', 'error'); return; }
-      try {
-        ensureModal();
-        // Load result + related test for pass_score
-        const { data: result } = await db.from('exam_test_results')
-          .select('*').eq('attempt_id', attemptId).is('deleted_at', null).single();
-        if (!result || result.pass_fail !== 'pass') {
-          App.toast?.show?.('Certificate chỉ khả dụng cho kết quả PASS.', 'warning');
-          return;
-        }
-        let passScore = null;
-        if (result.test_id) {
-          const { data: test } = await db.from('exam_tests').select('pass_score').eq('id', result.test_id).single();
-          passScore = test?.pass_score ?? null;
-        }
-        renderCertificate({
-          attempt_id: result.attempt_id,
-          employee_name: result.employee_name,
-          employee_email: result.employee_email,
-          test_name: result.test_name,
-          project_name: result.project_name,
-          total_score: result.total_score,
-          score_percentage: result.score_percentage,
-          pass_score: passScore,
-          graded_at: result.created_at,
-        });
-        document.getElementById('certificate-print-wrapper').classList.add('open');
-      } catch (e) {
-        App.toast?.show?.('Không tải được Certificate: ' + (e.message || e), 'error');
-      }
-    },
-    show(data) { ensureModal(); renderCertificate(data || {}); document.getElementById('certificate-print-wrapper').classList.add('open'); },
-    close() { const w = document.getElementById('certificate-print-wrapper'); if (w) w.classList.remove('open'); },
-    print() { window.print(); },
-    async download() {
-      const area = document.getElementById('certificate-print-area');
-      if (!area) return;
-      const name = (area.dataset.employeeName || 'Employee').replace(/[^a-zA-Z0-9_\-]+/g, '');
-      const filename = `Certificate_${name || 'Employee'}`;
-
-      // A4 Landscape px
-      const A4_W = 1123, A4_H = 794;
-      try {
-        if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch(_){} }
-        App.toast?.show?.('Đang tạo PDF...', 'info');
-
-        // Load html2canvas dynamically if needed
-        if (typeof html2canvas === 'undefined') {
-          await new Promise((res, rej) => {
-            const s = document.createElement('script');
-            s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-            s.onload = res; s.onerror = rej;
-            document.head.appendChild(s);
-          });
-        }
-        // Capture certificate area to canvas
-        const canvas = await html2canvas(area, {
-          scale: 2,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff',
-          logging: false,
-          width: area.offsetWidth,
-          height: area.offsetHeight,
-          foreignObjectRendering: false,
-          imageTimeout: 0,
-          removeContainer: true,
-        });
-
-        const imgData = canvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.href = imgData;
-        link.download = `Certificate_${name || 'Employee'}.png`;
-        link.click();
-        App.toast?.show?.('Tải ảnh thành công!', 'success');
-      } catch (e) {
-        App.toast?.show?.('Lỗi tạo PDF: ' + (e?.message || e), 'error');
-        console.error('[Certificate PDF]', e);
-      }
-    }
-  };
-
 })();
 </script>
