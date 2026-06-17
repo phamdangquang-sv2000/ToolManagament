@@ -55,7 +55,7 @@ body{background:var(--surface2);color:var(--text-1)}
 @keyframes spin-icon{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 #refresh-icon.spinning{animation:spin-icon .7s linear infinite}
 
-/* ── CARD ── */
+
 .card{
   background:var(--surface);
   border-radius:var(--radius-lg);
@@ -67,7 +67,7 @@ body{background:var(--surface2);color:var(--text-1)}
 .card:hover{box-shadow:var(--shadow-lg)}
 .dark .card{background:var(--surface);border-color:var(--border)}
 
-/* ── GLASS ── */
+
 .glass{
   background:rgba(255,255,255,.7);
   backdrop-filter:blur(16px);
@@ -79,7 +79,7 @@ body{background:var(--surface2);color:var(--text-1)}
   border-color:rgba(255,255,255,.06);
 }
 
-/* ── BUTTONS ── */
+
 .btn{
   display:inline-flex;align-items:center;gap:.4rem;
   padding:.5rem 1rem;border-radius:.6rem;
@@ -125,7 +125,7 @@ body{background:var(--surface2);color:var(--text-1)}
 
 .text-3xl { font-size: 1.775rem !important; }
 
-/* ── INPUTS ── */
+
 .input{
   width:100%;padding:.55rem .85rem;
   border-radius:.6rem;
@@ -150,7 +150,7 @@ select.input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xml
   text-transform:uppercase;letter-spacing:.07em;
 }
 
-/* ── BADGES ── */
+
 .badge{
   display:inline-flex;align-items:center;
   padding:.2rem .65rem;border-radius:999px;
@@ -176,7 +176,7 @@ select.input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xml
 .bg-teal{background:#ccfbf1;color:#134e4a}
 .dark .bg-teal{background:rgba(20,184,166,.15);color:#5eead4}
 
-/* ── SIDEBAR NAV ── */
+
 .nav-link{
   display:flex;align-items:center;gap:.6rem;
   padding:.5rem .8rem;border-radius:.6rem;
@@ -210,7 +210,7 @@ select.input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xml
   box-shadow:0 3px 8px rgba(13,148,136,.3);
 }
 
-/* ── PENDING BADGE ── */
+
 .pending-badge{
   display:inline-flex;align-items:center;justify-content:center;
   min-width:1.1rem;height:1.1rem;padding:0 .3rem;
@@ -219,7 +219,7 @@ select.input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xml
   margin-left:auto;
 }
 
-/* ── MODAL ── */
+
 .modal-bd{
   position:fixed;inset:0;
   background:rgba(15,22,41,.6);
@@ -244,12 +244,12 @@ select.input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xml
   border-radius:var(--radius-xl) var(--radius-xl) 0 0;
 }
 
-/* ── SECTION TRANSITIONS ── */
+
 .section{display:none}
 .section.active{display:block;animation:sectionIn .35s cubic-bezier(.4,0,.2,1)}
 @keyframes sectionIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
-/* ── TABLE ── */
+
 .tw{overflow-x:auto}
 .card > .tw{border:none;border-radius:0}
 .card > .tw + #emp-pager,.card > .tw + [id$="-pager"]{background:var(--surface)}
@@ -273,12 +273,12 @@ td{
 tr:hover td{background:rgba(13,148,136,.03)}
 .dark tr:hover td{background:rgba(20,184,166,.05)}
 
-/* ── PROGRESS ── */
+
 .prog{height:.45rem;border-radius:999px;background:var(--surface3);overflow:hidden}
 .dark .prog{background:var(--surface3)}
 .prog-fill{height:100%;border-radius:999px;transition:width .6s cubic-bezier(.4,0,.2,1)}
 
-/* ── SPINNER ── */
+
 .spinner{
   display:inline-block;width:.9rem;height:.9rem;
   border:2px solid rgba(255,255,255,.35);
@@ -287,7 +287,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ── TOAST ── */
+
 #toasts{position:fixed;top:1.25rem;right:1.25rem;z-index:100;display:flex;flex-direction:column;gap:.5rem}
 .toast{
   display:flex;align-items:center;gap:.75rem;
@@ -306,7 +306,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
   font-size:.8rem;
 }
 
-/* ── FULLCALENDAR DARK ── */
+
 .fc{font-size:12px!important}.fc-event{cursor:pointer;font-size:11px!important;border-radius:.35rem!important;border:none!important}
 .dark .fc-theme-standard td,.dark .fc-theme-standard th,.dark .fc-theme-standard .fc-scrollgrid{border-color:var(--border)!important}
 .dark .fc-daygrid-day-number,.dark .fc-col-header-cell-cushion{color:var(--text-2)!important}
@@ -316,7 +316,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
 .dark .fc-day-today{background:rgba(79,70,229,.06)!important}
 .dark .fc-daygrid-day{background:var(--surface)!important}
 
-/* ── ANIMATIONS ── */
+
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideRight{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
@@ -336,7 +336,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
 .stat-card:nth-child(7){animation-delay:.35s}
 .stat-card:nth-child(8){animation-delay:.4s}
 
-/* ── LOGIN SPECIFIC ── */
+
 .login-card{
   background:rgba(255,255,255,.85);
   backdrop-filter:blur(24px);
@@ -355,7 +355,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
   position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;
 }
 
-/* ── LOGO ── */
+
 .logo-ring{
   position:relative;
   width:5.5rem;height:5.5rem;
@@ -374,7 +374,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
 
-/* ── STAT CARDS ── */
+
 .stat-icon{
   width:3.25rem;height:3.25rem;border-radius:1rem;
   display:flex;align-items:center;justify-content:center;
@@ -388,25 +388,25 @@ tr:hover td{background:rgba(13,148,136,.03)}
 }
 .dark .stat-value{color:var(--text-1)}
 
-/* ── SECTION HEADER ── */
+
 .section-header{
   display:flex;align-items:center;justify-content:space-between;
   flex-wrap:wrap;gap:.75rem;margin-bottom:1.25rem;
 }
 
-/* ── FILTERS ROW ── */
+
 .filters-row{
   display:flex;flex-wrap:wrap;gap:.65rem;
   align-items:center;margin-bottom:1.25rem;
 }
 
-/* ── SCROLLBAR ── */
+
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:999px}
 ::-webkit-scrollbar-thumb:hover{background:var(--text-3)}
 
-/* ── TAB ── */
+
 .tab-container{
   display:flex;border-radius:.85rem;
   background:var(--surface3);padding:.3rem;gap:.3rem;margin-bottom:1.5rem;
@@ -425,10 +425,10 @@ tr:hover td{background:rgba(13,148,136,.03)}
 }
 .dark .tab-btn.active{background:var(--surface3);color:#5eead4}
 
-/* ── DIVIDER ── */
+
 .divider{height:1px;background:var(--border);margin:1rem 0}
 
-/* ── SIDEBAR SECTION LABEL ── */
+
 .nav-section-label{
   font-size:.65rem;font-weight:800;
   color:var(--text-3);
@@ -437,7 +437,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
   margin-top:.5rem;
 }
 
-/* ── SCHEDULE TABLE SPECIFIC ── */
+
 .sch-table-container{
   overflow-x:auto;
   border-radius:var(--radius-lg);
@@ -556,10 +556,10 @@ tr:hover td{background:rgba(13,148,136,.03)}
   border:1.5px dashed var(--border);border-radius:5px;
   background:transparent;
 }
-/* Dark cells empty */
+
 .dark .sch-cell-empty{border-color:var(--border);}
 
-/* ── CELL POPUP DROPDOWN ── */
+
 .sch-popup{
   position:fixed;
   z-index:9999;
@@ -600,34 +600,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
 }
 .dark .sch-rule-warning{background:rgba(245,158,11,.12);color:#fbbf24;}
 
-/* ── RULES PANEL ── */
-.rules-panel{
-  background:var(--surface);
-  border:1.5px solid var(--border);
-  border-radius:var(--radius-lg);
-  padding:1.25rem;
-  margin-bottom:1rem;
-  box-shadow:var(--shadow-sm);
-}
-.rules-panel-title{
-  font-size:.85rem;font-weight:800;
-  color:var(--text-1);margin-bottom:.75rem;
-  display:flex;align-items:center;gap:.5rem;
-}
-.rule-item{
-  display:flex;align-items:center;gap:.75rem;
-  padding:.5rem .6rem;border-radius:.5rem;
-  border:1px solid var(--border);margin-bottom:.4rem;
-  background:var(--surface2);
-  font-size:.78rem;
-}
-.rule-item-key{flex:1;font-weight:600;color:var(--text-2);}
-.rule-item-val{
-  font-weight:700;color:var(--text-1);
-  min-width:3rem;text-align:right;
-}
 
-/* ── PENDING REQUESTS SECTION ── */
 .pending-req-card{
   background:var(--surface);
   border:1.5px solid #fbbf24;
@@ -647,7 +620,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
 }
 .dark .pending-req-title{color:#fbbf24;}
 
-/* ── EMPLOYEE FORM CARD ── */
+
 .emp-form-card{
   background:var(--surface);
   border:1.5px solid var(--indigo);
@@ -661,13 +634,11 @@ tr:hover td{background:rgba(13,148,136,.03)}
   background:var(--surface2);
 }
 
-/* ── MOBILE: hide overlay always ── */
+
 #mobile-overlay{ display:none !important; }
 
-/* ══════════════════════════════════════
-   MOBILE LAYOUT  (≤ 1023px)
-══════════════════════════════════════ */
-/* Mobile top header */
+
+
 #mob-header{
   display:none;
   position:fixed;top:0;left:0;right:0;z-index:40;
@@ -685,7 +656,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
   background:linear-gradient(90deg,#0d9488,#5eead4);
 }
 
-/* Mobile bottom nav */
+
 #mob-nav{
   display:none;
   position:fixed;bottom:0;left:0;right:0;z-index:40;
@@ -719,7 +690,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
 }
 .mob-nav-btn.active .mob-nav-dot{ opacity:1; }
 
-/* Mobile "more" drawer */
+
 #mob-drawer{
   display:block;
   position:fixed;bottom:0;left:0;right:0;z-index:50;
@@ -754,20 +725,20 @@ tr:hover td{background:rgba(13,148,136,.03)}
 .dark .mob-drawer-item.active{color:#14b8a6;}
 
 @media (max-width:1023px){
-  /* Show mobile chrome */
+  
   #mob-header{ display:flex; }
   #mob-nav{ display:block; }
 
-  /* Hide desktop sidebar */
+  
   aside{ display:none !important; }
 
-  /* Main content: full width, top/bottom padding for chrome */
+  
   main{
     margin-left:0 !important;
     padding:calc(52px + env(safe-area-inset-top) + 1rem) 1rem calc(56px + env(safe-area-inset-bottom) + 1rem) 1rem !important;
   }
 
-  /* Page header: stack on mobile */
+  
   main > .flex.items-center.justify-between{
     flex-direction:column !important;
     align-items:flex-start !important;
@@ -780,11 +751,11 @@ tr:hover td{background:rgba(13,148,136,.03)}
     width:100% !important;
   }
 
-  /* Dashboard grid: 1 col on mobile */
+  
   #s-dashboard > div[style*="grid-template-columns:repeat(3"]{
     grid-template-columns:1fr !important;
   }
-  /* Stat grid inside dashboard */
+  
   div[style*="grid-template-columns:repeat(4"]{
     grid-template-columns:repeat(2,1fr) !important;
   }
@@ -795,34 +766,34 @@ tr:hover td{background:rgba(13,148,136,.03)}
     grid-template-columns:1fr !important;
   }
 
-  /* Cards padding tighter on mobile */
+  
   .card{ padding:1rem !important; }
 
-  /* Tables: horizontally scrollable */
+  
   .tw{ overflow-x:auto; }
   table{ font-size:.75rem; }
   th{ padding:.55rem .75rem !important; }
   td{ padding:.5rem .75rem !important; }
 
-  /* Inputs: 16px to prevent iOS zoom on focus */
+  
   .input, input, select, textarea{
     font-size:16px !important;
     min-width:0;
   }
 
-  /* Date fields: force single column on mobile */
+  
   #lr-date-grid{
     grid-template-columns:1fr !important;
   }
 
-  /* Filters row: wrap */
+  
   .filters-row{ gap:.45rem !important; }
   .filters-row .input{ flex:1 1 calc(50% - .45rem); min-width:120px; }
 
-  /* Section header: stack */
+  
   .section-header{ flex-direction:column; align-items:flex-start !important; }
 
-  /* Modal: bottom sheet */
+  
   .modal-bd{ align-items:flex-end !important; padding:0 !important; }
   .modal-box{
     border-radius:1.5rem 1.5rem 0 0 !important;
@@ -832,7 +803,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
     padding-bottom:calc(1.5rem + env(safe-area-inset-bottom)) !important;
   }
 
-  /* Toast position */
+  
   #toasts{
     top:auto !important;
     bottom:calc(56px + env(safe-area-inset-bottom) + .75rem) !important;
@@ -841,20 +812,20 @@ tr:hover td{background:rgba(13,148,136,.03)}
   }
   .toast{ max-width:100% !important; font-size:.75rem !important; }
 
-  /* Schedule table: make name col narrower */
+  
   .sch-table thead tr:first-child th.sch-name-col{ min-width:110px !important; }
 
-  /* Stat value slightly smaller */
+  
   .stat-value{ font-size:1.4rem !important; }
 
-  /* Section title smaller */
+  
   h2#page-title{ font-size:1.1rem !important; }
 
-  /* Buttons compact */
+  
   .btn{ padding:.45rem .75rem !important; font-size:.75rem !important; }
   .btn-sm{ padding:.3rem .55rem !important; font-size:.68rem !important; }
 
-  /* Calendar: smaller toolbar */
+  
   .fc .fc-toolbar{ flex-direction:column !important; gap:.4rem !important; }
   .fc .fc-toolbar-title{ font-size:.95rem !important; }
 }
@@ -869,13 +840,13 @@ tr:hover td{background:rgba(13,148,136,.03)}
   }
 }
 
-/* ── NO HORIZONTAL SCROLL on mobile (regular tables only) ── */
+
 @media (max-width:1023px){
   .tw{ overflow-x:hidden !important; }
   .tw table{ table-layout:fixed; width:100%; }
   .tw td, .tw th{ overflow:hidden; text-overflow:ellipsis; }
 
-  /* Schedule table: keep horizontal scroll, fix name column visibility */
+  
   .sch-table-container{ overflow-x:auto !important; -webkit-overflow-scrolling:touch; }
   .sch-table{ table-layout:auto !important; }
   .sch-table thead tr:first-child th.sch-name-col{
@@ -891,24 +862,23 @@ tr:hover td{background:rgba(13,148,136,.03)}
   .sch-table thead tr:first-child th:not(.sch-name-col){ padding:.35rem .1rem !important; font-size:.56rem !important; }
   .sch-table td:not(.sch-name-td){ padding:.2rem .08rem !important; }
 
-  /* Schedule controls: hide only sort label+select on mobile, keep export */
+  
   #s-calendar > div:nth-child(2){ flex-wrap:wrap !important; gap:.5rem !important; }
   #s-calendar > div:nth-child(2) > span:first-child,
   #s-calendar > div:nth-child(2) > #sch-sort{ display:none !important; }
   #s-calendar > div:nth-child(2) > div.flex{ width:100% !important; justify-content:flex-start !important; flex-wrap:wrap !important; gap:.4rem !important; margin-left:0 !important; }
 
-  /* Schedule first control row: compact */
+  
   #s-calendar > div:first-child{
     gap:.5rem !important; margin-bottom:.6rem !important;
   }
   #s-calendar #sch-month{ max-width:110px !important; font-size:.8rem !important; }
   #s-calendar #sch-year{ max-width:82px !important; font-size:.8rem !important; }
-  /* Legend on mobile: compact grid */
+  
   #sch-legend{ margin-left:0 !important; display:grid !important; grid-template-columns:repeat(4,auto); justify-content:start; gap:.22rem !important; }
-  #s-calendar #btn-rules{ display:none !important; }
 }
 
-/* ── MOBILE ROW CARDS for leaves/warnings/attendance/tet ── */
+
 .mob-row-card{
   background:var(--surface);
   border:1px solid var(--border);
@@ -946,7 +916,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
 .mob-row-card-actions{
   display:flex;gap:.35rem;margin-top:.5rem;
 }
-/* hide table, show card list on mobile */
+
 @media (max-width:1023px){
   .mob-table-hide{ display:none !important; }
   .mob-card-show{ display:block !important; }
@@ -955,7 +925,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
   .mob-card-show{ display:none !important; }
 }
 
-/* ── Employee card list (mobile only) ─────────────────── */
+
 .emp-card-list{ display:none; }
 .emp-card{
   background:var(--surface);
@@ -994,7 +964,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
   gap:.5rem;
 }
 
-/* FAB: Thêm nhân viên */
+
 #fab-add-emp{
   display:none;
   position:fixed;
@@ -1015,16 +985,16 @@ tr:hover td{background:rgba(13,148,136,.03)}
 #fab-add-emp:active{transform:scale(.92);}
 
 @media (max-width:1023px){
-  /* Show card list, hide table wrapper */
+  
   #emp-card-list-wrap{ display:block !important; }
   .emp-card-list{ display:block; }
   #s-employees .card.p-0{ display:none !important; }
 
-  /* Nút thêm nhân viên: ẩn trong filter row, hiện FAB */
+  
   #btn-add-emp{ display:none !important; }
   #fab-add-emp{ display:flex !important; }
 
-  /* Filters row: stack nicely */
+  
   #s-employees .filters-row{
     flex-direction:column;
     align-items:stretch;
@@ -1033,8 +1003,8 @@ tr:hover td{background:rgba(13,148,136,.03)}
     max-width:100% !important;
   }
 
-  /* ── KHO FILE OT: mobile fixes ── */
-  /* Stat cards: 2x2 grid thay vì 4 cột */
+  
+  
   #otf-stats{
     grid-template-columns:repeat(2,1fr) !important;
     gap:.65rem !important;
@@ -1043,7 +1013,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
     font-size:1.3rem !important;
   }
 
-  /* Filter bar: xếp dọc, full width */
+  
   #s-ot-files .filters-row{
     flex-direction:column;
     align-items:stretch;
@@ -1063,7 +1033,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
   }
 }
 
-/* FAB upload cho mobile (ot-files) */
+
 #otf-fab-upload{
   display:none;
   position:fixed;
@@ -1089,9 +1059,9 @@ tr:hover td{background:rgba(13,148,136,.03)}
 </head>
 <body>
 
-<!-- ── MOBILE CHROME (hidden on desktop) ── -->
 
-<!-- Top header -->
+
+
 <div id="mob-header">
   <div style="display:flex;align-items:center;gap:.5rem;">
     <div style="width:1.75rem;height:1.75rem;border-radius:.45rem;background:linear-gradient(135deg,#0d9488,#14b8a6);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -1113,12 +1083,12 @@ tr:hover td{background:rgba(13,148,136,.03)}
   </div>
 </div>
 
-<!-- FAB: Upload File OT (mobile) -->
+
 <button id="otf-fab-upload" onclick="otfOpenUpload()" title="Upload File OT">
   <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
 </button>
 
-<!-- Bottom navigation -->
+
 <div id="mob-nav">
   <div class="mob-nav-inner">
     <button class="mob-nav-btn active" id="mnb-dashboard" onclick="mobGo('dashboard')">
@@ -1149,10 +1119,10 @@ tr:hover td{background:rgba(13,148,136,.03)}
   </div>
 </div>
 
-<!-- Drawer backdrop -->
+
 <div id="mob-drawer-backdrop" onclick="closeMobDrawer()"></div>
 
-<!-- More drawer -->
+
 <div id="mob-drawer">
   <div style="width:2.5rem;height:3px;border-radius:999px;background:var(--border);margin:0 auto .75rem;"></div>
   <div style="font-size:.65rem;font-weight:800;color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;padding:.25rem .5rem .5rem;">Thêm chức năng</div>
@@ -1179,9 +1149,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
 
 <div id="toasts"></div>
 
-<!-- ========================================
-     LOGIN SCREEN
-======================================== -->
+
 <div id="login-screen" class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style="background:linear-gradient(135deg,#f0fdf9 0%,#ecfdf5 40%,#f0fdfa 100%)">
   <div class="login-bg-orb" style="width:500px;height:500px;top:-120px;left:-160px;background:radial-gradient(circle,rgba(13,148,136,.16),transparent 70%)"></div>
   <div class="login-bg-orb" style="width:400px;height:400px;bottom:-100px;right:-120px;background:radial-gradient(circle,rgba(20,184,166,.13),transparent 70%)"></div>
@@ -1273,12 +1241,10 @@ tr:hover td{background:rgba(13,148,136,.03)}
   </div>
 </div>
 
-<!-- ========================================
-     MAIN APP
-======================================== -->
+
 <div id="app" class="hidden min-h-screen flex">
 
-  <!-- SIDEBAR -->
+  
   <aside class="flex flex-col fixed left-0 top-0 z-30" style="width:228px;height:100vh;background:var(--surface);border-right:1px solid var(--border);box-shadow:4px 0 24px rgba(0,0,0,.04);overflow:hidden">
     <div style="height:3px;background:linear-gradient(90deg,#0d9488,#5eead4);flex-shrink:0"></div>
     <div class="p-4 flex items-center gap-3" style="border-bottom:1px solid var(--border)">
@@ -1339,7 +1305,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
     </div>
   </aside>
 
-  <!-- MAIN CONTENT -->
+  
   <main class="flex-1 overflow-auto" style="margin-left:228px;padding:1.75rem">
 
     <div class="flex items-center justify-between mb-6">
@@ -1362,11 +1328,11 @@ tr:hover td{background:rgba(13,148,136,.03)}
       </div>
     </div>
 
-    <!-- DASHBOARD -->
+    
     <div id="s-dashboard" class="section active">
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem">
 
-        <!-- Top 3 Nghỉ phép -->
+        
         <div class="card" style="padding:1.25rem">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem">
             <div style="display:flex;align-items:center;gap:.6rem">
@@ -1384,7 +1350,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
           <div id="top-leave"></div>
         </div>
 
-        <!-- Top 3 Warning -->
+        
         <div class="card" style="padding:1.25rem">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem">
             <div style="display:flex;align-items:center;gap:.6rem">
@@ -1402,7 +1368,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
           <div id="top-warn"></div>
         </div>
 
-        <!-- Top 3 Đi trễ / Về sớm -->
+        
         <div class="card" style="padding:1.25rem">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem">
             <div style="display:flex;align-items:center;gap:.6rem">
@@ -1423,7 +1389,7 @@ tr:hover td{background:rgba(13,148,136,.03)}
       </div>
     </div>
 
-    <!-- EMPLOYEES -->
+    
     <div id="s-employees" class="section">
       <div class="filters-row">
         <input id="f-emp" type="text" class="input" style="max-width:210px" placeholder="Tìm theo tên..." oninput="resetEmpPage()">
@@ -1439,15 +1405,10 @@ tr:hover td{background:rgba(13,148,136,.03)}
         </select>
         <select id="f-emp-year" class="input" style="max-width:220px" onchange="onLeaveYearChange()" title="Kỳ phép theo năm tài chính Tháng 4–Tháng 3"></select>
         <div class="ml-auto" style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
-          <span id="sync-nhansu-status" style="font-size:11.5px;color:#6b7280"></span>
-          <button id="btn-sync-nhansu" onclick="openSyncNhanSuModal()" style="display:flex;align-items:center;gap:.4rem;font-size:13px;padding:.4rem .9rem;border:1.5px solid #d1d5db;background:#f9fafb;color:#374151;border-radius:.6rem;font-weight:600;cursor:pointer;white-space:nowrap">
-            <svg id="sync-nhansu-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-            Sync nhân sự
-          </button>
           <button id="btn-add-emp" onclick="openEmpModal(null)" class="btn btn-primary" style="display:none">+ Thêm nhân viên</button>
         </div>
       </div>
-      <!-- Desktop table -->
+      
       <div class="card p-0 overflow-hidden">
         <div class="tw">
           <table>
@@ -1475,22 +1436,22 @@ tr:hover td{background:rgba(13,148,136,.03)}
         </div>
         <div id="emp-pager" style="border-top:1px solid var(--border)"></div>
       </div>
-      <!-- Mobile card list -->
+      
       <div id="emp-card-list-wrap" style="display:none">
         <div id="emp-card-list" class="emp-card-list"></div>
         <div id="emp-card-pager"></div>
       </div>
     </div>
 
-    <!-- FAB: Thêm nhân viên (mobile) -->
+    
     <button id="fab-add-emp" onclick="openEmpModal(null)" title="Thêm nhân viên">
       <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </button>
 
-    <!-- LEAVES -->
+    
     <div id="s-leaves" class="section">
 
-      <!-- ADMIN: SQL setup notice (shown when hr_leave_requests table missing) -->
+      
       <div id="admin-sql-setup" class="hidden" style="margin-bottom:1rem">
         <div style="background:#fef3c7;border:1.5px solid #f59e0b;border-radius:.85rem;padding:1.25rem;box-shadow:0 4px 16px rgba(245,158,11,.12)">
           <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.75rem">
@@ -1518,7 +1479,7 @@ CREATE TABLE hr_leave_requests (<br>
         </div>
       </div>
 
-      <!-- ADMIN: Pending requests section -->
+      
       <div id="admin-pending-section" class="hidden">
         <div class="pending-req-card">
           <div class="pending-req-title">
@@ -1529,7 +1490,7 @@ CREATE TABLE hr_leave_requests (<br>
         </div>
       </div>
 
-      <!-- EMPLOYEE: Leave request form -->
+      
       <div id="emp-leave-form-section" class="hidden">
         <div class="emp-form-card">
           <div style="font-size:.9rem;font-weight:800;color:var(--text-1);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem">
@@ -1576,7 +1537,7 @@ CREATE TABLE hr_leave_requests (<br>
           </div>
         </div>
 
-        <!-- Employee: My pending requests -->
+        
         <div id="emp-my-requests-section" style="margin-bottom:1.25rem">
           <div class="section-header" style="margin-bottom:.75rem">
             <div style="display:flex;align-items:center;gap:.5rem">
@@ -1590,31 +1551,30 @@ CREATE TABLE hr_leave_requests (<br>
         </div>
       </div>
 
-      <!-- Filters & table (shown for both roles) -->
+      
       <div class="filters-row">
         <input id="f-leave" type="text" class="input" style="max-width:270px" placeholder="Tìm theo tên..." oninput="resetLeavePage()">
         <select id="f-leave-m" class="input" style="max-width:190px" onchange="resetLeavePage()">
           <option value="">Tất cả tháng</option>
         </select>
-        <button id="btn-add-leave" onclick="openLeaveModal(null)" class="btn btn-primary ml-auto" style="display:none">+ Thêm bản ghi</button>
       </div>
       <div class="card p-0 overflow-hidden mob-table-hide">
         <div class="tw">
           <table>
-            <thead><tr><th>#</th><th>Nhân viên</th><th>Ngày nghỉ</th><th>Loại</th><th>Số ngày</th><th>Lý do</th><th id="th-leave-action" style="display:none">Thao tác</th></tr></thead>
+            <thead><tr><th>#</th><th>Nhân viên</th><th>Ngày nghỉ</th><th>Loại</th><th>Số ngày</th><th>Lý do</th></tr></thead>
             <tbody id="leave-body"></tbody>
           </table>
         </div>
         <div id="leave-pager" style="border-top:1px solid var(--border)"></div>
       </div>
-      <!-- Mobile card list for leaves -->
+      
       <div id="leave-card-list-wrap" class="mob-card-show" style="display:none">
         <div id="leave-card-list"></div>
         <div id="leave-card-pager"></div>
       </div>
     </div>
 
-    <!-- WARNINGS -->
+    
     <div id="s-warnings" class="section">
       <div class="filters-row">
         <input id="f-warn" type="text" class="input" style="max-width:270px" placeholder="Tìm theo tên..." oninput="resetWarnPage()">
@@ -1639,14 +1599,14 @@ CREATE TABLE hr_leave_requests (<br>
         </div>
         <div id="warn-pager" style="border-top:1px solid var(--border)"></div>
       </div>
-      <!-- Mobile card list for warnings -->
+      
       <div id="warn-card-list-wrap" class="mob-card-show" style="display:none">
         <div id="warn-card-list"></div>
         <div id="warn-card-pager"></div>
       </div>
     </div>
 
-    <!-- ATTENDANCE -->
+    
     <div id="s-attendance" class="section">
       <div class="filters-row">
         <input id="f-att" type="text" class="input" style="max-width:270px" placeholder="Tìm theo tên..." oninput="resetAttPage()">
@@ -1671,14 +1631,14 @@ CREATE TABLE hr_leave_requests (<br>
         </div>
         <div id="att-pager" style="border-top:1px solid var(--border)"></div>
       </div>
-      <!-- Mobile card list for attendance -->
+      
       <div id="att-card-list-wrap" class="mob-card-show" style="display:none">
         <div id="att-card-list"></div>
         <div id="att-card-pager"></div>
       </div>
     </div>
 
-    <!-- TET -->
+    
     <div id="s-tet" class="section">
       <div class="filters-row">
         <input id="f-tet" type="text" class="input" style="max-width:270px" placeholder="Tìm theo tên..." oninput="resetTetPage()">
@@ -1693,16 +1653,16 @@ CREATE TABLE hr_leave_requests (<br>
         </div>
         <div id="tet-pager" style="border-top:1px solid var(--border)"></div>
       </div>
-      <!-- Mobile card list for tet -->
+      
       <div id="tet-card-list-wrap" class="mob-card-show" style="display:none">
         <div id="tet-card-list"></div>
         <div id="tet-card-pager"></div>
       </div>
     </div>
 
-    <!-- CALENDAR / SCHEDULE -->
+    
     <div id="s-calendar" class="section">
-      <!-- Controls Row -->
+      
       <div class="flex flex-wrap items-center gap-3 mb-3">
         <select id="sch-month" class="input" style="max-width:130px" onchange="initCal()">
           <option value="1">Tháng 1</option><option value="2">Tháng 2</option>
@@ -1722,7 +1682,7 @@ CREATE TABLE hr_leave_requests (<br>
         <button id="btn-init-month" class="hidden btn btn-secondary btn-sm" onclick="initializeMonth()" style="font-size:.75rem;gap:.35rem">
           <span>⚡</span> Khởi tạo tháng
         </button>
-        <!-- Legend -->
+        
         <div id="sch-legend" style="display:flex;flex-wrap:wrap;gap:.3rem;align-items:center;margin-left:auto">
           <span style="display:inline-flex;align-items:center;font-size:.65rem;padding:.15rem .45rem;border-radius:999px;background:#e0f2fe;color:#0369a1;font-weight:700;white-space:nowrap">x Office</span>
           <span style="display:inline-flex;align-items:center;font-size:.65rem;padding:.15rem .45rem;border-radius:999px;background:#dcfce7;color:#15803d;font-weight:700;white-space:nowrap">w WFH</span>
@@ -1731,11 +1691,10 @@ CREATE TABLE hr_leave_requests (<br>
           <span style="display:inline-flex;align-items:center;font-size:.65rem;padding:.15rem .45rem;border-radius:999px;background:#f3e8ff;color:#7e22ce;font-weight:700;white-space:nowrap">xo/wo Nửa ngày</span>
           <span style="display:inline-flex;align-items:center;font-size:.65rem;padding:.15rem .45rem;border-radius:999px;background:#fee2e2;color:#991b1b;font-weight:700;white-space:nowrap">om/oa Off buổi</span>
           <span style="display:inline-flex;align-items:center;font-size:.65rem;padding:.15rem .45rem;border-radius:999px;background:#ffd7b5;color:#7c2d12;border:1.5px solid #fb923c;font-weight:700;white-space:nowrap">u Nghỉ KL</span>
-          <span id="btn-rules" class="hidden btn btn-secondary btn-sm" onclick="toggleRulesPanel()" style="font-size:.65rem;padding:.3rem .7rem;cursor:pointer">⚙️ Quy tắc</span>
         </div>
       </div>
 
-      <!-- Sort + Export row -->
+      
       <div class="flex flex-wrap items-center gap-3 mb-3">
         <span style="font-size:.78rem;font-weight:600;color:var(--text-2)">Sắp xếp:</span>
         <select id="sch-sort" class="input" style="max-width:180px;font-size:.78rem" onchange="onSchSortChange()">
@@ -1744,36 +1703,14 @@ CREATE TABLE hr_leave_requests (<br>
           <option value="wfh-desc">WFH nhiều nhất</option>
           <option value="wfh-asc">WFH ít nhất</option>
         </select>
-        <div class="flex items-center gap-2 ml-auto flex-wrap">
-          <span style="font-size:.75rem;font-weight:600;color:var(--text-2)">📸 Xuất ảnh từ ngày</span>
-          <input id="sch-from-day" type="number" min="1" max="31" value="1" class="input" style="width:62px;font-size:.8rem;text-align:center;padding:.3rem .5rem">
-          <span style="font-size:.75rem;color:var(--text-3)">đến ngày</span>
-          <input id="sch-to-day" type="number" min="1" max="31" value="31" class="input" style="width:62px;font-size:.8rem;text-align:center;padding:.3rem .5rem">
-          <button id="btn-export-img" onclick="exportScheduleImage()" class="btn btn-primary btn-sm" style="font-size:.75rem;gap:.3rem">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            Xuất ảnh PNG
-          </button>
-        </div>
       </div>
 
-      <!-- Rules panel (admin only, toggleable) -->
-      <div id="sch-rules-panel" class="hidden rules-panel">
-        <div class="rules-panel-title" style="justify-content:space-between">
-          <span style="display:flex;align-items:center;gap:.4rem">⚙️ Quy tắc đăng ký lịch làm</span>
-          <button id="btn-save-rules" class="btn btn-primary btn-sm" onclick="saveRules()" style="font-size:.72rem">💾 Lưu quy tắc</button>
-        </div>
-        <div id="rules-list"></div>
-        <div style="margin-top:.65rem;font-size:.7rem;color:var(--text-3);">
-          💡 Ngày WFH bị chặn: hệ thống sẽ <strong>từ chối</strong> lưu, không chỉ cảnh báo.
-        </div>
-      </div>
-
-      <!-- Info note -->
+      
       <div id="sch-info-note" style="font-size:.72rem;color:var(--text-3);margin-bottom:.75rem;padding:.5rem .75rem;background:var(--surface3);border-radius:.5rem;border-left:3px solid var(--indigo)">
         ⚡ Đang tải...
       </div>
 
-      <!-- Schedule table -->
+      
       <div class="sch-table-container">
         <div id="sch-loading" style="padding:3rem;text-align:center;color:var(--text-3);font-size:.85rem;font-weight:600;">
           <div class="spinner" style="border-top-color:var(--indigo);border-color:var(--border);margin:0 auto .75rem;width:1.5rem;height:1.5rem;border-width:3px"></div>
@@ -1783,12 +1720,10 @@ CREATE TABLE hr_leave_requests (<br>
       </div>
     </div>
 
-    <!-- ═══════════════════════════════════════════════
-         KHO FILE OT — MODULE MỚI (Additive Only)
-    ═══════════════════════════════════════════════ -->
+    
     <div id="s-ot-files" class="section">
 
-      <!-- Stat cards -->
+      
       <div id="otf-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem">
         <div class="card stat-card" style="padding:1.1rem">
           <div style="display:flex;align-items:center;gap:.75rem">
@@ -1836,7 +1771,7 @@ CREATE TABLE hr_leave_requests (<br>
         </div>
       </div>
 
-      <!-- Filter + Actions bar -->
+      
       <div class="card" style="padding:1rem;margin-bottom:1rem">
         <div class="filters-row" style="margin-bottom:0">
           <select id="otf-f-year" class="input" style="max-width:120px" onchange="otfRender()">
@@ -1861,7 +1796,7 @@ CREATE TABLE hr_leave_requests (<br>
         </div>
       </div>
 
-      <!-- File list table -->
+      
       <div class="card p-0">
         <div class="tw mob-table-hide">
           <table>
@@ -1885,21 +1820,19 @@ CREATE TABLE hr_leave_requests (<br>
             </tbody>
           </table>
         </div>
-        <!-- Mobile cards -->
+        
         <div id="otf-card-list" class="mob-card-show" style="display:none;padding:.75rem"></div>
       </div>
 
     </div>
-    <!-- END KHO FILE OT -->
+    
 
   </main>
 </div>
 
-<!-- ========================================
-     MODALS
-======================================== -->
 
-<!-- Employee Modal -->
+
+
 <div id="m-emp" class="modal-bd hidden">
   <div class="modal-box fade" onclick="event.stopPropagation()">
     <h3 id="m-emp-title" class="font-extrabold text-lg mb-5 tracking-tight" style="color:var(--text-1)">Nhân viên</h3>
@@ -1931,37 +1864,7 @@ CREATE TABLE hr_leave_requests (<br>
   </div>
 </div>
 
-<!-- Leave Modal -->
-<div id="m-leave" class="modal-bd hidden">
-  <div class="modal-box fade" onclick="event.stopPropagation()">
-    <h3 class="font-extrabold text-lg mb-5 tracking-tight" style="color:var(--text-1)">Nghỉ phép</h3>
-    <input type="hidden" id="ml-id">
-    <div class="space-y-4">
-      <div><label class="label">Nhân viên *</label><select id="ml-emp" class="input"></select></div>
-      <div><label class="label">Ngày nghỉ *</label><input id="ml-month" type="date" class="input"></div>
-      <div><label class="label">Loại nghỉ *</label>
-        <select id="ml-type" class="input">
-          <option value="AL">AL – Annual Leave (Nghỉ phép năm có lương)</option>
-          <option value="UL">UL – Unpaid Leave (Nghỉ phép không lương)</option>
-        </select>
-      </div>
-      <div><label class="label">Số ngày nghỉ</label>
-        <select id="ml-days" class="input">
-          <option value="0.25">0.25 ngày</option>
-          <option value="0.5">0.5 ngày</option>
-          <option value="1" selected>1 ngày</option>
-        </select>
-      </div>
-      <div><label class="label">Lý do</label><textarea id="ml-note" class="input" rows="3" placeholder="Nhập lý do nghỉ..."></textarea></div>
-    </div>
-    <div class="flex gap-2.5 mt-6 justify-end">
-      <button onclick="closeModal('m-leave')" class="btn btn-secondary">Hủy</button>
-      <button onclick="saveLeave()" class="btn btn-primary">Lưu</button>
-    </div>
-  </div>
-</div>
 
-<!-- Warning Modal -->
 <div id="m-warn" class="modal-bd hidden">
   <div class="modal-box fade" onclick="event.stopPropagation()" style="max-width:580px">
     <h3 class="font-extrabold text-lg mb-5 tracking-tight" style="color:var(--text-1)">Warning</h3>
@@ -1984,7 +1887,7 @@ CREATE TABLE hr_leave_requests (<br>
       <div><label class="label">Lý do</label><textarea id="mw-reason" class="input" rows="2"></textarea></div>
       <div><label class="label">Ngày gỡ (nếu đã gỡ)</label><input id="mw-resolve" type="date" class="input"></div>
 
-      <!-- FILE UPLOAD SECTION -->
+      
       <div>
         <label class="label">📎 Đính kèm (ảnh, mail, file...)</label>
         <div id="mw-dropzone"
@@ -1999,19 +1902,19 @@ CREATE TABLE hr_leave_requests (<br>
         </div>
         <input type="file" id="mw-files" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.eml,.msg,.txt" style="display:none" onchange="handleWarnFileSelect(this)">
 
-        <!-- Existing attachments (when editing) -->
+        
         <div id="mw-existing-files" style="display:none;margin-top:.6rem">
           <div style="font-size:.7rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.4rem">File đã lưu</div>
           <div id="mw-existing-list" style="display:flex;flex-wrap:wrap;gap:.45rem"></div>
         </div>
 
-        <!-- New files to upload -->
+        
         <div id="mw-new-files" style="display:none;margin-top:.6rem">
           <div style="font-size:.7rem;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.4rem">File sẽ upload</div>
           <div id="mw-new-list" style="display:flex;flex-wrap:wrap;gap:.45rem"></div>
         </div>
 
-        <!-- Upload progress -->
+        
         <div id="mw-upload-progress" style="display:none;margin-top:.5rem">
           <div style="font-size:.75rem;color:var(--indigo);font-weight:600;margin-bottom:.3rem" id="mw-upload-status">Đang upload...</div>
           <div style="background:var(--surface3);border-radius:999px;height:.4rem;overflow:hidden">
@@ -2027,7 +1930,7 @@ CREATE TABLE hr_leave_requests (<br>
   </div>
 </div>
 
-<!-- Attendance Modal -->
+
 <div id="m-att" class="modal-bd hidden">
   <div class="modal-box fade" onclick="event.stopPropagation()">
     <h3 class="font-extrabold text-lg mb-5 tracking-tight" style="color:var(--text-1)">Sự kiện đi trễ / về sớm</h3>
@@ -2064,7 +1967,7 @@ CREATE TABLE hr_leave_requests (<br>
   </div>
 </div>
 
-<!-- Tet Modal -->
+
 <div id="m-tet" class="modal-bd hidden">
   <div class="modal-box fade" onclick="event.stopPropagation()">
     <h3 class="font-extrabold text-lg mb-5 tracking-tight" style="color:var(--text-1)">Nghỉ Tết</h3>
@@ -2082,7 +1985,7 @@ CREATE TABLE hr_leave_requests (<br>
   </div>
 </div>
 
-<!-- Confirm Delete Modal -->
+
 <div id="m-confirm" class="modal-bd hidden">
   <div class="modal-box fade" style="max-width:400px" onclick="event.stopPropagation()">
     <div class="flex items-center gap-3 mb-4">
@@ -2098,14 +2001,14 @@ CREATE TABLE hr_leave_requests (<br>
 </div>
 
 <script>
-// ============ CONFIG ============
+
 const SUPA_URL = window.SUPABASE_CONFIG['Work_Attendance_Summary.html'].url;
 const SUPA_KEY = window.SUPABASE_CONFIG['Work_Attendance_Summary.html'].key;
 const MAX_FAIL=5,LOCK_MS=5*60*1000,SESS_MS=30*60*1000;
 const { createClient } = supabase;
 const db = createClient(SUPA_URL, SUPA_KEY);
 
-// ============ STATE ============
+
 const _initLeaveYear = (() => {
   const n = new Date(), y = n.getFullYear(), m = n.getMonth() + 1;
   return m >= 4 ? y : y - 1;
@@ -2122,14 +2025,14 @@ const S = {
   lockUntil: parseInt(localStorage.getItem('hr_lu') || '0'),
   sessTimer: null,
   selectedLeaveYear: _initLeaveYear,
-  // Schedule state
+  
   scheduleData: {},
   scheduleRules: {},
   scheduleLoading: false,
   scheduleSortOrder: 'name-asc',
 };
 
-// ============ DARK MODE ============
+
 function toggleDark() {
   const isDark = document.documentElement.classList.toggle('dark');
   localStorage.setItem('hr_dark', isDark ? '1' : '0');
@@ -2143,7 +2046,7 @@ function updateDarkUI() {
 if (localStorage.getItem('hr_dark') === '1') { document.documentElement.classList.add('dark'); }
 updateDarkUI();
 
-// ============ TOAST ============
+
 function toast(msg, type = 'success') {
   const colors = { success:'linear-gradient(135deg,#059669,#10b981)', error:'linear-gradient(135deg,#dc2626,#ef4444)', info:'linear-gradient(135deg,#2563eb,#3b82f6)', warn:'linear-gradient(135deg,#d97706,#f59e0b)' };
   const icons = { success:'✓', error:'✕', info:'i', warn:'⚠' };
@@ -2155,7 +2058,7 @@ function toast(msg, type = 'success') {
   setTimeout(() => el.remove(), 4000);
 }
 
-// ============ LOGIN ============
+
 function switchTab(tab) {
   const isAdmin = tab === 'admin';
   document.getElementById('form-admin').classList.toggle('hidden', !isAdmin);
@@ -2170,7 +2073,7 @@ function togglePwd() {
   i.type = i.type === 'password' ? 'text' : 'password';
 }
 
-// ============ SECURITY ============
+
 function genSalt() { return CryptoJS.lib.WordArray.random(16).toString(); }
 function hashPwd(p, s) {
   return CryptoJS.PBKDF2(p, s, { keySize:8, iterations:310000, hasher:CryptoJS.algo.SHA256 }).toString();
@@ -2292,7 +2195,7 @@ async function enterApp(isAdmin) {
     if (el) el.style.display = isAdmin ? '' : 'none';
   });
 
-  // Show/hide role-specific leave sections
+  
   const adminPending = document.getElementById('admin-pending-section');
   const adminSqlSetup = document.getElementById('admin-sql-setup');
   const empForm = document.getElementById('emp-leave-form-section');
@@ -2300,9 +2203,6 @@ async function enterApp(isAdmin) {
   if (adminSqlSetup) adminSqlSetup.classList.toggle('hidden', !isAdmin);
   if (empForm) empForm.classList.toggle('hidden', isAdmin);
 
-  // Show rules button and init-month button for admin
-  const btnRules = document.getElementById('btn-rules');
-  if (btnRules) btnRules.classList.toggle('hidden', !isAdmin);
   const btnInit = document.getElementById('btn-init-month');
   if (btnInit) btnInit.classList.toggle('hidden', !isAdmin);
 
@@ -2314,7 +2214,7 @@ async function enterApp(isAdmin) {
   go(savedTab && validTabs.includes(savedTab) ? savedTab : 'dashboard');
 }
 
-// ============ SESSION TIMER ============
+
 function startSessTimer() {
   if (S.sessTimer) clearInterval(S.sessTimer);
   S.sessTimer = setInterval(() => {
@@ -2351,7 +2251,7 @@ function doLogout() {
 }
 
 async function tryRestoreSession() {
-  // Try restoring admin session first
+  
   try {
     const raw = localStorage.getItem('hr_sess');
     if (raw) {
@@ -2364,7 +2264,7 @@ async function tryRestoreSession() {
     }
   } catch (e) {}
 
-  // Try restoring employee session (no server token needed)
+  
   try {
     const role = localStorage.getItem('hr_role');
     if (role === 'employee') { await enterApp(false); return true; }
@@ -2373,7 +2273,7 @@ async function tryRestoreSession() {
   return false;
 }
 
-// ============ GLOBAL REFRESH ============
+
 async function refreshAll() {
   const icon = document.getElementById('refresh-icon');
   const btn = document.getElementById('btn-refresh');
@@ -2381,7 +2281,7 @@ async function refreshAll() {
   if (icon) icon.classList.add('spinning');
   try {
     await loadAll();
-    // Re-render the currently active tab
+    
     const active = document.querySelector('.nav-link.active');
     const tab = active ? active.getAttribute('data-s') : localStorage.getItem('hr_tab');
     if (tab) go(tab);
@@ -2394,7 +2294,7 @@ async function refreshAll() {
   }
 }
 
-// ============ DATA LOADING ============
+
 async function loadAll() {
   const [a, b, c, d, e] = await Promise.all([
     db.from('hr_employees').select('*').order('name'),
@@ -2409,7 +2309,7 @@ async function loadAll() {
   await loadLeaveRequests();
 }
 
-// ============ LEAVE REQUESTS ============
+
 
 async function loadLeaveRequests() {
   try {
@@ -2472,7 +2372,7 @@ function onLrDateRangeChange() {
   const preview  = document.getElementById('lr-days-preview');
   const daysType = document.getElementById('lr-days-type').value;
 
-  // Auto-fill end date if not set or earlier than start
+  
   if (startVal && endInput) {
     if (!endInput.value || endInput.value < startVal) {
       endInput.value = startVal;
@@ -2483,7 +2383,7 @@ function onLrDateRangeChange() {
   const endVal = endInput ? endInput.value : startVal;
   const weekdays = getWeekdaysBetween(startVal, endVal);
 
-  // half-day only allowed for single day
+  
   const isHalf = daysType === 'half';
   const totalDays = isHalf ? 0.5 : weekdays.length;
 
@@ -2558,7 +2458,7 @@ async function submitLeaveRequest() {
       : `Đã gửi ${weekdays.length} đơn nghỉ phép (${startDate} → ${endDate})! Chờ Admin xét duyệt.`;
     toast(msg, 'success');
 
-    // ── AUTO-COMPOSE EMAIL ──
+    
     composeLeaveEmail({
       empName: emp?.name || '',
       startDate,
@@ -2570,7 +2470,7 @@ async function submitLeaveRequest() {
       weekdays,
     });
 
-    // Clear form
+    
     document.getElementById('lr-date').value = '';
     document.getElementById('lr-date-end').value = '';
     document.getElementById('lr-days-preview').textContent = '—';
@@ -2589,7 +2489,7 @@ async function submitLeaveRequest() {
 }
 
 
-// ── COMPOSE LEAVE EMAIL ──
+
 function composeLeaveEmail({ empName, startDate, endDate, daysCount, sessionType, reason, weekdays }) {
   const toList = [
     'TangHien.Phat@heineken.com',
@@ -2633,7 +2533,7 @@ function composeLeaveEmail({ empName, startDate, endDate, daysCount, sessionType
   const cc = encodeURIComponent(ccList.join(';'));
   const mailtoLink = 'mailto:' + to + '?cc=' + cc + '&subject=' + subject + '&body=' + body;
 
-  // Tự động mở ứng dụng mail ngay lập tức
+  
   window.location.href = mailtoLink;
 }
 
@@ -2646,7 +2546,7 @@ async function approveLeaveRequest(reqId) {
   if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner" style="border-color:rgba(255,255,255,.3);border-top-color:#fff"></span>'; }
 
   try {
-    // 1. Insert into hr_leave_records
+    
     let noteStr = req.reason || 'Đơn xin nghỉ phép được duyệt';
     if (req.session_type === 'morning') noteStr += ' (buổi sáng)';
     if (req.session_type === 'afternoon') noteStr += ' (buổi chiều)';
@@ -2659,7 +2559,7 @@ async function approveLeaveRequest(reqId) {
     });
     if (e1) throw new Error('Tạo bản ghi nghỉ: ' + e1.message);
 
-    // 2. Update hr_work_schedule with appropriate marker
+    
     let schedStatus = 'o';
     if (req.leave_type === 'UL') schedStatus = 'u';
     if (req.session_type === 'morning') schedStatus = (req.leave_type === 'UL') ? 'u' : 'om';
@@ -2669,10 +2569,10 @@ async function approveLeaveRequest(reqId) {
       { employee_id: req.employee_id, work_date: req.leave_date, status: schedStatus },
       { onConflict: 'employee_id,work_date' }
     );
-    // Update local schedule data
+    
     S.scheduleData[`${req.employee_id}|${req.leave_date}`] = schedStatus;
 
-    // 3. Update request status to approved
+    
     const { error: e2 } = await db.from('hr_leave_requests').update({ status: 'approved' }).eq('id', reqId);
     if (e2) throw new Error('Cập nhật đơn: ' + e2.message);
 
@@ -2719,14 +2619,14 @@ function renderPendingRequests() {
   const sqlSetup = document.getElementById('admin-sql-setup');
   const pendingSection = document.getElementById('admin-pending-section');
 
-  // Show SQL setup banner if table not ready, hide pending section
+  
   if (!S.leaveRequestsReady) {
     if (sqlSetup) sqlSetup.classList.remove('hidden');
     if (pendingSection) pendingSection.classList.add('hidden');
     return;
   }
 
-  // Table is ready — hide setup banner, show pending section
+  
   if (sqlSetup) sqlSetup.classList.add('hidden');
   if (pendingSection) pendingSection.classList.remove('hidden');
 
@@ -2742,7 +2642,7 @@ function renderPendingRequests() {
     return;
   }
 
-  // Mobile-responsive: use card layout on small screens, table on desktop
+  
   const isMobile = window.innerWidth < 768;
   if (isMobile) {
     container.innerHTML = pending.map((r, i) => {
@@ -2871,7 +2771,7 @@ function updateLyLabel() {
   document.getElementById('ly-label').textContent = `Kỳ phép: 01/04/${ly} → 31/03/${ly+1}`;
 }
 
-// ============ NAVIGATION ============
+
 const PAGE_NAMES = {
   dashboard:'Dashboard', employees:'Nhân viên', leaves:'Nghỉ phép',
   warnings:'Warning', attendance:'Đi trễ / Về sớm', tet:'Nghỉ Tết', calendar:'Lịch Đăng Ký Làm',
@@ -2888,7 +2788,7 @@ function go(name) {
   document.getElementById('page-title').textContent = PAGE_NAMES[name] || name;
   localStorage.setItem('hr_tab', name);
 
-  // Update mobile title & bottom nav active state
+  
   const mobTitle = document.getElementById('mob-title');
   if (mobTitle) mobTitle.textContent = PAGE_NAMES[name] || name;
   syncMobNav(name);
@@ -2910,19 +2810,19 @@ function go(name) {
   else if (name === 'calendar') initCal();
 }
 
-// ── Mobile helpers ─────────────────────────────────────
+
 const MOB_NAV_TABS = ['dashboard','employees','leaves','calendar'];
 
 function syncMobNav(name) {
-  // Bottom nav buttons
+  
   MOB_NAV_TABS.forEach(t => {
     const btn = document.getElementById('mnb-' + t);
     if (btn) btn.classList.toggle('active', t === name);
   });
-  // "More" button active when a drawer-tab is selected
+  
   const moreBtn = document.getElementById('mnb-more');
   if (moreBtn) moreBtn.classList.toggle('active', !MOB_NAV_TABS.includes(name));
-  // Drawer items
+  
   ['warnings','attendance','tet'].forEach(t => {
     const el = document.getElementById('mdi-' + t);
     if (el) el.classList.toggle('active', t === name);
@@ -2931,7 +2831,7 @@ function syncMobNav(name) {
 
 function mobGo(name) {
   go(name);
-  // Scroll main back to top
+  
   const main = document.querySelector('main');
   if (main) main.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -2946,11 +2846,11 @@ function closeMobDrawer() {
   document.getElementById('mob-drawer-backdrop').classList.remove('open');
 }
 
-// Sync dark mode icon in mobile chrome
+
 const _origToggleDark = typeof toggleDark === 'function' ? toggleDark : null;
 
-// ============ DASHBOARD ============
-// _dashMode stores { leave/warn/att: { month: 1-12 or 0=all, year: 2025 } }
+
+
 const _dashMode = {
   leave: { month: new Date().getMonth() + 1, year: new Date().getFullYear() },
   warn:  { month: new Date().getMonth() + 1, year: new Date().getFullYear() },
@@ -2970,12 +2870,12 @@ function initDashPickers() {
     const ySel = document.getElementById(`dash-${card}-year-sel`);
     if (!mSel || !ySel) return;
 
-    // Month options: 0 = Tất cả, 1-12
+    
     mSel.innerHTML = _dashMonthNames.map((n, i) =>
       `<option value="${i}" ${i === _dashMode[card].month ? 'selected' : ''}>${n}</option>`
     ).join('');
 
-    // Year options
+    
     ySel.innerHTML = years.map(y =>
       `<option value="${y}" ${y === _dashMode[card].year ? 'selected' : ''}>${y}</option>`
     ).join('');
@@ -2992,7 +2892,7 @@ function dashPickerChange(card) {
   else if (card === 'att') renderTopAtt();
 }
 
-// Keep dashToggle as no-op for backward compat (buttons removed but just in case)
+
 function dashToggle(card, mode) {}
 
 function _dashFilterDate(dateStr, card) {
@@ -3001,7 +2901,7 @@ function _dashFilterDate(dateStr, card) {
   const d = new Date(dateStr.length <= 7 ? dateStr + '-01' : dateStr);
   if (isNaN(d)) return false;
   if (d.getFullYear() !== year) return false;
-  if (month === 0) return true; // Tất cả tháng trong năm
+  if (month === 0) return true; 
   return d.getMonth() + 1 === month;
 }
 
@@ -3077,12 +2977,12 @@ function renderDash() {
   renderTopAtt();
 }
 
-// ============ HELPER ============
+
 function eName(id) {
   return S.employees.find(e => e.id === id)?.name || '—';
 }
 
-// ============ EMPLOYEES ============
+
 function empAlUsed(empId) {
   const ly = S.selectedLeaveYear;
   const startD = `${ly}-04-01`, endD = `${ly+1}-03-31`;
@@ -3273,7 +3173,7 @@ function renderEmpCards(pageList, totalItems, totalPages, start) {
     </div>`;
   }).join('') : `<div style="text-align:center;padding:2rem;color:var(--text-3);font-size:.85rem">Không có dữ liệu</div>`;
 
-  // Mobile pager
+  
   if (!cardPager) return;
   if (totalItems <= EMP_PAGE_SIZE) { cardPager.innerHTML = ''; return; }
   const from = ((_empPage - 1) * EMP_PAGE_SIZE) + 1;
@@ -3300,7 +3200,7 @@ function renderEmpCards(pageList, totalItems, totalPages, start) {
       </div>
     </div>`;
 
-  // Re-bind edit/delete buttons on cards
+  
   cardList.querySelectorAll('.edit-emp-btn').forEach(btn => {
     btn.addEventListener('click', () => openEmpModal(S.employees.find(e => e.id === btn.dataset.id)));
   });
@@ -3349,7 +3249,7 @@ document.addEventListener('keydown', function(e){
 });
 
 document.addEventListener('click', function(e) {
-  // Close popup if clicking outside
+  
   const popup = document.getElementById('sch-cell-popup');
   if (popup && !popup.contains(e.target) && !e.target.closest('.sch-cell-clickable')) {
     closeSchPopup();
@@ -3359,11 +3259,6 @@ document.addEventListener('click', function(e) {
   if (editBtn) { openEmpModal(editBtn.dataset.id); return; }
   const delBtn = e.target.closest('.del-emp-btn');
   if (delBtn) { confirmDel(`Xóa nhân viên "${delBtn.dataset.name}"?`, () => delEmp(delBtn.dataset.id)); return; }
-
-  const editLeave = e.target.closest('.edit-leave-btn');
-  if (editLeave) { openLeaveModal(editLeave.dataset.id); return; }
-  const delLeave = e.target.closest('.del-leave-btn');
-  if (delLeave) { confirmDel('Xóa bản ghi nghỉ phép?', () => doDelLeave(delLeave.dataset.id)); return; }
 
   const editWarn = e.target.closest('.edit-warn-btn');
   if (editWarn) { openWarnModal(editWarn.dataset.id); return; }
@@ -3426,7 +3321,7 @@ async function delEmp(id) {
   await loadAll(); renderEmp(); renderDash();
 }
 
-// ============ LEAVES ============
+
 function buildMonthOptions() {
   const months = new Set();
   S.leaves.forEach(l => {
@@ -3447,11 +3342,11 @@ function buildMonthOptions() {
 }
 
 function renderLeaves() {
-  // Render role-specific sections
+  
   if (S.isAdmin) {
     renderPendingRequests();
   } else {
-    // Fill employee dropdown for request form
+    
     const empSel = document.getElementById('lr-emp');
     if (empSel) {
       const activeEmployees = S.employees.filter(e => e.is_active !== false);
@@ -3489,12 +3384,7 @@ function renderLeaves() {
     else if (days === 0.5) daysBadge = `<span class="badge bg-indigo">0.5 ngày</span>`;
     else daysBadge = `<span class="badge bg-blue">${days} ngày</span>`;
 
-    const actionCell = S.isAdmin
-      ? `<td><div style="display:flex;gap:.3rem">
-          <button class="btn btn-secondary btn-sm edit-leave-btn" data-id="${l.id}">✏️</button>
-          <button class="btn btn-danger btn-sm del-leave-btn" data-id="${l.id}">🗑️</button>
-        </div></td>`
-      : '';
+    const actionCell = '';
     const leaveTypeBadge = (l.leave_type === 'UL')
       ? `<span class="badge" style="background:#fef3c7;color:#92400e;border:1px solid #f59e0b;font-weight:800">UL</span>`
       : `<span class="badge" style="background:#dbeafe;color:#1e40af;border:1px solid #3b82f6;font-weight:800">AL</span>`;
@@ -3507,10 +3397,10 @@ function renderLeaves() {
       <td style="max-width:280px;white-space:normal;font-size:.75rem;line-height:1.5;color:var(--text-2)">${(l.note || '—').replace(/\r?\n/g, '<br>')}</td>
       ${actionCell}
     </tr>`;
-  }).join('') : emptyRow(S.isAdmin ? 7 : 6);
+  }).join('') : emptyRow(6);
   renderGenericPager('leave-pager', totalItems, _leavePage, 'gotoLeavePage', 'bản ghi');
 
-  // Mobile card list
+  
   const leaveCardList = document.getElementById('leave-card-list');
   const leaveCardPager = document.getElementById('leave-card-pager');
   if (leaveCardList) {
@@ -3518,7 +3408,7 @@ function renderLeaves() {
       const days = parseFloat(l.days_absent) || 0;
       let daysBadge = days === 0.25 ? `<span class="badge bg-teal">0.25 ngày</span>` : days === 0.5 ? `<span class="badge bg-indigo">0.5 ngày</span>` : `<span class="badge bg-blue">${days} ngày</span>`;
       const leaveTypeBadge = (l.leave_type === 'UL') ? `<span class="badge" style="background:#fef3c7;color:#92400e;border:1px solid #f59e0b;font-weight:800">UL</span>` : `<span class="badge" style="background:#dbeafe;color:#1e40af;border:1px solid #3b82f6;font-weight:800">AL</span>`;
-      const actions = S.isAdmin ? `<div class="mob-row-card-actions"><button class="btn btn-secondary btn-sm edit-leave-btn" data-id="${l.id}">✏️ Sửa</button><button class="btn btn-danger btn-sm del-leave-btn" data-id="${l.id}">🗑️ Xóa</button></div>` : '';
+      const actions = '';
       return `<div class="mob-row-card">
         <div class="mob-row-card-header">
           <div class="mob-row-card-name">${eName(l.employee_id)}</div>
@@ -3540,61 +3430,6 @@ function fillSel(selId, curId) {
     .filter(e => e.is_active !== false || e.id === curId)
     .map(e => `<option value="${e.id}"${e.id === curId ? ' selected' : ''}>${e.name}</option>`)
     .join('');
-}
-
-function openLeaveModal(id) {
-  const l = id ? S.leaves.find(x => x.id === id) : null;
-  document.getElementById('ml-id').value = l?.id || '';
-  fillSel('ml-emp', l?.employee_id || '');
-  document.getElementById('ml-month').value = l?.month?.split('T')[0] || '';
-  const sel = document.getElementById('ml-days');
-  const dv = parseFloat(l?.days_absent);
-  if (!isNaN(dv)) {
-    if (dv === 0.25) sel.value = '0.25';
-    else if (dv === 0.5) sel.value = '0.5';
-    else sel.value = '1';
-  } else {
-    sel.value = '1';
-  }
-  document.getElementById('ml-type').value = l?.leave_type || 'AL';
-  document.getElementById('ml-note').value = l?.note || '';
-  openModal('m-leave');
-}
-
-async function saveLeave() {
-  const id = document.getElementById('ml-id').value;
-  const empId = document.getElementById('ml-emp').value;
-  const leaveDate = document.getElementById('ml-month').value;
-  if (!empId || !leaveDate) { toast('Chọn nhân viên và ngày nghỉ!', 'error'); return; }
-  const days = parseFloat(document.getElementById('ml-days').value) || 1;
-  const leaveType = document.getElementById('ml-type').value || 'AL';
-  const data = { employee_id: empId, month: leaveDate, days_absent: days, leave_type: leaveType, note: document.getElementById('ml-note').value.trim() || null };
-  const { error } = id ? await db.from('hr_leave_records').update(data).eq('id', id) : await db.from('hr_leave_records').insert(data);
-  if (error) { toast('Lỗi: ' + error.message, 'error'); return; }
-
-  // Tự động cập nhật ô lịch sch-table khi thêm/sửa bản ghi UL
-  if (leaveType === 'UL' && leaveDate) {
-    const schStatus = 'u';
-    try {
-      await db.from('hr_work_schedule').upsert(
-        { employee_id: empId, work_date: leaveDate, status: schStatus },
-        { onConflict: 'employee_id,work_date' }
-      );
-      S.scheduleData[`${empId}|${leaveDate}`] = schStatus;
-    } catch(schErr) { console.warn('Không thể cập nhật lịch UL:', schErr); }
-  }
-
-  toast('Đã lưu', 'success'); closeModal('m-leave');
-  await loadAll(); buildMonthOptions(); renderLeaves();
-  if (document.getElementById('s-employees').classList.contains('active')) renderEmp();
-  if (document.getElementById('s-dashboard').classList.contains('active')) renderDash();
-}
-
-async function doDelLeave(id) {
-  await db.from('hr_leave_records').delete().eq('id', id);
-  toast('Đã xóa', 'success'); await loadAll(); buildMonthOptions(); renderLeaves();
-  if (document.getElementById('s-employees').classList.contains('active')) renderEmp();
-  if (document.getElementById('s-dashboard').classList.contains('active')) renderDash();
 }
 
 // ============ WARNINGS ============
@@ -3645,7 +3480,7 @@ function renderWarn() {
   }).join('') : emptyRow(S.isAdmin ? 10 : 9);
   renderGenericPager('warn-pager', totalItems, _warnPage, 'gotoWarnPage', 'warning');
 
-  // Mobile card list
+  
   const warnCardList = document.getElementById('warn-card-list');
   if (warnCardList) {
     warnCardList.innerHTML = pageList.length ? pageList.map(w => {
@@ -3665,10 +3500,10 @@ function renderWarn() {
           ${w.resolve_date ? `<div class="mob-row-card-field"><span class="mob-row-card-label">Ngày gỡ</span><span class="mob-row-card-val">${fmtD(w.resolve_date)}</span></div>` : ''}
         </div>
         ${w.reason ? `<div class="mob-row-card-reason">${w.reason}</div>` : ''}
-        ${(w.attachments||[]).length ? `<div style="padding:.3rem .75rem .5rem;display:flex;flex-wrap:wrap;gap:.35rem">
-          ${(w.attachments||[]).map(a => {
+        ${(w.attachments||[[]).length ? `<div style="padding:.3rem .75rem .5rem;display:flex;flex-wrap:wrap;gap:.35rem">
+          ${(w.attachments||[[]).map(a => {
             const ext = (a.name||'').split('.').pop().toLowerCase();
-            const isImg = ['jpg','jpeg','png','gif','webp','svg'].includes(ext);
+            const isImg = [['jpg','jpeg','png','gif','webp','svg'].includes(ext);
             const icon = warnFileIcon(a.name||'');
             const action = a.url ? (isImg
               ? `onclick="warnPreviewImage('${a.url}','${a.name}')"`
@@ -3792,7 +3627,7 @@ function showWarnAttachments(event, warnId) {
   popup.className = 'warn-attach-popup';
   popup.style.cssText = `position:fixed;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:.75rem;box-shadow:0 8px 32px rgba(0,0,0,.15);padding:.6rem;min-width:220px;max-width:300px`;
 
-  // Position below button
+  
   const top = rect.bottom + 6;
   const left = Math.min(rect.left, window.innerWidth - 310);
   popup.style.top = top + 'px';
@@ -3841,7 +3676,7 @@ function handleWarnFileDrop(e) {
 }
 
 function addWarnFiles(files) {
-  const MAX = 10 * 1024 * 1024; // 10MB
+  const MAX = 10 * 1024 * 1024; 
   files.forEach((f, i) => {
     if (f.size > MAX) { toast(`File "${f.name}" vượt 10MB, bỏ qua.`, 'warn'); return; }
     f.__idx = Date.now() + i + Math.random();
@@ -3883,9 +3718,9 @@ async function uploadWarnFiles(warnId, empName) {
     progStatus.textContent = `Đang upload ${i+1}/${total}: ${file.name}`;
     progBar.style.width = `${Math.round((i/total)*100)}%`;
 
-    const safeEmp = (empName || 'unknown').replace(/[^a-zA-Z0-9_\-]/g, '_').substring(0, 40);
+    const safeEmp = (empName || 'unknown').replace(/[[^a-zA-Z0-9_\-]/g, '_').substring(0, 40);
     const ext = file.name.includes('.') ? file.name.split('.').pop() : 'bin';
-    const baseName = file.name.replace(/[^a-zA-Z0-9_\-\.]/g, '_').substring(0, 60);
+    const baseName = file.name.replace(/[[^a-zA-Z0-9_\-\.]/g, '_').substring(0, 60);
     const path = `${safeEmp}/${warnId}/${Date.now()}_${baseName}`;
 
     const { data, error } = await db.storage.from('Mail_Warning').upload(path, file, { upsert: true });
@@ -3913,18 +3748,18 @@ async function saveWarn() {
   saveBtn.innerHTML = '<span class="spinner"></span> Đang lưu...';
 
   try {
-    // Determine record ID (for new records, we need to insert first to get the ID)
+    
     let recordId = id;
     let existingAttachments = [];
 
     if (id) {
-      // Editing: get current attachments
+      
       const existing = S.warnings.find(x => x.id === id);
       existingAttachments = existing?.attachments || [];
-      // Remove deleted files from existing list
+      
       existingAttachments = existingAttachments.filter(a => !_warnDeleteFiles.includes(a.path || a));
     } else {
-      // Insert first to get the ID, then update with attachments
+      
       const initData = {
         employee_id: empId,
         employee_name: emp?.name || '',
@@ -3940,10 +3775,10 @@ async function saveWarn() {
       recordId = inserted.id;
     }
 
-    // Upload new files
+    
     const newUploads = await uploadWarnFiles(recordId, emp?.name || empId);
 
-    // Delete removed files from storage
+    
     if (_warnDeleteFiles.length) {
       await db.storage.from('Mail_Warning').remove(_warnDeleteFiles);
     }
@@ -3976,7 +3811,7 @@ async function saveWarn() {
 }
 
 async function doDelWarn(id) {
-  // Delete attachments from storage too
+  
   const w = S.warnings.find(x => x.id === id);
   const attachments = w?.attachments || [];
   if (attachments.length) {
@@ -3987,7 +3822,7 @@ async function doDelWarn(id) {
   toast('Đã xóa', 'success'); await loadAll(); renderWarn();
 }
 
-// ============ ATTENDANCE ============
+
 function renderAtt() {
   const q = (document.getElementById('f-att')?.value || '').toLowerCase();
   const tf = document.getElementById('f-att-t')?.value || '';
@@ -4132,10 +3967,10 @@ function renderTet() {
       <td style="color:var(--text-2)">${typeof days === 'number' ? days + ' ngày' : days}</td>
       ${actionCell}
     </tr>`;
-  }).join('') : emptyRow(S.isAdmin ? 7 : 6);
+  }).join('') : emptyRow(6);
   renderGenericPager('tet-pager', totalItems, _tetPage, 'gotoTetPage', 'bản ghi');
 
-  // Mobile card list
+  
   const tetCardList = document.getElementById('tet-card-list');
   if (tetCardList) {
     tetCardList.innerHTML = pageList.length ? pageList.map(t => {
@@ -4194,10 +4029,10 @@ async function doDelTet(id) {
 }
 
 // ============================================================
-// WORK SCHEDULE (Lịch Đăng Ký Làm)
-// ============================================================
 
-// Cell style per code
+
+
+
 const SCH_STYLE = {
   x:  { bg:'#bfdbfe', color:'#1e40af', border:'#93c5fd', label:'x' },
   w:  { bg:'#bbf7d0', color:'#14532d', border:'#86efac', label:'w' },
@@ -4213,10 +4048,10 @@ const SCH_STYLE = {
 
 const DOW_VI = ['CN','T2','T3','T4','T5','T6','T7'];
 
-// Current popup context
+
 let _schPopupCtx = null;
 
-// Load schedule data from Supabase for given month/year
+
 async function loadScheduleData(year, month) {
   const startDate = `${year}-${String(month).padStart(2,'0')}-01`;
   const endDate = `${year}-${String(month).padStart(2,'0')}-${new Date(year,month,0).getDate()}`;
@@ -4227,7 +4062,7 @@ async function loadScheduleData(year, month) {
       .gte('work_date', startDate)
       .lte('work_date', endDate);
     if (error) throw error;
-    // Build lookup: empId + date -> status
+    
     const lookup = {};
     (data || []).forEach(row => {
       const dateStr = row.work_date.split('T')[0];
@@ -4240,7 +4075,7 @@ async function loadScheduleData(year, month) {
   }
 }
 
-// Load schedule rules from Supabase
+
 function getDefaultRules() {
   return {
     max_wfh_per_month:      { value: '1',     description: 'Số lần WFH tối đa mỗi tháng' },
@@ -4266,17 +4101,17 @@ async function loadScheduleRules() {
   }
 }
 
-// Get value for a cell (DB-loaded or default)
+
 function schGetVal(empId, year, month, day) {
   const dateStr = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
   const key = `${empId}|${dateStr}`;
   if (S.scheduleData[key] !== undefined) return S.scheduleData[key];
-  // Default: weekdays = 'x', weekends = ''
+  
   const dow = new Date(year, month-1, day).getDay();
   return (dow === 0 || dow === 6) ? '' : 'x';
 }
 
-// Save a cell to Supabase
+
 async function schSaveCell(empId, year, month, day, val) {
   const dateStr = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
   const key = `${empId}|${dateStr}`;
@@ -4293,7 +4128,7 @@ async function schSaveCell(empId, year, month, day, val) {
   }
 }
 
-// Count WFH for employee in month
+
 function countWfhInMonth(empId, year, month) {
   const daysInMonth = new Date(year, month, 0).getDate();
   let count = 0;
@@ -4306,7 +4141,7 @@ function countWfhInMonth(empId, year, month) {
   return count;
 }
 
-// Check rule violations for a proposed change
+
 function checkSchRules(empId, year, month, day, newVal) {
   const rules = S.scheduleRules;
   const warnings = [];
@@ -4335,71 +4170,7 @@ function checkSchRules(empId, year, month, day, newVal) {
   return warnings;
 }
 
-// Render rules panel (editable for admin)
-function renderRulesPanel() {
-  const container = document.getElementById('rules-list');
-  if (!container) return;
-  const r = S.scheduleRules;
-  const RULE_LABELS = {
-    max_wfh_per_month:      { label: 'WFH tối đa / tháng', hint: 'Số nguyên, vd: 1' },
-    wfh_blocked_days:       { label: 'Ngày không cho WFH', hint: '2=T2, 3=T3, 4=T4... cách nhau dấu phẩy, vd: 2,3' },
-    allow_employee_edit:    { label: 'Nhân viên tự đăng ký', hint: 'true hoặc false' },
-    require_reason_for_off: { label: 'Yêu cầu lý do khi nghỉ', hint: 'true hoặc false' },
-    default_weekday_status: { label: 'Trạng thái mặc định ngày thường', hint: 'x, w, o...' },
-    advance_days_required:  { label: 'Phải đăng ký trước (ngày)', hint: '0 = không giới hạn' },
-  };
-  if (!Object.keys(r).length) {
-    container.innerHTML = '<div style="font-size:.78rem;color:var(--text-3);padding:.5rem">Không tải được quy tắc từ Supabase (kiểm tra kết nối hoặc RLS).</div>';
-    return;
-  }
-  container.innerHTML = Object.entries(r).map(([k, v]) => {
-    const meta = RULE_LABELS[k] || { label: k, hint: '' };
-    return `<div class="rule-item" style="align-items:flex-start;flex-direction:column;gap:.3rem;padding:.6rem .75rem">
-      <div style="display:flex;align-items:center;justify-content:space-between;width:100%;gap:.75rem">
-        <span class="rule-item-key" style="font-size:.78rem">${meta.label}</span>
-        <input class="input rule-val-input" data-key="${k}" value="${escAttr(v.value)}"
-          style="max-width:160px;padding:.3rem .6rem;font-size:.8rem;font-weight:700;text-align:center"
-          placeholder="${meta.hint}">
-      </div>
-      ${meta.hint ? `<span style="font-size:.67rem;color:var(--text-3)">${meta.hint}</span>` : ''}
-    </div>`;
-  }).join('');
-}
 
-async function saveRules() {
-  if (!S.isAdmin) return;
-  const inputs = document.querySelectorAll('.rule-val-input');
-  if (!inputs.length) return;
-  const btn = document.getElementById('btn-save-rules');
-  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; }
-  try {
-    const updates = [];
-    inputs.forEach(inp => {
-      const key = inp.dataset.key;
-      const val = inp.value.trim();
-      updates.push({ rule_key: key, rule_value: val, description: S.scheduleRules[key]?.description || null });
-    });
-    const { error } = await db.from('hr_schedule_rules')
-      .upsert(updates, { onConflict: 'rule_key' });
-    if (error) throw error;
-    updates.forEach(u => { if (S.scheduleRules[u.rule_key]) S.scheduleRules[u.rule_key].value = u.rule_value; });
-    toast('Đã lưu quy tắc!', 'success');
-    const m = parseInt(document.getElementById('sch-month').value);
-    const y = parseInt(document.getElementById('sch-year').value);
-    renderSchedule(y, m);
-  } catch(e) {
-    toast('Lỗi lưu quy tắc: ' + e.message, 'error');
-  } finally {
-    if (btn) { btn.disabled = false; btn.innerHTML = '💾 Lưu quy tắc'; }
-  }
-}
-
-function toggleRulesPanel() {
-  const panel = document.getElementById('sch-rules-panel');
-  if (panel) panel.classList.toggle('hidden');
-}
-
-// Bulk-initialize a month
 async function initializeMonth() {
   if (!S.isAdmin) return;
   const m = parseInt(document.getElementById('sch-month').value);
@@ -4449,7 +4220,7 @@ async function initializeMonth() {
   }
 }
 
-// Init calendar section
+
 async function initCal() {
   closeSchPopup();
   const wrap = document.getElementById('sch-table-wrap');
@@ -4467,18 +4238,13 @@ async function initCal() {
   S.scheduleData = schData;
   S.scheduleRules = rules;
 
-  // Auto-update to-day input to match days in selected month
-  const toInput = document.getElementById('sch-to-day');
-  if (toInput) toInput.value = new Date(y, m, 0).getDate();
-
-  renderRulesPanel();
   renderSchedule(y, m);
 
   loading.style.display = 'none';
   wrap.style.display = 'block';
 }
 
-// ============ SORT HELPERS ============
+
 function getSortedScheduleEmployees(y, m) {
   const base = S.employees.filter(e => e.is_active !== false);
   const sort = S.scheduleSortOrder || 'name-asc';
@@ -4499,200 +4265,7 @@ function onSchSortChange() {
   renderSchedule(y, m);
 }
 
-// ============ EXPORT IMAGE (Direct Canvas Drawing — no html2canvas) ============
-async function exportScheduleImage() {
-  const m = parseInt(document.getElementById('sch-month').value);
-  const y = parseInt(document.getElementById('sch-year').value);
-  const daysInMonth = new Date(y, m, 0).getDate();
-  const fromDay = Math.max(1, parseInt(document.getElementById('sch-from-day').value) || 1);
-  const toDay   = Math.min(daysInMonth, parseInt(document.getElementById('sch-to-day').value) || daysInMonth);
 
-  if (fromDay > toDay) { toast('Ngày bắt đầu phải ≤ ngày kết thúc!', 'warn'); return; }
-
-  const btn = document.getElementById('btn-export-img');
-  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner" style="border-color:rgba(255,255,255,.3);border-top-color:#fff;width:12px;height:12px;border-width:2px"></span> Đang xuất...'; }
-
-  try {
-    const dataUrl = drawScheduleCanvas(y, m, fromDay, toDay);
-    const mn = ['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'][m-1];
-    const link = document.createElement('a');
-    link.download = `LichLam_${mn}_${y}_Ngay${fromDay}-${toDay}.png`;
-    link.href = dataUrl;
-    link.click();
-    toast('Đã xuất ảnh thành công!', 'success');
-  } catch(e) {
-    toast('Lỗi xuất ảnh: ' + e.message, 'error');
-  } finally {
-    if (btn) { btn.disabled = false; btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Xuất ảnh PNG'; }
-  }
-}
-
-function drawScheduleCanvas(year, month, fromDay, toDay) {
-  const SC = 3; // 3× = ~300 DPI, crisp on any screen / PowerPoint
-  const employees = getSortedScheduleEmployees(year, month);
-  const DOW_SHORT = ['CN','T2','T3','T4','T5','T6','T7'];
-  const MONTH_VN  = ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6',
-                     'Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
-
-  // Only weekday columns inside the range
-  const wdCols = [];
-  for (let d = fromDay; d <= toDay; d++) {
-    const dow = new Date(year, month-1, d).getDay();
-    if (dow !== 0 && dow !== 6) wdCols.push({ d, dow });
-  }
-
-  const today = new Date();
-
-  // Layout (logical px — canvas is SC× larger)
-  const PAD     = 20;
-  const TITLE_H = 44;
-  const HEAD_H  = 44;
-  const ROW_H   = 30;
-  const LEG_H   = 38;
-  const NAME_W  = 170;
-  const CELL_W  = 42;
-  const BADGE_W = 30;
-  const BADGE_H = 18;
-  const BADGE_R = 5;
-
-  const totalW = PAD + NAME_W + wdCols.length * CELL_W + PAD;
-  const totalH = PAD + TITLE_H + HEAD_H + employees.length * ROW_H + PAD;
-
-  const canvas = document.createElement('canvas');
-  canvas.width  = totalW * SC;
-  canvas.height = totalH * SC;
-  const ctx = canvas.getContext('2d');
-  ctx.scale(SC, SC);
-
-  // ── Background ──
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, totalW, totalH);
-
-  // ── Title block ──
-  let cy = PAD;
-  ctx.fillStyle = '#0f2923';
-  ctx.font = 'bold 13px Arial,sans-serif';
-  ctx.textBaseline = 'middle';
-  ctx.textAlign = 'left';
-  ctx.fillText('Lich Dang Ky Lam - ' + MONTH_VN[month-1] + ' ' + year, PAD, cy + 13);
-  ctx.fillStyle = '#8faaa4';
-  ctx.font = '10px Arial,sans-serif';
-  ctx.fillText('Ngay ' + fromDay + ' - ' + toDay + '  |  ' + employees.length + ' nhan vien', PAD, cy + 31);
-  cy += TITLE_H;
-
-  // ── Header row ──
-  // Name header cell
-  canvasRect(ctx, PAD, cy, NAME_W, HEAD_H, '#0d9488', null, 0);
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 11px Arial,sans-serif';
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('NHAN VIEN', PAD + 10, cy + HEAD_H / 2);
-
-  // Day headers
-  wdCols.forEach(({ d, dow }, i) => {
-    const cx   = PAD + NAME_W + i * CELL_W;
-    const isToday = today.getFullYear()===year && today.getMonth()===month-1 && today.getDate()===d;
-    const hBg  = isToday ? '#f59e0b' : '#0d9488';
-    canvasRect(ctx, cx, cy, CELL_W, HEAD_H, hBg, 'rgba(255,255,255,0.2)', 0);
-    // separator line
-    ctx.fillStyle = 'rgba(255,255,255,0.18)';
-    ctx.fillRect(cx, cy, 1, HEAD_H);
-    // day number
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 12px Arial,sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(String(d), cx + CELL_W / 2, cy + HEAD_H / 2 - 8);
-    ctx.font = '9px Arial,sans-serif';
-    ctx.fillText(DOW_SHORT[dow], cx + CELL_W / 2, cy + HEAD_H / 2 + 9);
-  });
-  cy += HEAD_H;
-
-  // ── Employee rows ──
-  employees.forEach((emp, idx) => {
-    const rowY  = cy + idx * ROW_H;
-    const rowBg = idx % 2 === 0 ? '#f4fcfb' : '#ffffff';
-
-    // Row background
-    ctx.fillStyle = rowBg;
-    ctx.fillRect(PAD, rowY, NAME_W + wdCols.length * CELL_W, ROW_H);
-
-    // Bottom separator
-    ctx.fillStyle = '#c8e6e0';
-    ctx.fillRect(PAD, rowY + ROW_H - 1, NAME_W + wdCols.length * CELL_W, 1);
-
-    // Employee name (left-aligned, clipped)
-    ctx.fillStyle = '#0f2923';
-    ctx.font = 'bold 10.5px Arial,sans-serif';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(PAD + 8, rowY, NAME_W - 12, ROW_H);
-    ctx.clip();
-    ctx.fillText(emp.name, PAD + 8, rowY + ROW_H / 2);
-    ctx.restore();
-
-    // Name column right border
-    ctx.fillStyle = '#b2d8d2';
-    ctx.fillRect(PAD + NAME_W - 1, rowY, 1, ROW_H);
-
-    // Day cells
-    wdCols.forEach(({ d }, i) => {
-      const cx  = PAD + NAME_W + i * CELL_W;
-      const val = schGetVal(emp.id, year, month, d);
-      const s   = SCH_STYLE[val] || SCH_STYLE['x'];
-
-      // Right border
-      ctx.fillStyle = '#daeee9';
-      ctx.fillRect(cx + CELL_W - 1, rowY, 1, ROW_H);
-
-      // Badge
-      const bx = cx + (CELL_W - BADGE_W) / 2;
-      const by = rowY + (ROW_H - BADGE_H) / 2;
-      canvasRoundRect(ctx, bx, by, BADGE_W, BADGE_H, BADGE_R, s.bg, s.border);
-      ctx.fillStyle = s.color;
-      ctx.font = 'bold 9.5px Arial,sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(s.label, bx + BADGE_W / 2, by + BADGE_H / 2);
-    });
-  });
-  cy += employees.length * ROW_H;
-
-  return canvas.toDataURL('image/png');
-}
-
-// Draw a plain filled rectangle (no rounded corners needed for large areas)
-function canvasRect(ctx, x, y, w, h, fill, stroke, lw) {
-  ctx.fillStyle = fill;
-  ctx.fillRect(x, y, w, h);
-  if (stroke) {
-    ctx.strokeStyle = stroke;
-    ctx.lineWidth = lw || 1;
-    ctx.strokeRect(x, y, w, h);
-  }
-}
-
-// Draw a rounded rectangle (for badges and legend pills)
-function canvasRoundRect(ctx, x, y, w, h, r, fill, stroke) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-  ctx.lineTo(x, y + r);
-  ctx.quadraticCurveTo(x, y, x + r, y);
-  ctx.closePath();
-  if (fill)   { ctx.fillStyle   = fill;   ctx.fill(); }
-  if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 1.2; ctx.stroke(); }
-}
-
-// Render the schedule grid
 function renderSchedule(year, month) {
   const m = month || parseInt(document.getElementById('sch-month').value);
   const y = year || parseInt(document.getElementById('sch-year').value);
@@ -4720,7 +4293,7 @@ function renderSchedule(year, month) {
 
   let html = `<table class="sch-table">`;
 
-  // Header row
+  
   html += `<thead><tr>`;
   html += `<th class="sch-name-col">Nhân viên</th>`;
   days.forEach(({ d, dow, isWeekend, isToday }) => {
@@ -4780,7 +4353,7 @@ function renderSchedule(year, month) {
   document.getElementById('sch-table-wrap').innerHTML = html;
 }
 
-// Open inline popup dropdown at cell
+
 function openSchPopup(event, empId, year, month, day, empName) {
   if (!S.isAdmin) return;
   closeSchPopup();
@@ -4821,7 +4394,7 @@ function openSchPopup(event, empId, year, month, day, empName) {
 
   document.body.appendChild(popup);
 
-  // Position popup near the clicked cell
+  
   const rect = event.currentTarget.getBoundingClientRect();
   const popW = 220, popH = 180;
   let left = rect.left + rect.width / 2 - popW / 2;
@@ -4840,7 +4413,7 @@ function openSchPopup(event, empId, year, month, day, empName) {
   }, 60);
 }
 
-// Live check rules when dropdown changes
+
 function onPopupValChange(newVal, empId, year, month, day) {
   const warnings = checkSchRules(empId, year, month, day, newVal);
   const warnEl = document.getElementById('popup-rule-warn');
@@ -4889,7 +4462,7 @@ function closeSchPopup() {
   _schPopupCtx = null;
 }
 
-// ============ MODAL HELPERS ============
+
 function openModal(id) {
   const el = document.getElementById(id);
   el.classList.remove('hidden');
@@ -4899,7 +4472,7 @@ function openModal(id) {
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
 document.addEventListener('click', function(e) {
-  ['m-emp','m-leave','m-warn','m-att','m-tet','m-confirm'].forEach(id => {
+  ['m-emp','m-warn','m-att','m-tet','m-confirm'].forEach(id => {
     const el = document.getElementById(id);
     if (el && e.target === el) closeModal(id);
   });
@@ -4913,7 +4486,7 @@ function confirmDel(msg, cb) {
   btn.addEventListener('click', handler);
 }
 
-// ============ UTILS ============
+
 function fmtD(d) {
   if (!d) return '—';
   const dt = new Date(d + 'T00:00:00');
@@ -4926,10 +4499,10 @@ function escAttr(s) {
   return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-// ============ AUTO-SET MONTH/YEAR IN SCHEDULE ============
+
 function initSchMonthYear() {
   const now = new Date();
-  const curMonth = now.getMonth() + 1; // 1-12
+  const curMonth = now.getMonth() + 1; 
   const curYear = now.getFullYear();
 
   const monthSel = document.getElementById('sch-month');
@@ -4938,7 +4511,7 @@ function initSchMonthYear() {
   if (monthSel) monthSel.value = String(curMonth);
 
   if (yearSel) {
-    // Add year option if not present
+    
     const exists = Array.from(yearSel.options).some(o => parseInt(o.value) === curYear);
     if (!exists) {
       const opt = document.createElement('option');
@@ -4950,9 +4523,9 @@ function initSchMonthYear() {
   }
 }
 
-// ============ BOOT ============
+
 document.addEventListener('DOMContentLoaded', async () => {
-  // Set current month/year for schedule tab
+  
   initSchMonthYear();
 
   await tryRestoreSession();
@@ -4965,52 +4538,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 </html>
 
 
-<!-- ═══════════════════════════════════════════════════
-     SYNC NHÂN SỰ — hardcoded source, no config needed
-     ═══════════════════════════════════════════════════ -->
 
-<!-- Modal preview/confirm -->
-<div id="modal-sync-nhansu" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.45);backdrop-filter:blur(3px);align-items:center;justify-content:center">
-  <div style="background:#fff;border-radius:1rem;width:min(500px,95vw);box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden">
-    <!-- Header -->
-    <div style="background:linear-gradient(135deg,#059669,#10b981);padding:1.1rem 1.4rem;display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div style="color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;gap:.5rem">
-          <svg width="15" height="15" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-          Sync nhân sự
-        </div>
-        <div style="color:rgba(255,255,255,.8);font-size:11.5px;margin-top:1px">
-          <code style="background:rgba(255,255,255,.2);padding:1px 5px;border-radius:4px">nhan_su</code>
-          →
-          <code style="background:rgba(255,255,255,.2);padding:1px 5px;border-radius:4px">hr_employees</code>
-        </div>
-      </div>
-      <button onclick="closeSyncModal()" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:26px;height:26px;border-radius:50%;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
-    </div>
 
-    <!-- Body -->
-    <div style="padding:1.25rem 1.4rem">
-      <div id="sync-loading" style="text-align:center;padding:1.5rem 0;color:#6b7280;font-size:13px">
-        <div style="display:inline-block;width:28px;height:28px;border:3px solid #e5e7eb;border-top-color:#10b981;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:.6rem"></div>
-        <div>Đang đọc dữ liệu từ nguồn...</div>
-      </div>
-      <div id="sync-result" style="display:none">
-        <div id="sync-result-text" style="font-size:13px;margin-bottom:1rem"></div>
-        <div id="sync-new-list" style="max-height:180px;overflow-y:auto;background:#f0fdf4;border:1.5px solid #a7f3d0;border-radius:.65rem;padding:.75rem;font-size:12.5px;color:#065f46;display:none"></div>
-        <div id="sync-error-box" style="display:none;background:#fef2f2;border:1.5px solid #fca5a5;border-radius:.65rem;padding:.75rem;font-size:13px;color:#dc2626"></div>
-      </div>
-      <div style="display:flex;gap:.6rem;justify-content:flex-end;padding-top:.9rem;border-top:1px solid #f3f4f6;margin-top:.5rem">
-        <button onclick="closeSyncModal()" style="padding:.45rem 1rem;border:1.5px solid #d1d5db;background:#fff;border-radius:.6rem;font-size:13px;font-weight:600;cursor:pointer;color:#374151">Đóng</button>
-        <button id="sync-confirm-btn" onclick="syncNhanSuRun()" style="padding:.45rem 1.2rem;border:none;background:linear-gradient(135deg,#059669,#10b981);color:#fff;border-radius:.6rem;font-size:13px;font-weight:700;cursor:pointer;display:none"></button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ========================================
-     KHO FILE OT — MODALS
-======================================== -->
-<!-- Upload Modal -->
 <div id="m-otf-upload" class="modal-bd hidden">
   <div class="modal-box fade" onclick="event.stopPropagation()">
     <h3 class="font-extrabold text-lg mb-5 tracking-tight" style="color:var(--text-1)">📁 Upload File OT</h3>
@@ -5066,7 +4595,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   </div>
 </div>
 
-<!-- Edit Modal -->
+
 <div id="m-otf-edit" class="modal-bd hidden">
   <div class="modal-box fade" onclick="event.stopPropagation()">
     <h3 class="font-extrabold text-lg mb-5 tracking-tight" style="color:var(--text-1)">✏️ Chỉnh sửa thông tin file</h3>
@@ -5103,69 +4632,69 @@ document.addEventListener('DOMContentLoaded', async () => {
 </div>
 
 <script>
-// ══════════════════════════════════════════════════════════
-//  KHO FILE OT — Toàn bộ module mới, độc lập hoàn toàn
-// ══════════════════════════════════════════════════════════
 
-// ── State riêng của module ──
+
+
+
+
 const OTF = {
   files: [],
   loaded: false,
   selectedFile: null,
 };
 
-const OTF_BUCKET = 'File_OT';   // Bucket đã tạo trong Supabase Storage
-const OTF_TABLE  = 'file_ot';   // Bảng mới trong Supabase DB
+const OTF_BUCKET = 'File_OT';   
+const OTF_TABLE  = 'file_ot';   
 
-// ── Build danh sách năm động: 2 năm trước → 2 năm sau so với năm hiện tại ──
-// Tự động bao gồm bất kỳ năm nào đã có file trong DB
+
+
 function otfBuildYearOptions() {
   const curYear = new Date().getFullYear();
-  // Base range: 2 năm trước → 2 năm sau
+  
   const minYear = curYear - 2;
   const maxYear = curYear + 2;
 
-  // Gom thêm các năm từ dữ liệu thực tế (phòng khi file cũ hơn range)
+  
   const yearsInData = new Set(OTF.files.map(f => f.year).filter(Boolean));
   const allYears = new Set();
   for (let y = minYear; y <= maxYear; y++) allYears.add(y);
   yearsInData.forEach(y => allYears.add(y));
   const sortedYears = Array.from(allYears).sort((a, b) => a - b);
 
-  // ── Filter dropdown: "Tất cả năm" + danh sách năm ──
+  
   const filterSel = document.getElementById('otf-f-year');
   if (filterSel) {
     const prevVal = filterSel.value;
     filterSel.innerHTML = '<option value="">Tất cả năm</option>' +
       sortedYears.map(y => `<option value="${y}"${y === curYear ? ' selected' : ''}>${y}</option>`).join('');
-    // Khôi phục lựa chọn trước nếu còn hợp lệ
+    
     if (prevVal && sortedYears.includes(parseInt(prevVal))) filterSel.value = prevVal;
   }
 
-  // ── Upload dropdown: "-- Chọn năm --" + danh sách, mặc định năm hiện tại ──
+  
   const upSel = document.getElementById('otf-up-year');
   if (upSel) {
     upSel.innerHTML = '<option value="">-- Chọn năm --</option>' +
       sortedYears.map(y => `<option value="${y}">${y}</option>`).join('');
-    upSel.value = String(curYear); // Auto-select năm hiện tại
+    upSel.value = String(curYear); 
   }
 
-  // ── Edit dropdown: danh sách năm (không có "Chọn") ──
+  
   const editSel = document.getElementById('otf-edit-year');
   if (editSel) {
     editSel.innerHTML = sortedYears.map(y => `<option value="${y}">${y}</option>`).join('');
   }
 }
 
-// ── Tháng dạng chữ ──
+
 function otfMonthName(m) {
   return ['01','02','03','04','05','06','07','08','09','10','11','12'][parseInt(m)-1] || String(m).padStart(2,'0');
 }
 
-// ── Rút gọn MIME type thành tên ngắn ──
+
 function otfFileExt(type, fileName) {
   if (!type && !fileName) return '—';
-  // Ưu tiên lấy từ tên file
+  
   if (fileName) {
     const ext = fileName.split('.').pop().toUpperCase();
     if (ext && ext.length <= 5) return ext;
@@ -5187,7 +4716,7 @@ function otfFileExt(type, fileName) {
   return t.split('/').pop().toUpperCase().slice(0, 6);
 }
 
-// ── Format dung lượng ──
+
 function otfFmtSize(bytes) {
   if (!bytes) return '—';
   if (bytes < 1024) return bytes + ' B';
@@ -5195,7 +4724,7 @@ function otfFmtSize(bytes) {
   return (bytes/(1024*1024)).toFixed(2) + ' MB';
 }
 
-// ── Icon theo loại file ──
+
 function otfFileIcon(type) {
   if (!type) return '📄';
   const t = type.toLowerCase();
@@ -5205,14 +4734,14 @@ function otfFileIcon(type) {
   return '📄';
 }
 
-// ── Load danh sách file từ Supabase ──
+
 async function otfLoad() {
   try {
     const { data, error } = await db.from(OTF_TABLE).select('*').order('created_at', { ascending: false });
     if (error) throw error;
     OTF.files = data || [];
     OTF.loaded = true;
-    otfBuildYearOptions(); // Rebuild năm động sau khi có dữ liệu thực tế
+    otfBuildYearOptions(); 
   } catch(e) {
     OTF.files = [];
     OTF.loaded = true;
@@ -5220,7 +4749,7 @@ async function otfLoad() {
   }
 }
 
-// ── Render thống kê ──
+
 function otfRenderStats() {
   const now = new Date();
   const curYear = now.getFullYear();
@@ -5238,7 +4767,7 @@ function otfRenderStats() {
   if (el('otf-stat-size'))  el('otf-stat-size').textContent  = otfFmtSize(totalSize);
 }
 
-// ── Render danh sách file ──
+
 function otfRender() {
   otfRenderStats();
 
@@ -5255,10 +4784,10 @@ function otfRender() {
   const tbody = document.getElementById('otf-body');
   const cardList = document.getElementById('otf-card-list');
 
-  // Action column header always visible (single th now)
+  
   const thAdmin = document.getElementById('otf-th-action');
   if (thAdmin) thAdmin.style.display = '';
-  // Remove old emp-th reference (no longer exists)
+  
 
   if (!list.length) {
     if (tbody) tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:2.5rem;color:var(--text-3);font-size:.875rem;font-weight:500">Không có file nào</td></tr>`;
@@ -5266,7 +4795,7 @@ function otfRender() {
     return;
   }
 
-  // ── Desktop table rows ──
+  
   if (tbody) {
     tbody.innerHTML = list.map(f => {
       const adminActions = isAdmin ? `
@@ -5302,7 +4831,7 @@ function otfRender() {
     }).join('');
   }
 
-  // ── Mobile cards ──
+  
   if (cardList) {
     cardList.innerHTML = list.map(f => {
       const adminBtns = isAdmin ? `
@@ -5345,20 +4874,20 @@ function otfRender() {
   }
 }
 
-// ── Init khi vào section ──
+
 async function otfInit() {
-  // Show/hide upload button for admin
+  
   const uploadBtn = document.getElementById('otf-btn-upload');
   if (uploadBtn) uploadBtn.style.display = S.isAdmin ? 'inline-flex' : 'none';
 
-  // Show/hide FAB upload (mobile admin)
+  
   const fabUpload = document.getElementById("otf-fab-upload");
   if (fabUpload) {
     if (S.isAdmin) fabUpload.classList.add("visible");
     else fabUpload.classList.remove("visible");
   }
 
-  // Build năm dynamic ngay (base range) trước khi load data
+  
   otfBuildYearOptions();
 
   if (!OTF.loaded) {
@@ -5371,21 +4900,21 @@ async function otfInit() {
   otfRender();
 }
 
-// ── Get signed URL for a file ──
+
 async function otfGetUrl(fileUrl) {
-  // fileUrl lưu ở dạng path trong bucket: "year/month/filename"
+  
   try {
     const { data, error } = await db.storage.from(OTF_BUCKET).createSignedUrl(fileUrl, 3600);
     if (error) throw error;
     return data.signedUrl;
   } catch(e) {
-    // Thử public URL nếu bucket là public
+    
     const { data } = db.storage.from(OTF_BUCKET).getPublicUrl(fileUrl);
     return data?.publicUrl || null;
   }
 }
 
-// ── Xem file ──
+
 async function otfView(id) {
   const f = OTF.files.find(x => x.id === id);
   if (!f) return;
@@ -5398,7 +4927,7 @@ async function otfView(id) {
   }
 }
 
-// ── Download file ──
+
 async function otfDownload(id) {
   const f = OTF.files.find(x => x.id === id);
   if (!f) return;
@@ -5414,14 +4943,14 @@ async function otfDownload(id) {
   }
 }
 
-// ── Mở modal upload ──
+
 function otfOpenUpload() {
   if (!S.isAdmin) return;
-  // Reset form
+  
   document.getElementById('otf-up-year').value = '';
   document.getElementById('otf-up-month').value = '';
   OTF.selectedFile = null;
-  // Rebuild năm và auto-select năm + tháng hiện tại
+  
   otfBuildYearOptions();
   const curMonth = new Date().getMonth() + 1;
   document.getElementById('otf-up-month').value = String(curMonth);
@@ -5469,7 +4998,7 @@ function otfOnDrop(e) {
   if (sel)    sel.style.display = 'flex';
 }
 
-// ── Thực hiện upload ──
+
 async function otfDoUpload() {
   if (!S.isAdmin) return;
   const year  = document.getElementById('otf-up-year').value;
@@ -5492,16 +5021,16 @@ async function otfDoUpload() {
   if (pct)  pct.textContent = '10%';
 
   try {
-    // Tên file duy nhất trong bucket
+    
     const ts  = Date.now();
     const ext = file.name.split('.').pop();
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const safeName = file.name.replace(/[[^a-zA-Z0-9._-]/g, '_');
     const storagePath = `${year}/${String(month).padStart(2,'0')}/${ts}_${safeName}`;
 
     if (bar) bar.style.width = '30%';
     if (pct) pct.textContent = '30%';
 
-    // Upload file lên storage
+    
     const { error: upErr } = await db.storage.from(OTF_BUCKET).upload(storagePath, file, {
       cacheControl: '3600',
       upsert: false,
@@ -5512,10 +5041,10 @@ async function otfDoUpload() {
     if (bar) bar.style.width = '70%';
     if (pct) pct.textContent = '70%';
 
-    // Xác định người upload
+    
     const uploaderName = S.session ? 'Admin' : 'Nhân viên';
 
-    // Lưu metadata vào DB
+    
     const { error: dbErr } = await db.from(OTF_TABLE).insert({
       file_name:   file.name,
       file_url:    storagePath,
@@ -5526,7 +5055,7 @@ async function otfDoUpload() {
       uploaded_by: uploaderName,
     });
     if (dbErr) {
-      // Xóa file đã upload nếu DB lỗi
+      
       await db.storage.from(OTF_BUCKET).remove([storagePath]);
       throw new Error('Lưu DB: ' + dbErr.message);
     }
@@ -5549,7 +5078,7 @@ async function otfDoUpload() {
   }
 }
 
-// ── Mở modal chỉnh sửa ──
+
 function otfOpenEdit(id) {
   if (!S.isAdmin) return;
   const f = OTF.files.find(x => x.id === id);
@@ -5561,7 +5090,7 @@ function otfOpenEdit(id) {
   openModal('m-otf-edit');
 }
 
-// ── Lưu chỉnh sửa ──
+
 async function otfDoEdit() {
   if (!S.isAdmin) return;
   const id    = document.getElementById('otf-edit-id').value;
@@ -5590,7 +5119,7 @@ async function otfDoEdit() {
   }
 }
 
-// ── Xác nhận xóa ──
+
 function otfConfirmDelete(id) {
   if (!S.isAdmin) return;
   const f = OTF.files.find(x => x.id === id);
@@ -5598,17 +5127,17 @@ function otfConfirmDelete(id) {
   confirmDel(`Xóa file "${f.file_name}"? Thao tác này không thể hoàn tác.`, () => otfDoDelete(id));
 }
 
-// ── Thực hiện xóa ──
+
 async function otfDoDelete(id) {
   if (!S.isAdmin) return;
   const f = OTF.files.find(x => x.id === id);
   if (!f) return;
   try {
-    // Xóa file trong storage trước
+    
     if (f.file_url) {
       await db.storage.from(OTF_BUCKET).remove([f.file_url]);
     }
-    // Xóa record trong DB
+    
     const { error } = await db.from(OTF_TABLE).delete().eq('id', id);
     if (error) throw error;
     toast('Đã xóa file!', 'success');
@@ -5620,7 +5149,7 @@ async function otfDoDelete(id) {
   }
 }
 
-// ── Đóng modal khi click ngoài ──
+
 document.addEventListener('click', function(e) {
   ['m-otf-upload','m-otf-edit'].forEach(id => {
     const el = document.getElementById(id);
@@ -5628,14 +5157,14 @@ document.addEventListener('click', function(e) {
   });
 });
 
-// ══════════════════════════════════════════════════════════
-//  PATCH go() để hỗ trợ tab ot-files — Additive Only
-// ══════════════════════════════════════════════════════════
+
+
+
 (function() {
   const _origGo = go;
   window.go = function(name) {
     if (name === 'ot-files') {
-      // Thực hiện navigation thủ công cho tab mới
+      
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
       const sec = document.getElementById('s-ot-files');
@@ -5648,7 +5177,7 @@ document.addEventListener('click', function(e) {
       if (mobTitle) mobTitle.textContent = 'Kho File OT';
       const lyLabel = document.getElementById('ly-label');
       if (lyLabel) lyLabel.textContent = '';
-      // Sync mobile nav: highlight "Thêm" button
+      
       const moreBtn = document.getElementById('mnb-more');
       ['dashboard','employees','leaves','calendar'].forEach(t => {
         const btn = document.getElementById('mnb-' + t);
@@ -5661,148 +5190,24 @@ document.addEventListener('click', function(e) {
       });
       const mdiOtf = document.getElementById('mdi-ot-files');
       if (mdiOtf) mdiOtf.classList.add('active');
-      // Init module
+      
       otfInit();
       return;
     }
-    // Hide FAB upload when leaving ot-files
+    
     const fabUpload = document.getElementById("otf-fab-upload");
     if (fabUpload) fabUpload.classList.remove("visible");
     _origGo(name);
   };
 })();
 
-// ── Restore session: nếu tab cũ là ot-files thì load lại ──
-// (Đây là additive — chỉ bổ sung, không can thiệp luồng cũ)
+
+
 const _origTryRestoreSession = typeof tryRestoreSession === 'function' ? tryRestoreSession : null;
 
-// ── Đảm bảo tab ot-files được hỗ trợ khi khởi tạo ──
+
 document.addEventListener('DOMContentLoaded', function() {
-  // Add ot-files vào validTabs check trong enterApp (không sửa code cũ)
-  // Chỉ đảm bảo rằng nếu savedTab === 'ot-files' thì go() sẽ xử lý đúng
-});
-</script>
-<script>
-const NS_URL = window.SUPABASE_CONFIG['Work_Attendance_Summary.html'].hr.url;
-const NS_KEY = window.SUPABASE_CONFIG['Work_Attendance_Summary.html'].hr.key;
-
-let _syncRows = []; // cache rows từ nguồn
-
-function closeSyncModal() {
-  document.getElementById('modal-sync-nhansu').style.display = 'none';
-}
-
-async function openSyncNhanSuModal() {
-  // Reset UI
-  document.getElementById('sync-loading').style.display = 'block';
-  document.getElementById('sync-result').style.display = 'none';
-  document.getElementById('sync-confirm-btn').style.display = 'none';
-  document.getElementById('modal-sync-nhansu').style.display = 'flex';
-  _syncRows = [];
-
-  try {
-    // Fetch toàn bộ nhan_su
-    const res = await fetch(`${NS_URL}/rest/v1/nhan_su?select=ho_ten,tai_khoan,ngay_vao,trang_thai&bo_phan=eq.L2&limit=1000`, {
-      headers: { 'apikey': NS_KEY, 'Authorization': 'Bearer ' + NS_KEY, 'Accept': 'application/json' }
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const rows = await res.json();
-
-    // So sánh với hr_employees hiện tại theo email (tai_khoan)
-    const existingEmails = new Set((S.employees || []).map(e => (e.email || '').toLowerCase()).filter(Boolean));
-    const existingNames  = new Set((S.employees || []).map(e => (e.name  || '').toLowerCase()));
-
-    const newRows = rows.filter(r => {
-      const email = (r.tai_khoan || '').toLowerCase();
-      const name  = (r.ho_ten || '').toLowerCase();
-      return email ? !existingEmails.has(email) : !existingNames.has(name);
-    });
-
-    _syncRows = newRows;
-
-    // Render result
-    document.getElementById('sync-loading').style.display = 'none';
-    document.getElementById('sync-result').style.display = 'block';
-    const errBox = document.getElementById('sync-error-box');
-    errBox.style.display = 'none';
-
-    const resultTxt = document.getElementById('sync-result-text');
-    const listEl    = document.getElementById('sync-new-list');
-    const confirmBtn = document.getElementById('sync-confirm-btn');
-
-    if (newRows.length === 0) {
-      resultTxt.innerHTML = `<div style="display:flex;align-items:center;gap:.5rem;color:#059669;font-weight:600"><span style="font-size:18px">✓</span> Đã đồng bộ — không có nhân viên mới (${rows.length} người trong nguồn).</div>`;
-      listEl.style.display = 'none';
-    } else {
-      resultTxt.innerHTML = `
-        <div style="color:#374151;font-size:13.5px">Tìm thấy <b style="color:#059669;font-size:16px">${newRows.length}</b> nhân viên mới chưa có trong hệ thống:</div>
-      `;
-      listEl.innerHTML = newRows.map(r =>
-        `<div style="padding:.2rem 0;border-bottom:1px solid #d1fae5;display:flex;justify-content:space-between;align-items:center">
-          <span style="font-weight:600">${r.ho_ten || '—'}</span>
-          <span style="color:#6b7280;font-size:11.5px">${r.tai_khoan || ''}</span>
-        </div>`
-      ).join('');
-      listEl.style.display = 'block';
-      confirmBtn.textContent = `⚡ Thêm ${newRows.length} nhân viên`;
-      confirmBtn.style.display = 'inline-flex';
-    }
-  } catch(e) {
-    document.getElementById('sync-loading').style.display = 'none';
-    document.getElementById('sync-result').style.display = 'block';
-    document.getElementById('sync-error-box').innerHTML = '✕ Lỗi kết nối nguồn: ' + e.message;
-    document.getElementById('sync-error-box').style.display = 'block';
-  }
-}
-
-async function syncNhanSuRun() {
-  if (!_syncRows.length) return;
-  const btn = document.getElementById('sync-confirm-btn');
-  const statusEl = document.getElementById('sync-nhansu-status');
-  btn.disabled = true;
-  btn.textContent = 'Đang thêm...';
-
-  try {
-    // Parse ngày dd/MM/yyyy → yyyy-MM-dd
-    function parseDate(str) {
-      if (!str) return null;
-      const m = str.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-      return m ? `${m[3]}-${m[2]}-${m[1]}` : null;
-    }
-
-    const toInsert = _syncRows.map(r => ({
-      name:       (r.ho_ten || '').trim(),
-      email:      (r.tai_khoan || '').trim() || null,
-      start_date: parseDate(r.ngay_vao),
-      is_active:  r.trang_thai !== 'Inactive',
-    })).filter(r => r.name);
-
-    // Insert theo batch 50
-    const BATCH = 50;
-    let inserted = 0;
-    for (let i = 0; i < toInsert.length; i += BATCH) {
-      const { error } = await db.from('hr_employees').insert(toInsert.slice(i, i + BATCH));
-      if (error) throw new Error(error.message);
-      inserted += toInsert.slice(i, i + BATCH).length;
-    }
-
-    const now = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-    if (statusEl) statusEl.innerHTML = `<span style="color:#059669">+${inserted} · ${now}</span>`;
-    toast(`✓ Đã thêm ${inserted} nhân viên mới vào hệ thống!`, 'success');
-    closeSyncModal();
-    await loadAll();
-    renderEmp();
-    if (document.getElementById('s-dashboard').classList.contains('active')) renderDash();
-  } catch(e) {
-    document.getElementById('sync-error-box').innerHTML = '✕ Lỗi ghi dữ liệu: ' + e.message;
-    document.getElementById('sync-error-box').style.display = 'block';
-    toast('Sync thất bại: ' + e.message, 'error');
-    btn.disabled = false;
-    btn.textContent = `⚡ Thêm ${_syncRows.length} nhân viên`;
-  }
-}
-
-document.getElementById('modal-sync-nhansu').addEventListener('click', function(e) {
-  if (e.target === this) closeSyncModal();
+  
+  
 });
 </script>

@@ -20,7 +20,7 @@ if (!window.SUPABASE_CONFIG) {
 }
 </script>
 <style>
-/* ===== RESET & BASE ===== */
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -65,15 +65,15 @@ html, body {
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Loại bỏ 300ms tap delay trên toàn bộ app */
+  
   touch-action: manipulation;
-  /* Ngăn iOS text size adjust khi xoay màn hình */
+  
   -webkit-text-size-adjust: 100%;
 }
-/* Tắt highlight xanh khi tap trên iOS */
+
 * { -webkit-tap-highlight-color: transparent; }
 
-/* ===== UTILITIES ===== */
+
 .hidden { display: none !important; }
 .flex { display: flex; }
 .flex-col { flex-direction: column; }
@@ -95,7 +95,7 @@ html, body {
 .mb-2 { margin-bottom: 8px; }
 .space-y > * + * { margin-top: 14px; }
 
-/* ===== ANIMATIONS ===== */
+
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 @keyframes fadeInScale { from { opacity:0; transform:scale(.95); } to { opacity:1; transform:scale(1); } }
@@ -108,7 +108,7 @@ html, body {
 .anim-fade-in { animation: fadeIn .4s ease forwards; }
 .anim-slide-up { animation: slideUp .5s ease forwards; }
 
-/* ===== BUTTONS ===== */
+
 button { cursor: pointer; border: none; font-family: var(--font-body); font-size: 15px; transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition); }
 
 .btn {
@@ -140,11 +140,11 @@ button { cursor: pointer; border: none; font-family: var(--font-body); font-size
 .btn-sm { padding: 8px 16px; font-size: 13px; border-radius: 8px; width: auto; }
 .btn-icon { width: 42px; height: 42px; padding: 0; border-radius: 12px; }
 
-/* ===== INPUTS ===== */
+
 input[type=email], input[type=password], input[type=text], select {
   width: 100%; padding: 13px 16px;
   border: 1.5px solid var(--border); border-radius: 12px;
-  /* 16px: ngưỡng iOS dùng để không zoom khi focus */
+  
   font-size: 16px; font-family: var(--font-body); background: #fff; color: var(--text);
   outline: none; transition: border-color var(--transition), box-shadow var(--transition);
   box-shadow: var(--shadow-sm);
@@ -164,14 +164,14 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 }
 .input-wrap .eye-btn:hover { color: var(--teal); }
 
-/* ===== CARD ===== */
+
 .card {
   background: var(--card); border-radius: var(--radius);
   box-shadow: var(--shadow); border: 1px solid var(--border-light);
 }
 .card-body { padding: 24px; }
 
-/* ===== BADGE ===== */
+
 .badge {
   display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px;
   border-radius: 20px; font-size: 11px; font-weight: 700;
@@ -187,7 +187,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 .badge-done      { background: var(--green-light); color: var(--green); }
 .badge-pending   { background: var(--red-light); color: var(--red); }
 
-/* ===== SPINNER ===== */
+
 .spinner {
   width: 20px; height: 20px;
   border: 2.5px solid rgba(255,255,255,.35); border-top-color: #fff;
@@ -195,7 +195,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 }
 .spinner-teal { border-color: rgba(13,148,136,.2); border-top-color: var(--teal); }
 
-/* ===== TOAST ===== */
+
 #toast {
   position: fixed; bottom: calc(28px + env(safe-area-inset-bottom)); left: 50%;
   transform: translateX(-50%) translateY(90px);
@@ -212,7 +212,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 #toast.error { background: var(--red); }
 #toast.success { background: var(--green); }
 
-/* ===== OVERLAY / MODAL ===== */
+
 .overlay {
   position: fixed; inset: 0; background: rgba(15,23,42,.6);
   z-index: 100; display: flex; align-items: flex-end; justify-content: center;
@@ -245,7 +245,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 }
 .modal h2 { font-size: 19px; font-weight: 700; font-family: var(--font-display); letter-spacing: -.03em; }
 
-/* ===== PROGRESS BAR ===== */
+
 .progress-track { background: rgba(0,0,0,.07); border-radius: 99px; height: 8px; overflow: hidden; }
 .progress-fill {
   background: linear-gradient(90deg, var(--teal) 0%, var(--teal-bright) 100%);
@@ -259,9 +259,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   will-change: transform;
 }
 
-/* =====================================================
-   LOGIN VIEW
-===================================================== */
+
 #view-login {
   min-height: 100dvh; display: flex; align-items: center; justify-content: center;
   padding: 20px; position: relative; overflow: hidden;
@@ -284,7 +282,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   will-change: transform;
 }
 
-/* Login card */
+
 .login-card { width: 100%; max-width: 440px; z-index: 1; animation: slideUp .55s cubic-bezier(.34,1.1,.64,1); }
 
 .login-card .card {
@@ -293,7 +291,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   overflow: hidden; border-radius: 24px;
 }
 
-/* Header */
+
 .login-header {
   text-align: center; padding: 28px 28px 20px;
   background: linear-gradient(175deg, #f0fdfa 0%, rgba(240,253,250,.4) 60%, #fff 100%);
@@ -328,7 +326,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   color: var(--text-muted); font-size: 14px; font-weight: 400; line-height: 1.5;
 }
 
-/* Step labels */
+
 .login-step-label {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: 12px; font-weight: 600; color: var(--teal);
@@ -346,17 +344,17 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   box-shadow: 0 2px 8px rgba(79,70,229,.12);
 }
 
-/* Body */
+
 .login-body { padding: 20px 28px 20px; }
 
-/* Desktop: thu gọn chiều cao thừa khi hiển thị PIN (không có keypad) */
+
 @media (min-width: 640px) {
   [id^="step-pin-"] { padding: 8px 0 !important; min-height: 0 !important; }
   .login-body { padding: 20px 28px 8px; }
   #login-back { margin-top: 4px !important; }
 }
 
-/* Back link */
+
 .back-link {
   display: inline-flex; align-items: center; gap: 6px;
   color: var(--text-muted); font-size: 14px; font-weight: 500;
@@ -365,7 +363,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 }
 .back-link:hover { background: var(--bg-2); color: var(--text); }
 
-/* ===== PIN KEYPAD — REDESIGNED ===== */
+
 @keyframes pinShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
 
 .pin-dots { display: flex; gap: 14px; justify-content: center; margin-bottom: 18px; }
@@ -434,7 +432,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   box-shadow: 0 0 0 4px rgba(13,148,136,.12);
 }
 
-/* Desktop hint - ẩn trên mobile, hiện trên desktop */
+
 .pin-keyboard-hint {
   display: none;
   font-size: 13px; color: var(--text-sub); font-weight: 500;
@@ -444,7 +442,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   .pin-keyboard-hint { display: block; }
 }
 
-/* keypad-inner: hiện mobile, ẩn desktop */
+
 .keypad-inner {
   display: grid;
   grid-template-columns: repeat(3, 62px);
@@ -456,15 +454,13 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   .pin-keyboard-hint { display: block; }
 }
 
-/* pin-desktop-wrap: ẩn mobile, hiện desktop */
+
 .pin-desktop-wrap { display: none; }
 @media (min-width: 640px) {
   .pin-desktop-wrap { display: block; }
 }
 
-/* =====================================================
-   APP HEADER
-===================================================== */
+
 .app-header {
   background: rgba(255,255,255,.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-light);
@@ -502,7 +498,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 }
 .logout-chip:hover { background: var(--red-light); color: var(--red); }
 
-/* ===== BGM TOGGLE BUTTON ===== */
+
 .bgm-btn {
   width: 30px; height: 30px; border-radius: 50%; padding: 0;
   background: none; border: none; cursor: pointer;
@@ -530,7 +526,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   from { transform: scaleY(0.4); }
   to   { transform: scaleY(1);   }
 }
-/* strikethrough line when muted */
+
 .bgm-btn .bgm-mute-line {
   position: absolute; width: 18px; height: 2px;
   background: var(--text-sub); border-radius: 2px;
@@ -539,13 +535,11 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 }
 .bgm-btn.bgm-off .bgm-mute-line { display: block; }
 
-/* =====================================================
-   EMPLOYEE VIEW
-===================================================== */
+
 #view-employee { display: none; flex-direction: column; min-height: 100dvh; }
 .emp-main { flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; padding: 24px 20px; }
 
-/* Hero Progress Card */
+
 .progress-card {
   position: relative; overflow: hidden;
   border-radius: 20px; padding: 28px 28px 24px;
@@ -597,7 +591,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 }
 .progress-ring-label { font-size: 10px; color: rgba(255,255,255,.7); font-weight: 500; text-transform: uppercase; letter-spacing: .06em; margin-top: 2px; }
 
-/* Tabs */
+
 .tabs-section { margin-bottom: 20px; animation: fadeIn .5s .1s both; }
 .tabs-section-label { font-size: 11px; font-weight: 700; color: var(--text-sub); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 12px; }
 .tabs-wrap {
@@ -633,7 +627,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 .tab:hover:not(.active) { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
 .tab:active { transform: scale(.95); }
 
-/* Lesson grid */
+
 .lessons-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
 .lessons-header h3 { font-size: 16px; font-weight: 700; font-family: var(--font-display); letter-spacing: -.03em; }
 .lesson-count { font-size: 12px; color: var(--text-muted); background: var(--bg-2); padding: 3px 10px; border-radius: 99px; font-weight: 600; }
@@ -679,7 +673,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   background: var(--bg-2); padding: 4px 10px; border-radius: 99px; font-weight: 500;
 }
 
-/* Lesson modal */
+
 .timer-chip {
   background: linear-gradient(135deg, var(--teal-light), #e0f2fe);
   color: var(--teal); font-size: 24px; font-family: 'Courier New', monospace;
@@ -716,7 +710,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   .lesson-content th, .lesson-content td { font-size: 12px; padding: 7px 9px; }
 }
 
-/* ===== BLOCK EDITOR (Admin) ===== */
+
 .be-wrap { border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden; background: #fff; }
 .be-toolbar {
   display: flex; align-items: center; gap: 6px; padding: 10px 14px;
@@ -774,7 +768,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 .be-block.type-callout { border-color: rgba(13,148,136,.3); }
 .be-block.type-callout .be-block-header { background: linear-gradient(90deg, var(--teal-light), #e0f2fe); color: var(--teal-dark); border-bottom-color: rgba(13,148,136,.15); }
 .be-block.type-callout .be-block-body { background: linear-gradient(135deg, #f0fdfa, #e0f2fe); }
-/* Table block */
+
 .be-table-editor { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .be-table { border-collapse: collapse; min-width: 100%; width: max-content; font-size: 13px; }
 .be-table th, .be-table td { border: 1.5px solid var(--border); padding: 0; min-width: 80px; }
@@ -801,7 +795,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   font-family: var(--font-body); color: var(--text-muted); transition: transform .15s, opacity .15s, box-shadow .15s;
 }
 .be-tc-btn:hover { border-color: var(--teal); color: var(--teal); }
-/* Image block */
+
 .be-img-drop {
   border: 2px dashed var(--border); border-radius: 10px; padding: 20px;
   text-align: center; cursor: pointer; transition: transform .2s, opacity .2s, box-shadow .2s; background: var(--bg-2);
@@ -816,7 +810,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   border-radius: 7px; border: none; background: rgba(0,0,0,.55); color: #fff;
   font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--font-body);
 }
-/* YouTube block */
+
 .be-yt-input-row { display: flex; gap: 8px; align-items: center; }
 .be-yt-input {
   flex: 1; padding: 9px 13px; border-radius: 9px; border: 1.5px solid var(--border);
@@ -837,14 +831,14 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   background: #fff; font-size: 11px; font-weight: 600; cursor: pointer;
   font-family: var(--font-body); color: var(--text-muted);
 }
-/* Heading block */
+
 .be-heading-input {
   width: 100%; border: none; outline: none; font-size: 17px; font-weight: 800;
   font-family: var(--font-display); color: var(--teal-dark); background: transparent;
   padding: 4px 0; letter-spacing: -.03em;
 }
 .be-heading-input::placeholder { color: var(--text-sub); }
-/* empty state */
+
 .be-empty {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   padding: 32px; color: var(--text-sub); font-size: 13px; gap: 8px;
@@ -852,7 +846,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 }
 .be-empty .be-empty-icon { font-size: 28px; }
 
-/* Grammar Exercise Builder */
+
 .ge-ex-block { background: var(--bg-2); border: 1.5px solid var(--border); border-radius: 10px; padding: 14px; margin-top: 16px; }
 .ge-ex-title { font-size: 13px; font-weight: 700; color: var(--teal); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
 .ge-ex-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
@@ -866,7 +860,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 
 
 
-/* ===== GRAMMAR LESSON — EMPLOYEE VIEW ===== */
+
 .grammar-lesson-content {
   font-size: 15px; line-height: 1.9; color: var(--text);
 }
@@ -935,7 +929,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   font-size: 13px; vertical-align: top; display: table-cell;
   white-space: normal; word-break: break-word;
 }
-/* Trên mobile: nếu table quá nhiều cột thì cho phép scroll ngang */
+
 @media (max-width: 639px) {
   .grammar-lesson-content .table-wrap {
     overflow-x: auto;
@@ -959,7 +953,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 }
 .lesson-content img { max-width: 100%; height: auto; border-radius: 8px; }
 
-/* Grammar exercise - employee */
+
 .grammar-ex-wrap {
   background: linear-gradient(135deg, #f0fdfa, #fff);
   border: 1.5px solid rgba(13,148,136,.2);
@@ -1012,7 +1006,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
   color: var(--red);
 }
 
-/* Reading article styling */
+
 .reading-article { }
 .reading-meta {
   display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
@@ -1041,7 +1035,7 @@ label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7p
 .audio-wrap { background: var(--bg-2); border-radius: 12px; padding: 14px; margin-bottom: 20px; border: 1px solid var(--border-light); }
 audio { width: 100%; }
 
-/* ===== READING QUIZ BUILDER (Admin) ===== */
+
 .rq-question-block {
   background: #fff; border: 1.5px solid var(--border); border-radius: 12px;
   padding: 16px; display: flex; flex-direction: column; gap: 10px;
@@ -1084,7 +1078,7 @@ audio { width: 100%; }
 .rq-add-q-btn:hover { background: var(--teal-light); border-style: solid; }
 .rq-note { font-size: 11px; color: var(--text-muted); background: var(--indigo-light); color: var(--indigo); padding: 7px 12px; border-radius: 8px; }
 
-/* ===== READING QUIZ (Employee) ===== */
+
 .reading-quiz-wrap { margin-top: 28px; border-top: 2px solid var(--border-light); padding-top: 24px; }
 .reading-quiz-header {
   display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;
@@ -1135,16 +1129,14 @@ audio { width: 100%; }
 }
 .rq-retry-btn:hover { background: var(--red); color: #fff; }
 
-/* ===== FILL-IN-THE-BLANK INPUT ===== */
+
 .fillblank-input:focus {
   background: var(--teal-light) !important;
   border-bottom-color: var(--teal-dark) !important;
   box-shadow: 0 2px 0 var(--teal-dark);
 }
 
-/* =====================================================
-   ADMIN VIEW
-===================================================== */
+
 #view-admin { display: none; flex-direction: column; min-height: 100dvh; }
 .admin-main { flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; padding: 28px 20px; }
 
@@ -1207,7 +1199,7 @@ tbody tr:hover { background: var(--teal-glass); }
 .td-email { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 .empty-row td { text-align: center; color: var(--text-muted); padding: 48px; }
 
-/* Select styling */
+
 select {
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
@@ -1216,7 +1208,7 @@ select {
   padding-right: 36px !important;
 }
 
-/* ===== BACK LINK ===== */
+
 .back-link {
   background: none; border: none; color: var(--text-muted); font-size: 14px;
   cursor: pointer; font-family: var(--font-body); font-weight: 500;
@@ -1225,9 +1217,7 @@ select {
 }
 .back-link:hover { color: var(--teal); background: var(--teal-light); }
 
-/* =====================================================
-   RESPONSIVE
-===================================================== */
+
 @media (max-width: 640px) {
   .emp-main, .admin-main { padding: 16px; }
   .tabs-wrap { margin: 0 -16px; padding: 0 16px; }
@@ -1252,10 +1242,10 @@ select {
   .sxp-val  { font-size: 17px; }
   .sxp-lbl  { font-size: 10px; }
 
-  /* Tabs: pill chips scroll ngang */
+  
   .tabs-section { overflow: visible; }
 
-  /* Tables: chuyển sang card layout trên mobile */
+  
   .table-wrap { overflow: visible; box-shadow: none; background: transparent; border: none; }
   .table-wrap table { display: block; min-width: 0; }
   .table-wrap thead { display: none; }
@@ -1281,13 +1271,13 @@ select {
   .table-wrap tbody .empty-row td { justify-content: center; }
   .table-wrap tbody .empty-row td::before { display: none; }
 
-  /* Monthly attendance table: giữ scroll ngang (quá nhiều cột) */
+  
   #monthly-attendance-wrap { overflow-x: auto !important; }
   #monthly-attendance-wrap .att-table { min-width: 600px; }
 
-  /* Table-wrap bên trong card section: padding để card con không sát mép, bottom 12px để không cụt */
+  
   .table-wrap tbody { padding: 12px 12px 12px; }
-  /* Đảm bảo table-wrap trong card section không transparent */
+  
   .table-wrap { background: var(--card) !important; }
 }
 
@@ -1307,7 +1297,7 @@ select {
   .lesson-grid { grid-template-columns: repeat(4, 1fr); }
 }
 
-/* ===== VOCAB FLASHCARDS ===== */
+
 @keyframes cardPop { from { opacity:0; transform:translateY(10px) scale(.95); } to { opacity:1; transform:translateY(0) scale(1); } }
 
 .vocab-card {
@@ -1371,7 +1361,7 @@ select {
 }
 .vocab-back .vocab-phonetic { color: rgba(255,255,255,.85); margin-top: 6px; }
 
-/* Done state for cards (flipped + listened) */
+
 .vocab-card.done .vocab-front {
   border-color: var(--teal);
   background: linear-gradient(180deg, #ffffff 0%, var(--teal-light) 100%);
@@ -1387,7 +1377,7 @@ select {
 }
 .vocab-card.done .vocab-check { display: flex; }
 
-/* Lesson progress bar */
+
 .vocab-progress-wrap {
   display: flex; align-items: center; gap: 10px;
   margin-bottom: 14px;
@@ -1412,13 +1402,13 @@ select {
   opacity: .55; cursor: not-allowed; filter: grayscale(.2);
 }
 
-/* ===== MONTHLY ATTENDANCE GRID ===== */
-/* ===== ATTENDANCE TABLE — Enhanced UI ===== */
+
+
 @keyframes attRowIn { from { opacity:0; transform:translateX(-8px); } to { opacity:1; transform:translateX(0); } }
 @keyframes attCellPop { from { transform:scale(.7); opacity:0; } to { transform:scale(1); opacity:1; } }
 @keyframes attCollapseDown { from { opacity:0; max-height:0; } to { opacity:1; max-height:2000px; } }
 
-/* Section wrapper with collapse */
+
 .att-section-wrap {
   background: #fff;
   border-radius: 20px;
@@ -1430,7 +1420,7 @@ select {
 }
 .att-section-wrap:hover { box-shadow: 0 6px 28px rgba(13,148,136,.11), 0 2px 8px rgba(0,0,0,.06); }
 
-/* Collapse header */
+
 .att-collapse-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 18px 22px;
@@ -1462,7 +1452,7 @@ select {
 .att-section-wrap.collapsed .att-collapse-chevron svg { transform: rotate(-90deg); }
 .att-collapse-chevron:hover { background: rgba(13,148,136,.16); }
 
-/* Collapsible body */
+
 .att-collapse-body {
   overflow: hidden;
   transition: max-height .4s cubic-bezier(.4,0,.2,1), opacity .3s ease;
@@ -1472,7 +1462,7 @@ select {
   max-height: 0; opacity: 0; pointer-events: none;
 }
 
-/* Month filter inside header */
+
 .att-month-input {
   padding: 6px 12px; border-radius: 9px;
   border: 1.5px solid rgba(13,148,136,.2); font-size: 14px;
@@ -1482,13 +1472,13 @@ select {
 }
 .att-month-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.1); }
 
-/* Overflow scroll container */
+
 .att-scroll-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-/* Table */
+
 .att-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px; }
 .att-table th, .att-table td {
   border-right: 1px solid rgba(226,232,240,.7);
@@ -1497,7 +1487,7 @@ select {
 }
 .att-table th:last-child, .att-table td:last-child { border-right: none; }
 
-/* Header row */
+
 .att-table thead th {
   background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
   padding: 10px 4px;
@@ -1527,7 +1517,7 @@ select {
   width: 3px; height: 3px; border-radius: 50%; background: var(--teal);
 }
 
-/* Body rows */
+
 .att-table tbody td {
   padding: 0; height: 38px; vertical-align: middle;
   transition: background .15s;
@@ -1544,7 +1534,7 @@ select {
 .att-table tbody tr:nth-child(even):hover td.td-name { background: var(--teal-glass); }
 .att-table tbody tr:hover td.td-name { background: var(--teal-glass); }
 
-/* Cells */
+
 .att-cell {
   display: flex; align-items: center; justify-content: center; height: 38px;
   font-size: 12px; font-weight: 700; cursor: default;
@@ -1577,11 +1567,11 @@ select {
   background: rgba(239,246,255,.9);
 }
 
-/* Today column highlight */
+
 .att-table tbody td.today-td { background: rgba(13,148,136,.04) !important; }
 .att-table tbody tr:hover td.today-td { background: rgba(13,148,136,.08) !important; }
 
-/* Legend */
+
 .att-legend {
   display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
   padding: 12px 20px; border-top: 1px solid rgba(226,232,240,.7);
@@ -1600,7 +1590,7 @@ select {
 .att-legend-dot.partial { background: linear-gradient(135deg, #fff7ed, #fef3e2); color: #c2410c; border: 1px solid #fed7aa; }
 .att-legend-dot.noclass { background: var(--bg); border: 1px solid var(--border); }
 
-/* Stats chips in header */
+
 .att-stat-chip {
   display: inline-flex; align-items: center; gap: 5px;
   padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
@@ -1609,14 +1599,14 @@ select {
 .att-stat-chip.done { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
 .att-stat-chip.pending { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
 
-/* Loading skeleton */
+
 .skeleton {
   background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
   background-size: 200% auto; animation: shimmer 1.5s ease infinite;
   border-radius: 8px;
 }
 
-/* ===== DAY SCHEDULE TIMELINE ===== */
+
 .day-group {
   margin-bottom: 28px;
 }
@@ -1651,7 +1641,7 @@ select {
   flex: 1; height: 1px; background: var(--border-light);
 }
 
-/* Locked lesson card */
+
 .lesson-card.locked {
   opacity: .6; position: relative; overflow: hidden;
   background: var(--bg-2);
@@ -1686,7 +1676,7 @@ select {
   pointer-events: none;
 }
 
-/* completed lesson card */
+
 .lesson-card.completed {
   border: 1.5px solid rgba(13,148,136,.25);
   background: linear-gradient(135deg, var(--teal-light) 0%, #fff 100%);
@@ -1711,7 +1701,7 @@ select {
   margin-top: 6px;
 }
 
-/* ===== VOCAB MINI-TEST ===== */
+
 .mini-test-wrap {
   animation: fadeIn .35s ease;
 }
@@ -1790,7 +1780,7 @@ select {
 .mini-test-feedback.correct { background: var(--green-light); color: var(--green); }
 .mini-test-feedback.wrong   { background: var(--red-light); color: var(--red); }
 
-/* ===== TYPING MINI-TEST ===== */
+
 .mt-type-card {
   background: linear-gradient(145deg, var(--teal) 0%, #0891b2 100%) !important;
   border-color: transparent !important; box-shadow: var(--shadow-teal) !important;
@@ -1826,12 +1816,12 @@ select {
   font-size: 14px; white-space: nowrap;
 }
 
-/* Review card khi trả lời sai */
+
 .mt-review-wrap {
   animation: fadeIn .3s ease;
 }
 
-/* ===== WELCOME ANIMATION — DUOLINGO STYLE ===== */
+
 @keyframes wFadeIn    { from{opacity:0}               to{opacity:1} }
 @keyframes wFadeOut   { from{opacity:1}               to{opacity:0} }
 @keyframes wSlideUp   { from{opacity:0;transform:translateY(52px) scale(.9)} to{opacity:1;transform:translateY(0) scale(1)} }
@@ -1862,7 +1852,7 @@ select {
   pointer-events: none;
 }
 
-/* Top wave — app teal */
+
 .wv-top-wave {
   position: absolute; top: 0; left: 0; right: 0; height: 38vh; overflow: hidden;
   background: linear-gradient(160deg, var(--teal) 0%, var(--teal-mid) 60%, var(--teal-bright) 100%);
@@ -1874,7 +1864,7 @@ select {
   background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,255,255,.18) 0%, transparent 70%);
 }
 
-/* Main card */
+
 .wv-card {
   position: relative; z-index: 2;
   background: #fff; border-radius: 28px;
@@ -1887,7 +1877,7 @@ select {
   margin-top: 10vh;
 }
 
-/* Mascot */
+
 .wv-mascot-wrap {
   width: 110px; height: 110px; margin: -80px auto 20px;
   position: relative;
@@ -1913,7 +1903,7 @@ select {
   position: relative; z-index: 1;
 }
 
-/* Greeting text */
+
 .wv-greeting {
   font-size: 13px; font-weight: 700; color: var(--teal);
   text-transform: uppercase; letter-spacing: .1em;
@@ -1936,7 +1926,7 @@ select {
 }
 .wv-name em { font-style: normal; color: var(--teal-dark); }
 
-/* Streak badge */
+
 .wv-streak-badge {
   display: inline-flex; align-items: center; gap: 8px;
   background: linear-gradient(135deg, var(--teal-light), #fff);
@@ -1949,7 +1939,7 @@ select {
 .wv-streak-num  { font-size: 20px; font-weight: 800; color: var(--teal-dark); font-family:'Bricolage Grotesque',sans-serif; line-height:1; }
 .wv-streak-lbl  { font-size: 11px; font-weight: 600; color: var(--teal); text-transform: uppercase; letter-spacing:.06em; }
 
-/* XP floating chip */
+
 .wv-xp-chip {
   position: absolute; top: -14px; right: -14px;
   background: linear-gradient(135deg, var(--teal-mid), var(--teal));
@@ -1961,13 +1951,13 @@ select {
   font-family: 'Bricolage Grotesque', sans-serif;
 }
 
-/* Divider */
+
 .wv-divider {
   height: 1px; background: #f3f4f6; margin: 0 0 20px;
   animation: wSubtitleIn .3s ease 1s both;
 }
 
-/* Features list */
+
 .wv-features {
   display: flex; gap: 8px; margin-bottom: 24px;
   animation: wSubtitleIn .4s ease 1.1s both;
@@ -1979,7 +1969,7 @@ select {
 .wv-feat-icon { font-size: 20px; margin-bottom: 4px; }
 .wv-feat-lbl  { font-size: 10px; font-weight: 700; color: var(--teal-dark); text-transform:uppercase; letter-spacing:.05em; line-height:1.3; }
 
-/* CTA Button — app teal, Duolingo 3D style */
+
 .wv-cta {
   width: 100%; padding: 16px; border-radius: 14px; border: none; cursor: pointer;
   background: linear-gradient(180deg, var(--teal-mid) 0%, var(--teal) 100%);
@@ -1998,12 +1988,12 @@ select {
 .wv-cta:hover  { transform: translateY(-2px); box-shadow: 0 7px 0 var(--teal-dark), 0 12px 28px rgba(13,148,136,.45); }
 .wv-cta:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--teal-dark), 0 4px 12px rgba(13,148,136,.3); }
 
-/* Confetti layer */
+
 .wv-confetti-layer { position:absolute; inset:0; pointer-events:none; z-index:1; }
 .wv-confetti-piece { position:absolute; animation: wConfetti linear both; }
 .wv-star-piece     { position:absolute; animation: wStarBurst ease both; }
 
-/* ===== CONFIRM DIALOG ===== */
+
 #confirm-overlay {
   position: fixed; inset: 0; background: rgba(15,23,42,.55);
   z-index: 9000; display: flex; align-items: center; justify-content: center;
@@ -2090,11 +2080,11 @@ select {
   width: 100%; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 700;
   background: linear-gradient(135deg, var(--teal), var(--teal-mid)); color: #fff;
   border: none; cursor: pointer; transition: transform .2s, opacity .2s, box-shadow .2s; box-shadow: var(--shadow-teal);
-  display: none; /* hiện sau khi lật */
+  display: none; 
 }
 .mt-review-confirm:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(13,148,136,.35); }
 
-/* ===== INTRO VIDEO OVERLAY ===== */
+
 #intro-video-overlay {
   position: fixed; inset: 0; z-index: 99998;
   background: #000;
@@ -2107,10 +2097,10 @@ select {
 }
 #intro-video-el {
   width: 100%; height: 100%;
-  object-fit: contain;   /* default: contain để không crop */
+  object-fit: contain;   
   background: #000;
 }
-/* Desktop landscape: cover vừa khít đẹp hơn */
+
 @media (min-width: 640px) and (orientation: landscape) {
   #intro-video-el { object-fit: cover; }
 }
@@ -2127,7 +2117,7 @@ select {
 }
 #intro-skip-btn:hover { background: rgba(255,255,255,.3); transform: scale(1.04); }
 
-/* ===== STREAK / XP PANEL ===== */
+
 .streak-xp-bar {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -2172,7 +2162,7 @@ select {
   50%      { box-shadow: 0 0 0 6px rgba(249,115,22,0); }
 }
 
-/* ===== ATTENDANCE BUTTON (in streak bar) ===== */
+
 .sxp-card.att-card {
   cursor: pointer;
   background: linear-gradient(135deg,var(--teal-light),#ccfaf6);
@@ -2186,7 +2176,7 @@ select {
 }
 .sxp-card.att-card .sxp-val { color: var(--teal-dark); }
 
-/* ===== ATTENDANCE POPUP MODAL ===== */
+
 @keyframes attModalIn  { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes attModalOut { from { transform: translateY(0); } to { transform: translateY(100%); } }
 @keyframes attCellPop  { 0%{transform:scale(0);opacity:0} 70%{transform:scale(1.15)} 100%{transform:scale(1);opacity:1} }
@@ -2214,13 +2204,13 @@ select {
   .att-popup { border-radius: 28px; max-height: 88vh; animation: fadeInScale .3s ease; }
 }
 
-/* drag handle */
+
 .att-popup-handle {
   width: 36px; height: 4px; border-radius: 2px;
   background: #e5e7eb; margin: 10px auto 0; flex-shrink: 0;
 }
 
-/* header */
+
 .att-popup-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 16px 20px 12px; flex-shrink: 0;
@@ -2239,7 +2229,7 @@ select {
 }
 .att-popup-close:hover { background: #e5e7eb; }
 
-/* month nav */
+
 .att-popup-nav {
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 20px 14px; flex-shrink: 0;
@@ -2258,7 +2248,7 @@ select {
   font-family: var(--font-display); letter-spacing: -.02em;
 }
 
-/* stat pills */
+
 .att-popup-stats {
   display: flex; gap: 8px; padding: 0 20px 16px; flex-shrink: 0;
 }
@@ -2277,13 +2267,13 @@ select {
 .att-ps.remain  .att-ps-val { color: #94a3b8; }
 .att-ps-lbl { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; color: #9ca3af; margin-top: 3px; }
 
-/* scrollable calendar body */
+
 .att-popup-body {
   flex: 1; overflow-y: auto; padding: 0 16px 20px;
   -webkit-overflow-scrolling: touch;
 }
 
-/* calendar */
+
 .att-cal-grid {
   display: grid; grid-template-columns: repeat(5,1fr); gap: 5px;
 }
@@ -2305,20 +2295,20 @@ select {
 .att-day:active { transform: scale(.9); }
 .att-day.empty  { visibility: hidden; }
 
-/* weekend — removed (not shown) */
 
-/* future */
+
+
 .att-day.fut-day { background: #f9fafb; border: 2px dashed #e5e7eb; }
 .att-day.fut-day .att-day-num { color: #d1d5db; }
 
-/* no lesson day — grey */
+
 .att-day.no-lesson-day {
   background: #f3f4f6; border-color: #e5e7eb;
   box-shadow: 0 2px 0 #e5e7eb;
 }
 .att-day.no-lesson-day .att-day-num { color: #9ca3af; }
 
-/* present — teal */
+
 .att-day.ok-day {
   background: linear-gradient(180deg, var(--teal-bright) 0%, var(--teal) 100%);
   border-color: var(--teal-dark);
@@ -2332,7 +2322,7 @@ select {
 .att-day.ok-day .att-day-num  { color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.2); }
 .att-day.ok-day .att-day-icon { color: #fff; }
 
-/* absent — red */
+
 .att-day.no-day {
   background: #fff1f2; border-color: #fca5a5;
   box-shadow: 0 3px 0 #fca5a5;
@@ -2340,7 +2330,7 @@ select {
 .att-day.no-day .att-day-num  { color: #ef4444; }
 .att-day.no-day .att-day-icon { color: #ef4444; }
 
-/* today ring */
+
 .att-day.today-day {
   outline: 3px solid var(--teal); outline-offset: 2px;
 }
@@ -2348,7 +2338,7 @@ select {
 .att-day-num  { font-size: 12px; font-weight: 800; line-height: 1; font-family: var(--font-display); }
 .att-day-icon { font-size: 10px; font-weight: 700; line-height: 1; }
 
-/* ===== CLAIM REWARD MODAL ===== */
+
 #claim-reward-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,.55);
   backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
@@ -2393,7 +2383,7 @@ select {
 }
 .claim-close-btn:hover { background: var(--border); }
 
-/* ===== LEADERBOARD MODAL ===== */
+
 #leaderboard-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,.55);
   backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
@@ -2418,7 +2408,7 @@ select {
 .lb-xp     { font-size: 16px; font-weight: 800; color: var(--teal-dark); flex-shrink: 0; }
 .lb-streak-badge { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 99px; padding: 2px 8px; font-size: 11px; font-weight: 700; color: #ea580c; flex-shrink: 0; }
 
-  /* ===== SPEAKING LESSON ===== */
+  
   @keyframes sp-wave {
     0%,100% { transform: scaleY(.3); } 50% { transform: scaleY(1); }
   }
@@ -2443,15 +2433,15 @@ select {
   @media (max-width: 380px) {
     .speaking-sentence-text { font-size: 18px; line-height: 1.55; }
   }
-  /* word-by-word tokens */
+  
   .sp-word { display: inline-block; padding: 2px 1px; border-radius: 4px; transition: all .2s; }
   .sp-word.heard    { color: var(--text-muted); background: var(--bg-2); }
   .sp-word.match    { color: var(--green); font-weight: 800; background: #dcfce7; border-radius:5px; animation: sp-pop .25s ease; }
   .sp-word.wrong    { color: var(--red); font-weight: 800; text-decoration: underline wavy var(--red); background: #fee2e2; border-radius:5px; }
   .sp-word.missed   { color: var(--red); opacity:.55; text-decoration: line-through; }
-  /* interim live preview */
+  
   .sp-interim { font-size:13px; color: var(--teal); min-height:20px; margin:6px 0 2px; font-style:italic; letter-spacing:.01em; }
-  /* waveform */
+  
   .sp-waveform {
     display: flex; align-items: center; justify-content: center;
     gap: 3px; height: 32px; margin: 8px 0;
@@ -2464,7 +2454,7 @@ select {
     opacity: 0; transition: opacity .2s;
   }
   .sp-bar.active { opacity: 1; }
-  /* record button */
+  
   .speaking-record-btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 10px;
     padding: 14px 32px; border-radius: 99px; border: none; cursor: pointer;
@@ -2480,7 +2470,7 @@ select {
     box-shadow: 0 4px 20px rgba(220,38,38,.45);
   }
   .speaking-record-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
-  /* listen sample button */
+  
   .sp-listen-btn {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 7px 16px; border-radius: 99px; border: 1.5px solid var(--border);
@@ -2490,7 +2480,7 @@ select {
   }
   .sp-listen-btn:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-light); }
   .sp-listen-btn.playing { color: var(--teal); border-color: var(--teal); background: var(--teal-light); }
-  /* score ring */
+  
   .sp-score-ring {
     width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 10px;
     display: flex; align-items: center; justify-content: center;
@@ -2522,7 +2512,7 @@ select {
   .speaking-nav-btn:active:not(:disabled) { transform: scale(.95); background: var(--teal-light); border-color: var(--teal); color: var(--teal); }
   .speaking-nav-btn:disabled { opacity: .4; cursor: not-allowed; }
 
-  /* ── Countdown overlay ── */
+  
   .sp-countdown-overlay {
     position: absolute; inset: 0; border-radius: var(--radius);
     background: rgba(255,255,255,.93); backdrop-filter: blur(4px);
@@ -2536,7 +2526,7 @@ select {
   }
   .sp-countdown-label { font-size: 13px; color: var(--text-muted); font-weight: 600; }
 
-  /* ── Mic-ready pulse ring ── */
+  
   @keyframes sp-mic-pulse {
     0%   { box-shadow: 0 0 0 0 rgba(13,148,136,.55); }
     70%  { box-shadow: 0 0 0 14px rgba(13,148,136,0); }
@@ -2546,7 +2536,7 @@ select {
     animation: sp-mic-pulse 1.1s ease-out infinite;
   }
 
-  /* ── iOS/browser warning banner ── */
+  
   .sp-browser-warn {
     display: flex; align-items: flex-start; gap: 10px;
     background: #fff7ed; border: 1.5px solid #fed7aa;
@@ -2555,20 +2545,20 @@ select {
   }
   .sp-browser-warn .sp-warn-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
 
-  /* ── Mobile: bigger tap target ── */
+  
   @media (max-width: 639px) {
     .speaking-record-btn { padding: 16px 28px; font-size: 17px; min-width: 210px; }
     .sp-listen-btn       { padding: 10px 20px; font-size: 14px; }
     .speaking-nav-btn    { padding: 12px 24px; font-size: 14px; }
   }
 
-  /* ── Permission denied state ── */
+  
   .speaking-record-btn.perm-denied {
     background: linear-gradient(135deg, #94a3b8, #cbd5e1);
     box-shadow: none; cursor: not-allowed;
   }
 
-  /* ===== WRITING LESSON (Employee) ===== */
+  
   .writing-lesson-wrap { animation: fadeIn .35s ease; }
   .writing-prompt-card {
     background: linear-gradient(135deg, var(--teal-light) 0%, #f0fdfa 100%);
@@ -2609,7 +2599,7 @@ select {
     font-size: 14px; font-weight: 600; color: var(--green); margin-top: 12px;
   }
 
-  /* ===== VOCAB NOTEBOOK ===== */
+  
   #vocab-nb-tooltip {
     position: fixed; z-index: 8888;
     background: #1e293b; color: #fff; border-radius: 8px;
@@ -2629,7 +2619,7 @@ select {
   }
   #vocab-nb-tooltip:hover { background: #0d9488; }
 
-  /* Notebook modal — bottom sheet popup matching att-popup style */
+  
   #vocab-nb-overlay {
     position: fixed; inset: 0; background: rgba(15,23,42,.5);
     backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
@@ -2651,7 +2641,7 @@ select {
     #vocab-nb-modal { border-radius: 28px; max-height: 88vh; animation: fadeInScale .3s ease; }
   }
 
-  /* drag handle */
+  
   #vocab-nb-modal::before {
     content: ''; display: block;
     width: 36px; height: 4px; border-radius: 2px;
@@ -2679,7 +2669,7 @@ select {
   .vocab-nb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   @media (min-width: 480px) { .vocab-nb-grid { grid-template-columns: repeat(3,1fr); } }
 
-  /* Flashcard in notebook */
+  
   .nb-flashcard {
     background: var(--card); border: 1.5px solid var(--border);
     border-radius: 14px; padding: 16px 14px;
@@ -2703,10 +2693,10 @@ select {
     touch-action: manipulation;
   }
   .nb-flashcard:hover .nb-fc-del { opacity: 1; }
-  /* Always show delete on touch devices */
+  
   @media (pointer: coarse) { .nb-fc-del { opacity: .55; } }
 
-  /* Notebook button in header */
+  
   .nb-header-btn {
     display: inline-flex; align-items: center; gap: 5px;
     padding: 7px 12px; border-radius: 99px; border: 1.5px solid var(--border);
@@ -2724,7 +2714,7 @@ select {
     border: 2px solid #fff; display: none;
   }
 
-  /* Writing Admin section */
+  
   .writing-sub-row {
     background: var(--bg); border: 1.5px solid var(--border-light);
     border-radius: 12px; padding: 14px 16px; margin-bottom: 8px;
@@ -2757,7 +2747,7 @@ select {
   .writing-graded-badge.pass { background: var(--green-light); color: var(--green); }
     .writing-graded-badge.fail { background: var(--red-light); color: var(--red); }
 
-    /* ===== VOCAB NOTEBOOK OVERLAY ===== */
+    
     .vocab-nb-overlay {
       position: fixed; inset: 0; z-index: 7000;
       background: rgba(0,0,0,.5); display: flex; align-items: center; justify-content: center;
@@ -2815,12 +2805,7 @@ select {
     }
     .vocab-nb-tooltip:hover { background: #0f172a; }
 
-  /* =====================================================
-     HOVER GUARD — chỉ áp dụng hover effects trên thiết
-     bị có con trỏ thật (desktop/laptop). Trên mobile
-     (pointer: coarse) không có hover, tránh state "dính"
-     sau khi tap.
-  ===================================================== */
+  
   @media (hover: hover) and (pointer: fine) {
     .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 12px 32px rgba(13,148,136,.35); }
     .btn-outline:hover { border-color: var(--teal); color: var(--teal); box-shadow: var(--shadow); transform: translateY(-1px); }
@@ -2895,10 +2880,10 @@ select {
 </head>
 <body>
 
-<!-- TOAST -->
+
 <div id="toast"></div>
 
-<!-- INTRO VIDEO OVERLAY (shown once after first PIN setup) -->
+
 <div id="intro-video-overlay" class="hidden">
   <video id="intro-video-el" autoplay muted playsinline
     src="https://dubvrtthmopdlyvxjhbw.supabase.co/storage/v1/object/public/image/kling_20260528_VIDEO_Use_the_pr_3706_0.mp4">
@@ -2906,7 +2891,7 @@ select {
   <button id="intro-skip-btn">Bỏ qua →</button>
 </div>
 
-<!-- WELCOME OVERLAY (shown on first PIN login) -->
+
 <div id="welcome-overlay" class="hidden">
   <div class="wv-confetti-layer" id="wv-confetti"></div>
   <div class="wv-top-wave"></div>
@@ -2952,9 +2937,7 @@ select {
   </div>
 </div>
 
-<!-- ============================
-     CONFIRM DIALOG
-============================= -->
+
 <div id="confirm-overlay" class="hidden">
   <div id="confirm-box">
     <div class="confirm-icon-wrap">
@@ -2971,9 +2954,7 @@ select {
   </div>
 </div>
 
-<!-- ============================
-     LOGIN VIEW
-============================= -->
+
 <div id="view-login">
   <div class="login-card">
     <div class="card">
@@ -2997,7 +2978,7 @@ select {
       </div>
       <div class="login-body">
 
-        <!-- STEP: EMAIL -->
+        
         <div id="step-email" class="space-y">
           <div>
             <label for="inp-email">Email</label>
@@ -3009,7 +2990,7 @@ select {
           </button>
         </div>
 
-        <!-- STEP: PASSWORD (admin) -->
+        
         <div id="step-password" class="space-y hidden">
           <div>
             <label for="inp-password">Mật khẩu</label>
@@ -3024,7 +3005,7 @@ select {
           <button class="btn btn-primary" id="btn-pwd-login" onclick="handlePasswordLogin()">Đăng nhập</button>
         </div>
 
-        <!-- STEP: PIN ENTRY -->
+        
         <div id="step-pin-entry" class="hidden" style="display:flex;flex-direction:column;align-items:center;padding:4px 0 8px">
           <div class="pin-dots">
             <div class="pin-dot" id="d0"></div>
@@ -3038,7 +3019,7 @@ select {
           <div class="keypad" id="keypad-entry"></div>
         </div>
 
-        <!-- STEP: PIN CREATE -->
+        
         <div id="step-pin-create" class="hidden" style="display:flex;flex-direction:column;align-items:center;padding:4px 0 8px">
           <div class="pin-dots">
             <div class="pin-dot" id="c0"></div>
@@ -3052,7 +3033,7 @@ select {
           <div class="keypad" id="keypad-create"></div>
         </div>
 
-        <!-- STEP: PIN CONFIRM -->
+        
         <div id="step-pin-confirm" class="hidden" style="display:flex;flex-direction:column;align-items:center;padding:4px 0 8px">
           <div class="pin-dots">
             <div class="pin-dot" id="f0"></div>
@@ -3066,7 +3047,7 @@ select {
           <div class="keypad" id="keypad-confirm"></div>
         </div>
 
-        <!-- BACK BUTTON -->
+        
         <div id="login-back" class="hidden mt-6 text-center">
           <button class="back-link" onclick="goBackToEmail()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
@@ -3079,9 +3060,7 @@ select {
   </div>
 </div>
 
-<!-- ============================
-     EMPLOYEE VIEW
-============================= -->
+
 <div id="view-employee">
   <header class="app-header">
     <div class="app-header-inner">
@@ -3112,7 +3091,7 @@ select {
   </header>
 
   <main class="emp-main">
-    <!-- Progress Hero Card -->
+    
     <div class="progress-card">
       <div class="progress-card-grid">
         <div>
@@ -3137,7 +3116,7 @@ select {
       </div>
     </div>
 
-    <!-- Streak / XP Stats Bar -->
+    
     <div class="streak-xp-bar" id="streak-xp-bar">
       <div class="sxp-card streak-card">
         <div class="sxp-icon">🔥</div>
@@ -3170,7 +3149,7 @@ select {
       </div>
     </div>
 
-    <!-- Tabs Section -->
+    
     <div class="tabs-section">
       <div class="tabs-section-label">Danh mục bài học</div>
       <div class="tabs-wrap">
@@ -3186,7 +3165,7 @@ select {
       </div>
     </div>
 
-    <!-- Lessons header + grid -->
+    
     <div class="lessons-header">
       <h3>Bài học dành cho bạn</h3>
       <span class="lesson-count" id="lesson-count-badge">—</span>
@@ -3200,9 +3179,7 @@ select {
   </main>
 </div>
 
-<!-- ============================
-     CLAIM REWARD MODAL
-============================= -->
+
 <div class="hidden" id="claim-reward-overlay">
   <div class="claim-modal">
     <div class="claim-modal-fire">🎁</div>
@@ -3213,9 +3190,7 @@ select {
   </div>
 </div>
 
-<!-- ============================
-     LEADERBOARD MODAL
-============================= -->
+
 <div class="hidden" id="leaderboard-overlay" onclick="if(event.target===this)closeLeaderboardModal()">
   <div style="background:#fff;border-radius:24px;padding:28px;max-width:480px;width:100%;max-height:80vh;overflow-y:auto;animation:scaleIn .3s cubic-bezier(.34,1.56,.64,1) both">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
@@ -3230,9 +3205,7 @@ select {
   </div>
 </div>
 
-<!-- ============================
-     LESSON MODAL
-============================= -->
+
 <div class="overlay hidden" id="lesson-overlay" onclick="handleOverlayClick(event)">
   <div class="modal" id="lesson-modal">
     <div class="modal-header">
@@ -3270,9 +3243,7 @@ select {
   </div>
 </div>
 
-<!-- ============================
-     ADMIN VIEW
-============================= -->
+
 <div id="view-admin">
   <header class="app-header">
     <div class="app-header-inner">
@@ -3300,7 +3271,7 @@ select {
   </header>
 
   <main class="admin-main">
-    <!-- Admin hero -->
+    
     <div class="admin-hero">
       <div class="admin-hero-inner">
         <div>
@@ -3320,7 +3291,7 @@ select {
       </div>
     </div>
 
-    <!-- Stats -->
+    
     <div class="stats-grid">
       <div class="stat-card blue">
         <div class="stat-label">Tổng nhân viên</div>
@@ -3336,9 +3307,9 @@ select {
       </div>
     </div>
 
-    <!-- Monthly Attendance Grid — Enhanced Collapsible -->
+    
     <div class="att-section-wrap" style="margin-top:28px" id="att-section-outer">
-      <!-- Collapse Header -->
+      
       <div class="att-collapse-header" onclick="toggleAttSection()">
         <div class="att-collapse-header-left">
           <div class="att-collapse-icon-wrap">📅</div>
@@ -3354,7 +3325,7 @@ select {
           </button>
         </div>
       </div>
-      <!-- Collapsible Body -->
+      
       <div class="att-collapse-body">
         <div id="monthly-attendance-wrap" class="att-scroll-wrap">
           <div id="monthly-attendance-grid">
@@ -3364,7 +3335,7 @@ select {
       </div>
     </div>
 
-    <!-- Assign Lessons Section -->
+    
     <div style="margin-top:28px;background:var(--card);border-radius:var(--radius);border:1px solid var(--border-light);box-shadow:var(--shadow);overflow:hidden">
       <div class="table-section-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border-light);margin:0">
         <h2>📚 Phân công bài học theo ngày</h2>
@@ -3391,7 +3362,7 @@ select {
 
 
 
-  <!-- Modal phân công -->
+  
     <div id="assign-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px">
       <div style="background:var(--bg);border-radius:18px;padding:28px;width:100%;max-width:520px;box-shadow:0 24px 64px rgba(0,0,0,.18);max-height:90vh;overflow-y:auto">
         <h3 style="font-size:17px;font-weight:700;margin-bottom:20px">📅 Phân công bài học</h3>
@@ -3420,7 +3391,7 @@ select {
       </div>
     </div>
 
-    <!-- Modal quản lý bài học -->
+    
     <div id="lesson-mgmt-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto">
       <div style="background:var(--bg);border-radius:18px;padding:32px;width:100%;max-width:860px;box-shadow:0 24px 64px rgba(0,0,0,.2);max-height:95vh;overflow-y:auto;margin:auto">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
@@ -3429,13 +3400,13 @@ select {
         </div>
         <div style="display:flex;flex-direction:column;gap:16px">
 
-          <!-- Tiêu đề -->
+          
           <div>
             <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Tiêu đề bài học</label>
             <input type="text" id="lm-title" placeholder="VD: Numbers 1–100" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;background:var(--bg-2)">
           </div>
 
-          <!-- Loại + Thời gian -->
+          
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
             <div>
               <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Loại</label>
@@ -3454,7 +3425,7 @@ select {
             </div>
           </div>
 
-          <!-- VOCAB section -->
+          
           <div id="lm-vocab-section">
             <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Danh sách từ vựng</label>
 
@@ -3471,7 +3442,7 @@ select {
             <div id="lm-vocab-preview" style="margin-top:8px;font-size:12px;color:var(--text-muted)"></div>
           </div>
 
-          <!-- GRAMMAR TOPIC SELECTOR (only shown for GRAMMAR type) -->
+          
           <div id="lm-grammar-topic-row" class="hidden">
             <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Chủ đề ngữ pháp</label>
             <select id="lm-grammar-topic" style="width:100%;margin-top:6px;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;background:var(--bg-2)" onchange="onGrammarTopicChange()">
@@ -3507,11 +3478,11 @@ select {
 
           </div>
 
-          <!-- READING / GRAMMAR section -->
+          
           <div id="lm-content-section" class="hidden">
             <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Nội dung bài học</label>
 
-            <!-- Block Editor -->
+            
             <div id="lm-block-editor-wrap" class="be-wrap" style="margin-top:8px">
               <div class="be-toolbar">
                 <button type="button" class="be-add-btn" onclick="beAddBlock('text')">✦ Đoạn văn</button>
@@ -3529,7 +3500,7 @@ select {
               </div>
             </div>
 
-            <!-- Grammar Exercise Builder -->
+            
             <div id="lm-grammar-ex-section" class="hidden" style="margin-top:14px">
               <div class="ge-ex-block">
                 <div class="ge-ex-title">✏️ Bài tập điền từ (nhân viên sẽ làm)</div>
@@ -3545,11 +3516,11 @@ select {
               </button>
             </div>
 
-            <!-- Hidden textarea to hold serialized content (sent to DB) -->
+            
             <textarea id="lm-content-input" class="hidden"></textarea>
           </div>
 
-          <!-- READING QUIZ BUILDER -->
+          
           <div id="lm-quiz-section" class="hidden">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
               <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin:0">📝 Câu hỏi trắc nghiệm <span style="color:var(--teal);text-transform:none;letter-spacing:0;font-size:11px">(bắt buộc trả lời đúng để hoàn thành)</span></label>
@@ -3561,7 +3532,7 @@ select {
             <button type="button" class="rq-add-q-btn" style="margin-top:12px" onclick="addQuizQuestion()">+ Thêm câu hỏi</button>
           </div>
 
-          <!-- Audio URL (Listening) -->
+          
           <div id="lm-audio-section" class="hidden">
 
             <div style="margin-bottom:14px">
@@ -3584,7 +3555,7 @@ select {
               <div style="margin-top:6px;font-size:11px;color:var(--text-muted)">📌 Nhập transcript vào ô bên trên.</div>
             </div>
 
-            <!-- Preview bài điền từ (admin thấy đáp án) -->
+            
             <div id="lm-fillblank-preview" class="hidden" style="margin-top:14px">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
                 <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin:0">Preview bài điền từ <span style="color:var(--teal);font-size:11px;text-transform:none;letter-spacing:0">(từ được ẩn hiện màu xanh)</span></label>
@@ -3595,9 +3566,9 @@ select {
             </div>
           </div>
 
-            <!-- SPEAKING section -->
+            
             <div id="lm-speaking-section" class="hidden">
-              <!-- How-to box -->
+              
               <div style="background:linear-gradient(135deg,var(--teal-light),#e0f2fe);border:1.5px solid var(--teal-bright);border-radius:12px;padding:14px 16px;margin-bottom:14px">
                 <div style="font-size:12px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🎤 Cách tạo bài Speaking kiểu Duolingo</div>
                 <div style="font-size:13px;color:var(--teal-dark);line-height:1.7">
@@ -3613,7 +3584,7 @@ select {
                 oninput="updateSpeakingPreview()"
                 style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:16px;background:var(--bg-2);font-family:var(--font-body);resize:vertical;line-height:1.8;-webkit-appearance:none;touch-action:manipulation"></textarea>
               <div id="lm-speaking-preview" style="margin-top:8px;font-size:12px;color:var(--text-muted);min-height:18px"></div>
-              <!-- Quick tips -->
+              
               <div style="margin-top:12px;padding:10px 14px;background:var(--bg-2);border-radius:10px;border:1px solid var(--border-light)">
                 <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">💡 Gợi ý theo chủ đề</div>
                 <div style="display:flex;flex-wrap:wrap;gap:6px">
@@ -3625,9 +3596,9 @@ select {
               </div>
             </div>
 
-            <!-- WRITING section -->
+            
             <div id="lm-writing-section" class="hidden">
-              <!-- How-to box -->
+              
               <div style="background:linear-gradient(135deg,var(--teal-light),#f0fdfa);border:1.5px solid var(--teal-bright);border-radius:12px;padding:14px 16px;margin-bottom:14px">
                 <div style="font-size:12px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">✍️ Cách hoạt động của bài Writing</div>
                 <div style="font-size:13px;color:var(--teal-dark);line-height:1.7">
@@ -3663,7 +3634,7 @@ select {
       </div>
     </div>
 
-    <!-- Modal quản lý nhân viên -->
+    
     <div id="emp-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px">
       <div style="background:var(--bg);border-radius:18px;padding:28px;width:100%;max-width:440px;box-shadow:0 24px 64px rgba(0,0,0,.18)">
         <h3 style="font-size:17px;font-weight:700;margin-bottom:20px" id="emp-modal-title">👤 Thêm nhân viên</h3>
@@ -3684,7 +3655,7 @@ select {
       </div>
     </div>
 
-    <!-- Table -->
+    
     <div style="margin-top:28px;background:var(--card);border-radius:var(--radius);border:1px solid var(--border-light);box-shadow:var(--shadow);overflow:hidden">
       <div class="table-section-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border-light);margin:0">
         <h2 style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px" onclick="toggleEmpTable()">
@@ -3711,7 +3682,7 @@ select {
       <div id="emp-pagination"></div>
     </div>
 
-    <!-- Lesson Management Section -->
+    
     <div style="margin-top:36px;margin-bottom:40px;background:var(--card);border-radius:var(--radius);border:1px solid var(--border-light);box-shadow:var(--shadow);overflow:hidden">
       <div class="table-section-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border-light);margin:0">
         <h2>📘 Quản lý bài học</h2>
@@ -3752,26 +3723,11 @@ select {
 const SB_URL = window.SUPABASE_CONFIG['Learning_English_v1.html'].url, SB_KEY = window.SUPABASE_CONFIG['Learning_English_v1.html'].key;
 const sb = supabase.createClient(SB_URL, SB_KEY);
 
-/*
-  ╔══════════════════════════════════════════════════════════════════════════╗
-  ║  MIGRATION: Chạy SQL này trong Supabase SQL Editor                      ║
-  ╠══════════════════════════════════════════════════════════════════════════╣
-  ║  -- ĐỔI UNIQUE CONSTRAINT: từ (user,lesson,date) → (user,lesson,sched)  ║
-  ║  ALTER TABLE lesson_completions                                          ║
-  ║    DROP CONSTRAINT IF EXISTS                                             ║
-  ║    lesson_completions_user_id_lesson_id_date_key;                        ║
-  ║  ALTER TABLE lesson_completions                                          ║
-  ║    DROP CONSTRAINT IF EXISTS                                             ║
-  ║    lesson_completions_user_lesson_sched_key;                             ║
-  ║  ALTER TABLE lesson_completions                                          ║
-  ║    ADD CONSTRAINT lesson_completions_user_lesson_sched_key               ║
-  ║    UNIQUE(user_id, lesson_id, scheduled_date);                           ║
-  ╚══════════════════════════════════════════════════════════════════════════╝
-*/
 
-/* ── Supabase B: bảng nhan_su (HR system) ── */
+
+
 const SB_HR_URL = window.SUPABASE_CONFIG['Learning_English_v1.html'].hr.url, SB_HR_KEY = window.SUPABASE_CONFIG['Learning_English_v1.html'].hr.key;
-// sbHR được tạo lazy trong syncNhanSu() để tránh crash khi chưa điền credentials
+
 
 let currentUser = null;
 let currentUserRec = null;
@@ -3786,11 +3742,11 @@ let elapsedSecs   = 0;
 let adminRows     = [];
 let realtimeChannel = null;
 
-/* ── PAGINATION ── */
+
 const PAGE_SIZE = 7;
 let empPage = 1, assignPage = 1, progressPage = 1, lessonPage = 1;
 let allAssignSchedules = [];
-let allProgressSnapshot = null; // { users, sessions, schedules, completions }
+let allProgressSnapshot = null; 
 
 function renderPagination(containerId, total, currentPage, onGoto) {
   const container = document.getElementById(containerId);
@@ -3799,8 +3755,8 @@ function renderPagination(containerId, total, currentPage, onGoto) {
   if (totalPages <= 1) { container.innerHTML = ''; return; }
   const start = (currentPage - 1) * PAGE_SIZE + 1;
   const end   = Math.min(currentPage * PAGE_SIZE, total);
-  const s = containerId; // use as namespace key via data attr
-  // All sections are now wrapped in cards, pagination is the card footer — just a top border separator
+  const s = containerId; 
+  
   container.style.marginTop = '0';
   container.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid var(--border-light);background:#fff;font-size:13px;color:var(--text-muted)">
@@ -3819,7 +3775,7 @@ window._pgGoto = function(ns, p) {
   else if (ns === 'lesson-pagination')   { lessonPage = p;  renderLessonMgmtPage(); }
 };
 
-/* SESSION / AUTH */
+
 function saveUser(u) { localStorage.setItem('el_user', JSON.stringify(u)); currentUser = u; }
 function loadUser()  { try { return JSON.parse(localStorage.getItem('el_user')); } catch { return null; } }
 function clearSession() { localStorage.removeItem('el_user'); currentUser = null; }
@@ -3833,7 +3789,7 @@ async function logout() {
   resetLoginForm();
 }
 
-/* VIEW ROUTER */
+
 function showView(v) {
   document.getElementById('view-login').style.display    = v === 'login'    ? 'flex'   : 'none';
   document.getElementById('view-employee').style.display = v === 'employee' ? 'flex'   : 'none';
@@ -3852,7 +3808,7 @@ function goTo(role) {
   startBgm();
 }
 
-/* TOAST */
+
 let toastTimer;
 function toast(msg, type = '') {
   const el = document.getElementById('toast');
@@ -3864,7 +3820,7 @@ function toast(msg, type = '') {
 }
 
 
-/* SOUND EFFECTS — Supabase Storage */
+
 const _sfx = {
   correct: new Audio('https://dubvrtthmopdlyvxjhbw.supabase.co/storage/v1/object/public/sound_englearn/correct.mp3'),
   wrong:   new Audio('https://dubvrtthmopdlyvxjhbw.supabase.co/storage/v1/object/public/sound_englearn/wrong.mp3'),
@@ -3879,12 +3835,12 @@ function playWrongSound() {
   try { _sfx.wrong.currentTime = 0; _sfx.wrong.play().catch(()=>{}); } catch(e) {}
 }
 
-/* ===== BACKGROUND MUSIC ===== */
+
 const _bgm = new Audio('https://dubvrtthmopdlyvxjhbw.supabase.co/storage/v1/object/public/sound_englearn/EngLearn%20Drift.mp3');
 _bgm.loop   = true;
 _bgm.volume = 0.35;
 
-let _bgmEnabled = true; // default: bật
+let _bgmEnabled = true; 
 
 function _bgmLoadState() {
   try {
@@ -3913,7 +3869,7 @@ function startBgm() {
   _bgmUpdateButtons();
   if (_bgmEnabled) {
     _bgm.play().catch(() => {
-      // Autoplay blocked → chờ user interaction rồi thử lại
+      
       const resume = () => {
         if (_bgmEnabled) _bgm.play().catch(() => {});
         document.removeEventListener('click', resume);
@@ -3941,7 +3897,7 @@ function stopBgm() {
   _bgm.currentTime = 0;
 }
 
-/* CONFIRM DIALOG */
+
 let _confirmResolve = null;
 function showConfirm({ title = 'Xác nhận', message = '', icon = '🗑️', iconType = 'danger', okText = 'Đồng ý', cancelText = 'Huỷ' } = {}) {
   return new Promise(resolve => {
@@ -3974,7 +3930,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-/* LOGIN: EMAIL STEP */
+
 async function handleEmailNext() {
   const email = document.getElementById('inp-email').value.trim();
   if (!email) return;
@@ -4003,7 +3959,7 @@ async function handleEmailNext() {
   }
 }
 
-/* LOGIN: PASSWORD STEP (ADMIN) */
+
 async function handlePasswordLogin() {
   const email    = document.getElementById('inp-email').value.trim();
   const password = document.getElementById('inp-password').value;
@@ -4026,7 +3982,7 @@ function togglePwd() {
   inp.type = inp.type === 'password' ? 'text' : 'password';
 }
 
-/* LOGIN: PIN STEPS */
+
 const PIN_LEN = 6;
 
 function buildKeypad(containerId, dotPrefix, onOk) {
@@ -4035,9 +3991,9 @@ function buildKeypad(containerId, dotPrefix, onOk) {
   currentPin = '';
   updateDots(dotPrefix);
 
-  // ── Desktop: hidden input bắt phím bàn phím vật lý ──────────────
+  
   const desktopWrap = document.createElement('div');
-  desktopWrap.className = 'pin-desktop-wrap'; // hiện trên desktop, ẩn mobile (CSS)
+  desktopWrap.className = 'pin-desktop-wrap'; 
 
   const inp = document.createElement('input');
   inp.type = 'password';
@@ -4058,7 +4014,7 @@ function buildKeypad(containerId, dotPrefix, onOk) {
   desktopWrap.appendChild(inp);
   wrap.appendChild(desktopWrap);
 
-  // Re-focus khi click vùng login card
+  
   const card = document.querySelector('.login-card');
   if (card && !card._pinFocusAttached) {
     card._pinFocusAttached = true;
@@ -4066,9 +4022,9 @@ function buildKeypad(containerId, dotPrefix, onOk) {
   }
   setTimeout(() => inp.focus(), 80);
 
-  // ── Mobile: keypad tròn ──────────────────────────────────────────
+  
   const keypadWrap = document.createElement('div');
-  keypadWrap.className = 'keypad-inner'; // hiện mobile, ẩn desktop (CSS)
+  keypadWrap.className = 'keypad-inner'; 
 
   [1,2,3,4,5,6,7,8,9].forEach(n => {
     const b = document.createElement('button');
@@ -4110,14 +4066,14 @@ function handlePinEntry() {
     finishLogin(currentUserRec);
   } else {
     toast('Sai mã PIN. Vui lòng thử lại.', 'error');
-    // Shake dots animation
+    
     const dotPrefix = 'd';
     for (let i = 0; i < PIN_LEN; i++) {
       const el = document.getElementById(dotPrefix + i);
       if (el) { el.classList.add('shake'); setTimeout(() => el.classList.remove('shake'), 500); }
     }
     currentPin = ''; setTimeout(() => updateDots('d'), 100);
-    // Clear desktop input nếu có
+    
     const inp = document.querySelector('#keypad-entry input');
     if (inp) inp.value = '';
   }
@@ -4125,23 +4081,23 @@ function handlePinEntry() {
 
 
 function isWeakPin(pin) {
-  // 1. Tất cả cùng 1 số: 111111, 222222...
+  
   if (/^(\d)\1+$/.test(pin)) return 'Mã PIN quá đơn giản (không dùng số lặp lại).';
-  // 2. Tăng dần liên tiếp: 123456, 234567...
+  
   const digits = pin.split('').map(Number);
   const allAsc = digits.every((d, i) => i === 0 || d === digits[i-1] + 1);
   if (allAsc) return 'Mã PIN quá đơn giản (không dùng dãy số tăng dần).';
-  // 3. Giảm dần liên tiếp: 654321, 987654...
+  
   const allDesc = digits.every((d, i) => i === 0 || d === digits[i-1] - 1);
   if (allDesc) return 'Mã PIN quá đơn giản (không dùng dãy số giảm dần).';
-  // 4. Blacklist phổ biến
+  
   const blacklist = ['123456','654321','111111','222222','333333','444444',
     '555555','666666','777777','888888','999999','000000',
     '112233','123123','121212','696969','159159','123321','000123'];
   if (blacklist.includes(pin)) return 'Mã PIN này quá phổ biến, vui lòng chọn mã khác.';
-  // 5. Chỉ có 2 chữ số xen kẽ: 121212, 010101...
+  
   if (new Set(digits).size <= 2) return 'Mã PIN quá đơn giản (cần ít nhất 3 chữ số khác nhau).';
-  return null; // hợp lệ
+  return null; 
 }
 
 function handlePinCreate() {
@@ -4177,7 +4133,7 @@ async function handlePinConfirm() {
   const { error } = await sb.from('users').update({ pin_code: currentPin }).eq('id', currentUserRec.id);
   if (error) { toast('Lỗi lưu PIN.', 'error'); return; }
   currentUserRec.pin_code = currentPin;
-  finishLogin(currentUserRec, true); // first-time PIN → show welcome animation
+  finishLogin(currentUserRec, true); 
 }
 
 async function finishLogin(rec, isNewPin = false) {
@@ -4187,13 +4143,13 @@ async function finishLogin(rec, isNewPin = false) {
   if (isNewPin && u.role === 'EMPLOYEE') {
     document.getElementById('view-login').style.display = 'none';
     showIntroVideo(() => {
-      // Hiển thị welcome screen - user phải bấm "Bắt đầu học!" để tiếp tục
-      // Lúc đó mới grant +10 XP, load data rồi vào employee view
+      
+      
       showWelcomeAnimation(u.name, async () => {
-        // onDone chỉ được gọi khi user BẤM nút "Bắt đầu học!"
-        await grantRegistrationXP(u.id);  // grant XP → insert registration_xp
+        
+        await grantRegistrationXP(u.id);  
         showView('employee');
-        await loadEmployeeData();          // load sau khi XP đã được ghi → hiển thị đúng
+        await loadEmployeeData();          
         startBgm();
       });
     });
@@ -4203,7 +4159,7 @@ async function finishLogin(rec, isNewPin = false) {
 }
 
 
-/* ===== INTRO VIDEO ===== */
+
 function showIntroVideo(onDone) {
   const overlay = document.getElementById('intro-video-overlay');
   const video   = document.getElementById('intro-video-el');
@@ -4231,22 +4187,22 @@ function showIntroVideo(onDone) {
   skipBtn.addEventListener('click', finish);
 }
 
-/* ===== WELCOME ANIMATION ===== */
-/* ===== WELCOME ANIMATION — DUOLINGO STYLE ===== */
+
+
 function showWelcomeAnimation(name, onDone) {
   const overlay  = document.getElementById('welcome-overlay');
   const nameEl   = document.getElementById('wv-name-el');
   const ctaBtn   = document.getElementById('wv-cta-btn');
   const confWrap = document.getElementById('wv-confetti');
 
-  // Personalize greeting with first name
+  
   const firstName = (name || '').split(' ').pop() || name;
   if (nameEl) nameEl.innerHTML = `Xin chào, <em>${firstName}</em>!`;
 
   overlay.classList.remove('hidden');
   overlay.classList.remove('fade-out');
 
-  // ── Confetti ─────────────────────────────────────
+  
   confWrap.innerHTML = '';
   const colors = ['#0d9488','#14b8a6','#2dd4bf','#ffd900','#ff6b6b','#a78bfa','#f0fdfa','#0891b2','#fbbf24'];
   const shapes = ['4px','50%','2px'];
@@ -4265,7 +4221,7 @@ function showWelcomeAnimation(name, onDone) {
     confWrap.appendChild(p);
   }
 
-  // ── Star bursts ───────────────────────────────────
+  
   const starList = ['⭐','✨','💫','🌟'];
   for (let i = 0; i < 10; i++) {
     const s = document.createElement('div');
@@ -4280,7 +4236,7 @@ function showWelcomeAnimation(name, onDone) {
     confWrap.appendChild(s);
   }
 
-  // ── CTA button dismiss ────────────────────────────
+  
   const dismiss = async () => {
     if (ctaBtn) {
       ctaBtn.removeEventListener('click', dismiss);
@@ -4292,11 +4248,11 @@ function showWelcomeAnimation(name, onDone) {
     overlay.classList.add('hidden');
     overlay.classList.remove('fade-out');
     confWrap.innerHTML = '';
-    if (onDone) await onDone(); // await để grantRegistrationXP chạy xong trước khi loadEmployeeData
+    if (onDone) await onDone(); 
   };
 
   if (ctaBtn) ctaBtn.addEventListener('click', dismiss);
-  // Không auto-dismiss: user phải bấm "Bắt đầu học!" để tiếp tục
+  
 }
 
 function showLoginStep(step) {
@@ -4309,7 +4265,7 @@ function showLoginStep(step) {
       if (s.startsWith('pin')) el.style.display = 'flex';
     }
   });
-  // Update step badge in header
+  
   const badge = document.getElementById('login-step-badge');
   const badgeText = document.getElementById('login-step-text');
   const stepLabels = {
@@ -4340,7 +4296,7 @@ function resetLoginForm() {
 
 function goBackToEmail() { resetLoginForm(); }
 
-/* EMPLOYEE: LOAD DATA */
+
 async function loadEmployeeData() {
   const name = currentUser.name;
   document.getElementById('emp-greeting').textContent = 'Chào, ' + name + ' 👋';
@@ -4350,15 +4306,15 @@ async function loadEmployeeData() {
 
   await Promise.all([loadLessons(), loadTodaySessions()]);
   await loadStreakAndXP();
-  // Init attendance chip count (non-blocking)
+  
   refreshAttPopupIfOpen();
 }
 
 async function loadLessons() {
   const today = todayStr();
 
-  // Fetch schedules (lesson_id + date only, no JOIN to avoid RLS issues),
-  // sessions, and completions all in parallel
+  
+  
   const [{ data: rawSchedules }, { data: allSessions }, { data: allCompletions }] = await Promise.all([
     sb.from('lesson_schedules')
       .select('lesson_id, date')
@@ -4373,19 +4329,19 @@ async function loadLessons() {
   ]);
 
   const sessions = allSessions || [];
-  // completionSet: "lesson_id:scheduled_date" — dùng scheduled_date để check đúng ngày bài được giao
-  // fallback về date cho record cũ chưa có scheduled_date
+  
+  
   const completionSet = new Set((allCompletions || []).map(c => `${c.lesson_id}:${c.scheduled_date || c.date}`))
-  // completedAtMap: "lesson_id:scheduled_date" → completed_at (để hiện giờ hoàn thành trên card)
+  
   const completedAtMap = {};
   for (const c of (allCompletions || [])) {
     completedAtMap[`${c.lesson_id}:${c.scheduled_date || c.date}`] = c.completed_at;
   }
 
-  // Collect all unique lesson IDs from schedules so we can fetch lesson details
+  
   const uniqueLessonIds = [...new Set((rawSchedules || []).map(s => s.lesson_id))];
 
-  // Fetch lesson details separately (avoids JOIN/RLS issues)
+  
   let lessonDetailMap = {};
   if (uniqueLessonIds.length) {
     const { data: lessonDetails } = await sb.from('lessons')
@@ -4394,13 +4350,13 @@ async function loadLessons() {
     for (const l of (lessonDetails || [])) lessonDetailMap[l.id] = l;
   }
 
-  // Nhóm schedules theo ngày, enriching with lesson details
+  
   const dayMap = {};
   for (const s of (rawSchedules || [])) {
     const lessonDetail = lessonDetailMap[s.lesson_id];
-    if (!lessonDetail) continue; // lesson not found or no access
+    if (!lessonDetail) continue; 
     if (!dayMap[s.date]) dayMap[s.date] = [];
-    // Avoid duplicates if same lesson is assigned globally + individually
+    
     if (!dayMap[s.date].some(l => l.id === lessonDetail.id)) {
       dayMap[s.date].push(lessonDetail);
     }
@@ -4408,7 +4364,7 @@ async function loadLessons() {
 
   const sortedDates = Object.keys(dayMap).sort();
 
-  // Map: date → Set of completed lesson IDs (theo scheduled_date — ngày bài được giao)
+  
   const completedIdsByDate = {};
   for (const date of sortedDates) {
     completedIdsByDate[date] = new Set(
@@ -4418,9 +4374,9 @@ async function loadLessons() {
     );
   }
 
-  // allLessonsDoneByDate: ngày nào đã hoàn thành TẤT CẢ bài được giao (không cần 15 phút)
-  // dùng completedIdsByDate để check theo scheduled_date chính xác
-  // VD: hoàn thành bài ngày 27 vào ngày 28, scheduled_date=27 → ngày 27 vẫn được tính → bài ngày 28 mở khóa
+  
+  
+  
   const allLessonsDoneByDate = new Set();
   for (const date of sortedDates) {
     const dayLessons = dayMap[date] || [];
@@ -4430,21 +4386,21 @@ async function loadLessons() {
     }
   }
 
-  // completedDates (điểm danh): ≥15 phút HỌC ĐÚNG NGÀY ĐÓ VÀ hoàn thành TẤT CẢ bài được giao đúng ngày
+  
   const completedDates = new Set();
   for (const date of sortedDates) {
-    // Chỉ tính sessions đã kết thúc (ended_at != null) để tránh tính thừa session đang mở
+    
     const daySessions = sessions.filter(s => s.date === date && s.ended_at);
     const totalSec = daySessions.reduce((a, s) => a + (s.duration_seconds || 0), 0);
-    // Điểm danh: ≥15p học ĐÚNG ngày đó VÀ hoàn thành hết bài ĐÚNG ngày đó (scheduled_date = date)
-    // → tránh trường hợp treo giờ ngày 27 nhưng bấm hoàn thành ngày 28
+    
+    
     const dayCompletedIds = completedIdsByDate[date] || new Set();
     const dayLessons = dayMap[date] || [];
     const allLessonsDoneOnSameDay = dayLessons.length > 0 && dayLessons.every(l => dayCompletedIds.has(l.id));
     if (totalSec >= 15 * 60 && allLessonsDoneOnSameDay) completedDates.add(date);
   }
 
-  // Tính lesson IDs đã hoàn thành hôm nay — dùng cho progress bar ngày hôm nay
+  
   const todaySessions = sessions.filter(s => s.date === today);
   const completedLessonIds = completedIdsByDate[today] || new Set();
 
@@ -4453,19 +4409,19 @@ async function loadLessons() {
     const isToday  = date === today;
     const isPast   = date < today;
 
-    // prevAllDone: ngày trước đã hoàn thành hết bài (không cần 15 phút) — dùng để mở khóa
+    
     const prevAllDone = prevDate ? allLessonsDoneByDate.has(prevDate) : true;
 
-    // Unlock: ngày hiện tại phải khớp với hôm nay HOẶC đã qua, VÀ ngày trước hoàn thành hết bài
+    
     const unlocked = (isToday || isPast) && prevAllDone;
 
-    // Với ngày hôm nay: check completion theo ngày hôm nay
-    // Với ngày đã qua: check completion đúng ngày đó (không dùng anyDate để tránh nhầm bài trùng lesson_id)
+    
+    
     const dayCompletedLessonIds = isToday
       ? completedLessonIds
       : completedIdsByDate[date] || new Set();
 
-    // Tính tổng thời gian học đúng ngày đó (chỉ sessions đã kết thúc)
+    
     const daySessions = sessions.filter(s => s.date === date && s.ended_at);
     const totalSec = daySessions.reduce((a, s) => a + (s.duration_seconds || 0), 0);
     const dayCompletedIds = completedIdsByDate[date] || new Set();
@@ -4489,7 +4445,7 @@ async function loadLessons() {
     };
   });
 
-  // Chỉ hiển thị bài học đã được phân công — không fallback load tất cả
+  
   allLessons = allScheduleDays.flatMap(d => d.lessons);
 
   renderLessons();
@@ -4505,14 +4461,14 @@ async function loadTodaySessions() {
 
 function updateProgress(sessions) {
   const totalSec = sessions.reduce((a, s) => a + (s.duration_seconds || 0), 0);
-  // Cộng thêm thời gian đang học dở nếu có
+  
   const liveExtra = activeSession ? elapsedSecs : 0;
   const finalSec = totalSec + liveExtra;
   const mins = Math.floor(finalSec / 60);
   const secs = finalSec % 60;
   const pct  = Math.min(100, (finalSec / (15 * 60)) * 100);
 
-  // Hiển thị giây khi chưa đủ 1 phút
+  
   const label = mins > 0
     ? `${mins} phút ${secs > 0 ? secs + ' giây' : ''} / 15 phút`
     : finalSec > 0
@@ -4526,7 +4482,7 @@ function updateProgress(sessions) {
   if (pctEl) pctEl.textContent = Math.round(pct) + '%';
 }
 
-/* EMPLOYEE: LESSON RENDER */
+
 function switchTab(btn) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
@@ -4545,10 +4501,10 @@ function renderLessons() {
   const grid = document.getElementById('lesson-grid');
   const typeEmoji = { READING:'📖', LISTENING:'🎧', VOCAB:'📝', GRAMMAR:'⚙️', SPEAKING:'🎤', WRITING:'✍️' };
 
-  // Timeline mode: nhóm theo ngày
+  
   const today = todayStr();
 
-  // Lọc theo tab nếu cần
+  
   let days = allScheduleDays;
   if (currentTab !== 'ALL') {
     days = days.map(d => ({ ...d, lessons: d.lessons.filter(l => l.type === currentTab) }))
@@ -4572,7 +4528,7 @@ function renderLessons() {
   }
 
   grid.innerHTML = days.map(day => {
-    // Day header badge
+    
     let dotClass = 'locked', badgeHtml = '';
     if (day.isToday && day.isDone) {
       dotClass = 'past';
@@ -4605,7 +4561,7 @@ function renderLessons() {
       const isLocked    = !day.unlocked;
 
       if (isLocked) {
-        // Xác định lý do khóa
+        
         let lockMsg = '';
         if (day.isFuture) {
           lockMsg = `Bài học sẽ mở vào ${formatDateVi(day.date)}`;
@@ -4652,7 +4608,7 @@ function renderLessons() {
       return `
         <div class="lesson-card">
           <div class="lesson-meta">
-            <span class="badge badge-${l.type.toLowerCase()}">${typeEmoji[l.type]||''} ${l.type}</span>
+            <span class="badge badge-${l.type.toLowerCase()}">${typeEmoji[[l.type]||''} ${l.type}</span>
             <span class="lesson-duration"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${l.duration_estimate} phút</span>
           </div>
           <div class="lesson-title">${esc(l.title)}</div>
@@ -4765,15 +4721,15 @@ function openLessonModal(lesson, alreadyCompleted) {
       endLabel.textContent = 'Kết thúc bài học';
     }
   } else if (lesson.type === 'LISTENING') {
-    // LISTENING is handled below after audio setup — skip generic render
+    
     contentEl.innerHTML = '';
     hintEl.classList.add('hidden');
     endBtn.disabled = false;
     endLabel.textContent = 'Kết thúc bài học';
   } else {
-    // Smart render: nếu content là plain text (không có HTML tags) thì auto-format đẹp
+    
     const raw = lesson.content || '';
-    // GRAMMAR type: parse JSON {html, exercise}
+    
     if (lesson.type === 'GRAMMAR') {
       let grammarHtml = '';
       let grammarExercise = null;
@@ -4784,9 +4740,9 @@ function openLessonModal(lesson, alreadyCompleted) {
       } catch {
         grammarHtml = raw;
       }
-      // Render Grammar content beautifully
+      
       contentEl.innerHTML = `<div class="grammar-lesson-content lesson-content">${wrapTables(renderYTEmbeds(grammarHtml))}</div>`;
-      // Render exercise if present AND lock end button until done
+      
       if (grammarExercise && grammarExercise.items && grammarExercise.items.length > 0) {
         hintEl.classList.remove('hidden');
         hintEl.textContent = '✏️ Đọc lý thuyết xong, hãy làm bài tập bên dưới để hoàn thành!';
@@ -4794,12 +4750,12 @@ function openLessonModal(lesson, alreadyCompleted) {
         endLabel.textContent = 'Làm bài tập trước';
         setTimeout(() => renderGrammarExercise(grammarExercise), 100);
       } else {
-        // No exercise → still require scrolling through content before finishing
+        
         hintEl.classList.add('hidden');
         endBtn.disabled = false;
         endLabel.textContent = 'Kết thúc bài học';
       }
-      // *** CRITICAL: return here so READING code below doesn't overwrite ***
+      
       document.getElementById('modal-audio').classList.add('hidden');
       document.getElementById('modal-audio-inner').innerHTML = '';
       document.getElementById('lesson-overlay').classList.remove('hidden');
@@ -4816,13 +4772,13 @@ function openLessonModal(lesson, alreadyCompleted) {
           readingText = parsed.text || '';
           readingQuestions = parsed.questions || [];
         }
-      } catch { /* plain text, no quiz */ }
+      } catch {  }
     }
 
-    const isHtml = /<[a-z][\s\S]*>/i.test(readingText);
+    const isHtml = /<[[a-z][[\s\S]*>/i.test(readingText);
 
     if (!isHtml && lesson.type === 'READING') {
-      // Auto-format plain text thành bài đọc đẹp
+      
       const paragraphs = readingText.split(/\n{2,}|\n/).map(s => s.trim()).filter(Boolean);
       const wordCount  = readingText.trim().split(/\s+/).length;
       const readMins   = Math.max(1, Math.round(wordCount / 200));
@@ -4830,7 +4786,7 @@ function openLessonModal(lesson, alreadyCompleted) {
       const longestNearMid = paragraphs
         .slice(Math.max(0, midIdx - 1), midIdx + 2)
         .reduce((a, b) => a.length > b.length ? a : b, '');
-      const highlightSentence = longestNearMid.match(/[^.!?]+[.!?]/)?.[1] || '';
+      const highlightSentence = longestNearMid.match(/[[^.!?]+[[.!?]/)?.[1] || '';
       const renderedParas = paragraphs.map((p, i) => {
         if (i === midIdx && highlightSentence.length > 40) {
           return `<p>${esc(p)}</p><div class="reading-highlight">"${esc(highlightSentence.trim())}"</div>`;
@@ -4850,7 +4806,7 @@ function openLessonModal(lesson, alreadyCompleted) {
       contentEl.innerHTML = `<div class="lesson-content">${wrapTables(renderYTEmbeds(readingText))}</div>`;
     }
 
-    // Render reading quiz if present
+    
     if (lesson.type === 'READING' && readingQuestions.length > 0) {
       hintEl.classList.remove('hidden');
       hintEl.textContent = '📝 Đọc xong hãy trả lời đúng tất cả câu hỏi bên dưới để hoàn thành bài học!';
@@ -4869,7 +4825,7 @@ function openLessonModal(lesson, alreadyCompleted) {
   if (lesson.audio_url) {
     const ytId = extractYouTubeId(lesson.audio_url);
     if (ytId) {
-      const endMatch = lesson.audio_url.match(/[#&]t=([0-9]+)/);
+      const endMatch = lesson.audio_url.match(/[[#&]t=([[0-9]+)/);
       const endSecs = endMatch ? parseInt(endMatch[1]) : 0;
       audioInner.innerHTML = buildYTAudioPlayer(ytId, endSecs);
       initYTAudioPlayer(ytId, endSecs);
@@ -4882,7 +4838,7 @@ function openLessonModal(lesson, alreadyCompleted) {
     audioInner.innerHTML = '';
   }
 
-  // For LISTENING: render fill-in-the-blank exercise
+  
   if (lesson.type === 'LISTENING') {
     try {
       const parsed = JSON.parse(lesson.content || '{}');
@@ -4893,7 +4849,7 @@ function openLessonModal(lesson, alreadyCompleted) {
         endLabel.textContent = 'Điền từ và kiểm tra trước';
         renderFillBlankExercise(parsed);
       } else if (parsed.transcript) {
-        // Has transcript but no blanks generated — show as text
+        
         contentEl.innerHTML = `<div style="background:var(--bg-2);border-radius:10px;padding:16px;font-size:14px;line-height:1.8;color:var(--text-muted);font-style:italic">${esc(parsed.transcript).replace(/\n/g,'<br>')}</div>`;
         hintEl.classList.add('hidden');
         endBtn.disabled = false;
@@ -4910,7 +4866,7 @@ function openLessonModal(lesson, alreadyCompleted) {
     }
   }
 
-    // SPEAKING lesson
+    
     if (lesson.type === 'SPEAKING') {
       document.getElementById('modal-audio').classList.add('hidden');
       document.getElementById('modal-audio-inner').innerHTML = '';
@@ -4935,7 +4891,7 @@ function openLessonModal(lesson, alreadyCompleted) {
       endLabel.textContent = 'Kết thúc bài học';
     }
 
-    // WRITING lesson
+    
     if (lesson.type === 'WRITING') {
       document.getElementById('modal-audio').classList.add('hidden');
       document.getElementById('modal-audio-inner').innerHTML = '';
@@ -4978,17 +4934,17 @@ function openLessonModal(lesson, alreadyCompleted) {
   document.body.style.overflow = 'hidden';
 }
 
-let currentLessonCompleted = false; // set to true when this lesson was already in lesson_completions
+let currentLessonCompleted = false; 
 
 function closeLessonModal() {
   document.getElementById('lesson-overlay').classList.add('hidden');
   document.body.style.overflow = '';
-  if (_bgmEnabled) _bgm.play().catch(() => {});  // bật lại nhạc nền khi thoát bài học
+  if (_bgmEnabled) _bgm.play().catch(() => {});  
 }
 
 function tryCloseLessonModal() {
   if (currentLessonCompleted) {
-    // Bài đã hoàn thành trước rồi (Học lại) → tắt ngay, không cần kiểm tra vocab
+    
     stopTimer();
     if (activeSession) {
       sb.from('learning_sessions').update({
@@ -4998,7 +4954,7 @@ function tryCloseLessonModal() {
     }
     window.vocabProgress = null; window.readingQuiz = null; window._fillBlankState = null;
     window.miniTest = null; window._speakingState = null; window._writingState = null;
-    // Dọn dẹp speaking nếu đang chạy
+    
     if (window._activeRecognition) { try { window._activeRecognition.abort(); } catch(e){} window._activeRecognition = null; }
     if (window._activeRecognitionTimeout) { clearTimeout(window._activeRecognitionTimeout); window._activeRecognitionTimeout = null; }
     if (window._spCountdownTimer) { clearInterval(window._spCountdownTimer); window._spCountdownTimer = null; }
@@ -5006,7 +4962,7 @@ function tryCloseLessonModal() {
     closeLessonModal();
     loadTodaySessions();
   } else {
-    // Bài chưa hoàn thành → vẫn cho phép đóng (chỉ lưu session, không ghi nhận hoàn thành)
+    
     stopTimer();
     if (activeSession) {
       sb.from('learning_sessions').update({
@@ -5037,7 +4993,7 @@ function handleOverlayClick(e) {
       }
       window.vocabProgress = null; window.readingQuiz = null; window._fillBlankState = null;
       window.miniTest = null; window._speakingState = null; window._writingState = null;
-      // Dọn dẹp speaking nếu đang chạy
+      
       if (window._activeRecognition) { try { window._activeRecognition.abort(); } catch(e){} window._activeRecognition = null; }
       if (window._activeRecognitionTimeout) { clearTimeout(window._activeRecognitionTimeout); window._activeRecognitionTimeout = null; }
       if (window._spCountdownTimer) { clearInterval(window._spCountdownTimer); window._spCountdownTimer = null; }
@@ -5045,7 +5001,7 @@ function handleOverlayClick(e) {
       closeLessonModal();
       loadTodaySessions();
     } else {
-      // Bài chưa hoàn thành → vẫn cho phép đóng khi click overlay (chỉ lưu session, không ghi nhận hoàn thành)
+      
       stopTimer();
       if (activeSession) {
         sb.from('learning_sessions').update({
@@ -5068,7 +5024,7 @@ function handleOverlayClick(e) {
 async function endLesson() {
   if (!activeSession) return;
 
-  // Completion check: must flip every vocab card, then complete mini-test
+  
   const vp = window.vocabProgress;
   if (vp && vp.total > 0) {
     const done = vp.flipped.filter(Boolean).length;
@@ -5082,14 +5038,14 @@ async function endLesson() {
       }
       return;
     }
-    // Nếu mini-test vẫn đang chạy → chưa được kết thúc
+    
     if (window.miniTest && window.miniTest.queue.length > 0) {
       toast(`Hãy hoàn thành mini-test trước! Còn ${window.miniTest.queue.length} câu trong hàng đợi.`, 'error');
       return;
     }
   }
 
-  // Completion check: reading quiz must be answered all correct
+  
   const rq = window.readingQuiz;
   if (rq) {
     const unanswered = rq.submitted.filter(x => !x).length;
@@ -5105,7 +5061,7 @@ async function endLesson() {
     }
   }
 
-  // Completion check: fill-blank must be fully correct
+  
   const fb = window._fillBlankState;
   if (fb && !fb.passed) {
     toast('Hãy điền đúng tất cả từ còn thiếu trước khi hoàn thành!', 'error');
@@ -5119,22 +5075,22 @@ async function endLesson() {
   btn.innerHTML = '<div class="spinner"></div>';
 
   const lessonId = activeSession.lesson.id;
-  const dateStr  = activeSession.scheduledDate || todayStr(); // ghi đúng ngày bài được giao
+  const dateStr  = activeSession.scheduledDate || todayStr(); 
   const today    = todayStr();
 
-  // 1. Cập nhật learning_sessions
+  
   await sb.from('learning_sessions').update({
     ended_at: new Date().toISOString(), duration_seconds: elapsedSecs
   }).eq('id', activeSession.id);
 
-  // 2. Ghi nhận hoàn thành bài học — dùng insert thay vì upsert để tránh lỗi constraint
+  
   const { error: compErr } = await sb.from('lesson_completions').insert({
     user_id: currentUser.id, lesson_id: lessonId,
-    date: today,                // ngày thực tế hoàn thành
-    scheduled_date: dateStr,    // ngày bài được giao (từ lesson_schedules)
+    date: today,                
+    scheduled_date: dateStr,    
     completed_at: new Date().toISOString()
   });
-  // Bỏ qua lỗi duplicate (đã hoàn thành rồi bấm Học lại thêm lần nữa)
+  
   if (compErr && compErr.code !== '23505') {
     console.error('[lesson_completions] insert error:', compErr.code, compErr.message);
   }
@@ -5146,18 +5102,18 @@ async function endLesson() {
   activeSession = null;
   window.vocabProgress = null; window.readingQuiz = null; window._fillBlankState = null;
   window.miniTest = null; window._speakingState = null; window._writingState = null;
-  // Dọn dẹp speaking nếu đang chạy
+  
   if (window._activeRecognition) { try { window._activeRecognition.abort(); } catch(e){} window._activeRecognition = null; }
   if (window._activeRecognitionTimeout) { clearTimeout(window._activeRecognitionTimeout); window._activeRecognitionTimeout = null; }
   if (window._spCountdownTimer) { clearInterval(window._spCountdownTimer); window._spCountdownTimer = null; }
   if (window.speechSynthesis) window.speechSynthesis.cancel();
   toast('🎉 Tuyệt vời! Bạn đã hoàn thành bài học.', 'success');
   await loadTodaySessions();
-  await loadLessons(); // refresh trạng thái mở khóa + rebuild allScheduleDays với data mới nhất
-  await checkAndUpdateAttendance(); // điểm danh & tính streak — PHẢI await để allScheduleDays đã sẵn sàng
+  await loadLessons(); 
+  await checkAndUpdateAttendance(); 
 }
 
-// Update vocab progress UI + khi xong hết thẻ thì chuyển sang mini-test
+
 function updateVocabProgressUI() {
   const vp = window.vocabProgress;
   if (!vp) return;
@@ -5168,7 +5124,7 @@ function updateVocabProgressUI() {
   const lab2  = document.getElementById('btn-end-lesson-label');
   if (fill)  fill.style.width = (vp.total ? (done/vp.total*100) : 0) + '%';
   if (label) label.textContent = `${done} / ${vp.total}`;
-  // Mark per-card done state
+  
   vp.flipped.forEach((f,i) => {
     const c = document.querySelector(`.vocab-card[data-idx="${i}"]`);
     if (!c) return;
@@ -5176,7 +5132,7 @@ function updateVocabProgressUI() {
   });
   if (btn && lab2) {
     if (done >= vp.total && vp.total > 0 && !window.miniTest) {
-      // Tất cả thẻ đã lật xong → chuyển sang giai đoạn mini-test
+      
       btn.disabled = true;
       lab2.textContent = 'Đang vào mini-test...';
       setTimeout(() => startVocabMiniTest(vp.words), 600);
@@ -5187,7 +5143,7 @@ function updateVocabProgressUI() {
   }
 }
 
-/* ===== VOCAB MINI-TEST ===== */
+
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -5198,7 +5154,7 @@ function shuffle(arr) {
 }
 
 function startVocabMiniTest(words) {
-  // Each word randomly gets qtype: 'choice' or 'type'
+  
   const queue = shuffle([...words]).map(w => ({
     ...w,
     qtype: Math.random() < 0.5 ? 'choice' : 'type'
@@ -5318,7 +5274,7 @@ function submitTypingAnswer() {
   if (!inp) return;
   const current = mt.queue[0];
   const typed = inp.value.trim().toLowerCase();
-  const correct = current.word.replace(/\s*\([^)]*\)\s*/g, '').trim().toLowerCase();
+  const correct = current.word.replace(/\s*\([[^)]*\)\s*/g, '').trim().toLowerCase();
   const isCorrect = typed === correct;
   const feedbackEl = document.getElementById('mini-test-feedback');
   inp.disabled = true;
@@ -5338,11 +5294,11 @@ function submitTypingAnswer() {
     if (lab2) lab2.textContent = `Mini-test (${mt.total - mt.queue.length}/${mt.total})`;
     setTimeout(renderMiniTestQuestion, 900);
   } else {
-    // Đưa câu sai về cuối hàng chờ, đổi sang choice
+    
     const wrongWord = mt.queue.shift();
     mt.queue.push({ ...wrongWord, qtype: 'choice' });
     playWrongSound();
-    // Hiện review card để lật thẻ
+    
     showWrongReview(wrongWord, feedbackEl);
   }
 }
@@ -5374,16 +5330,16 @@ function handleMiniTestAnswer(btn, chosen, correct) {
     setTimeout(renderMiniTestQuestion, 900);
   } else {
     btn.classList.add('wrong');
-    // Đưa câu sai về cuối hàng chờ
+    
     const wrongWord = mt.queue.shift();
     mt.queue.push({ ...wrongWord, qtype: 'choice' });
     playWrongSound();
-    // Hiện review card
+    
     showWrongReview(wrongWord, feedbackEl);
   }
 }
 
-// Hiện thẻ vocab để user lật xem rồi xác nhận "Đã nhớ rồi"
+
 function showWrongReview(word, feedbackEl) {
   const contentEl = document.getElementById('modal-content');
   if (!contentEl) return;
@@ -5432,7 +5388,7 @@ function confirmReview() {
   renderMiniTestQuestion();
 }
 
-// Autosave mỗi 10 giây khi đang học dở
+
 let autosaveInterval = null;
 async function autosaveSession() {
   if (!activeSession || elapsedSecs === 0) return;
@@ -5450,11 +5406,11 @@ function startTimer() {
     const m = Math.floor(elapsedSecs / 60);
     const s = elapsedSecs % 60;
     document.getElementById('modal-timer').textContent = m + ':' + String(s).padStart(2,'0');
-    // Cập nhật progress bar từ cache local, không fetch DB mỗi giây
+    
     updateProgress(window._todaySessions || []);
   }, 1000);
 
-  // Autosave mỗi 10 giây phòng tắt tab đột ngột
+  
   autosaveInterval = setInterval(autosaveSession, 10000);
 }
 
@@ -5463,8 +5419,8 @@ function stopTimer() {
   clearInterval(autosaveInterval);
 }
 
-// Helper: flush session về DB bằng keepalive PATCH (không xóa activeSession)
-// sendBeacon chỉ hỗ trợ POST → Supabase REST cần PATCH → dùng fetch keepalive
+
+
 function _saveSession(andClose = false) {
   if (!activeSession) return;
   const url  = `${SB_URL}/rest/v1/learning_sessions?id=eq.${activeSession.id}`;
@@ -5476,27 +5432,27 @@ function _saveSession(andClose = false) {
   if (andClose) activeSession = null;
 }
 
-// Lưu khi user tắt tab / đóng trình duyệt → đóng session hẳn
+
 window.addEventListener('beforeunload', () => { stopTimer(); _saveSession(true); });
 
-// Chuyển tab / app bị background → pause timer + lưu duration, GIỮ activeSession để resume
-// Quay lại tab → resume timer từ chỗ cũ
+
+
 document.addEventListener('visibilitychange', () => {
   if (!activeSession) return;
   if (document.hidden) {
-    // Tab bị ẩn: dừng timer, lưu duration hiện tại (chưa đóng session)
+    
     stopTimer();
     _saveSession(false);
   } else {
-    // Tab active trở lại: tiếp tục đếm từ elapsedSecs hiện tại
+    
     startTimer();
   }
 });
 
-// Fallback cho Safari iOS (pagehide = đóng hẳn)
+
 window.addEventListener('pagehide', () => { stopTimer(); _saveSession(true); });
 
-/* ADMIN: LOAD DATA */
+
 async function loadAdminData() {
   
 
@@ -5505,9 +5461,9 @@ async function loadAdminData() {
   tbody.innerHTML = '<tr class="empty-row"><td colspan="3"><div style="display:flex;align-items:center;justify-content:center;gap:10px"><div class="spinner spinner-teal"></div> Đang tải dữ liệu...</div></td></tr>';
 
 
-  // Init monthly attendance
+  
   const maFilter = document.getElementById('attendance-month-filter');
-  // Restore collapse state
+  
   try {
     const attWrap = document.getElementById('att-section-outer');
     if (attWrap && localStorage.getItem('att_collapsed') === '1') attWrap.classList.add('collapsed');
@@ -5531,7 +5487,7 @@ async function loadAdminData() {
   const sessions  = sessRes.data || [];
   const employees = users || [];
   const allTodaySchedules = todaySchedules || [];
-  // Build completions map: user_id → Set of completed lesson_ids today
+  
   const completionsByUser = {};
   for (const c of (todayCompletions || [])) {
     if (!completionsByUser[c.user_id]) completionsByUser[c.user_id] = new Set();
@@ -5543,13 +5499,13 @@ async function loadAdminData() {
     const totalS = mine.reduce((a,s) => a + (s.duration_seconds || 0), 0);
     const mins   = Math.floor(totalS / 60);
     const timeOk = mins >= 15;
-    // Lessons assigned to this employee = globally assigned (user_id null) + user-specific
+    
     const scheduledLessonIds = [...new Set(
       allTodaySchedules
         .filter(s => s.user_id === null || s.user_id === u.id)
         .map(s => s.lesson_id)
     )];
-    // Check if ALL scheduled lessons are completed
+    
     const userCompletions = completionsByUser[u.id] || new Set();
     const allLessonsDone = scheduledLessonIds.length > 0
       && scheduledLessonIds.every(lid => userCompletions.has(lid));
@@ -5626,7 +5582,7 @@ async function resetPinCode(id, name) {
   await loadAdminData();
 }
 
-/* ADMIN: ASSIGN LESSONS */
+
 let allLessonsAdmin = [];
 let allUsersAdmin   = [];
 
@@ -5640,7 +5596,7 @@ async function loadAssignData() {
   allLessonsAdmin = lessons || [];
   allUsersAdmin   = users   || [];
 
-  // Also refresh lesson management table
+  
   allLessonsMgmt = lessons ? await sb.from('lessons').select('*').order('created_at',{ascending:false}).then(r=>r.data||[]) : [];
   const lmTbody = document.getElementById('lessons-mgmt-tbody');
   if (lmTbody) loadLessonsMgmt();
@@ -5685,14 +5641,14 @@ async function openAssignModal() {
   const dateVal = todayStr();
   document.getElementById('assign-date').value = dateVal;
 
-  // Reset search và filter mỗi lần mở
+  
   _assignTypeFilter = 'ALL';
   const searchEl = document.getElementById('assign-search');
   if (searchEl) searchEl.value = '';
 
   document.getElementById('assign-modal').classList.remove('hidden');
 
-  // Fetch lại schedules từ Supabase để tránh cache cũ
+  
   const { data: freshSchedules } = await sb
     .from('lesson_schedules')
     .select('*,lessons(title,type)')
@@ -5750,7 +5706,7 @@ function _buildAssignTypeTabs(types) {
 }
 
 function renderAssignLessonList(date) {
-  // Collect lesson IDs already assigned on this date
+  
   const assignedIds = new Set(
     allAssignSchedules
       .filter(s => s.date === date)
@@ -5759,16 +5715,16 @@ function renderAssignLessonList(date) {
 
   let available = allLessonsAdmin.filter(l => !assignedIds.has(l.id));
 
-  // Build type tabs based on available lessons
+  
   const presentTypes = [...new Set(available.map(l => l.type))].filter(Boolean).sort();
   _buildAssignTypeTabs(presentTypes);
 
-  // Filter by type
+  
   if (_assignTypeFilter !== 'ALL') {
     available = available.filter(l => l.type === _assignTypeFilter);
   }
 
-  // Filter by search
+  
   const q = (document.getElementById('assign-search')?.value || '').trim().toLowerCase();
   if (q) available = available.filter(l => l.title.toLowerCase().includes(q));
 
@@ -5803,7 +5759,7 @@ function renderAssignLessonList(date) {
   }).join('');
 }
 
-/* EMPLOYEE TABLE COLLAPSE */
+
 let empTableOpen = true;
 function toggleEmpTable() {
   empTableOpen = !empTableOpen;
@@ -5814,7 +5770,7 @@ function toggleEmpTable() {
 }
 
 
-/* ADMIN: MONTHLY ATTENDANCE GRID */
+
 async function loadMonthlyAttendance(monthStr) {
   const grid = document.getElementById('monthly-attendance-grid');
   if (!grid || !monthStr) return;
@@ -5830,7 +5786,7 @@ async function loadMonthlyAttendance(monthStr) {
 
   const [{ data: users }, { data: schedules }, { data: sessions }, { data: completions }] = await Promise.all([
     sb.from('users').select('id,name').eq('role','EMPLOYEE').order('name'),
-    // Fetch ALL schedules (both global user_id=null and user-specific) for the month
+    
     sb.from('lesson_schedules').select('lesson_id,date,user_id').gte('date', firstDay).lte('date', lastDay),
     sb.from('learning_sessions').select('user_id,date,duration_seconds').gte('date', firstDay).lte('date', lastDay),
     sb.from('lesson_completions').select('user_id,lesson_id,date').gte('date', firstDay).lte('date', lastDay)
@@ -5843,14 +5799,14 @@ async function loadMonthlyAttendance(monthStr) {
 
   const allSchedules = schedules || [];
 
-  // Build sessions time map: user_id+date → total seconds
+  
   const sessionMap = {};
   for (const s of (sessions || [])) {
     const key = s.user_id + ':' + s.date;
     sessionMap[key] = (sessionMap[key] || 0) + (s.duration_seconds || 0);
   }
 
-  // Build completions map: user_id+date → Set of lesson_ids
+  
   const compMap = {};
   for (const c of (completions || [])) {
     const key = c.user_id + ':' + c.date;
@@ -5858,11 +5814,11 @@ async function loadMonthlyAttendance(monthStr) {
     compMap[key].add(c.lesson_id);
   }
 
-  // Build header — all days of the month
+  
   const days = [];
   for (let d = 1; d <= daysInMonth; d++) {
     const dateStr = `${monthStr}-${String(d).padStart(2,'0')}`;
-    const dow = new Date(year, month - 1, d).getDay(); // 0=Sun,6=Sat
+    const dow = new Date(year, month - 1, d).getDay(); 
     days.push({ d, dateStr, dow, dayName: dayNames[dow] });
   }
 
@@ -5880,7 +5836,7 @@ async function loadMonthlyAttendance(monthStr) {
       const isToday   = dateStr === today;
       const todayCls  = isToday ? ' today-td' : '';
 
-      // Per-employee scheduled lessons = global (null) + user-specific
+      
       const scheduled = [...new Set(
         allSchedules
           .filter(s => s.date === dateStr && (s.user_id === null || s.user_id === u.id))
@@ -5917,7 +5873,7 @@ async function loadMonthlyAttendance(monthStr) {
     return `<tr style="animation-delay:${uIdx * 0.03}s"><td class="td-name">${esc(u.name)}</td>${cells}</tr>`;
   }).join('');
 
-  // Update subtitle
+  
   const sub = document.getElementById('att-subtitle');
   if (sub) {
     const doneCount = users.reduce((acc, u) => {
@@ -5950,7 +5906,7 @@ async function loadMonthlyAttendance(monthStr) {
     </div>
   `;
 
-  // Reset scroll to the beginning (day 1) so all columns are visible from left
+  
   const wrap = document.getElementById('monthly-attendance-wrap');
   if (wrap) wrap.scrollLeft = 0;
 }
@@ -5966,7 +5922,7 @@ async function saveAssign() {
   const selectedLessons = [...document.querySelectorAll('.assign-lesson-cb:checked')].map(c => parseInt(c.value));
   if (!selectedLessons.length) { toast('Vui lòng chọn ít nhất một bài học!', 'error'); return; }
 
-  // Always assign to all employees (user_id = null means everyone)
+  
   const rows = selectedLessons.map(lid => ({ date, lesson_id: lid, user_id: null }));
 
   const { error } = await sb.from('lesson_schedules').insert(rows);
@@ -5985,7 +5941,7 @@ async function deleteAssign(id) {
   });
   if (!ok1) return;
 
-  // 1. Fetch the schedule row to get lesson_id + date
+  
   const { data: schedRow, error: fetchErr } = await sb
     .from('lesson_schedules').select('lesson_id, date').eq('id', id).maybeSingle();
   if (fetchErr || !schedRow) {
@@ -5993,35 +5949,35 @@ async function deleteAssign(id) {
   }
   const { lesson_id, date } = schedRow;
 
-  // 2. Delete learning_sessions for this lesson on this date
+  
   await sb.from('learning_sessions')
     .delete()
     .eq('lesson_id', lesson_id)
     .eq('date', date);
 
-  // 3. Delete lesson_completions for this lesson on this date
+  
   await sb.from('lesson_completions')
     .delete()
     .eq('lesson_id', lesson_id)
     .eq('date', date);
 
-  // 4. Delete daily_attendance for affected users on this date
+  
   await sb.from('daily_attendance')
     .delete()
     .eq('date', date);
 
-  // 5. Delete streak_rewards earned on this date
+  
   await sb.from('streak_rewards')
     .delete()
     .eq('awarded_at', date);
 
-  // 6. Delete writing_submissions for this lesson on this date
+  
   await sb.from('writing_submissions')
     .delete()
     .eq('lesson_id', lesson_id)
     .eq('scheduled_date', date);
 
-  // 7. Delete the schedule row itself
+  
   const { error } = await sb.from('lesson_schedules').delete().eq('id', id);
   if (error) { toast('Lỗi xoá phân công: ' + error.message, 'error'); return; }
 
@@ -6029,7 +5985,7 @@ async function deleteAssign(id) {
   await loadAssignData();
 }
 
-/* ADMIN: REALTIME */
+
 function subscribeRealtime() {
   if (realtimeChannel) sb.removeChannel(realtimeChannel);
   realtimeChannel = sb.channel('admin-sessions')
@@ -6038,7 +5994,7 @@ function subscribeRealtime() {
     }).subscribe();
 }
 
-/* ADMIN: CSV EXPORT */
+
 function exportCSV() {
   if (!adminRows.length) { toast('Không có dữ liệu để xuất.', 'error'); return; }
   const rows = [
@@ -6058,7 +6014,7 @@ function exportCSV() {
 }
 
 
-/* ADMIN: EMPLOYEE CRUD */
+
 let editingEmpId = null;
 
 function openEmpModal(id) {
@@ -6110,7 +6066,7 @@ async function deleteEmployee(id, name) {
   await loadAdminData();
 }
 
-/* ADMIN: LESSON MANAGEMENT */
+
 let allLessonsMgmt = [];
 let editingLessonId = null;
 
@@ -6174,12 +6130,12 @@ function renderLessonMgmtPage() {
     return;
   }
 
-  // Apply type filter
+  
   let filtered = _lessonMgmtTypeFilter === 'ALL'
     ? allLessonsMgmt
     : allLessonsMgmt.filter(l => l.type === _lessonMgmtTypeFilter);
 
-  // Apply search filter
+  
   const q = (document.getElementById('lesson-mgmt-search')?.value || '').trim().toLowerCase();
   if (q) filtered = filtered.filter(l => l.title.toLowerCase().includes(q));
 
@@ -6202,7 +6158,7 @@ function renderLessonMgmtPage() {
       try { const words = JSON.parse(l.content); preview = `${words.length} từ vựng`; }
       catch { preview = 'Nội dung cũ'; }
     } else if (l.content) {
-      const stripped = l.content.replace(/<[^>]+>/g, '').trim();
+      const stripped = l.content.replace(/<[[^>]+>/g, '').trim();
       preview = stripped.length > 50 ? stripped.slice(0, 50) + '…' : stripped;
     }
     return `
@@ -6223,7 +6179,7 @@ function renderLessonMgmtPage() {
   renderPagination('lesson-pagination', total, lessonPage);
 }
 
-/* ── Browser / platform helpers ─────────────────────────────────────────── */
+
 function _isIOS() {
   return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 }
@@ -6236,7 +6192,7 @@ function _isIOSFirefox() {
 function _isSamsungBrowser() {
   return /SamsungBrowser/.test(navigator.userAgent);
 }
-/* Returns true when Web Speech API is reliably available */
+
 function _speechSupported() {
   return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 }
@@ -6245,7 +6201,7 @@ function getBestEnglishVoice() {
   if (!window.speechSynthesis) return null;
   const voices = window.speechSynthesis.getVoices();
   if (!voices.length) return null;
-  // Priority list: best Neural/Natural voices first
+  
   const preferred = [
     'Microsoft Aria Online (Natural) - English (United States)',
     'Microsoft Jenny Online (Natural) - English (United States)',
@@ -6260,7 +6216,7 @@ function getBestEnglishVoice() {
     const v = voices.find(v => v.name === name);
     if (v) return v;
   }
-  // Fallback: any online English voice (online = Neural quality)
+  
   return voices.find(v => v.lang === 'en-US' && v.name.toLowerCase().includes('online'))
       || voices.find(v => v.lang === 'en-US' && !v.localService)
       || voices.find(v => v.lang === 'en-US')
@@ -6270,7 +6226,7 @@ function getBestEnglishVoice() {
 function speakWord(word, btn, idx) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
-  const clean = word.replace(/\s*\([^)]*\)\s*/g, '').trim();
+  const clean = word.replace(/\s*\([[^)]*\)\s*/g, '').trim();
   const utt = new SpeechSynthesisUtterance(clean);
   utt.lang = 'en-US';
   utt.rate = 0.85;
@@ -6286,14 +6242,14 @@ function speakWord(word, btn, idx) {
     window.speechSynthesis.speak(utt);
   };
 
-  // Voices may not be loaded yet on first call
+  
   if (window.speechSynthesis.getVoices().length) {
     trySpeak();
   } else {
     window.speechSynthesis.onvoiceschanged = () => { trySpeak(); };
   }
 
-  // Duolingo-style: mark this word as "listened"
+  
   if (typeof idx === 'number' && window.vocabProgress) {
     window.vocabProgress.listened[idx] = true;
     updateVocabProgressUI();
@@ -6302,7 +6258,7 @@ function speakWord(word, btn, idx) {
 
 function flipVocabCard(e, card, word, idx) {
   card.classList.toggle('flipped');
-  // Only mark as flipped/seen — do NOT auto-play audio. Employee must press 🔊 to listen.
+  
   if (typeof idx === 'number' && window.vocabProgress) {
     window.vocabProgress.flipped[idx] = true;
     updateVocabProgressUI();
@@ -6314,7 +6270,7 @@ async function importVocabFromExcel(input) {
   if (!file) return;
   input.value = '';
   try {
-    // Dynamically load SheetJS if not present
+    
     if (!window.XLSX) {
       await new Promise((res, rej) => {
         const s = document.createElement('script');
@@ -6331,7 +6287,7 @@ async function importVocabFromExcel(input) {
     const lines = [];
     for (const row of rows) {
       const word     = String(row[0] || '').trim();
-      // If row has 3 cols, treat as: word | phonetic | meaning. Else word | meaning.
+      
       const phonetic = String(row[1] || '').trim();
       const meaning  = String(row[2] || '').trim() || phonetic;
       const realPhonetic = String(row[2] || '').trim() ? phonetic : '';
@@ -6356,7 +6312,7 @@ async function importVocabFromExcel(input) {
   }
 }
 
-/* ===== AI VOCAB GENERATOR ===== */
+
 async function generateVocabWithAI() {
   toast("Tính năng AI đã bị gỡ khỏi hệ thống.", "error");
 }
@@ -6375,7 +6331,7 @@ function onLessonTypeChange() {
   const toggleBtn = document.getElementById('lm-toggle-ex-btn');
   if (exSection && !isGrammar) exSection.classList.add('hidden');
   if (toggleBtn) toggleBtn.classList.toggle('hidden', !isGrammar);
-  // Show/hide grammar topic row
+  
   const topicRow = document.getElementById('lm-grammar-topic-row');
   if (topicRow) topicRow.classList.toggle('hidden', !isGrammar);
 }
@@ -6383,14 +6339,14 @@ function onLessonTypeChange() {
 function onGrammarTopicChange() {
   const topic = document.getElementById('lm-grammar-topic')?.value;
   if (!topic) return;
-  // Auto-fill title if empty
+  
   const titleEl = document.getElementById('lm-title');
   if (titleEl && !titleEl.value.trim()) {
     titleEl.value = 'Grammar: ' + topic;
   }
 }
 
-// Live preview đếm số từ
+
 document.addEventListener('DOMContentLoaded', () => {
   const ta = document.getElementById('lm-vocab-input');
   if (ta) ta.addEventListener('input', updateVocabPreview);
@@ -6494,7 +6450,7 @@ function openLessonMgmtModal(id) {
         document.getElementById('lm-vocab-input').value = '';
       }
     } else if (l.type === 'READING') {
-      // Try to parse as {text, questions} or plain string
+      
       try {
         const parsed = JSON.parse(l.content || '{}');
         if (parsed.text !== undefined) {
@@ -6509,7 +6465,7 @@ function openLessonMgmtModal(id) {
         loadQuizQuestionsIntoBuilder([]);
       }
     } else if (l.type === 'LISTENING') {
-      // Parse content as {transcript, blanks} or plain string
+      
       try {
         const parsed = JSON.parse(l.content || '{}');
         document.getElementById('lm-transcript-input').value = parsed.transcript || '';
@@ -6541,7 +6497,7 @@ function openLessonMgmtModal(id) {
         document.getElementById('lm-writing-prompt').value = '';
       }
     } else {
-      // GRAMMAR: load into rich editor + exercise
+      
       try {
         const parsed = JSON.parse(l.content || '{}');
         geSetContent(parsed.html || '');
@@ -6585,7 +6541,7 @@ function closeLessonMgmtModal() {
   document.getElementById('lm-grammar-ex-section')?.classList.add('hidden');
   const btn = document.getElementById('lm-toggle-ex-btn');
   if (btn) btn.textContent = '✏️ Thêm bài tập';
-  // Reset grammar topic
+  
   const topicEl = document.getElementById('lm-grammar-topic');
   if (topicEl) topicEl.value = '';
   const grammarStatus = document.getElementById('lm-ai-grammar-status');
@@ -6619,7 +6575,7 @@ async function saveLessonMgmt() {
   } else if (type === 'READING') {
     const html = geGetContent();
     const questions = collectQuizQuestions();
-    if (questions === null) return; // validation failed
+    if (questions === null) return; 
     content = JSON.stringify({ text: html, questions });
   } else if (type === 'GRAMMAR') {
     const html = geGetContent();
@@ -6674,17 +6630,17 @@ async function deleteLessonMgmt(id, title) {
   await loadAssignData();
 }
 
-/* ===== AI QUIZ GENERATOR (Reading) ===== */
+
 async function generateQuizWithAI() {
   toast("Tính năng AI đã bị gỡ khỏi hệ thống.", "error");
 }
 
-/* ===== AI GRAMMAR LESSON GENERATOR ===== */
+
 async function generateGrammarWithAI() {
   toast("Tính năng AI đã bị gỡ khỏi hệ thống.", "error");
 }
 
-/* ===== QUIZ BUILDER (Admin) ===== */
+
 let quizQuestionCount = 0;
 
 function clearQuizBuilder() {
@@ -6743,7 +6699,7 @@ function loadQuizQuestionsIntoBuilder(questions) {
 
 function collectQuizQuestions() {
   const blocks = document.querySelectorAll('#lm-quiz-questions .rq-question-block');
-  if (blocks.length === 0) return []; // No questions is OK (no quiz)
+  if (blocks.length === 0) return [[]; // No questions is OK (no quiz)
   const questions = [];
   for (const block of blocks) {
     const question = block.querySelector('.rq-q-input').value.trim();
@@ -6758,14 +6714,14 @@ function collectQuizQuestions() {
   return questions;
 }
 
-/* ===== READING QUIZ PLAYER (Employee) ===== */
+
 window.readingQuiz = null; window._fillBlankState = null;
 
 function renderReadingQuiz(questions) {
   if (!questions || !questions.length) return;
   window.readingQuiz = {
     questions,
-    answers: new Array(questions.length).fill(null), // null = unanswered
+    answers: new Array(questions.length).fill(null), 
     submitted: new Array(questions.length).fill(false),
   };
 
@@ -6807,7 +6763,7 @@ function answerReadingQuestion(qi, oi, correctIndex) {
   rq.answers[qi] = oi;
 
   const isCorrect = oi === correctIndex;
-  // Disable all options for this question
+  
   for (let i = 0; i < rq.questions[qi].options.length; i++) {
     const btn = document.getElementById(`rq-opt-${qi}-${i}`);
     if (btn) {
@@ -6850,7 +6806,7 @@ function updateReadingQuizState() {
     return;
   }
 
-  // All answered
+  
   const allCorrect = correct === total;
   const resultArea = document.getElementById('rq-result-area');
   if (resultArea && resultArea.style.display === 'none') {
@@ -6881,10 +6837,10 @@ function updateReadingQuizState() {
 function retryReadingQuiz() {
   const rq = window.readingQuiz;
   if (!rq) return;
-  // Reset state
+  
   rq.answers = new Array(rq.questions.length).fill(null);
   rq.submitted = new Array(rq.questions.length).fill(false);
-  // Re-render quiz portion
+  
   const container = document.getElementById('reading-quiz-container');
   if (container) {
     container.remove();
@@ -6892,8 +6848,8 @@ function retryReadingQuiz() {
   renderReadingQuiz(rq.questions);
 }
 
-/* ===== YOUTUBE HELPER ===== */
-/* ===== YOUTUBE AUDIO-ONLY PLAYER ===== */
+
+
 function buildYTAudioPlayer(ytId, endSecs) {
   const dur = endSecs > 0 ? formatTime(endSecs) : '??:??';
   return `
@@ -6949,7 +6905,7 @@ let _ytPlayer = null, _ytEndSecs = 0, _ytTimer = null;
 
 function initYTAudioPlayer(ytId, endSecs) {
   _ytEndSecs = endSecs;
-  // Load YT IFrame API if not loaded
+  
   if (!window.YT || !window.YT.Player) {
     const tag = document.createElement('script');
     tag.src = 'https://www.youtube.com/iframe_api';
@@ -6980,7 +6936,7 @@ function _createYTPlayer(ytId, endSecs) {
         const pa = document.getElementById('yt-pause-icon');
         if (pi) pi.style.display = playing ? 'none' : 'block';
         if (pa) pa.style.display = playing ? 'block' : 'none';
-        // Auto-stop at end time
+        
         if (e.data === YT.PlayerState.ENDED || (endSecs > 0 && e.data === YT.PlayerState.PAUSED && _ytPlayer.getCurrentTime() >= endSecs - 0.5)) {
           _ytPlayer.pauseVideo();
           _ytPlayer.seekTo(0);
@@ -6995,7 +6951,7 @@ function _ytTick(endSecs) {
   try {
     const cur = _ytPlayer.getCurrentTime();
     const dur = endSecs > 0 ? endSecs : _ytPlayer.getDuration();
-    // Stop at end
+    
     if (endSecs > 0 && cur >= endSecs) {
       _ytPlayer.pauseVideo();
       _ytPlayer.seekTo(0);
@@ -7046,10 +7002,10 @@ function formatTime(secs) {
 function extractYouTubeId(url) {
   if (!url) return null;
   const patterns = [
-    /[?&]v=([^&#]+)/,
-    /youtu\.be\/([^?&#]+)/,
-    /youtube\.com\/embed\/([^?&#]+)/,
-    /youtube\.com\/shorts\/([^?&#]+)/,
+    /[[?&]v=([[^&#]+)/,
+    /youtu\.be\/([[^?&#]+)/,
+    /youtube\.com\/embed\/([[^?&#]+)/,
+    /youtube\.com\/shorts\/([[^?&#]+)/,
   ];
   for (const p of patterns) {
     const m = url.match(p);
@@ -7100,7 +7056,7 @@ function onAudioUrlInput(val) {
   }
 }
 
-/* ===== FILL-IN-THE-BLANK ADMIN ===== */
+
 window._fillBlankData = null;
 
 async function generateFillBlank() {
@@ -7120,7 +7076,7 @@ function showFillBlankPreview(data) {
   if (!section || !content || !answerKey) return;
   section.classList.remove('hidden');
 
-  // Build preview HTML with highlighted blanks
+  
   const html = (data.segments || []).map(seg => {
     if (seg.blank) {
       return `<span style="display:inline-block;background:rgba(13,148,136,.12);color:var(--teal);border:1.5px solid var(--teal-bright);border-radius:6px;padding:1px 10px;font-weight:700;margin:2px">${esc(seg.answer)}</span>`;
@@ -7129,7 +7085,7 @@ function showFillBlankPreview(data) {
   }).join('');
   content.innerHTML = html;
 
-  // Answer key
+  
   const blanks = data.blanks || [];
   answerKey.innerHTML = `<strong>📋 Đáp án (${blanks.length} từ):</strong> ${blanks.map((b,i) => `<span style="display:inline-block;background:#dcfce7;border-radius:4px;padding:2px 8px;margin:2px;font-weight:600">${i+1}. ${esc(b)}</span>`).join('')}`;
 }
@@ -7144,9 +7100,9 @@ window._fillBlankState = null;
 
 function renderFillBlankExercise(data) {
   const contentEl = document.getElementById('modal-content');
-  const segments = data.segments || [];
+  const segments = data.segments || [[];
   let blankIdx = 0;
-  const blanks = data.blanks || [];
+  const blanks = data.blanks || [[];
   window._fillBlankState = { blanks, userAnswers: new Array(blanks.length).fill(''), checked: false };
 
   const html = segments.map(seg => {
@@ -7427,8 +7383,8 @@ function beRenderAll() {
         <textarea class="be-callout-input" data-be-key="${key}-callout" placeholder="Nhập nội dung callout / ghi chú quan trọng..." oninput="beUpdateBlockData(${idx},'content',this.value)">${esc(block.data.content || '')}</textarea>
       </div>`;
     } else if (block.type === 'table') {
-      const hdrs = block.data.headers || [];
-      const rows = block.data.rows || [];
+      const hdrs = block.data.headers || [[];
+      const rows = block.data.rows || [[];
       let tbl = `<div class="be-block-body"><div class="be-table-editor"><table class="be-table"><thead><tr>`;
       hdrs.forEach((h, c) => {
         tbl += `<th><input type="text" value="${esc(h)}" placeholder="Cột ${c+1}" data-be-key="${key}-h${c}" oninput="beUpdateTableCell(${idx},-1,${c},this.value,true)"></th>`;
@@ -7487,7 +7443,7 @@ function beRenderAll() {
 
     el.innerHTML = header + body;
 
-    // Hidden file input for image blocks
+    
     if (block.type === 'image') {
       const inp = document.createElement('input');
       inp.type = 'file'; inp.accept = 'image/*'; inp.className = 'hidden';
@@ -7499,7 +7455,7 @@ function beRenderAll() {
     container.appendChild(el);
   });
 
-  // Restore focus
+  
   if (focusKey) {
     const restored = container.querySelector(`[data-be-key="${focusKey}"]`);
     if (restored) {
@@ -7538,16 +7494,16 @@ function beChangeYT(idx) {
   beRenderAll();
 }
 
-// Paste image into image blocks
+
 document.addEventListener('paste', function(e) {
   const items = e.clipboardData?.items;
   if (!items) return;
   for (const item of items) {
     if (item.type.startsWith('image/')) {
-      // Find last image block or add one
+      
       let imgIdx = _beBlocks.map((b,i)=>b.type==='image'?i:-1).filter(i=>i>=0).pop();
       if (imgIdx === undefined || _beBlocks[imgIdx]?.data.src) {
-        // Add new image block
+        
         beAddBlock('image');
         imgIdx = _beBlocks.length - 1;
       }
@@ -7559,11 +7515,11 @@ document.addEventListener('paste', function(e) {
   }
 });
 
-/* Serialize blocks to HTML for storage */
+
 function beBlocksToHtml(blocks) {
   return (blocks || _beBlocks).map(b => {
     if (b.type === 'text') {
-      // Convert newlines to <br> wrapped in <p>
+      
       const paras = (b.data.content || '').split(/\n\n+/).map(p => p.trim()).filter(Boolean);
       if (!paras.length) return '';
       return paras.map(p => `<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
@@ -7592,7 +7548,7 @@ function beHtmlToBlocks(html) {
   const root = doc.querySelector('div');
   if (!root) return [];
 
-  // Group consecutive <p>/<br> runs into text blocks, others as own blocks
+  
   let textBuf = [];
 
   function flushText() {
@@ -7603,7 +7559,7 @@ function beHtmlToBlocks(html) {
   }
 
   root.childNodes.forEach(node => {
-    if (node.nodeType === 3) { // text node
+    if (node.nodeType === 3) { 
       const t = node.textContent.trim();
       if (t) textBuf.push(t);
       return;
@@ -7612,7 +7568,7 @@ function beHtmlToBlocks(html) {
     if (!tag) return;
 
     if (tag === 'p') {
-      textBuf.push(node.innerHTML.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g,''));
+      textBuf.push(node.innerHTML.replace(/<br\s*\/?>/gi, '\n').replace(/<[[^>]+>/g,''));
     } else if (tag === 'h2' || tag === 'h3') {
       flushText();
       blocks.push({ type: 'heading', data: { content: node.textContent || '' }, id: Date.now() + Math.random() });
@@ -7640,10 +7596,10 @@ function beHtmlToBlocks(html) {
       const ytId = node.dataset.ytid;
       blocks.push({ type: 'youtube', data: { ytId, url: ytId }, id: Date.now() + Math.random() });
     } else if (tag === 'div') {
-      // Check for youtube embed iframe wrapper
+      
       const iframe = node.querySelector('iframe');
       if (iframe) {
-        const m = (iframe.src||'').match(/embed\/([^?&]+)/);
+        const m = (iframe.src||'').match(/embed\/([[^?&]+)/);
         if (m) { flushText(); blocks.push({ type: 'youtube', data: { ytId: m[1], url: m[1] }, id: Date.now() + Math.random() }); return; }
       }
       const inner = node.textContent.trim();
@@ -7657,7 +7613,7 @@ function beHtmlToBlocks(html) {
   return blocks;
 }
 
-/* geGetContent / geSetContent — now proxy to block editor */
+
 function geGetContent() { return beBlocksToHtml(); }
 
 function geSetContent(html) {
@@ -7665,7 +7621,7 @@ function geSetContent(html) {
   beSetBlocks(blocks);
 }
 
-/* Old stubs — no longer used but kept to avoid undefined errors */
+
 function geCmd() {}
 function geHighlight() {}
 function geFontSize() {}
@@ -7676,7 +7632,7 @@ function geInsertTable() {}
 function geShowYTInput() {}
 function geConfirmYT() {}
 
-/* === Grammar Exercise Builder (Admin) === */
+
 let _geExRows = [];
 
 function geToggleExercise() {
@@ -7752,15 +7708,15 @@ function geLoadExercise(exercise) {
   if (btn) btn.textContent = '✕ Ẩn bài tập';
 }
 
-/* === Render YouTube embeds for employee === */
+
 function wrapTables(html) {
-  // Wrap every <table> in a scrollable div to prevent horizontal overflow on mobile
-  return html.replace(/<table([^>]*)>/gi, '<div class="table-wrap"><table$1>').replace(/<\/table>/gi, '</table></div>');
+  
+  return html.replace(/<table([[^>]*)>/gi, '<div class="table-wrap"><table$1>').replace(/<\/table>/gi, '</table></div>');
 }
 
 function renderYTEmbeds(html) {
-  // Replace .yt-embed-wrap divs with real iframes
-  return html.replace(/<div[^>]*class="yt-embed-wrap"[^>]*data-ytid="([^"]+)"[^>]*>[\s\S]*?<\/div>/g, (match, ytId) => {
+  
+  return html.replace(/<div[[^>]*class="yt-embed-wrap"[[^>]*data-ytid="([[^"]+)"[[^>]*>[[\s\S]*?<\/div>/g, (match, ytId) => {
     return `<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin:14px 0">
       <iframe src="https://www.youtube.com/embed/${ytId}" frameborder="0" allowfullscreen
         style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:12px"></iframe>
@@ -7768,7 +7724,7 @@ function renderYTEmbeds(html) {
   });
 }
 
-/* === Grammar Exercise — Employee render === */
+
 function renderGrammarExercise(exercise) {
   const contentEl = document.getElementById('modal-content');
   const items = exercise.items || [];
@@ -8264,7 +8220,7 @@ async function openLeaderboardModal() {
       const rankClass = ['lb-rank-1','lb-rank-2','lb-rank-3'][i] || '';
       return `<div class="lb-row ${isMe ? 'lb-me' : ''}">
         <div class="lb-rank ${rankClass}">${rankLabel}</div>
-        <div class="lb-avatar">${esc((u.name[0] || '?').toUpperCase())}</div>
+        <div class="lb-avatar">${esc((u.name[[0] || '?').toUpperCase())}</div>
         <div class="lb-info">
           <div class="lb-name">${esc(u.name)}${isMe ? ' <span style="color:var(--teal);font-size:11px;font-weight:600">(bạn)</span>' : ''}</div>
           <div class="lb-meta">🔥 ${u.streak} ngày streak</div>
@@ -8282,17 +8238,17 @@ function closeLeaderboardModal() {
   document.getElementById('leaderboard-overlay')?.classList.add('hidden');
 }
 
-// ── Monthly Attendance collapse toggle ──────────────────────────────────────
+
 function toggleAttSection() {
   const wrap = document.getElementById('att-section-outer');
   if (!wrap) return;
   wrap.classList.toggle('collapsed');
-  // Save state
+  
   try { localStorage.setItem('att_collapsed', wrap.classList.contains('collapsed') ? '1' : '0'); } catch {}
 }
 
-// ── Employee Attendance Popup ─────────────────────────────────────────────
-let _attPopupMonth = null; // 'YYYY-MM'
+
+let _attPopupMonth = null; 
 
 function openAttPopup() {
   document.getElementById('att-popup-overlay').classList.remove('hidden');
@@ -8321,17 +8277,17 @@ async function renderAttPopup(monthStr) {
   const today = todayStr();
   const mNames = ['','Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
 
-  // Update nav label
+  
   const navLabel = document.getElementById('att-nav-month-label');
   if (navLabel) navLabel.textContent = `${mNames[month]} ${year}`;
 
-  // Disable future nav
+  
   const nowStr = new Date().getFullYear() + '-' + String(new Date().getMonth() + 1).padStart(2,'0');
   const navBtns = document.querySelectorAll('.att-nav-btn');
   if (navBtns[1]) navBtns[1].disabled = monthStr >= nowStr;
   if (navBtns[1]) navBtns[1].style.opacity = monthStr >= nowStr ? '.3' : '1';
 
-  // Show spinner while loading
+  
   const calEl = document.getElementById('att-cal-grid');
   calEl.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text-muted)"><div class="spinner spinner-teal" style="margin:0 auto 10px;width:24px;height:24px;border-width:3px"></div>Đang tải...</div>`;
 
@@ -8339,7 +8295,7 @@ async function renderAttPopup(monthStr) {
   const startDate = `${monthStr}-01`;
   const endDate   = `${monthStr}-${String(lastDay).padStart(2,'0')}`;
 
-  // Fetch lesson schedules, sessions, completions in parallel
+  
   const [{ data: schedRows }, { data: sessRows }, { data: compRows }] = await Promise.all([
     sb.from('lesson_schedules').select('lesson_id,date').gte('date', startDate).lte('date', endDate)
       .or(`user_id.eq.${currentUser.id},user_id.is.null`),
@@ -8349,34 +8305,34 @@ async function renderAttPopup(monthStr) {
       .gte('date', startDate).lte('date', endDate)
   ]);
 
-  // Build maps
-  // schedMap: date → Set of lesson_ids scheduled
+  
+  
   const schedMap = {};
   for (const s of (schedRows || [])) {
     if (!schedMap[s.date]) schedMap[s.date] = new Set();
     schedMap[s.date].add(s.lesson_id);
   }
-  // sessMap: date → total seconds
+  
   const sessMap = {};
   for (const s of (sessRows || [])) {
     sessMap[s.date] = (sessMap[s.date] || 0) + (s.duration_seconds || 0);
   }
-  // compMap: date → Set of completed lesson_ids
+  
   const compMap = {};
   for (const c of (compRows || [])) {
     if (!compMap[c.date]) compMap[c.date] = new Set();
     compMap[c.date].add(c.lesson_id);
   }
 
-  // Count stats (weekdays only)
+  
   let presentCount = 0, absentCount = 0, futureCount = 0;
   for (let d = 1; d <= lastDay; d++) {
     const ds  = `${monthStr}-${String(d).padStart(2,'0')}`;
     const dow = new Date(year, month - 1, d).getDay();
-    if (dow === 0 || dow === 6) continue; // skip weekends
+    if (dow === 0 || dow === 6) continue; 
     if (ds > today) { futureCount++; continue; }
     const hasLesson = !!schedMap[ds]?.size;
-    if (!hasLesson) continue; // no lesson day — don't count
+    if (!hasLesson) continue; 
     const totalSec = sessMap[ds] || 0;
     const done = compMap[ds] || new Set();
     const allDone = [...(schedMap[ds] || [])].every(lid => done.has(lid));
@@ -8390,18 +8346,18 @@ async function renderAttPopup(monthStr) {
   setEl('att-ps-remain',  futureCount);
   setEl('sxp-att-val', presentCount + ' ngày');
 
-  // Build calendar — 5 columns (T2–T6), no weekends
+  
   const dowLabels = ['T2','T3','T4','T5','T6'];
   const dowHtml = dowLabels.map(d => `<div class="att-cal-dow">${d}</div>`).join('');
 
-  // Offset: day-of-week of 1st of month, Mon=0..Fri=4 (skip Sat/Sun)
-  const firstDow = new Date(year, month - 1, 1).getDay(); // 0=Sun..6=Sat
-  // Map to weekday grid col (Mon=0, Tue=1, Wed=2, Thu=3, Fri=4)
-  const startOffset = firstDow === 0 ? 4 : firstDow - 1; // Sun wraps to Fri col? No — just offset
-  // Actually: if firstDow is Mon(1)→0, Tue(2)→1 ... Fri(5)→4, Sat(6)→0 next row, Sun(0)→0 next row
+  
+  const firstDow = new Date(year, month - 1, 1).getDay(); 
+  
+  const startOffset = firstDow === 0 ? 4 : firstDow - 1; 
+  
   let gridOffset = 0;
   if (firstDow >= 1 && firstDow <= 5) gridOffset = firstDow - 1;
-  else gridOffset = 0; // Sat or Sun → start from Mon col 0
+  else gridOffset = 0; 
 
   const empties = Array(gridOffset).fill('<div class="att-day empty"></div>').join('');
 
@@ -8409,7 +8365,7 @@ async function renderAttPopup(monthStr) {
   for (let d = 1; d <= lastDay; d++) {
     const ds  = `${monthStr}-${String(d).padStart(2,'0')}`;
     const dow = new Date(year, month - 1, d).getDay();
-    if (dow === 0 || dow === 6) continue; // skip weekends entirely
+    if (dow === 0 || dow === 6) continue; 
 
     const isFuture  = ds > today;
     const isToday   = ds === today;
@@ -8432,7 +8388,7 @@ async function renderAttPopup(monthStr) {
       cls += ' no-day';
       icon = `<div class="att-day-icon">✕</div>`;
     } else {
-      // past day, no lesson
+      
       cls += ' no-lesson-day';
     }
     if (isToday) cls += ' today-day';
@@ -8440,17 +8396,17 @@ async function renderAttPopup(monthStr) {
     cells += `<div class="${cls}" ${delay}><div class="att-day-num">${d}</div>${icon}</div>`;
   }
 
-  // Update grid to 5 columns
+  
   calEl.style.gridTemplateColumns = 'repeat(5, 1fr)';
   calEl.innerHTML = dowHtml + empties + cells;
 }
 
-// Refresh popup if open after check-in
+
 function refreshAttPopupIfOpen() {
   if (!document.getElementById('att-popup-overlay').classList.contains('hidden') && _attPopupMonth) {
     renderAttPopup(_attPopupMonth);
   }
-  // always refresh the chip label
+  
   if (currentUser) {
     const now = new Date();
     const ms = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
@@ -8465,9 +8421,7 @@ function refreshAttPopupIfOpen() {
 
 
 
-  /* ===================================================================
-     SPEAKING / PRONUNCIATION FEATURE
-  =================================================================== */
+  
 
   function renderSpeakingLesson(sentences) {
     const total = sentences.length;
@@ -8475,7 +8429,7 @@ function refreshAttPopupIfOpen() {
       `<div class="sp-bar" style="animation-delay:${i*0.1}s"></div>`
     ).join('');
 
-    // Banner cảnh báo trình duyệt (iOS Chrome/Firefox)
+    
     const browserWarnHtml = (_isIOSChrome() || _isIOSFirefox()) ? `
       <div class="sp-browser-warn" style="margin-bottom:16px">
         <span class="sp-warn-icon">⚠️</span>
@@ -8559,7 +8513,7 @@ function refreshAttPopupIfOpen() {
       utt.onend = utt.onerror = () => {
         if (btn) { btn.classList.remove('playing'); btn.innerHTML = '🔊 Nghe mẫu'; }
       };
-      // iOS: cancel + small delay prevents silent mode glitch
+      
       window.speechSynthesis.cancel();
       setTimeout(() => window.speechSynthesis.speak(utt), _isIOS() ? 120 : 0);
     };
@@ -8568,12 +8522,12 @@ function refreshAttPopupIfOpen() {
       doSpeak();
     } else {
       window.speechSynthesis.onvoiceschanged = () => doSpeak();
-      // Force voices load on iOS
+      
       window.speechSynthesis.getVoices();
     }
   }
 
-  // ── Waveform helpers ───────────────────────────────────────────────────────
+  
   function showWave(idx) {
     const w = document.getElementById(`sp-wave-${idx}`);
     if (!w) return;
@@ -8585,16 +8539,16 @@ function refreshAttPopupIfOpen() {
     w.querySelectorAll('.sp-bar').forEach(b => b.classList.remove('active'));
   }
 
-  // ── Global recognition refs ────────────────────────────────────────────────
+  
   window._activeRecognition    = null;
   window._activeRecognitionTimeout = null;
-  window._spCountdownTimer     = null;   // countdown interval handle
+  window._spCountdownTimer     = null;   
 
   function startSpeakingRecord(idx) {
     const st = window._speakingState;
     if (!st) return;
 
-    // ── Toggle: if already recording → stop gracefully ──────────────────────
+    
     if (window._activeRecognition) {
       window._activeRecognition.stop();
       return;
@@ -8603,19 +8557,19 @@ function refreshAttPopupIfOpen() {
     const btn      = document.getElementById(`sp-rec-btn-${idx}`);
     const card     = document.getElementById(`sp-card-${idx}`);
 
-    // ── iOS Chrome / Firefox: Web Speech API bị chặn → fallback ────────────
+    
     if (_isIOSChrome() || _isIOSFirefox()) {
       _showIOSBrowserWarning(idx);
       return;
     }
 
-    // ── Trình duyệt không hỗ trợ → fallback gõ tay ─────────────────────────
+    
     if (!_speechSupported()) {
       showSpeakingTextFallback(idx);
       return;
     }
 
-    // ── Kiểm tra permission trước (nếu Permissions API có sẵn) ──────────────
+    
     if (navigator.permissions && navigator.permissions.query) {
       navigator.permissions.query({ name: 'microphone' }).then(result => {
         if (result.state === 'denied') {
@@ -8623,13 +8577,13 @@ function refreshAttPopupIfOpen() {
           return;
         }
         _startCountdownThenRecord(idx);
-      }).catch(() => _startCountdownThenRecord(idx)); // API không hỗ trợ → tiếp tục
+      }).catch(() => _startCountdownThenRecord(idx)); 
     } else {
       _startCountdownThenRecord(idx);
     }
   }
 
-  // ── Countdown 3-2-1 rồi mới bật mic ────────────────────────────────────
+  
   function _startCountdownThenRecord(idx) {
     const card = document.getElementById(`sp-card-${idx}`);
     const btn  = document.getElementById(`sp-rec-btn-${idx}`);
@@ -8652,7 +8606,7 @@ function refreshAttPopupIfOpen() {
       if (count > 0) {
         if (numEl) {
           numEl.style.animation = 'none';
-          void numEl.offsetWidth; // reflow
+          void numEl.offsetWidth; 
           numEl.style.animation = '';
           numEl.textContent = count;
         }
@@ -8667,7 +8621,7 @@ function refreshAttPopupIfOpen() {
     }, 900);
   }
 
-  // ── Khởi động SpeechRecognition thực sự ─────────────────────────────────
+  
   function _doStartRecognition(idx) {
     const st       = window._speakingState;
     if (!st) return;
@@ -8683,7 +8637,7 @@ function refreshAttPopupIfOpen() {
     recognition.maxAlternatives = 3;
     window._activeRecognition   = recognition;
 
-    // Auto-stop: iOS thường tự dừng sau ~7s, Android ~15s — dùng 12s làm chuẩn
+    
     const autoStopMs = _isIOS() ? 8000 : 12000;
     window._activeRecognitionTimeout = setTimeout(() => {
       if (window._activeRecognition === recognition) recognition.stop();
@@ -8692,7 +8646,7 @@ function refreshAttPopupIfOpen() {
     let bestFinal      = '';
     let allAlternatives= [];
 
-    // Hiện nút dừng ngay, nhưng chờ audiostart mới show wave + trạng thái thật
+    
     if (btn) {
       btn.classList.add('recording');
       btn.innerHTML = '⏳ Đang kết nối mic...';
@@ -8712,7 +8666,7 @@ function refreshAttPopupIfOpen() {
       let finalText   = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
         if (event.results[i].isFinal) {
-          // Gom tất cả alternatives để chọn tốt nhất
+          
           for (let a = 0; a < event.results[i].length; a++) {
             allAlternatives.push(event.results[i][a].transcript);
           }
@@ -8756,7 +8710,7 @@ function refreshAttPopupIfOpen() {
           toast('Không thể truy cập micro. Kiểm tra cài đặt thiết bị.', 'error');
           break;
         case 'aborted':
-          // User dừng chủ động — không cần toast
+          
           break;
         default:
           toast('Lỗi: ' + event.error, 'error');
@@ -8775,7 +8729,7 @@ function refreshAttPopupIfOpen() {
       if (interimEl) interimEl.textContent = '';
 
       if (bestFinal.trim()) {
-        // Chọn transcript tốt nhất từ tất cả alternatives
+        
         const best = _pickBestTranscript(allAlternatives, st.sentences[idx]);
         const heard = best.trim().toLowerCase();
         const { score, wordResults } = scorePronunciation(st.sentences[idx], heard);
@@ -8796,10 +8750,10 @@ function refreshAttPopupIfOpen() {
     }
   }
 
-  // ── Chọn transcript tốt nhất trong các alternatives ─────────────────────
+  
   function _pickBestTranscript(alternatives, original) {
     if (!alternatives.length) return '';
-    // Chọn alt có score cao nhất so với câu gốc
+    
     let best = alternatives[0];
     let bestScore = -1;
     for (const alt of alternatives) {
@@ -8809,7 +8763,7 @@ function refreshAttPopupIfOpen() {
     return best;
   }
 
-  // ── Xử lý khi bị từ chối quyền micro ────────────────────────────────────
+  
   function _handleMicDenied(idx) {
     const btn = document.getElementById(`sp-rec-btn-${idx}`);
     const resultEl = document.getElementById(`sp-result-${idx}`);
@@ -8838,7 +8792,7 @@ function refreshAttPopupIfOpen() {
     }
   }
 
-  // ── Cảnh báo iOS Chrome / Firefox ───────────────────────────────────────
+  
   function _showIOSBrowserWarning(idx) {
     const resultEl = document.getElementById(`sp-result-${idx}`);
     const btn = document.getElementById(`sp-rec-btn-${idx}`);
@@ -8860,9 +8814,9 @@ function refreshAttPopupIfOpen() {
     }
   }
 
-  // Tô màu từng từ lên câu gốc theo interim/final transcript
+  
   function _highlightLive(idx, origWords, heardText) {
-    const clean = s => s.toLowerCase().replace(/[^a-z0-9'\s]/g, '').trim();
+    const clean = s => s.toLowerCase().replace(/[[^a-z0-9'\s]/g, '').trim();
     const heardWords = clean(heardText).split(/\s+/).filter(Boolean);
     origWords.forEach((w, wi) => {
       const el = document.getElementById(`sp-w-${idx}-${wi}`);
@@ -8920,18 +8874,18 @@ function refreshAttPopupIfOpen() {
     markSpeakingDone(idx, score, st.sentences[idx], wordResults, typed);
   }
 
-  // ── Improved scoring: sequence-aware alignment ─────────────────────────────
+  
   function scorePronunciation(original, heard) {
-    const clean = s => s.toLowerCase().replace(/[^a-z0-9'\s]/g, '').trim();
+    const clean = s => s.toLowerCase().replace(/[[^a-z0-9'\s]/g, '').trim();
     const origWords  = clean(original).split(/\s+/).filter(Boolean);
     const heardWords = clean(heard).split(/\s+/).filter(Boolean);
 
-    // Dynamic programming alignment (like diff / Duolingo)
-    // For each orig word, try to find best match in heard (in order, allow skip)
+    
+    
     let hi = 0;
     let matched = 0;
     const wordResults = origWords.map(ow => {
-      // Look ahead up to 4 words in heard stream
+      
       for (let lookahead = 0; lookahead < 4 && hi + lookahead < heardWords.length; lookahead++) {
         const hw = heardWords[hi + lookahead];
         if (hw === ow || levenshtein(hw, ow) <= Math.floor(ow.length / 4)) {
@@ -8943,7 +8897,7 @@ function refreshAttPopupIfOpen() {
       return { word: ow, ok: false };
     });
 
-    // Bonus: if heard has extra words not in orig, slight penalty
+    
     const extraPenalty = Math.max(0, heardWords.length - origWords.length) * 0.03;
     const rawScore = origWords.length > 0 ? matched / origWords.length : 0;
     const score = Math.max(0, Math.min(1, rawScore - extraPenalty));
@@ -8974,7 +8928,7 @@ function refreshAttPopupIfOpen() {
     const emoji = pct >= 80 ? '🌟' : pct >= 50 ? '👌' : '😅';
     const msg   = pct >= 80 ? 'Rất tốt!' : pct >= 50 ? 'Được rồi' : 'Thử lại nha!';
 
-    // Final word highlight
+    
     const origWords = original.trim().split(/\s+/);
     if (wordResults.length) {
       wordResults.forEach((w, wi) => {
@@ -9100,45 +9054,45 @@ function refreshAttPopupIfOpen() {
     return { original: raw, corrected: '', notes: [] };
   }
 
-  // Highlight notes inside a text. mode='original' marks wrong words red strike,
-  // mode='correction' marks fixed words green. Uses a placeholder token strategy
-  // to safely combine literal substring matches with HTML escaping.
+  
+  
+  
   function highlightWritingText(text, notes, mode) {
     if (!text) return '';
     const items = (notes || [])
       .map(n => mode === 'original' ? (n.original || '') : (n.correction || ''))
       .filter(s => s && s.length >= 2)
-      // De-duplicate, then sort longest first so longer matches win
+      
       .filter((s, i, a) => a.indexOf(s) === i)
       .sort((a, b) => b.length - a.length);
 
-    // Replace each match with a unique placeholder BEFORE escaping
+    
     const tokens = [];
     let working = text;
     items.forEach((needle, idx) => {
       const token = `\u0001HL${idx}\u0001`;
-      // Case-insensitive, all occurrences, literal match
-      const re = new RegExp(needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+      
+      const re = new RegExp(needle.replace(/[[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
       let replaced = false;
       working = working.replace(re, (m) => {
         replaced = true;
         tokens.push({ token, original: m });
         return token;
       });
-      if (!replaced) tokens.push({ token: null }); // keep index alignment
+      if (!replaced) tokens.push({ token: null }); 
     });
 
-    // Escape full text (placeholders are safe ASCII control chars)
+    
     let escaped = esc(working).replace(/\n/g, '<br>');
 
-    // Swap placeholders back as styled spans
+    
     const styleOriginal   = 'background:#fee2e2;color:var(--red);text-decoration:line-through;padding:1px 4px;border-radius:4px;font-weight:600';
     const styleCorrection = 'background:#dcfce7;color:var(--green);padding:1px 4px;border-radius:4px;font-weight:600';
     const style = mode === 'original' ? styleOriginal : styleCorrection;
 
     tokens.forEach(t => {
       if (!t.token) return;
-      // Token chars are control chars — they survive HTML escape unchanged
+      
       escaped = escaped.replace(
         t.token,
         `<mark style="${style}">${esc(t.original)}</mark>`
@@ -9239,9 +9193,9 @@ function refreshAttPopupIfOpen() {
   // Heuristic: detect Vietnamese by diacritics or common VN-only words
   function looksLikeVietnamese(text) {
     if (!text) return false;
-    // Vietnamese-specific diacritic letters
-    if (/[ăâđêôơưĂÂĐÊÔƠƯàáảãạằắẳẵặầấẩẫậèéẻẽẹềếểễệìíỉĩịòóỏõọồốổỗộờớởỡợùúủũụừứửữựỳýỷỹỵÀÁẢÃẠẰẮẲẴẶẦẤẨẪẬÈÉẺẼẸỀẾỂỄỆÌÍỈĨỊÒÓỎÕỌỒỐỔỖỘỜỚỞỠỢÙÚỦŨỤỪỨỬỮỰỲÝỶỸỴ]/.test(text)) return true;
-    // Common VN words without diacritics still trigger
+    
+    if (/[[ăâđêôơưĂÂĐÊÔƠƯàáảãạằắẳẵặầấẩẫậèéẻẽẹềếểễệìíỉĩịòóỏõọồốổỗộờớởỡợùúủũụừứửữựỳýỷỹỵÀÁẢÃẠẰẮẲẴẶẦẤẨẪẬÈÉẺẼẸỀẾỂỄỆÌÍỈĨỊÒÓỎÕỌỒỐỔỖỘỜỚỞỠỢÙÚỦŨỤỪỨỬỮỰỲÝỶỸỴ]/.test(text)) return true;
+    
     const lower = ' ' + text.toLowerCase() + ' ';
     const vnHits = [' toi ',' minh ',' ban ',' khong ',' duoc ',' cua ',' va ',' la ',' nguoi ',' hoc ',' tieng viet ',' nhe ',' nha ',' lam ',' gi ',' nay ',' the ',' nhung ',' voi '];
     let hits = 0; for (const w of vnHits) if (lower.includes(w)) hits++;
@@ -9308,17 +9262,15 @@ function refreshAttPopupIfOpen() {
     if (hintEl) { hintEl.classList.remove("hidden"); hintEl.textContent = "✅ Đã lưu bài viết. Bạn có thể hoàn thành bài học."; }
   }
 
-  // Stub kept so any stale references don't error
-  async function loadWritingSubmissions() { /* removed: admin no longer grades writing */ }
+  
+  async function loadWritingSubmissions() {  }
 
 
 
-  /* ===================================================================
-     VOCAB NOTEBOOK FEATURE
-  =================================================================== */
+  
 
   function initVocabNotebookForLesson() {
-    // Remove any existing listener
+    
     const contentEl = document.getElementById('modal-content');
     if (!contentEl) return;
 
@@ -9338,7 +9290,7 @@ function refreshAttPopupIfOpen() {
 
     const handleSelection = (e) => {
       if (e.target === tooltip || tooltip.contains(e.target)) return;
-      // Small delay on touch to allow browser to finalize selection
+      
       const check = () => {
         const sel = window.getSelection();
         const text = (sel?.toString() || '').trim();
@@ -9346,7 +9298,7 @@ function refreshAttPopupIfOpen() {
           tooltip.style.display = 'none';
           return;
         }
-        // Only show inside lesson modal
+        
         const overlay = document.getElementById('lesson-overlay');
         if (!overlay || overlay.classList.contains('hidden')) { tooltip.style.display = 'none'; return; }
         const range = sel.getRangeAt(0);
@@ -9354,19 +9306,19 @@ function refreshAttPopupIfOpen() {
         const context = sel.anchorNode?.textContent?.trim().slice(0, 120) || '';
         showTooltip(rect.left + rect.width/2 - 50, rect.top + window.scrollY, text, context);
       };
-      // touchend needs slight delay for selection to stabilize
+      
       if (e.type === 'touchend') setTimeout(check, 120);
       else check();
     };
 
-    // Remove previous touchend handler if any, then re-register
+    
     if (document._vocabTouchHandler) {
       document.removeEventListener('touchend', document._vocabTouchHandler);
     }
     document._vocabTouchHandler = handleSelection;
 
     document.onmouseup = handleSelection;
-    // Touch support: use addEventListener to allow multiple handlers
+    
     document.addEventListener('touchend', handleSelection, { passive: true });
 
     tooltip.onclick = async () => {
@@ -9447,7 +9399,7 @@ function refreshAttPopupIfOpen() {
       const wordEl = card.querySelector('.nb-fc-word');
       const word = wordEl?.textContent?.trim();
       if (word) {
-        // Open dictionary in new tab
+        
         window.open('https://dictionary.cambridge.org/dictionary/english-vietnamese/' + encodeURIComponent(word), '_blank');
         card.classList.remove('flipped');
       }
@@ -9466,14 +9418,14 @@ function refreshAttPopupIfOpen() {
     const card = document.getElementById(`nb-fc-${id}`);
     if (card) { card.style.opacity = '0'; card.style.transform = 'scale(.8)'; card.style.transition = 'opacity .2s, transform .2s'; setTimeout(() => card.remove(), 200); }
     refreshNbBadge();
-    // Update count
+    
     const grid = document.getElementById('vocab-nb-grid');
     const remaining = grid?.querySelectorAll('.nb-flashcard').length - 1;
     const countEl = document.getElementById('nb-word-count');
     if (countEl && remaining >= 0) countEl.textContent = remaining + ' từ';
   }
 
-  /* ===== AI REMOVED ===== Safe stubs kept so legacy references do not crash. */
+  
   function getAiProvider()        { return "none"; }
   function setAiProvider()        {}
   function renderAiProviderUI()   {}
@@ -9499,16 +9451,14 @@ function refreshAttPopupIfOpen() {
   async function checkGeminiQuota()     { toast("Tính năng AI đã bị gỡ.", "error"); }
   async function checkOpenRouterQuota() { toast("Tính năng AI đã bị gỡ.", "error"); }
 
-  /* BOOT */
+  
 (function init() {
   const u = loadUser();
   if (u) { currentUser = u; goTo(u.role); }
   else   { showView('login'); }
 })();
 </script>
-<!-- ============================
-     ATTENDANCE POPUP MODAL
-============================= -->
+
 <div id="att-popup-overlay" class="hidden" onclick="if(event.target===this)closeAttPopup()">
   <div class="att-popup" id="att-popup">
     <div class="att-popup-handle"></div>
@@ -9516,13 +9466,13 @@ function refreshAttPopupIfOpen() {
       <div class="att-popup-title">📅 Lịch điểm danh</div>
       <button class="att-popup-close" onclick="closeAttPopup()">×</button>
     </div>
-    <!-- month nav -->
+    
     <div class="att-popup-nav">
       <button class="att-nav-btn" onclick="shiftAttMonth(-1)">‹</button>
       <div class="att-nav-month" id="att-nav-month-label">Tháng 5 2026</div>
       <button class="att-nav-btn" onclick="shiftAttMonth(+1)">›</button>
     </div>
-    <!-- stats -->
+    
     <div class="att-popup-stats">
       <div class="att-ps present">
         <div class="att-ps-val" id="att-ps-present">—</div>
@@ -9537,7 +9487,7 @@ function refreshAttPopupIfOpen() {
         <div class="att-ps-lbl">⏳ Còn lại</div>
       </div>
     </div>
-    <!-- calendar -->
+    
     <div class="att-popup-body">
       <div class="att-cal-grid" id="att-cal-grid">
         <div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text-muted)">
@@ -9549,9 +9499,7 @@ function refreshAttPopupIfOpen() {
 </div>
 
 
-  <!-- ============================
-       VOCAB NOTEBOOK MODAL
-  ============================= -->
+  
   <div id="vocab-nb-tooltip">💾 Lưu từ</div>
 
   <div id="vocab-nb-overlay" class="hidden" onclick="if(event.target===this)closeVocabNotebook()">
