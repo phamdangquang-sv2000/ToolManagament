@@ -33,7 +33,7 @@ if (!window.SUPABASE_CONFIG) {
   @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
   :root {
-    /* New premium color palette */
+    
     --bg-base: #060610;
     --bg-surface: #0c0c1e;
     --glass-bg: rgba(255,255,255,0.06);
@@ -45,7 +45,7 @@ if (!window.SUPABASE_CONFIG) {
     --glass-shadow-lg: 0 24px 80px rgba(0,0,0,0.5), 0 4px 20px rgba(0,0,0,0.3);
     --blur: blur(28px);
     --blur-sm: blur(14px);
-    /* Vivid accent palette */
+    
     --accent: #3B82F6;
     --accent-bright: #60A5FA;
     --accent-glow: rgba(59,130,246,0.35);
@@ -68,10 +68,7 @@ if (!window.SUPABASE_CONFIG) {
     --nav-bottom-gap: max(16px, calc(12px + env(safe-area-inset-bottom, 0px)));
   }
 
-  /* ───────── Fallback safe-area UNIVERSAL cho mọi iPhone khi add shortcut ─────────
-     Dùng display-mode: standalone để đảm bảo khi mở từ Home Screen LUÔN có
-     padding tránh tai thỏ / Dynamic Island / status bar / home indicator,
-     bất kể env(safe-area-inset-*) có trả về giá trị hay không. */
+  
   @media (display-mode: standalone), (display-mode: fullscreen) {
     :root {
       --safe-top: max(env(safe-area-inset-top, 0px), 59px);
@@ -80,7 +77,7 @@ if (!window.SUPABASE_CONFIG) {
       --safe-right: max(env(safe-area-inset-right, 0px), 0px);
     }
   }
-  /* iOS Safari standalone (cờ riêng của Apple, vẫn cần phòng hờ) */
+  
   @supports (-webkit-touch-callout: none) {
     @media (display-mode: standalone), (display-mode: fullscreen) {
       :root {
@@ -89,7 +86,7 @@ if (!window.SUPABASE_CONFIG) {
       }
     }
   }
-  /* Landscape: tai thỏ chuyển sang trái/phải → cần safe-left/right ≥ 44px */
+  
   @media (orientation: landscape) and (max-device-height: 500px) {
     :root {
       --safe-left: max(env(safe-area-inset-left, 0px), 44px);
@@ -100,7 +97,7 @@ if (!window.SUPABASE_CONFIG) {
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
-  /* Prevent iOS auto-zoom on input focus */
+  
   input, select, textarea { font-size: 16px !important; }
   html, body { height: 100%; height: 100dvh; overflow: hidden; }
   body {
@@ -111,13 +108,13 @@ if (!window.SUPABASE_CONFIG) {
     position: relative;
   }
 
-  /* ── Animated aurora background ── */
+  
   #aurora-canvas {
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
     opacity: 0.65;
   }
 
-  /* Grain overlay */
+  
   body::after {
     content: '';
     position: fixed; inset: 0; z-index: 0;
@@ -125,7 +122,7 @@ if (!window.SUPABASE_CONFIG) {
     opacity: 0.6; pointer-events: none;
   }
 
-  /* ── Animated orbs ── */
+  
   .orb {
     position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
     filter: blur(80px); opacity: 0;
@@ -167,7 +164,7 @@ if (!window.SUPABASE_CONFIG) {
     50% { transform: translate(calc(-50% + 80px),calc(-50% - 60px)) scale(1.2); }
   }
 
-  /* Glass utility */
+  
   .glass {
     background: var(--glass-bg);
     backdrop-filter: var(--blur);
@@ -203,10 +200,10 @@ if (!window.SUPABASE_CONFIG) {
     box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 0 1px rgba(59,130,246,0.15);
   }
 
-  /* Layout */
+  
   #app { position: relative; z-index: 1; height: 100vh; height: 100dvh; display: flex; flex-direction: column; padding-left: var(--safe-left); padding-right: var(--safe-right); }
 
-  /* Topbar */
+  
   #topbar {
     padding: calc(14px + var(--safe-top)) calc(20px + var(--safe-right)) 14px calc(20px + var(--safe-left));
     display: flex; align-items: center; gap: 12px;
@@ -259,7 +256,7 @@ if (!window.SUPABASE_CONFIG) {
     50% { box-shadow: 0 4px 16px rgba(139,92,246,0.6), 0 0 30px rgba(139,92,246,0.3); }
   }
 
-  /* Mobile responsive */
+  
   @media (max-width: 768px) {
     #topbar {
       padding: 10px 12px 10px;
@@ -284,10 +281,10 @@ if (!window.SUPABASE_CONFIG) {
     #role-badge { display: none; }
   }
 
-  /* Main area */
+  
   #main { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
 
-  /* Search + filter bar */
+  
   #toolbar {
     padding: 12px 16px;
     display: flex; gap: 8px; align-items: center; flex-shrink: 0;
@@ -304,7 +301,7 @@ if (!window.SUPABASE_CONFIG) {
     transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
     position: relative; overflow: hidden;
   }
-  /* shimmer sweep on load */
+  
   .search-glass::after {
     content: ''; position: absolute;
     top: 0; left: -100%; width: 60%; height: 100%;
@@ -383,7 +380,7 @@ if (!window.SUPABASE_CONFIG) {
     box-shadow: 0 4px 12px rgba(245,158,11,0.2);
   }
 
-  /* Employee list */
+  
   #list-container {
     flex: 1; overflow-y: auto; padding: 0 16px 100px;
     -webkit-overflow-scrolling: touch;
@@ -392,7 +389,7 @@ if (!window.SUPABASE_CONFIG) {
   #list-container::-webkit-scrollbar-track { background: transparent; }
   #list-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
 
-  /* Employee card */
+  
   .emp-card {
     display: flex; align-items: center; gap: 14px;
     padding: 14px 16px; margin-bottom: 8px; cursor: pointer;
@@ -410,7 +407,7 @@ if (!window.SUPABASE_CONFIG) {
     background: linear-gradient(135deg, rgba(255,255,255,0.055) 0%, transparent 50%);
     pointer-events: none;
   }
-  /* Shimmer on hover */
+  
   .emp-card::after {
     content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
@@ -429,9 +426,7 @@ if (!window.SUPABASE_CONFIG) {
     from { opacity: 0; transform: translateY(12px) scale(0.97); }
     to { opacity: 1; transform: translateY(0) scale(1); }
   }
-  /* ════════════════════════════
-     EMP-AVATAR — rich animated
-     ════════════════════════════ */
+  
   .emp-avatar {
     width: 46px; height: 46px; border-radius: 16px; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
@@ -446,7 +441,7 @@ if (!window.SUPABASE_CONFIG) {
     75%  { transform: scale(0.94) rotate(-2deg); }
     100% { opacity:1; transform: scale(1) rotate(0deg); }
   }
-  /* spinning conic border — hidden until hover */
+  
   .emp-avatar::before {
     content: '';
     position: absolute; inset: -2.5px; border-radius: 19px;
@@ -456,19 +451,19 @@ if (!window.SUPABASE_CONFIG) {
     animation: avBorderSpin 2.4s linear infinite paused;
   }
   @keyframes avBorderSpin { to { transform: rotate(360deg); } }
-  /* glass sheen top-left */
+  
   .emp-avatar::after {
     content: '';
     position: absolute; inset: 0; border-radius: 16px;
     background: linear-gradient(135deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.06) 40%, transparent 65%);
     pointer-events: none; z-index: 2;
   }
-  /* initials */
+  
   .emp-avatar span {
     position: relative; z-index: 3;
     transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), text-shadow 0.3s ease;
   }
-  /* hover */
+  
   .emp-card:hover .emp-avatar {
     transform: scale(1.16) rotate(-8deg) translateY(-3px);
   }
@@ -480,7 +475,7 @@ if (!window.SUPABASE_CONFIG) {
     transform: scale(1.08);
     text-shadow: 0 0 14px currentColor;
   }
-  /* press */
+  
   .emp-card:active .emp-avatar {
     transform: scale(0.88) rotate(0deg) !important;
     transition-duration: 0.1s;
@@ -509,7 +504,7 @@ if (!window.SUPABASE_CONFIG) {
     box-shadow: 0 0 10px rgba(245,158,11,0.1);
   }
 
-  /* Stats row */
+  
   #stats-row {
     display: flex; gap: 8px; padding: 12px 16px 0; flex-shrink: 0;
     animation: fadeInUp 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.15s both;
@@ -535,7 +530,7 @@ if (!window.SUPABASE_CONFIG) {
     from { opacity: 0; transform: translateY(14px) scale(0.92); }
     to   { opacity: 1; transform: translateY(0) scale(1); }
   }
-  /* glowing bottom bar */
+  
   .stat-chip::before {
     content: ''; position: absolute; bottom: 0; left: 0; right: 0;
     height: 2.5px; border-radius: 0 0 16px 16px;
@@ -545,7 +540,7 @@ if (!window.SUPABASE_CONFIG) {
   .stat-chip:nth-child(2)::before { background: linear-gradient(90deg,#10B981,#06B6D4); box-shadow: 0 0 10px rgba(16,185,129,0.7); }
   .stat-chip:nth-child(3)::before { background: linear-gradient(90deg,#EF4444,#F59E0B); box-shadow: 0 0 10px rgba(239,68,68,0.7); }
   .stat-chip:nth-child(4)::before { background: linear-gradient(90deg,#F59E0B,#EF4444); box-shadow: 0 0 10px rgba(245,158,11,0.7); }
-  /* ambient glow on hover */
+  
   .stat-chip::after {
     content: ''; position: absolute; inset: 0;
     background: radial-gradient(ellipse at 50% 120%, rgba(255,255,255,0.06) 0%, transparent 70%);
@@ -579,7 +574,7 @@ if (!window.SUPABASE_CONFIG) {
     font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px;
   }
 
-  /* Floating bottom nav */
+  
   #bottom-nav {
     position: fixed; bottom: var(--nav-bottom-gap); left: 50%; transform: translateX(-50%);
     z-index: 200; display: flex; align-items: center; gap: 2px;
@@ -609,7 +604,7 @@ if (!window.SUPABASE_CONFIG) {
     position: relative; overflow: hidden; user-select: none;
   }
 
-  /* Active indicator dot above icon */
+  
   .nav-btn::before {
     content: '';
     position: absolute;
@@ -626,7 +621,7 @@ if (!window.SUPABASE_CONFIG) {
     opacity: 1;
   }
 
-  /* Ripple element */
+  
   .nav-btn .nav-ripple {
     position: absolute; border-radius: 50%;
     background: rgba(59,130,246,0.25);
@@ -638,7 +633,7 @@ if (!window.SUPABASE_CONFIG) {
     to { transform: scale(2.8); opacity: 0; }
   }
 
-  /* Particle canvas overlay */
+  
   .nav-btn canvas.nav-particles {
     position: absolute; top: 0; left: 0;
     width: 100%; height: 100%;
@@ -652,7 +647,7 @@ if (!window.SUPABASE_CONFIG) {
   }
   .nav-btn:not(.active):hover { color: var(--text-secondary); background: rgba(255,255,255,0.06); }
 
-  /* Icon wrapper */
+  
   .nav-btn .nav-icon-wrap {
     position: relative;
     width: 24px; height: 24px;
@@ -675,7 +670,7 @@ if (!window.SUPABASE_CONFIG) {
     100% { transform: scale(1) translateY(0); }
   }
 
-  /* Orbiting glow ring on active */
+  
   .nav-btn .nav-icon-ring {
     position: absolute; inset: -5px;
     border-radius: 50%;
@@ -694,7 +689,7 @@ if (!window.SUPABASE_CONFIG) {
     to { transform: rotate(360deg); }
   }
 
-  /* Label slide-up on activate */
+  
   .nav-btn span.nav-label {
     transition: color 0.3s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
     display: block;
@@ -708,13 +703,13 @@ if (!window.SUPABASE_CONFIG) {
     100% { transform: translateY(0); opacity: 1; }
   }
 
-  /* Tap press */
+  
   .nav-btn.nav-pressing svg {
     transform: scale(0.8) translateY(2px);
     filter: brightness(1.4);
   }
 
-  /* Modal overlay */
+  
   #modal-overlay {
     position: fixed; inset: 0; z-index: 500;
     background: rgba(0,0,0,0);
@@ -780,7 +775,7 @@ if (!window.SUPABASE_CONFIG) {
     display: flex; gap: 10px; flex-shrink: 0;
     background: linear-gradient(0deg, rgba(0,0,0,0.2), transparent);
   }
-  /* Modal handle animation */
+  
   .modal-handle {
     width: 36px; height: 4px; border-radius: 3px;
     background: rgba(255,255,255,0.15); margin: 12px auto 0;
@@ -791,7 +786,7 @@ if (!window.SUPABASE_CONFIG) {
     0%,100%  { background: rgba(255,255,255,0.15); width: 36px; }
     50%      { background: rgba(255,255,255,0.28); width: 42px; }
   }
-  /* Modal title animated underline */
+  
   .modal-title {
     font-size: 18px; font-weight: 800; letter-spacing: -0.4px;
     background: linear-gradient(135deg, #e2e8f0 30%, rgba(255,255,255,0.65));
@@ -799,7 +794,7 @@ if (!window.SUPABASE_CONFIG) {
     background-clip: text;
   }
 
-  /* Form elements */
+  
   .form-section { margin-bottom: 22px; }
   .form-section-title {
     font-size: 10px; font-weight: 800; color: var(--text-tertiary);
@@ -846,7 +841,7 @@ if (!window.SUPABASE_CONFIG) {
     border-top: 5px solid rgba(255,255,255,0.35); pointer-events: none;
   }
 
-  /* Buttons */
+  
   .btn {
     display: flex; align-items: center; justify-content: center; gap: 7px;
     padding: 13px 22px; border-radius: 14px; cursor: pointer; border: none;
@@ -886,7 +881,7 @@ if (!window.SUPABASE_CONFIG) {
   .btn-sm { padding: 8px 16px; font-size: 13px; border-radius: 10px; }
   .btn-full { width: 100%; }
 
-  /* Detail view */
+  
   .detail-row {
     display: flex; justify-content: space-between; align-items: flex-start;
     padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.07);
@@ -895,7 +890,7 @@ if (!window.SUPABASE_CONFIG) {
   .detail-label { font-size: 13px; color: var(--text-secondary); flex-shrink: 0; margin-right: 12px; }
   .detail-value { font-size: 14px; font-weight: 500; text-align: right; color: var(--text-primary); word-break: break-word; }
 
-  /* Toast */
+  
   #toast-container { position: fixed; top: calc(70px + var(--safe-top)); right: calc(16px + var(--safe-right)); z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
   .toast {
     display: flex; align-items: center; gap: 10px;
@@ -914,7 +909,7 @@ if (!window.SUPABASE_CONFIG) {
   .toast-error .toast-icon { background: rgba(239,68,68,0.2); color: #FCA5A5; }
   .toast-info .toast-icon { background: rgba(59,130,246,0.2); color: #93C5FD; }
 
-  /* Login screen */
+  
   #login-screen {
     position: fixed; inset: 0; z-index: 1000;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -991,14 +986,14 @@ if (!window.SUPABASE_CONFIG) {
   .input-error { border-color: rgba(239,68,68,0.5) !important; box-shadow: 0 0 0 3px rgba(239,68,68,0.1) !important; }
   .error-msg { font-size: 13px; color: #FCA5A5; text-align: center; margin-bottom: 8px; min-height: 18px; font-weight: 500; }
 
-  /* Skeleton */
+  
   .skeleton {
     background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.04) 75%);
     background-size: 200% 100%; animation: shimmer 1.8s ease infinite; border-radius: 8px;
   }
   @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-  /* Animations */
+  
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes slideUp { from { transform: translateY(60%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   @keyframes scaleIn { from { opacity: 0; transform: scale(0.88); } to { opacity: 1; transform: scale(1); } }
@@ -1007,17 +1002,17 @@ if (!window.SUPABASE_CONFIG) {
   @keyframes spin { to { transform: rotate(360deg); } }
   .spinner { animation: spin 0.7s linear infinite; }
 
-  /* Divider */
+  
   .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 4px 0; }
 
-  /* Connection dot */
+  
   .conn-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
   .conn-ok { background: var(--success-bright); box-shadow: 0 0 8px rgba(16,185,129,0.7), 0 0 16px rgba(16,185,129,0.3); }
   .conn-err { background: var(--danger-bright); box-shadow: 0 0 8px rgba(239,68,68,0.7); }
   .conn-loading { background: var(--warning-bright); animation: pulse 1.2s ease infinite; }
   @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
 
-  /* Confirm dialog */
+  
   #confirm-overlay {
     position: fixed; inset: 0; z-index: 600;
     background: rgba(0,0,0,0.75);
@@ -1034,13 +1029,13 @@ if (!window.SUPABASE_CONFIG) {
     animation: scaleIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
   }
 
-  /* Empty state */
+  
   .empty-state { padding: 70px 24px; text-align: center; }
   .empty-icon { font-size: 52px; margin-bottom: 18px; opacity: 0.4; }
   .empty-title { font-size: 17px; font-weight: 700; margin-bottom: 6px; color: var(--text-secondary); }
   .empty-sub { font-size: 14px; color: var(--text-tertiary); }
 
-  /* Offline banner */
+  
   #offline-banner {
     display: none; padding: 9px calc(16px + var(--safe-right)) 9px calc(16px + var(--safe-left)); text-align: center;
     background: rgba(245,158,11,0.12); border-bottom: 1px solid rgba(245,158,11,0.25);
@@ -1048,13 +1043,13 @@ if (!window.SUPABASE_CONFIG) {
     animation: fadeIn 0.3s ease;
   }
 
-  /* Scrollbar */
+  
   .modal-body::-webkit-scrollbar { width: 4px; }
   .modal-body::-webkit-scrollbar-track { background: transparent; }
   .modal-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
 
-  /* Avatar colors — more vibrant */
-  /* ── Avatar palette — deep solid gradients ── */
+  
+  
   .av-blue {
     background: linear-gradient(145deg, #1e40af 0%, #2563eb 50%, #60a5fa 100%);
     color: #dbeafe;
@@ -1092,7 +1087,7 @@ if (!window.SUPABASE_CONFIG) {
     --av-conic: conic-gradient(from 0deg, #0f766e, #5eead4, #3b82f6, #0f766e);
   }
 
-  /* per-color hover glow */
+  
   .emp-card:hover .av-blue   { box-shadow: 0 10px 32px rgba(37,99,235,0.65),  0 0 0 3px rgba(96,165,250,0.3); }
   .emp-card:hover .av-purple { box-shadow: 0 10px 32px rgba(124,58,237,0.65), 0 0 0 3px rgba(196,181,253,0.3); }
   .emp-card:hover .av-green  { box-shadow: 0 10px 32px rgba(5,150,105,0.65),  0 0 0 3px rgba(52,211,153,0.3); }
@@ -1100,7 +1095,7 @@ if (!window.SUPABASE_CONFIG) {
   .emp-card:hover .av-pink   { box-shadow: 0 10px 32px rgba(219,39,119,0.65), 0 0 0 3px rgba(249,168,212,0.3); }
   .emp-card:hover .av-teal   { box-shadow: 0 10px 32px rgba(13,148,136,0.65), 0 0 0 3px rgba(94,234,212,0.3); }
 
-  /* stagger entrance per card position */
+  
   .emp-card:nth-child(1)  .emp-avatar { animation-delay: 0.03s; }
   .emp-card:nth-child(2)  .emp-avatar { animation-delay: 0.08s; }
   .emp-card:nth-child(3)  .emp-avatar { animation-delay: 0.13s; }
@@ -1111,7 +1106,7 @@ if (!window.SUPABASE_CONFIG) {
   .emp-card:nth-child(8)  .emp-avatar { animation-delay: 0.38s; }
   .emp-card:nth-child(n+9) .emp-avatar { animation-delay: 0.42s; }
 
-  /* Detail view */
+  
   .detail-row {
     display: flex; justify-content: space-between; align-items: flex-start;
     padding: 13px 14px; margin-bottom: 6px;
@@ -1160,7 +1155,7 @@ if (!window.SUPABASE_CONFIG) {
     font-size: 12.5px;
   }
 
-  /* Toast */
+  
   #toast-container { position: fixed; top: calc(72px + var(--safe-top)); right: calc(16px + var(--safe-right)); z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
   .toast {
     display: flex; align-items: center; gap: 11px;
@@ -1175,19 +1170,19 @@ if (!window.SUPABASE_CONFIG) {
   .toast.removing { animation: toastOut 0.25s ease forwards; }
   .toast-icon { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
-  /* Inset top spacing for status bar */
+  
   @supports (padding-top: env(safe-area-inset-top)) {
-    /* Padding now handled directly via #login-screen safe-area vars */
+    
   }
 
-  /* Role badge upgrade */
+  
   #role-badge {
     padding: 4px 12px; border-radius: 12px;
     font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
     text-transform: uppercase;
   }
 
-  /* === Multi-view tabs === */
+  
   .view { display: none; }
   .view.active { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
   .device-card {
@@ -1223,26 +1218,24 @@ if (!window.SUPABASE_CONFIG) {
     box-shadow: 0 12px 40px rgba(0,0,0,0.35), 0 0 0 1px rgba(59,130,246,0.12);
   }
   .device-card:active { transform: scale(0.98); background: rgba(255,255,255,0.09); }
-  /* ══════════════════════════════
-     DEV-ICON  — rich 3D animated
-     ══════════════════════════════ */
+  
   .device-card .dev-icon {
     width: 46px; height: 46px; border-radius: 16px;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0; position: relative;
-    /* entrance pop */
+    
     animation: devIconPop 0.55s cubic-bezier(0.34,1.56,0.64,1) both;
     transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1),
                 box-shadow 0.35s ease;
     transform-style: preserve-3d;
-    /* default laptop colours — overridden per variant */
+    
     background: linear-gradient(145deg, #1e3a8a 0%, #1d4ed8 55%, #3b82f6 100%);
     color: #bfdbfe;
     box-shadow: 0 4px 16px rgba(29,78,216,0.45),
                 inset 0 1px 0 rgba(255,255,255,0.18);
   }
 
-  /* entrance keyframe */
+  
   @keyframes devIconPop {
     0%   { opacity:0; transform:scale(0.4) rotate(-20deg); }
     55%  { opacity:1; transform:scale(1.16) rotate(6deg); }
@@ -1250,7 +1243,7 @@ if (!window.SUPABASE_CONFIG) {
     100% { opacity:1; transform:scale(1) rotate(0deg); }
   }
 
-  /* glass sheen top-left */
+  
   .device-card .dev-icon::before {
     content:''; position:absolute; inset:0; border-radius:16px;
     background: linear-gradient(135deg,
@@ -1260,7 +1253,7 @@ if (!window.SUPABASE_CONFIG) {
     pointer-events:none; z-index:2;
   }
 
-  /* spinning conic border — appears on hover */
+  
   .device-card .dev-icon::after {
     content:''; position:absolute; inset:-2.5px; border-radius:19px;
     background: var(--di-conic, conic-gradient(from 0deg,#1d4ed8,#60a5fa,#7c3aed,#1d4ed8));
@@ -1270,7 +1263,7 @@ if (!window.SUPABASE_CONFIG) {
   }
   @keyframes devBorderSpin { to { transform:rotate(360deg); } }
 
-  /* SVG sits above sheen */
+  
   .device-card .dev-icon svg {
     width: 22px; height: 22px;
     position:relative; z-index:3;
@@ -1279,7 +1272,7 @@ if (!window.SUPABASE_CONFIG) {
     filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
   }
 
-  /* ── HOVER: tilt-lift + spin border + glow ── */
+  
   .device-card:hover .dev-icon {
     transform: scale(1.18) rotate(-10deg) translateY(-4px);
   }
@@ -1292,13 +1285,13 @@ if (!window.SUPABASE_CONFIG) {
     filter: drop-shadow(0 0 8px currentColor);
   }
 
-  /* ── PRESS ── */
+  
   .device-card:active .dev-icon {
     transform: scale(0.86) rotate(0deg) !important;
     transition-duration: 0.08s;
   }
 
-  /* ── staggered entrance ── */
+  
   .device-card:nth-child(1)  .dev-icon { animation-delay:0.03s; }
   .device-card:nth-child(2)  .dev-icon { animation-delay:0.08s; }
   .device-card:nth-child(3)  .dev-icon { animation-delay:0.13s; }
@@ -1309,8 +1302,8 @@ if (!window.SUPABASE_CONFIG) {
   .device-card:nth-child(8)  .dev-icon { animation-delay:0.38s; }
   .device-card:nth-child(n+9) .dev-icon{ animation-delay:0.42s; }
 
-  /* ── STATUS colour variants ── */
-  /* laptop In Used — blue */
+  
+  
   .dev-icon.di-inused {
     background: linear-gradient(145deg,#1e3a8a,#1d4ed8,#3b82f6);
     color:#bfdbfe;
@@ -1320,7 +1313,7 @@ if (!window.SUPABASE_CONFIG) {
   .device-card:hover .di-inused {
     box-shadow:0 10px 30px rgba(29,78,216,0.7), 0 0 0 3px rgba(96,165,250,0.35);
   }
-  /* laptop Backup — amber */
+  
   .dev-icon.di-backup {
     background: linear-gradient(145deg,#78350f,#d97706,#fbbf24);
     color:#fef3c7;
@@ -1330,7 +1323,7 @@ if (!window.SUPABASE_CONFIG) {
   .device-card:hover .di-backup {
     box-shadow:0 10px 30px rgba(217,119,6,0.7), 0 0 0 3px rgba(251,191,36,0.35);
   }
-  /* laptop Returned / Broken / other — slate */
+  
   .dev-icon.di-other {
     background: linear-gradient(145deg,#1e293b,#334155,#64748b);
     color:#cbd5e1;
@@ -1340,7 +1333,7 @@ if (!window.SUPABASE_CONFIG) {
   .device-card:hover .di-other {
     box-shadow:0 10px 30px rgba(51,65,85,0.65), 0 0 0 3px rgba(148,163,184,0.3);
   }
-  /* account icon — emerald-teal */
+  
   .dev-icon.di-account {
     background: linear-gradient(145deg,#064e3b,#059669,#2dd4bf);
     color:#d1fae5;
@@ -1351,7 +1344,7 @@ if (!window.SUPABASE_CONFIG) {
     box-shadow:0 10px 30px rgba(5,150,105,0.7), 0 0 0 3px rgba(52,211,153,0.35);
   }
 
-  /* ── idle pulse glow on di-inused ── */
+  
   @keyframes devGlowPulse {
     0%,100% { box-shadow:0 4px 16px rgba(29,78,216,0.5), inset 0 1px 0 rgba(255,255,255,0.18); }
     50%     { box-shadow:0 6px 24px rgba(29,78,216,0.75), 0 0 0 4px rgba(96,165,250,0.12), inset 0 1px 0 rgba(255,255,255,0.18); }
@@ -1391,12 +1384,12 @@ if (!window.SUPABASE_CONFIG) {
 </head>
 <body>
 
-<!-- Animated background orbs -->
+
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
 <div class="orb orb-3"></div>
 
-<!-- Login Screen -->
+
 <div id="login-screen">
   <div id="login-card">
     <div class="login-logo"><img src="https://dubvrtthmopdlyvxjhbw.supabase.co/storage/v1/object/public/image/Hr_managment_2.png" alt="HR L2"/></div>
@@ -1437,15 +1430,15 @@ if (!window.SUPABASE_CONFIG) {
   </div>
 </div>
 
-<!-- Main App -->
+
 <div id="app" style="display:none;">
-  <!-- Toast -->
+  
   <div id="toast-container"></div>
 
-  <!-- Offline banner -->
+  
   <div id="offline-banner">⚡ Mất kết nối — Đang thử lại...</div>
 
-  <!-- Top bar -->
+  
   <div id="topbar">
     <div class="brand-pill">
       <div class="brand-icon"><img src="https://dubvrtthmopdlyvxjhbw.supabase.co/storage/v1/object/public/image/Hr_managment_2.png" alt="HR"/></div>
@@ -1467,11 +1460,11 @@ if (!window.SUPABASE_CONFIG) {
     </button>
   </div>
 
-  <!-- Main content -->
+  
   <div id="main">
-    <!-- ===== EMPLOYEE VIEW ===== -->
+    
     <div id="view-employee" class="view active">
-    <!-- Stats -->
+    
     <div id="stats-row">
       <div class="stat-chip">
         <div class="stat-num" id="stat-total" style="color:#93C5FD;">—</div>
@@ -1491,7 +1484,7 @@ if (!window.SUPABASE_CONFIG) {
       </div>
     </div>
 
-    <!-- Toolbar -->
+    
     <div id="toolbar">
       <div class="search-glass">
         <svg class="search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -1502,7 +1495,7 @@ if (!window.SUPABASE_CONFIG) {
       </div>
     </div>
 
-    <!-- Filter pills -->
+    
     <div style="display:flex;gap:6px;padding:0 16px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
       <button class="filter-pill active" id="pill-All" onclick="setFilter('All')">Tất cả</button>
       <button class="filter-pill" id="pill-Active" onclick="setFilter('Active')">● Active</button>
@@ -1510,13 +1503,13 @@ if (!window.SUPABASE_CONFIG) {
       <button class="filter-pill" id="pill-Probation" onclick="setFilter('Probation')">● Probation</button>
     </div>
 
-    <!-- Employee list -->
+    
     <div id="list-container">
       <div id="list-content"></div>
     </div>
-    </div><!-- /view-employee -->
+    </div>
 
-    <!-- ===== LAPTOP VIEW ===== -->
+    
     <div id="view-laptop" class="view">
       <div id="stats-row">
         <div class="stat-chip"><div class="stat-num" id="lap-stat-total" style="color:#93C5FD;">—</div><div class="stat-lbl">Tổng</div></div>
@@ -1537,9 +1530,9 @@ if (!window.SUPABASE_CONFIG) {
         <button class="filter-pill" id="lap-pill-Returned" onclick="setLapFilter('Returned')">● Returned</button>
       </div>
       <div id="list-container"><div id="lap-list"></div></div>
-    </div><!-- /view-laptop -->
+    </div>
 
-    <!-- ===== ACCOUNT VIEW ===== -->
+    
     <div id="view-account" class="view">
       <div id="stats-row">
         <div class="stat-chip"><div class="stat-num" id="acc-stat-total" style="color:#93C5FD;">—</div><div class="stat-lbl">Tổng</div></div>
@@ -1560,10 +1553,10 @@ if (!window.SUPABASE_CONFIG) {
         <button class="filter-pill" id="acc-pill-Returned" onclick="setAccFilter('Returned')">● Returned</button>
       </div>
       <div id="list-container"><div id="acc-list"></div></div>
-    </div><!-- /view-account -->
+    </div>
   </div>
 
-  <!-- Bottom nav -->
+  
   <div id="bottom-nav">
     <div class="nav-btn active" id="nav-list" onclick="navTo('list')">
       <div class="nav-icon-wrap">
@@ -1572,7 +1565,7 @@ if (!window.SUPABASE_CONFIG) {
       </div>
       <span class="nav-label">Nhân sự</span>
     </div>
-    <!-- nav-add removed: replaced by #top-add-btn in the top bar -->
+    
     <div class="nav-btn" id="nav-add" style="display:none !important;"></div>
     <div class="nav-btn" id="nav-laptop" onclick="navTo('laptop')">
       <div class="nav-icon-wrap">
@@ -1605,7 +1598,7 @@ if (!window.SUPABASE_CONFIG) {
   </div>
 </div>
 
-<!-- Modal Sheet -->
+
 <div id="modal-overlay" onclick="handleOverlayClick(event)">
   <div id="modal-sheet">
     <div class="modal-handle"></div>
@@ -1620,7 +1613,7 @@ if (!window.SUPABASE_CONFIG) {
   </div>
 </div>
 
-<!-- Confirm Dialog -->
+
 <div id="confirm-overlay">
   <div id="confirm-box">
     <div id="confirm-icon" style="font-size:36px;text-align:center;margin-bottom:12px;"></div>
@@ -1634,28 +1627,28 @@ if (!window.SUPABASE_CONFIG) {
 </div>
 
 <script>
-// ============================================================
-// CONFIG (URL + anon key encoded — anon key vẫn public theo design,
-// chỉ tránh đọc trực tiếp khi nhìn source. Bảo mật thật: RLS + Auth.)
-// ============================================================
+
+
+
+
 const SUPABASE_URL = window.SUPABASE_CONFIG['HR_Management.html'].url;
 const SUPABASE_KEY = window.SUPABASE_CONFIG['HR_Management.html'].key;
-// Admin allowlist: chỉ những email này (sau khi đăng nhập Supabase Auth thành công)
-// mới được nâng quyền admin. Thêm email mới vào mảng nếu cần.
+
+
 const ADMIN_EMAILS = ["adminl2@gmail.com"];
 
-// ============================================================
-// SYNC sang Work_Attendance Supabase (bảng hr_employees, cột is_active)
-// Khớp theo ho_ten (nhan_su) === name (hr_employees)
-// ============================================================
+
+
+
+
 const WA_SUPABASE_URL = window.SUPABASE_CONFIG['HR_Management.html'].wa.url;
 const WA_SUPABASE_KEY = window.SUPABASE_CONFIG['HR_Management.html'].wa.key;
 
-// Map trạng thái nhan_su -> is_active của hr_employees
-// Active / Probation => true (đang làm việc), Inactive => false (đã nghỉ)
+
+
 function _mapTrangThaiToActive(trang_thai) {
   if (trang_thai === 'Inactive') return false;
-  return true; // Active hoặc Probation
+  return true; 
 }
 
 async function syncStatusToAttendance(ho_ten, trang_thai) {
@@ -1689,7 +1682,7 @@ async function syncStatusToAttendance(ho_ten, trang_thai) {
   }
 }
 
-// Phiên đăng nhập Supabase (lưu trong sessionStorage — đóng tab là mất)
+
 let _session = null;
 try { _session = JSON.parse(localStorage.getItem("sb_session") || "null"); } catch(_) {}
 function _saveSession(s){ _session = s; if(s) localStorage.setItem("sb_session", JSON.stringify(s)); else localStorage.removeItem("sb_session"); }
@@ -1704,7 +1697,7 @@ async function supaSignIn(email, password){
   });
   const j = await r.json().catch(()=>({}));
   if (!r.ok) throw new Error(j.error_description || j.msg || "Sai email hoặc mật khẩu");
-  return j; // { access_token, refresh_token, user, ... }
+  return j; 
 }
 async function supaSignOut(){
   if (!_session?.access_token) { _saveSession(null); return; }
@@ -1723,9 +1716,9 @@ const CO_SO_OPTIONS      = ["Head Office","SCSC Office","Cần Thơ Office"];
 const GIOI_TINH_OPTIONS  = ["Nam","Nữ"];
 const ALL_SEARCH_FIELDS  = ["ho_ten","gioi_tinh","chuc_danh","bo_phan","co_so","ngay_sinh","sdt","email","tai_khoan","trang_thai","ngay_vao","ngay_leave","name_gsd"];
 
-// ============================================================
-// STATE
-// ============================================================
+
+
+
 let currentRole = null;
 let allRecords  = [];
 let currentFilter = "All";
@@ -1733,9 +1726,9 @@ let searchDebounce = null;
 let confirmCallback = null;
 let autoRefreshTimer = null;
 
-// ============================================================
-// SUPABASE API
-// ============================================================
+
+
+
 const _h = () => ({
   "apikey": SUPABASE_KEY,
   "Authorization": `Bearer ${_bearer()}`,
@@ -1783,9 +1776,9 @@ async function dbCheckConn() {
   } catch { return false; }
 }
 
-// ============================================================
-// LOGIN
-// ============================================================
+
+
+
 function togglePw() {
   const inp = document.getElementById("login-pass");
   const ico = document.getElementById("pw-eye");
@@ -1810,7 +1803,7 @@ async function doLogin() {
     if (_isAdminEmail(sess.user?.email)) {
       startApp("admin");
     } else {
-      // Đăng nhập hợp lệ nhưng không phải admin → vào chế độ user (chỉ đọc)
+      
       startApp("user");
     }
   } catch(e){
@@ -1857,7 +1850,7 @@ async function doModalAdmin() {
   try {
     const sess = await supaSignIn(u, p);
     if (!_isAdminEmail(sess.user?.email)) {
-      // Đăng xuất ngay nếu không phải admin
+      
       _saveSession(sess); localStorage.removeItem("guest_mode"); await supaSignOut();
       if (err) err.textContent = "Tài khoản này không có quyền admin";
       return;
@@ -1877,9 +1870,9 @@ function restartAsAdmin() {
   loadData();
 }
 
-// ============================================================
-// START APP
-// ============================================================
+
+
+
 function startApp(role) {
   currentRole = role;
   document.getElementById("login-screen").style.display = "none";
@@ -1900,7 +1893,7 @@ function setupRoleUI() {
   badge.style.color = isAdmin ? "#60b3ff" : "var(--text-secondary)";
   document.getElementById("nav-add").style.display = "none";
   document.getElementById("nav-admin-btn").style.display = (!isAdmin) ? "flex" : "none";
-  // Nút đăng xuất chỉ hiện khi đã đăng nhập Supabase (có session)
+  
   const lo = document.getElementById("top-logout-btn");
   if (lo) lo.style.display = _session ? "inline-flex" : "none";
   if (typeof updateTopAddBtn === "function") updateTopAddBtn();
@@ -1918,24 +1911,16 @@ async function doLogout(){
   const e = document.getElementById("login-error"); if (e) e.textContent = "";
 }
 
-// ============================================================
-// LOAD DATA
-// ============================================================
+
+
+
 async function loadData(showSkeleton=true) {
   if (showSkeleton) renderSkeleton();
   setConnDot("loading");
   const kw = document.getElementById("search-input").value;
   try {
-    // Luôn tải danh mục account đầy đủ cùng nhân sự. Trước đây allAccounts chỉ
-    // được nạp khi mở tab Tài khoản, nên màn Chi tiết có thể hiện "—" dù
-    // nhan_su.account_id đã được gán. Không để bộ lọc/tìm kiếm của tab account
-    // làm mất dữ liệu dùng để đối chiếu ở màn Chi tiết.
-    const [records, accounts] = await Promise.all([
-      dbSearch(kw, currentFilter),
-      apiList(_urlAcc, "", "All", ACC_SEARCH_FIELDS, ACC_FIELDS),
-    ]);
+    const records = await dbSearch(kw, currentFilter);
     allRecords = records;
-    allAccounts = accounts;
     renderList(records);
     updateStats(records);
     setConnDot("ok");
@@ -1951,19 +1936,19 @@ function setConnDot(state) {
   dot.className = "conn-dot " + (state==="ok"?"conn-ok":state==="err"?"conn-err":"conn-loading");
 }
 
-// ── Count-up animation ──────────────────────────────────────
+
 function countUp(id, target, duration) {
   const el = document.getElementById(id);
   if (!el) return;
   const prev = parseInt(el.textContent) || 0;
-  if (prev === target) return; // no change, skip
+  if (prev === target) return; 
   const start = performance.now();
   const diff = target - prev;
   el.classList.add('counting');
   function step(now) {
     const elapsed = now - start;
     const progress = Math.min(elapsed / duration, 1);
-    // easeOutExpo
+    
     const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
     el.textContent = Math.round(prev + diff * ease);
     if (progress < 1) {
@@ -1985,9 +1970,9 @@ function updateStats(records) {
   countUp('stat-probation', records.filter(r=>r.trang_thai==="Probation").length, 850);
 }
 
-// ============================================================
-// RENDER LIST
-// ============================================================
+
+
+
 const AV_COLORS = ["av-blue","av-purple","av-green","av-orange","av-pink","av-teal"];
 
 function getInitials(name) {
@@ -2059,9 +2044,9 @@ function renderError(e) {
   </div>`;
 }
 
-// ============================================================
-// FILTER + SEARCH
-// ============================================================
+
+
+
 function setFilter(f) {
   currentFilter = f;
   document.querySelectorAll(".filter-pill").forEach(p=>p.classList.remove("active","success","danger","warning"));
@@ -2088,9 +2073,9 @@ function clearSearch() {
   loadData();
 }
 
-// ============================================================
-// NAV — enhanced with ripple + particle burst
-// ============================================================
+
+
+
 
 function navSpawnRipple(btn, e) {
   const rect = btn.getBoundingClientRect();
@@ -2147,11 +2132,11 @@ function navActivate(btnEl) {
   btnEl.classList.add("active");
   if (!wasActive) {
     navSpawnParticles(btnEl);
-    // Re-trigger bounce by removing and re-adding class
+    
     const svg = btnEl.querySelector("svg");
     if (svg) {
       svg.style.animation = "none";
-      svg.offsetHeight; // reflow
+      svg.offsetHeight; 
       svg.style.animation = "";
     }
     const label = btnEl.querySelector(".nav-label");
@@ -2163,7 +2148,7 @@ function navActivate(btnEl) {
   }
 }
 
-// Attach ripple to all nav buttons
+
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".nav-btn").forEach(btn => {
     const handler = (e) => {
@@ -2187,9 +2172,9 @@ function navTo(t) {
   }
 }
 
-// ============================================================
-// DETAIL VIEW
-// ============================================================
+
+
+
 function viewDetail(id) {
   const r = allRecords.find(x=>x.id===id);
   if (!r) return;
@@ -2205,13 +2190,7 @@ function viewDetail(id) {
     ["Ngày Sinh", r.ngay_sinh||"—"],
     ["SĐT", r.sdt||"—"],
     ["Email", r.email||"—"],
-    ["Tài Khoản", (() => {
-      const accountId = Number(r.account_id);
-      const a = Number.isFinite(accountId)
-        ? allAccounts.find(x => Number(x.id) === accountId)
-        : null;
-      return a?.heiway_account || r.tai_khoan || "—";
-    })()],
+    ["Tài Khoản", (() => { const a = allAccounts.find(x=>x.id===r.account_id); return a ? a.heiway_account : (r.tai_khoan||"—"); })()],
     ["Trạng Thái", r.trang_thai],
     ["Ngày Onboarding", r.ngay_vao||"—"],
     ["Ngày Leave", r.ngay_leave||"—"],
@@ -2219,7 +2198,7 @@ function viewDetail(id) {
   ];
 
   document.getElementById("modal-title").textContent = "Chi Tiết";
-  // Icon map for each field
+  
   const empIcons = {
     "Giới Tính":"⚧","Chức Danh":"💼","Bộ Phận":"🏢","Cơ Sở":"📍",
     "Ngày Sinh":"🎂","SĐT":"📞","Email":"✉️","Tài Khoản":"🔑",
@@ -2936,9 +2915,9 @@ function exportAccounts() {
   toast(`Đã xuất ${records.length} tài khoản`, "success");
 }
 
-// ============================================================
-// TOAST
-// ============================================================
+
+
+
 function toast(msg, type="info") {
   const c = document.getElementById("toast-container");
   const t = document.createElement("div");
@@ -2953,9 +2932,9 @@ function toast(msg, type="info") {
   setTimeout(()=>{ t.classList.add("removing"); setTimeout(()=>t.remove(),250); }, 3000);
 }
 
-// ============================================================
-// AUTO REFRESH + OFFLINE
-// ============================================================
+
+
+
 function startAutoRefresh() {
   if (autoRefreshTimer) clearInterval(autoRefreshTimer);
   autoRefreshTimer = setInterval(()=>loadData(false), 30000);
@@ -2970,9 +2949,9 @@ function showOfflineBanner(show) {
   document.getElementById("offline-banner").style.display = show ? "block" : "none";
 }
 
-// ============================================================
-// AURORA PARTICLE ANIMATION
-// ============================================================
+
+
+
 (function() {
   const canvas = document.createElement('canvas');
   canvas.id = 'aurora-canvas';
@@ -3037,25 +3016,25 @@ document.addEventListener("keydown", e=>{
 });
 
 
-// ============================================================
-// LAPTOPS & ACCOUNTS MODULE
-// ============================================================
+
+
+
 const _urlLap = (p="") => `${SUPABASE_URL}/rest/v1/laptops${p}`;
 const _urlAcc = (p="") => `${SUPABASE_URL}/rest/v1/accounts${p}`;
 
-let currentTab = "list";       // 'list' | 'laptop' | 'account'
+let currentTab = "list";       
 let allLaptops = [];
 let allAccounts = [];
 let lapFilter = "All", accFilter = "All";
 let lapSearchT = null, accSearchT = null;
 const LAP_FIELDS = ["name","heiway_account","account_id","serial_number","laptop_drive_c","wlan_guest","job_title","status","note","bien_ban_url","bien_ban_files"];
 const LAP_SEARCH_FIELDS = ["name","heiway_account","serial_number","laptop_drive_c","wlan_guest","job_title","status","note","bien_ban_url"];
-// Helper: parse bien_ban_files JSON array, fallback to bien_ban_url for legacy
+
 function parseBienBanFiles(r){
   let files = [];
   try { if(r.bien_ban_files) files = JSON.parse(r.bien_ban_files); } catch(e){}
   if(!Array.isArray(files)) files = [];
-  // Migrate legacy bien_ban_url if not already in list
+  
   if(r.bien_ban_url && !files.some(f=>f.url===r.bien_ban_url)){
     files = [{url: r.bien_ban_url, name: r.bien_ban_url.split("/").pop().split("?")[0], uploaded_at: null}, ...files];
   }
@@ -3072,7 +3051,7 @@ function isImageUrl(url){ return /\.(png|jpe?g|webp|gif)(\?|$)/i.test(url); }
 function isPdfUrl(url){ return /\.pdf(\?|$)/i.test(url); }
 function isOfficeUrl(url){ return /\.(docx?|xlsx?|pptx?)(\?|$)/i.test(url); }
 function isIOS(){ return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1); }
-// Mở file an toàn trên iOS: docx/xlsx/pptx → Office Online Viewer (iOS Safari không render được)
+
 function openFileSmart(url){
   try{
     if(!url){ toast("Không có file","error"); return; }
@@ -3081,18 +3060,18 @@ function openFileSmart(url){
       window.open(viewer, "_blank", "noopener");
       return;
     }
-    // ảnh và PDF: iOS Safari xem trực tiếp OK
+    
     window.open(url, "_blank", "noopener");
   }catch(e){ toast("Không mở được file: "+e.message,"error"); }
 }
 const ACC_FIELDS        = ["id","heiway_account","pic_name","job_title","status","note"];
-const ACC_SEARCH_FIELDS = ["heiway_account","pic_name","job_title","status","note"]; // chỉ text — không có id (integer)
+const ACC_SEARCH_FIELDS = ["heiway_account","pic_name","job_title","status","note"]; 
 const STATUS_OPTIONS_DEV = ["In Used","Backup","Returned","Broken","Spare"];
 
-// --- API ---
+
 async function apiList(urlFn, kw, filter, fields, selectFields) {
-  // fields = dùng để build OR search (chỉ text columns)
-  // selectFields = dùng để ?select=... (có thể có id integer) — nếu không truyền thì dùng fields
+  
+  
   const parts = [];
   const k = (kw||"").trim();
   if (k) parts.push(`or=(${fields.map(f=>`${f}.ilike.*${k}*`).join(",")})`);
@@ -3118,19 +3097,19 @@ async function apiDelete(urlFn, id) {
   if (!r.ok) throw new Error(await r.text());
 }
 
-// --- Status badge ---
+
 function devStatusBadge(s) {
   if (!s) return "";
   const map = {"In Used":"status-active","Backup":"status-probation","Returned":"status-inactive","Broken":"status-inactive","Spare":"status-probation"};
   return `<span class="status-badge ${map[s]||"status-probation"}">${s}</span>`;
 }
 
-// --- Render LAPTOPS ---
+
 function renderLapList(rows) {
   const el = document.getElementById("lap-list");
   if (!rows.length) { el.innerHTML = `<div class="empty-state"><div class="empty-icon">💻</div><div class="empty-title">Không có thiết bị</div><div class="empty-sub">Thử đổi bộ lọc hoặc từ khóa</div></div>`; return; }
 
-  /* SVG icons per status — rich illustrated versions */
+  
   const lapSVG = {
     'In Used': `<svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
       <style>
@@ -3249,7 +3228,7 @@ async function loadLaptops() {
 function setLapFilter(f){ lapFilter=f; document.querySelectorAll('[id^="lap-pill-"]').forEach(p=>p.classList.remove("active")); document.getElementById(`lap-pill-${f}`)?.classList.add("active"); loadLaptops(); }
 function onSearchLap(){ if(lapSearchT) clearTimeout(lapSearchT); lapSearchT=setTimeout(loadLaptops,350); }
 
-// --- Render ACCOUNTS ---
+
 function renderAccList(rows) {
   const el = document.getElementById("acc-list");
   if (!rows.length) { el.innerHTML = `<div class="empty-state"><div class="empty-icon">🔑</div><div class="empty-title">Không có tài khoản</div><div class="empty-sub">Thử đổi bộ lọc hoặc từ khóa</div></div>`; return; }
@@ -3301,20 +3280,15 @@ async function loadAccounts() {
   setConnDot("loading");
   try {
     const kw = document.getElementById("acc-search").value;
-    const [rows, fullRows] = await Promise.all([
-      apiList(_urlAcc, kw, accFilter, ACC_SEARCH_FIELDS, ACC_FIELDS),
-      apiList(_urlAcc, "", "All", ACC_SEARCH_FIELDS, ACC_FIELDS),
-    ]);
-    // rows chỉ phục vụ giao diện đang lọc; cache đối chiếu nhân sự luôn đầy đủ.
-    allAccounts = fullRows;
-    renderAccList(rows); updateAccStats(rows);
+    const rows = await apiList(_urlAcc, kw, accFilter, ACC_SEARCH_FIELDS, ACC_FIELDS);
+    allAccounts = rows; renderAccList(rows); updateAccStats(rows);
     setConnDot("ok");
   } catch(e) { setConnDot("err"); document.getElementById("acc-list").innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Lỗi tải</div><div class="empty-sub" style="color:#ff6b63;">${e.message}</div></div>`; }
 }
 function setAccFilter(f){ accFilter=f; document.querySelectorAll('[id^="acc-pill-"]').forEach(p=>p.classList.remove("active")); document.getElementById(`acc-pill-${f}`)?.classList.add("active"); loadAccounts(); }
 function onSearchAcc(){ if(accSearchT) clearTimeout(accSearchT); accSearchT=setTimeout(loadAccounts,350); }
 
-// --- Detail/Edit/Delete LAPTOPS ---
+
 function viewLap(id){
   const r = allLaptops.find(x=>x.id===id); if(!r) return;
   const isAdmin = currentRole==="admin";

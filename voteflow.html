@@ -21,9 +21,7 @@ if (!window.SUPABASE_CONFIG) {
 <script>window.bcrypt = (typeof dcodeIO !== "undefined" && dcodeIO.bcrypt) ? dcodeIO.bcrypt : window.bcrypt;</script>
 
 <style>
-/* ============================================================
-   DESIGN TOKENS
-   ============================================================ */
+
 :root {
   --c-bg:          #f6f7fb;
   --c-surface:     #ffffff;
@@ -53,9 +51,7 @@ if (!window.SUPABASE_CONFIG) {
   --ease-spring:   cubic-bezier(0.34,1.56,0.64,1);
 }
 
-/* ============================================================
-   RESET & BASE
-   ============================================================ */
+
 *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
 html { font-size:16px; scroll-behavior:smooth; }
 body {
@@ -88,16 +84,12 @@ select option { background: var(--c-surface2); }
 a { color: var(--c-accent); text-decoration:none; }
 h1,h2,h3,h4,h5 { font-family: var(--font-display); }
 
-/* ============================================================
-   SCROLLBAR
-   ============================================================ */
+
 ::-webkit-scrollbar { width:6px; height:6px; }
 ::-webkit-scrollbar-track { background: var(--c-surface); }
 ::-webkit-scrollbar-thumb { background: rgba(124,111,255,0.4); border-radius:3px; }
 
-/* ============================================================
-   UTILITY
-   ============================================================ */
+
 .hidden { display:none !important; }
 .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
 .flex { display:flex; }
@@ -118,9 +110,7 @@ h1,h2,h3,h4,h5 { font-family: var(--font-display); }
 .relative { position:relative; }
 .overflow-hidden { overflow:hidden; }
 
-/* ============================================================
-   BUTTONS
-   ============================================================ */
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -174,9 +164,7 @@ h1,h2,h3,h4,h5 { font-family: var(--font-display); }
 .btn-icon { padding:8px; border-radius:var(--radius-sm); aspect-ratio:1; }
 .btn:disabled { opacity:0.45; cursor:not-allowed; pointer-events:none; }
 
-/* ============================================================
-   GLASS CARD
-   ============================================================ */
+
 .card {
   background: rgba(17,17,24,0.8);
   backdrop-filter: blur(20px) saturate(160%);
@@ -187,7 +175,7 @@ h1,h2,h3,h4,h5 { font-family: var(--font-display); }
   transition: border-color .2s, box-shadow .2s;
 }
 .card:hover { border-color: var(--c-border-h); }
-/* Admin overrides — white surface */
+
 #admin-page .card {
   background: #fff;
   backdrop-filter: none;
@@ -199,9 +187,7 @@ h1,h2,h3,h4,h5 { font-family: var(--font-display); }
   box-shadow: var(--shadow-md);
 }
 
-/* ============================================================
-   BADGE
-   ============================================================ */
+
 .badge {
   display: inline-flex;
   align-items: center;
@@ -217,17 +203,13 @@ h1,h2,h3,h4,h5 { font-family: var(--font-display); }
 .badge-yellow{ background:rgba(245,158,11,0.15); color:var(--c-warning); }
 .badge-purple{ background:rgba(124,111,255,0.15);color:var(--c-accent); }
 
-/* ============================================================
-   FORM COMPONENTS
-   ============================================================ */
+
 .form-group { display:flex; flex-direction:column; gap:6px; }
 .form-label { font-size:13px; font-weight:500; color:var(--c-muted); }
 .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 @media(max-width:600px){ .form-row { grid-template-columns:1fr; } }
 
-/* ============================================================
-   SKELETON LOADER
-   ============================================================ */
+
 .skeleton {
   background: linear-gradient(90deg, var(--c-surface2) 25%, rgba(255,255,255,0.04) 50%, var(--c-surface2) 75%);
   background-size: 200% 100%;
@@ -236,9 +218,7 @@ h1,h2,h3,h4,h5 { font-family: var(--font-display); }
 }
 @keyframes skeleton-shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
-/* ============================================================
-   TOAST
-   ============================================================ */
+
 #toast-container {
   position: fixed;
   bottom: 24px;
@@ -270,9 +250,7 @@ h1,h2,h3,h4,h5 { font-family: var(--font-display); }
 @keyframes toast-in  { from{opacity:0;transform:translateX(24px)} to{opacity:1;transform:translateX(0)} }
 @keyframes toast-out { from{opacity:1;transform:translateX(0)} to{opacity:0;transform:translateX(24px)} }
 
-/* ============================================================
-   MODAL
-   ============================================================ */
+
 .modal-overlay {
   position: fixed; inset:0;
   background: rgba(0,0,0,0.7);
@@ -308,14 +286,10 @@ h1,h2,h3,h4,h5 { font-family: var(--font-display); }
 @keyframes modal-in { from{opacity:0;transform:scale(0.94) translateY(8px)} to{opacity:1;transform:scale(1) translateY(0)} }
 @keyframes fade-in  { from{opacity:0} to{opacity:1} }
 
-/* ============================================================
-   APP SHELL
-   ============================================================ */
+
 #app { min-height:100vh; }
 
-/* ============================================================
-   AUTH PAGE
-   ============================================================ */
+
 #emp-auth-page {
   min-height: 100vh;
   display: flex;
@@ -361,12 +335,8 @@ h1,h2,h3,h4,h5 { font-family: var(--font-display); }
 .auth-subtitle { color:var(--c-muted); text-align:center; font-size:14px; margin-bottom:28px; }
 .auth-form { display:flex; flex-direction:column; gap:14px; }
 
-/* ============================================================
-   ADMIN LAYOUT
-   ============================================================ */
-/* ============================================================
-   ADMIN LAYOUT
-   ============================================================ */
+
+
 #admin-page { display:flex; min-height:100vh; background:var(--c-bg); }
 
 .admin-sidebar {
@@ -456,9 +426,7 @@ h1,h2,h3,h4,h5 { font-family: var(--font-display); }
 .admin-section { display:none; }
 .admin-section.active { display:block; animation:fade-in .2s ease; }
 
-/* ============================================================
-   EVENT CARDS (replaces dark table)
-   ============================================================ */
+
 .events-grid {
   display: flex;
   flex-direction: column;
@@ -520,9 +488,7 @@ h1,h2,h3,h4,h5 { font-family: var(--font-display); }
 }
 .event-card-actions { display:flex; gap:8px; align-items:center; flex-shrink:0; }
 
-/* ============================================================
-   RESULTS CARDS
-   ============================================================ */
+
 .results-grid { display:flex; flex-direction:column; gap:20px; }
 .result-event-card {
   background: #fff;
@@ -566,9 +532,7 @@ h1,h2,h3,h4,h5 { font-family: var(--font-display); }
 .result-bar { height:100%; background:var(--c-grad1); border-radius:99px; transition:width .8s var(--ease-out); min-width:2px; }
 .result-pct { font-size:13px; font-weight:700; text-align:right; }
 
-/* ============================================================
-   HISTORY TABLE
-   ============================================================ */
+
 .history-filter-bar {
   display: flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:20px;
 }
@@ -598,9 +562,7 @@ h1,h2,h3,h4,h5 { font-family: var(--font-display); }
   font-size:12px; padding:4px 10px; border-radius:20px; font-weight:600;
 }
 
-/* ============================================================
-   DATA TABLE (generic)
-   ============================================================ */
+
 .data-table { width:100%; border-collapse:collapse; }
 .data-table th {
   text-align:left; padding:11px 16px;
@@ -617,7 +579,7 @@ h1,h2,h3,h4,h5 { font-family: var(--font-display); }
 .data-table tr:hover td { background:rgba(124,111,255,0.02); }
 .table-wrap { overflow-x:auto; }
 
-/* Stats */
+
 .stats-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; margin-bottom:28px; }
 .stat-card {
   padding:22px; background:#fff;
@@ -633,9 +595,7 @@ h1,h2,h3,h4,h5 { font-family: var(--font-display); }
 .chart-title { font-size:15px; font-weight:700; margin-bottom:16px; }
 canvas { max-height:280px; }
 
-/* ============================================================
-   VOTING PAGE
-   ============================================================ */
+
 #voting-page { min-height:100vh; }
 .voting-banner {
   width:100%;
@@ -739,7 +699,7 @@ canvas { max-height:280px; }
   box-shadow: var(--shadow-sm);
 }
 .voting-tab:hover:not(.active) { color: rgba(255,255,255,0.9); }
-/* Live results in voting panel */
+
 .vr-event-card {
   background: rgba(255,255,255,0.07);
   backdrop-filter: blur(12px);
@@ -898,18 +858,14 @@ canvas { max-height:280px; }
   to   { opacity:1; transform:translateY(0) scale(1); }
 }
 
-/* ============================================================
-   CONFETTI
-   ============================================================ */
+
 #confetti-canvas {
   position:fixed;inset:0;
   pointer-events:none;
   z-index:9998;
 }
 
-/* ============================================================
-   LOADING / EMPTY / ERROR STATES
-   ============================================================ */
+
 .state-overlay {
   display:flex;
   flex-direction:column;
@@ -932,9 +888,7 @@ canvas { max-height:280px; }
 }
 @keyframes spin { to{transform:rotate(360deg)} }
 
-/* ============================================================
-   ADMIN HAMBURGER TOGGLE (mobile)
-   ============================================================ */
+
 .sidebar-toggle {
   display:none;
   position:fixed;
@@ -955,9 +909,7 @@ canvas { max-height:280px; }
   z-index:99;
 }
 
-/* ============================================================
-   ADMIN LOCATIONS GRID
-   ============================================================ */
+
 .admin-locs-grid {
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
@@ -978,18 +930,14 @@ canvas { max-height:280px; }
 .admin-loc-votes { font-size:13px; color:var(--c-muted); }
 .admin-loc-actions { display:flex; gap:8px; margin-top:12px; }
 
-/* ============================================================
-   RESULT BARS
-   ============================================================ */
+
 .result-row { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
 .result-name { min-width:120px; font-size:14px; font-weight:600; }
 .result-bar-wrap { flex:1; height:10px; background:var(--c-surface2); border-radius:5px; overflow:hidden; }
 .result-bar { height:100%; background:var(--c-grad1); border-radius:5px; transition:width .8s var(--ease-out); }
 .result-pct { min-width:42px; text-align:right; font-size:13px; font-weight:600; color:var(--c-accent); }
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
+
 @media(max-width:900px) {
   .admin-sidebar { transform:translateX(-100%); }
   .admin-sidebar.open { transform:translateX(0); }
@@ -1006,9 +954,7 @@ canvas { max-height:280px; }
   #toast-container { right:12px; left:12px; max-width:100%; }
 }
 
-/* ============================================================
-   COLOUR SCHEME PULSE (animated gradient border)
-   ============================================================ */
+
 @property --angle { syntax:'<angle>'; initial-value:0deg; inherits:false; }
 .gradient-border {
   position:relative;
@@ -1023,9 +969,7 @@ canvas { max-height:280px; }
 }
 @keyframes rotate-border { to{--angle:360deg} }
 
-/* ============================================================
-   VOTE SUCCESS OVERLAY
-   ============================================================ */
+
 .vote-success-ring {
   position:absolute;inset:0;
   border-radius:var(--radius-xl);
@@ -1040,9 +984,7 @@ canvas { max-height:280px; }
   100%{ opacity:0; transform:scale(1.05); }
 }
 
-/* ============================================================
-   TOPBAR ANNOUNCEMENT
-   ============================================================ */
+
 .topbar {
   background: var(--c-grad1);
   color:#fff;
@@ -1052,9 +994,7 @@ canvas { max-height:280px; }
   font-weight:500;
 }
 
-/* ============================================================
-   ADMIN TABS
-   ============================================================ */
+
 .tab-list {
   display:flex;
   gap:4px;
@@ -1081,9 +1021,7 @@ canvas { max-height:280px; }
 }
 .tab-item:hover:not(.active) { color:var(--c-text); }
 
-/* ============================================================
-   VOTE HISTORY TABLE
-   ============================================================ */
+
 .history-table { width:100%; border-collapse:collapse; font-size:13px; }
 .history-table th { padding:10px 12px; font-size:11px; font-weight:600; color:var(--c-muted); text-transform:uppercase; letter-spacing:.04em; border-bottom:1px solid var(--c-border); text-align:left; }
 .history-table td { padding:10px 12px; border-bottom:1px solid rgba(15,23,42,0.04); vertical-align:middle; }
@@ -1092,9 +1030,7 @@ canvas { max-height:280px; }
 .option-badge { display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;font-size:12px;font-weight:700;font-family:var(--font-display); }
 .history-filter-bar { display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;align-items:center; }
 
-/* ============================================================
-   OPTION CARDS (A/B/C/D)
-   ============================================================ */
+
 .option-letter {
   width:48px; height:48px; border-radius:50%;
   background:var(--c-grad1);
@@ -1120,7 +1056,7 @@ canvas { max-height:280px; }
 @keyframes option-pop { 0%{transform:scale(1)} 40%{transform:scale(1.03)} 100%{transform:scale(1)} }
 .vote-options-grid { display:flex; flex-direction:column; gap:14px; max-width:680px; margin:0 auto; }
 
-/* Public result page */
+
 .public-result-wrap { max-width:720px; margin:0 auto; padding:48px 24px; }
 .public-result-header { text-align:center; margin-bottom:40px; }
 .public-result-title { font-size:clamp(24px,5vw,40px); font-weight:800; font-family:var(--font-display); margin-bottom:8px; }
@@ -1136,9 +1072,7 @@ canvas { max-height:280px; }
 .live-dot { width:8px;height:8px;border-radius:50%;background:var(--c-success);display:inline-block;margin-right:6px;animation:pulse-dot 1.5s infinite; }
 @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
 
-/* ============================================================
-   COUNTDOWN
-   ============================================================ */
+
 .countdown-wrap {
   display:flex;
   gap:12px;
@@ -1158,11 +1092,9 @@ canvas { max-height:280px; }
 </head>
 <body>
 
-<!-- ============================================================
-     DOM STRUCTURE
-     ============================================================ -->
+
 <div id="app">
-  <!-- AUTH PAGE -->
+  
   <div id="auth-page" class="hidden">
     <div class="auth-card" style="position:relative;">
       <button class="btn btn-ghost btn-sm" onclick="
@@ -1191,10 +1123,7 @@ canvas { max-height:280px; }
   </div>
 
 
-  <!-- =========================================================
-       EMPLOYEE AUTH PAGE (Voter login: ID/Email + 6-digit PIN)
-       Reuses existing voting-app design tokens (.auth-card, .btn, .form-group)
-       ========================================================= -->
+  
   <div id="emp-auth-page" class="hidden">
     <div class="auth-card">
       <div class="auth-logo">
@@ -1202,7 +1131,7 @@ canvas { max-height:280px; }
         <span class="auth-logo-text">VoteFlow</span>
       </div>
 
-      <!-- Step 1: identifier -->
+      
       <div id="emp-step-identifier">
         <h1 class="auth-title">Đăng nhập nhân viên</h1>
         <p class="auth-subtitle">Mã nhân viên hoặc email công ty</p>
@@ -1216,7 +1145,7 @@ canvas { max-height:280px; }
         </div>
       </div>
 
-      <!-- Step 2: create PIN -->
+      
       <div id="emp-step-create-pin" class="hidden">
         <h1 class="auth-title">Tạo mã PIN cá nhân</h1>
         <p class="auth-subtitle" id="emp-create-pin-hello">Bảo mật tài khoản của bạn bằng PIN 6 chữ số</p>
@@ -1235,7 +1164,7 @@ canvas { max-height:280px; }
         </div>
       </div>
 
-      <!-- Step 3: enter PIN -->
+      
       <div id="emp-step-enter-pin" class="hidden">
         <h1 class="auth-title">Nhập mã PIN</h1>
         <p class="auth-subtitle" id="emp-enter-pin-hello">Chào mừng trở lại</p>
@@ -1250,7 +1179,7 @@ canvas { max-height:280px; }
         </div>
       </div>
 
-      <!-- Step 4: locked -->
+      
       <div id="emp-step-locked" class="hidden" style="text-align:center;">
         <div style="font-size:48px;line-height:1;margin:8px 0 18px;">🔒</div>
         <h1 class="auth-title" style="color:var(--c-error);">Tài khoản đã bị khóa</h1>
@@ -1267,12 +1196,12 @@ canvas { max-height:280px; }
     </div>
   </div>
 
-  <!-- ADMIN PAGE -->
+  
   <div id="admin-page" class="hidden">
     <button class="sidebar-toggle btn-ghost btn" id="sidebar-toggle-btn">☰</button>
     <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
-    <!-- Sidebar -->
+    
     <aside class="admin-sidebar" id="admin-sidebar">
       <div class="sidebar-logo">
         <div class="sidebar-logo-icon"><img src="https://edsowiramriosgwfuewg.supabase.co/storage/v1/object/public/Video/vote2.png" alt="VoteFlow" /></div>
@@ -1296,9 +1225,9 @@ canvas { max-height:280px; }
       </div>
     </aside>
 
-    <!-- Content -->
+    
     <main class="admin-content">
-      <!-- Dashboard Section -->
+      
       <div class="admin-section" id="section-dashboard">
         <div class="admin-header">
           <div class="admin-header-left">
@@ -1325,7 +1254,7 @@ canvas { max-height:280px; }
         </div>
       </div>
 
-      <!-- Events Section -->
+      
       <div class="admin-section active" id="section-events">
         <div class="admin-header">
           <div class="admin-header-left">
@@ -1340,7 +1269,7 @@ canvas { max-height:280px; }
         <div class="events-grid" id="events-grid"></div>
       </div>
 
-      <!-- Locations Section -->
+      
       <div class="admin-section" id="section-locations">
         <div class="admin-header">
           <div class="admin-header-left">
@@ -1356,7 +1285,7 @@ canvas { max-height:280px; }
         <div class="admin-locs-grid" id="locations-grid"></div>
       </div>
 
-      <!-- Results Section -->
+      
       <div class="admin-section" id="section-results">
         <div class="admin-header">
           <div class="admin-header-left">
@@ -1367,7 +1296,7 @@ canvas { max-height:280px; }
         <div class="results-grid" id="results-content"></div>
       </div>
 
-      <!-- History Section -->
+      
       <div class="admin-section" id="section-history">
         <div class="admin-header">
           <div class="admin-header-left">
@@ -1406,7 +1335,7 @@ canvas { max-height:280px; }
         </div>
       </div>
 
-      <!-- Config Section -->
+      
       <div class="admin-section" id="section-config">
         <div class="admin-header">
           <div class="admin-header-left">
@@ -1451,7 +1380,7 @@ canvas { max-height:280px; }
     </main>
   </div>
 
-  <!-- VOTING PAGE -->
+  
   <div id="voting-page" class="hidden">
     <div id="announcement-bar" class="topbar hidden"></div>
     <div style="position:fixed;top:12px;left:16px;right:16px;z-index:200;display:flex;justify-content:space-between;align-items:center;pointer-events:none;">
@@ -1473,7 +1402,7 @@ canvas { max-height:280px; }
     </div>
     <div class="voting-body">
       <div class="voting-meta" id="voting-meta"></div>
-      <!-- Tabs (hidden - results moved to event picker page) -->
+      
       <div class="voting-tabs" id="voting-tabs" style="display:none;">
         <button class="voting-tab active" id="tab-vote" onclick="Voting.switchTab('vote')">🗳️ Bình chọn</button>
         <button class="voting-tab" id="tab-results" onclick="Voting.switchTab('results')">📊 Kết quả</button>
@@ -1488,7 +1417,7 @@ canvas { max-height:280px; }
     </div>
   </div>
 
-  <!-- LANDING PAGE (no event param) -->
+  
   <div id="landing-page" class="hidden">
     <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(124,111,255,0.10) 0%, transparent 70%);">
       <div style="text-align:center;max-width:420px;width:100%;">
@@ -1514,7 +1443,7 @@ canvas { max-height:280px; }
       </div>
     </div>
   </div>
-  <!-- PUBLIC ALL RESULTS PAGE -->
+  
   <div id="public-all-results-page" class="hidden">
     <div style="min-height:100vh;background:var(--c-bg);padding:32px 16px;">
       <div style="max-width:760px;margin:0 auto;">
@@ -1533,7 +1462,7 @@ canvas { max-height:280px; }
     </div>
   </div>
 
-  <!-- PUBLIC RESULT PAGE -->
+  
   <div id="public-result-page" class="hidden">
     <div class="public-result-wrap">
       <div class="public-result-header">
@@ -1555,15 +1484,15 @@ canvas { max-height:280px; }
   </div>
 </div>
 
-<!-- MODALS -->
+
 <div id="modal-container"></div>
 <canvas id="confetti-canvas"></canvas>
 <div id="toast-container"></div>
 
 <script>
-// ============================================================
-// CONFIG
-// ============================================================
+
+
+
 const SUPABASE_URL  = window.SUPABASE_CONFIG['voteflow.html'].url;
 const SUPABASE_ANON = window.SUPABASE_CONFIG['voteflow.html'].key;
 const { createClient } = supabase;
@@ -1571,9 +1500,9 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON, {
   realtime: { params: { eventsPerSecond: 10 } }
 });
 
-// ============================================================
-// STATE MANAGEMENT
-// ============================================================
+
+
+
 const State = {
   user:      null,
   isAdmin:   false,
@@ -1585,15 +1514,15 @@ const State = {
   realtimeChannel: null,
   charts:          {},
   votedLocations:  new Set(),
-  myNominatedName: null,   // tên người được đề xuất khi chọn "Lựa chọn khác"
+  myNominatedName: null,   
   antiDupMethod:   'localStorage',
   deviceId:        null,
   fingerprint:     null,
 };
 
-// ============================================================
-// UTILITIES
-// ============================================================
+
+
+
 function sanitize(str) {
   const d = document.createElement('div');
   d.textContent = str ?? '';
@@ -1603,11 +1532,11 @@ function fmtDate(ts) {
   if (!ts) return '—';
   return new Date(ts).toLocaleString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', timeZone:'Asia/Ho_Chi_Minh' });
 }
-// Convert UTC/ISO timestamp to Vietnam local time string for datetime-local input (YYYY-MM-DDTHH:mm)
+
 function toVNLocal(ts) {
   if (!ts) return '';
   const d = new Date(ts);
-  // offset VN = UTC+7
+  
   const vnMs = d.getTime() + 7 * 60 * 60 * 1000;
   const vn = new Date(vnMs);
   const pad = n => String(n).padStart(2, '0');
@@ -1641,7 +1570,7 @@ async function getBrowserFingerprint() {
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('').slice(0,32);
 }
 function getVoterIdentifier(eventId) {
-  // Ưu tiên dùng employee ID (đã login) → đảm bảo mỗi nhân viên chỉ vote 1 lần
+  
   const empSession = EmployeeAuth && EmployeeAuth.session;
   if (empSession && empSession.employee && empSession.employee.id) {
     return 'emp_' + empSession.employee.id;
@@ -1649,7 +1578,7 @@ function getVoterIdentifier(eventId) {
   const method = State.antiDupMethod;
   if (method === 'fingerprint') return State.fingerprint || State.deviceId;
   if (method === 'deviceId')    return State.deviceId;
-  // localStorage fallback
+  
   const key = 'vf_voter_' + eventId;
   let id = localStorage.getItem(key);
   if (!id) { id = genUUID(); localStorage.setItem(key, id); }
@@ -1673,9 +1602,9 @@ function countUp(el, target, duration = 800) {
   requestAnimationFrame(step);
 }
 
-// ============================================================
-// TOAST
-// ============================================================
+
+
+
 const Toast = {
   show(msg, type = 'info', duration = 3500) {
     const icons = { success:'✅', error:'❌', info:'ℹ️', warning:'⚠️' };
@@ -1691,9 +1620,9 @@ const Toast = {
   }
 };
 
-// ============================================================
-// MODAL
-// ============================================================
+
+
+
 const Modal = {
   _stack: [],
   open(html, opts = {}) {
@@ -1711,14 +1640,14 @@ const Modal = {
     if (!item) return;
     item.overlay.remove();
     if (item.cb) item.cb();
-    Admin._savingEvent = false; // reset guard khi modal đóng
+    Admin._savingEvent = false; 
   },
   closeAll() { while (this._stack.length) this.close(); }
 };
 
-// ============================================================
-// AUTH
-// ============================================================
+
+
+
 const Auth = {
   async init() {
     const { data: { session } } = await sb.auth.getSession();
@@ -1736,15 +1665,15 @@ const Auth = {
   },
   async checkAdminRole() {
     if (!State.user) return false;
-    // 1. Check app_metadata.role (set bằng Supabase service role / SQL)
+    
     const appRole = State.user.app_metadata?.role;
     if (appRole === 'admin') { State.isAdmin = true; return true; }
-    // 2. Check user_metadata.role (user tự set hoặc admin set)
+    
     const metaRole = State.user.user_metadata?.role;
     if (metaRole === 'admin') { State.isAdmin = true; return true; }
-    // 3. Fallback: mọi Supabase Auth user đều là admin
-    //    (phù hợp khi chỉ có 1 admin account)
-    //    Xoá dòng dưới nếu muốn kiểm soát chặt hơn
+    
+    
+    
     State.isAdmin = true;
     return true;
   },
@@ -1755,11 +1684,11 @@ const Auth = {
   }
 };
 
-// ============================================================
-// API
-// ============================================================
+
+
+
 const API = {
-  /* Events */
+  
   async getEvents() {
     const { data, error } = await sb.from('voting_events').select('*').order('created_at', { ascending: false });
     if (error) throw error;
@@ -1783,7 +1712,7 @@ const API = {
     const { error } = await sb.from('voting_events').delete().eq('id', id);
     if (error) throw error;
   },
-  /* Locations */
+  
   async getOptions(eventId) {
     let q = sb.from('vote_options').select('*').order('sort_order', { ascending: true });
     if (eventId) q = q.eq('event_id', eventId);
@@ -1804,14 +1733,14 @@ const API = {
     const { error } = await sb.from('vote_options').delete().eq('id', id);
     if (error) throw error;
   },
-  /* Votes */
+  
   async castVote(eventId, locationId, voterIdentifier, voterName, nominatedName = null) {
-    // Check duplicate
+    
     const { data: existing } = await sb.from('votes')
       .select('id').eq('event_id', eventId).eq('voter_identifier', voterIdentifier).maybeSingle();
     const event = await API.getActiveEvent(eventId);
     if (existing && !event?.allow_multiple_votes) throw new Error('duplicate');
-    // Validate self_vote: không cho đề xuất chính mình qua "Lựa chọn khác"
+    
     if (nominatedName) {
       const empSession = EmployeeAuth && EmployeeAuth.session;
       const selfName = empSession?.employee?.full_name || empSession?.employee?.name || null;
@@ -1819,13 +1748,13 @@ const API = {
         throw new Error('self_vote');
       }
     }
-    // Insert vote — voter_name = tên người bầu, nominated_name = tên được đề xuất (chỉ với Lựa chọn khác)
+    
     const insertData = { event_id: eventId, option_id: locationId, voter_identifier: voterIdentifier };
     if (voterName) insertData.voter_name = voterName;
     if (nominatedName) insertData.nominated_name = nominatedName;
     const { error: vErr } = await sb.from('votes').insert(insertData);
     if (vErr) throw vErr;
-    // Sync vote_count = COUNT(*) từ bảng votes (tránh race condition)
+    
     const { count } = await sb.from('votes')
       .select('id', { count: 'exact', head: true })
       .eq('option_id', locationId);
@@ -1836,7 +1765,7 @@ const API = {
     if (error) throw error;
     return data || [];
   },
-  /* Config */
+  
   async getConfig() {
     const { data } = await sb.from('app_config').select('*').limit(1).maybeSingle();
     return data || {};
@@ -1849,7 +1778,7 @@ const API = {
       await sb.from('app_config').insert(cfg);
     }
   },
-  /* Total stats */
+  
   async getDashboardStats() {
     const [events, votes] = await Promise.all([
       sb.from('voting_events').select('id, active').then(r => r.data || []),
@@ -1861,9 +1790,9 @@ const API = {
   }
 };
 
-// ============================================================
-// CONFETTI
-// ============================================================
+
+
+
 const Confetti = {
   particles: [],
   anim: null,
@@ -1903,9 +1832,9 @@ const Confetti = {
   }
 };
 
-// ============================================================
-// ADMIN MODULE
-// ============================================================
+
+
+
 const Admin = {
   async init() {
     const email = State.user?.email || '';
@@ -1955,7 +1884,7 @@ const Admin = {
     if (section === 'config')    await Admin.loadConfig();
   },
 
-  /* ---- DASHBOARD ---- */
+  
   async loadDashboard() {
     try {
       const stats = await API.getDashboardStats();
@@ -1966,7 +1895,7 @@ const Admin = {
         <div class="stat-card"><div class="stat-label">Tổng phiếu</div><div class="stat-value">${fmtNum(stats.totalVotes)}</div></div>
         <div class="stat-card"><div class="stat-label">Hôm nay</div><div class="stat-value" style="color:var(--c-accent)">${fmtNum(stats.todayVotes)}</div></div>
       `;
-      // Charts
+      
       const events = await API.getEvents();
       if (events.length) {
         const firstActive = events.find(e=>e.active) || events[0];
@@ -1980,7 +1909,7 @@ const Admin = {
     const data   = locs.map(l=>l.vote_count||0);
     const palette= ['#7c6fff','#ff6b9d','#22d3a0','#f59e0b','#0ea5e9','#a78bfa','#fb7185'];
 
-    // Bar
+    
     if (State.charts.bar) State.charts.bar.destroy();
     const ctxB = document.getElementById('chart-bar').getContext('2d');
     State.charts.bar = new Chart(ctxB, {
@@ -1992,7 +1921,7 @@ const Admin = {
         responsive:true, maintainAspectRatio:true,
       }
     });
-    // Donut
+    
     if (State.charts.donut) State.charts.donut.destroy();
     const ctxD = document.getElementById('chart-donut').getContext('2d');
     State.charts.donut = new Chart(ctxD, {
@@ -2005,7 +1934,7 @@ const Admin = {
     });
   },
 
-  /* ---- EVENTS ---- */
+  
   async loadEvents() {
     try {
       State.events = await API.getEvents();
@@ -2080,7 +2009,7 @@ const Admin = {
   },
   showEventModal(id) {
     const ev = id ? State.events.find(e=>e.id===id) : null;
-    // Load existing options if editing
+    
     const existingOpts = ev?._options || [];
     const defaultOpts = existingOpts.length ? existingOpts : [
       {label:'A', name:'', description:''},
@@ -2169,13 +2098,13 @@ const Admin = {
     });
   },
   async saveEvent(id) {
-    // Guard chống double-submit
+    
     if (Admin._savingEvent) return;
     Admin._savingEvent = true;
     const saveBtn = document.querySelector('.modal .btn-primary');
     if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = '⏳ Đang lưu...'; }
 
-    // Collect options from modal
+    
     const optRows = document.querySelectorAll('.ev-option-row');
     const options = [];
     optRows.forEach((row, i) => {
@@ -2211,19 +2140,19 @@ const Admin = {
       if (id) {
         await API.updateEvent(id, payload);
 
-        // --- Chiến lược an toàn: upsert/diff thay vì delete-all ---
-        // 1. Lấy options hiện tại
+        
+        
         const { data: existingOpts } = await sb
           .from('vote_options').select('id,name,label,vote_count').eq('event_id', id);
         const existing = existingOpts || [];
 
-        // 2. Ghép options mới với options cũ theo thứ tự (theo index)
+        
         const toInsert = [];
         for (let i = 0; i < options.length; i++) {
           const o = options[i];
-          const matched = existing[i]; // Ghép theo vị trí giữ nguyên vote_count
+          const matched = existing[i]; 
           if (matched) {
-            // Update option đã tồn tại
+            
             const { error: updErr } = await sb.from('vote_options').update({
               label:       o.label,
               name:        o.name,
@@ -2232,7 +2161,7 @@ const Admin = {
             }).eq('id', matched.id);
             if (updErr) throw new Error('Cập nhật option thất bại: ' + updErr.message);
           } else {
-            // Option mới cần insert
+            
             toInsert.push({
               event_id:    eventId,
               label:       o.label,
@@ -2244,20 +2173,20 @@ const Admin = {
           }
         }
 
-        // 3. Xóa các option thừa (chỉ xóa nếu không có phiếu bầu)
+        
         if (existing.length > options.length) {
           const surplus = existing.slice(options.length);
           for (const old of surplus) {
             if ((old.vote_count || 0) === 0) {
               await sb.from('vote_options').delete().eq('id', old.id);
             } else {
-              // Có phiếu bầu → đánh dấu ẩn thay vì xóa (đặt sort_order cao để không hiển thị)
+              
               await sb.from('vote_options').update({ sort_order: 9999 }).eq('id', old.id);
             }
           }
         }
 
-        // 4. Insert các option mới
+        
         if (toInsert.length) {
           const { error: insErr } = await sb.from('vote_options').insert(toInsert);
           if (insErr) throw new Error('Tạo options mới thất bại: ' + insErr.message);
@@ -2267,7 +2196,7 @@ const Admin = {
         const created = await API.createEvent(payload);
         eventId = created.id;
 
-        // Insert vote_options mới cho event vừa tạo
+        
         const locPayload = options.map((o, i) => ({
           event_id:    eventId,
           label:       o.label,
@@ -2291,7 +2220,7 @@ const Admin = {
     }
   },
 
-  /* ---- LOCATIONS ---- */
+  
   async loadLocationsSection() {
     const events = await API.getEvents();
     State.events = events;
@@ -2323,7 +2252,7 @@ const Admin = {
   },
   showLocationModal(id) {
     const eventId = document.getElementById('loc-event-filter').value;
-    const locs = [];  // we'll rely on reload
+    const locs = [];  
     const html = `
       <div class="modal-header">
         <span class="modal-title">${id?'Chỉnh sửa':'Thêm'} địa điểm</span>
@@ -2342,7 +2271,7 @@ const Admin = {
     `;
     const modal = Modal.open(html);
     if (id) {
-      // Load current data
+      
       API.getOptions(eventId).then(locs => {
         const l = locs.find(x=>x.id===id);
         if (l) {
@@ -2378,7 +2307,7 @@ const Admin = {
     await Admin.loadLocations(eventId);
   },
 
-  /* ---- RESULTS ---- */
+  
   async loadResultsSection() {
     const events = await API.getEvents();
     State.events = events;
@@ -2388,7 +2317,7 @@ const Admin = {
       return;
     }
     container.innerHTML = '<div style="padding:16px;text-align:center;color:var(--c-muted);">⏳ Đang tải...</div>';
-    // Load tất cả events song song
+    
     const allData = await Promise.all(events.map(async ev => {
       const locs = await API.getVoteStats(ev.id);
       return { ev, locs };
@@ -2428,15 +2357,15 @@ const Admin = {
         </div>`;
     }).join('');
   },
-  async loadResults() {},  // kept for compat
-  /* ---- HISTORY ---- */
+  async loadResults() {},  
+  
   async loadHistorySection() {
     const events = await API.getEvents();
     State.events = events;
     const sel = document.getElementById('history-event-filter');
     sel.innerHTML = '<option value="">-- Chọn sự kiện --</option>' +
       events.map(e=>`<option value="${e.id}">${sanitize(e.title)}</option>`).join('');
-    // Bind filters
+    
     sel.onchange = () => Admin.loadHistory(sel.value);
     document.getElementById('history-option-filter').onchange = () => Admin.renderHistoryTable();
     document.getElementById('history-search').oninput = () => Admin.renderHistoryTable();
@@ -2450,7 +2379,7 @@ const Admin = {
 
     document.getElementById('history-tbody').innerHTML = '<tr><td colspan="4" style="text-align:center;padding:32px;color:var(--c-muted);">⏳ Đang tải...</td></tr>';
 
-    // Load votes joined with employee info and location name
+    
     const { data: votes, error } = await sb.from('votes')
       .select('id, created_at, voter_identifier, voter_name, nominated_name, option_id, vote_options(label, name)')
       .eq('event_id', eventId)
@@ -2458,7 +2387,7 @@ const Admin = {
 
     if (error) { Toast.show('Lỗi tải lịch sử: '+error.message, 'error'); return; }
 
-    // Enrich with employee name from voter_identifier (emp_UUID format)
+    
     const empIds = [...new Set((votes||[])
       .filter(v => v.voter_identifier?.startsWith('emp_'))
       .map(v => v.voter_identifier.replace('emp_', '')))];
@@ -2474,9 +2403,9 @@ const Admin = {
       const empId = v.voter_identifier?.startsWith('emp_') ? v.voter_identifier.replace('emp_','') : null;
       const emp   = empId ? empMap[empId] : null;
       const isOther = /lựa chọn khác/i.test(v.vote_options?.name || '');
-      // emp_name = tên người bầu (từ hr_employees hoặc voter_name)
+      
       const voterDisplayName = emp?.name || v.voter_name || (empId ? '(Không tìm thấy)' : 'Khách');
-      // option_name: nếu là "Lựa chọn khác" thì hiển thị tên được đề xuất kèm theo
+      
       const baseOptionName = v.vote_options ? (v.vote_options.label+'. '+v.vote_options.name) : (v.option_id||'?');
       const optionNameDisplay = (isOther && v.nominated_name)
         ? baseOptionName + ' → ' + v.nominated_name
@@ -2492,7 +2421,7 @@ const Admin = {
       };
     });
 
-    // Populate option filter
+    
     const labels = [...new Set(Admin._historyData.map(v=>v.option_label))].sort();
     const optSel = document.getElementById('history-option-filter');
     const curVal = optSel.value;
@@ -2577,7 +2506,7 @@ const Admin = {
     a.click();
   },
 
-  /* ---- CONFIG ---- */
+  
   async loadConfig() {
     try {
       const cfg = await API.getConfig();
@@ -2607,12 +2536,12 @@ const Admin = {
   },
 };
 
-// ============================================================
-// VOTING MODULE
-// ============================================================
+
+
+
 const Voting = {
   async init(eventId) {
-    // Reset toàn bộ state trước khi load event mới — tránh data cũ từ event trước
+    
     State.votedLocations  = new Set();
     State.myNominatedName = null;
     State.currentEvent    = null;
@@ -2620,13 +2549,13 @@ const Voting = {
     Voting._pendingVoteId = null;
     const oldBar = document.getElementById('vote-submit-bar');
     if (oldBar) oldBar.remove();
-    // Clear countdown interval nếu còn
+    
     if (Voting._countdownTimer) { clearInterval(Voting._countdownTimer); Voting._countdownTimer = null; }
 
     State.deviceId    = getOrSetDeviceId();
     State.fingerprint = await getBrowserFingerprint();
 
-    // Load config
+    
     try {
       const cfg = await API.getConfig();
       State.config = cfg;
@@ -2639,7 +2568,7 @@ const Voting = {
       if (cfg.antidup) State.antiDupMethod = cfg.antidup;
     } catch(e){}
 
-    // Reset tabs
+    
     document.getElementById('voting-tabs').style.display = 'none';
     document.getElementById('voting-panel-vote').style.display = '';
     document.getElementById('voting-panel-results').style.display = 'none';
@@ -2655,7 +2584,7 @@ const Voting = {
       if (!event) { Voting.showError('Không tìm thấy sự kiện.'); return; }
       if (!event.active) { Voting.showError('Sự kiện đã kết thúc hoặc chưa mở.'); return; }
 
-      // Banner
+      
       document.getElementById('voting-banner-title').textContent = event.title;
       document.getElementById('voting-banner-desc').textContent  = event.description || '';
       const bannerImg = document.getElementById('voting-banner-img');
@@ -2669,14 +2598,14 @@ const Voting = {
       }
       document.title = event.title + ' — VoteFlow';
 
-      // Meta / countdown
+      
       Voting.renderMeta(event);
 
-      // Locations
+      
       const locs = await API.getOptions(eventId);
       State.currentLocations = locs;
 
-      // Check voted (dùng employee ID nếu có, fallback localStorage)
+      
       const voterIdentifier = getVoterIdentifier(eventId);
       const { data: myVotes } = await sb.from('votes')
         .select('option_id, nominated_name')
@@ -2689,17 +2618,17 @@ const Voting = {
           if (v.nominated_name) State.myNominatedName = v.nominated_name;
         });
       } else {
-        // Supabase xác nhận không có vote → clear localStorage cache để tránh stale state
+        
         locs.forEach(l => localStorage.removeItem('vf_voted_' + eventId + '_' + l.id));
-        // KHÔNG fallback localStorage nữa vì Supabase là source of truth
+        
       }
 
       Voting.clearLoading();
       Voting.renderLocations(locs, event);
       Voting.subscribeRealtime(eventId);
-      // Tabs hidden - results are shown on event picker page
+      
 
-      // Show back btn when employee has session (can go back to event picker)
+      
       const backBtn = document.getElementById('voting-back-btn');
       if (backBtn && EmployeeAuth.session) backBtn.style.display = '';
 
@@ -2757,12 +2686,12 @@ const Voting = {
     };
     update(); Voting._countdownTimer = setInterval(update, 1000);
   },
-  // Tracks which option the employee has highlighted (but not yet submitted)
+  
   _pendingVoteId: null,
 
   renderLocations(locs, event) {
     const grid = document.getElementById('voting-locations-grid');
-    grid.className = ''; // remove grid class, use flex column
+    grid.className = ''; 
     if (!locs.length) {
       grid.innerHTML = '<div class="state-overlay"><div class="state-icon">🗳️</div><div class="state-title">Chưa có lựa chọn</div><div class="state-msg">Ban tổ chức chưa thêm lựa chọn nào.</div></div>';
       return;
@@ -2774,7 +2703,7 @@ const Voting = {
     const sorted = [...locs].sort((a,b)=>(a.sort_order??99)-(b.sort_order??99));
     const total  = sorted.reduce((s,l)=>s+(l.vote_count||0),0);
 
-    // Reset pending when re-rendering after a real vote
+    
     if (hasVoted) Voting._pendingVoteId = null;
 
     grid.innerHTML = '<div class="vote-options-grid" id="vote-options-inner">' +
@@ -2786,12 +2715,12 @@ const Voting = {
         const label     = l.label || String.fromCharCode(65+i);
         const pct       = total ? Math.round((l.vote_count||0)/total*100) : 0;
 
-        // Border/bg highlight for pending selection
+        
         const cardStyle = isPending
           ? `border-color:${color};background:${color}12;`
           : '';
 
-        // Right-side action
+        
         let actionHtml;
         if (voted) {
           actionHtml = `<div style="font-size:24px;">✅</div>`;
@@ -2827,14 +2756,14 @@ const Voting = {
           </div>`;
       }).join('') + '</div>';
 
-    // Render the submit bar if there's a pending selection and not yet voted
+    
     if (!hasVoted) {
       Voting._renderSubmitBar(event.id, sorted);
     }
   },
 
   _renderSubmitBar(eventId, sorted) {
-    // Remove existing bar
+    
     const old = document.getElementById('vote-submit-bar');
     if (old) old.remove();
 
@@ -2866,22 +2795,22 @@ const Voting = {
       </button>`;
 
     document.getElementById('voting-page').appendChild(bar);
-    // Add padding to prevent bar covering last card
+    
     const body = document.getElementById('voting-locations-grid');
     if (body) body.style.paddingBottom = '80px';
   },
 
   selectOption(eventId, locationId) {
-    if (State.votedLocations.size > 0) return; // already voted, locked
+    if (State.votedLocations.size > 0) return; 
 
-    // Toggle: clicking same option deselects
+    
     if (Voting._pendingVoteId === locationId) {
       Voting._pendingVoteId = null;
     } else {
       Voting._pendingVoteId = locationId;
     }
 
-    // Re-render just the option cards (not full re-fetch, fast)
+    
     const sorted = [...State.currentLocations].sort((a,b)=>(a.sort_order??99)-(b.sort_order??99));
     const palette = ['#7c6fff','#ff6b9d','#22d3a0','#f59e0b','#0ea5e9','#a78bfa','#fb7185','#34d399'];
 
@@ -2897,7 +2826,7 @@ const Voting = {
         card.style.borderColor = '';
         card.style.background = '';
       }
-      // Update checkmark area
+      
       const actionDiv = card.querySelector('div[style*="flex-shrink:0"]');
       if (actionDiv) {
         if (isPending) {
@@ -2910,7 +2839,7 @@ const Voting = {
       }
     });
 
-    // Update submit bar
+    
     Voting._renderSubmitBar(eventId, sorted);
   },
 
@@ -2966,45 +2895,45 @@ const Voting = {
     }
   },
 
-  // Legacy handleVote kept for compatibility but now just calls selectOption
+  
   async handleVote(eventId, locationId) {
     Voting.selectOption(eventId, locationId);
   },
 
   async _showOtherChoiceModal(eventId, locationId) {
-    // Load employee list from hr_employees:
-    // - Active employees only (is_active != false, filtered client-side)
-    // - Exclude names already present as vote options (A, B, C, D...)
+    
+    
+    
     let employees = [];
     try {
       const { data } = await sb.from('hr_employees')
         .select('id,name,email,is_active')
         .not('name', 'is', null)
         .order('name', { ascending: true });
-      // Filter active client-side (handles boolean true AND string 'true')
+      
       employees = (data || []).filter(e =>
         (e.name || '').trim() &&
         e.is_active !== false && e.is_active !== 'false' && e.is_active !== 0
       );
     } catch(e) { employees = []; }
 
-    // Build set of existing option names (lowercased) to exclude duplicates
+    
     const existingNames = new Set(
       State.currentLocations
         .filter(l => !/lựa chọn khác/i.test(l.name))
         .map(l => (l.name || '').trim().toLowerCase())
     );
 
-    // Get current logged-in employee id to exclude self
+    
     const selfId = EmployeeAuth.session?.employee?.id;
 
-    // Filter out employees whose name already appears in the options list, and exclude self
+    
     employees = employees.filter(e => {
       const n = (e.name || '').trim().toLowerCase();
       return n && !existingNames.has(n) && e.id !== selfId;
     });
 
-    // Build a nice filterable list instead of a plain <select>
+    
     const listItems = employees.map(e => {
       const display = sanitize(e.name || e.email || '');
       return `<div class="emp-picker-item" onclick="Voting._pickEmployee('${(e.name || e.email || '').replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">

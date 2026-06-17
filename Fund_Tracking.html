@@ -9,10 +9,10 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <title>L2 Support · Quỹ</title>
 
-<!-- Animated Wallet Favicon -->
+
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237c5cff'/%3E%3Cstop offset='1' stop-color='%2322d3ee'/%3E%3C/linearGradient%3E%3ClinearGradient id='cg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23fbbf24'/%3E%3Cstop offset='1' stop-color='%23f59e0b'/%3E%3C/linearGradient%3E%3Cstyle%3E%40keyframes wob%7B0%25%2C100%25%7Btransform%3Arotate(-6deg)%7D50%25%7Btransform%3Arotate(6deg)%7D%7D%40keyframes coin%7B0%25%2C100%25%7Btransform%3AtranslateY(0)%7D50%25%7Btransform%3AtranslateY(-3px)%7D%7D.wg%7Banimation%3Awob 2.4s ease-in-out infinite%3Btransform-origin%3A16px 17px%7D.cg%7Banimation%3Acoin 1.2s ease-in-out infinite%7D%3C/style%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='15.5' fill='url(%23bg)'/%3E%3Cg class='wg'%3E%3Crect x='5' y='11' width='22' height='14' rx='3' fill='white' opacity='.92'/%3E%3Crect x='5' y='8' width='16' height='7' rx='2.5' fill='white' opacity='.65'/%3E%3Crect x='19' y='14' width='8' height='8' rx='2' fill='url(%23bg)' opacity='.9'/%3E%3Ccircle class='cg' cx='23' cy='18' r='2' fill='url(%23cg)'/%3E%3C/g%3E%3C/svg%3E">
 
-<!-- CDN -->
+
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./supabase-config.js"></script>
@@ -59,7 +59,7 @@ if (!window.SUPABASE_CONFIG) {
   ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:8px}
   ::-webkit-scrollbar-thumb:hover{background:var(--primary)}
 
-  /* Cards */
+  
   .glass{background:linear-gradient(180deg,rgba(26,35,66,.65),rgba(18,24,48,.55));backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:18px;transition:transform .3s cubic-bezier(.34,1.4,.64,1),border-color .3s,box-shadow .3s;}
   .glass:hover{border-color:var(--border2)}
   .stat{position:relative;overflow:hidden;padding:22px 24px;}
@@ -71,7 +71,7 @@ if (!window.SUPABASE_CONFIG) {
   .stat-conlai::after{background:var(--grad-green);}
   .stat-count::after{background:var(--grad-pink);}
 
-  /* Buttons */
+  
   .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:12px;font-weight:700;font-size:13.5px;cursor:pointer;border:1px solid transparent;transition:transform .18s cubic-bezier(.34,1.4,.64,1),box-shadow .18s,background .18s,color .18s;user-select:none;white-space:nowrap;}
   .btn:active{transform:translateY(1px) scale(.98)}
   .btn-primary{background:var(--grad);color:#fff;box-shadow:0 6px 20px var(--primary-glow),0 1px 0 rgba(255,255,255,.18) inset;position:relative;overflow:hidden;}
@@ -107,13 +107,13 @@ if (!window.SUPABASE_CONFIG) {
   #btnRefresh.spinning .icon-refresh{animation:refreshSpin .7s linear infinite}
   @keyframes refreshSpin{to{transform:rotate(360deg)}}
 
-  /* Inputs */
+  
   .field{width:100%;padding:11px 14px;background:rgba(8,11,22,.6);border:1px solid var(--border);border-radius:11px;color:var(--text);font-family:var(--font);font-size:13.5px;transition:border-color .18s,box-shadow .18s,background .18s;}
   .field:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(124,92,255,.15)}
   .field::placeholder{color:var(--text3)}
   label.lbl{display:block;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono);margin-bottom:6px;font-weight:700}
 
-  /* Badges */
+  
   .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:7px;font-size:11px;font-weight:700;font-family:var(--mono);letter-spacing:.03em}
   .badge-paid{background:linear-gradient(135deg,rgba(52,211,153,.18),rgba(52,211,153,.08));color:#6ee7b7;border:1px solid rgba(52,211,153,.3)}
   .badge-pending{background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(251,191,36,.08));color:#fcd34d;border:1px solid rgba(251,191,36,.3)}
@@ -122,7 +122,7 @@ if (!window.SUPABASE_CONFIG) {
   .badge-thu{background:rgba(52,211,153,.12);color:#6ee7b7;border:1px solid rgba(52,211,153,.28)}
   .badge-chi{background:rgba(248,113,113,.12);color:#fca5a5;border:1px solid rgba(248,113,113,.28)}
 
-  /* Table */
+  
   table.tbl{width:100%;border-collapse:collapse;font-size:13px}
   .tbl th{background:rgba(8,11,22,.55);text-align:left;padding:11px 14px;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-family:var(--mono);font-weight:700;border-bottom:1px solid var(--border);position:sticky;top:0;backdrop-filter:blur(8px);}
   .tbl td{padding:13px 14px;border-bottom:1px solid rgba(34,43,74,.5);vertical-align:middle}
@@ -133,7 +133,7 @@ if (!window.SUPABASE_CONFIG) {
 
   .avatar{width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.3)}
 
-  /* Modal */
+  
   .modal-backdrop{position:fixed;inset:0;background:rgba(4,6,14,.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:100;padding:20px;animation:fadeIn .2s}
   .modal-backdrop.open{display:flex}
   .modal{background:linear-gradient(180deg,#1a2342,#121830);border:1px solid var(--border2);border-radius:20px;max-width:560px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 40px var(--primary-glow);animation:popIn .3s cubic-bezier(.34,1.4,.64,1);}
@@ -146,7 +146,7 @@ if (!window.SUPABASE_CONFIG) {
   .spinner{width:18px;height:18px;border:2px solid var(--border2);border-top-color:var(--primary);border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
   @keyframes spin{to{transform:rotate(360deg)}}
 
-  /* Toast */
+  
   .toast{position:fixed;bottom:24px;right:24px;background:linear-gradient(180deg,#1a2342,#121830);border:1px solid var(--border2);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:600;box-shadow:0 14px 40px rgba(0,0,0,.5),0 0 24px var(--primary-glow);z-index:200;animation:toastIn .3s cubic-bezier(.34,1.4,.64,1);}
   @keyframes toastIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
   .toast-success{border-color:rgba(52,211,153,.4)}
@@ -157,7 +157,7 @@ if (!window.SUPABASE_CONFIG) {
   .gtext-red{background:var(--grad-red);-webkit-background-clip:text;background-clip:text;color:transparent}
   .gtext-green{background:var(--grad-green);-webkit-background-clip:text;background-clip:text;color:transparent}
 
-  /* Brand Logo */
+  
   .brand-logo{
     width:42px;height:42px;border-radius:12px;
     background:var(--grad);
@@ -170,7 +170,7 @@ if (!window.SUPABASE_CONFIG) {
     0%,100%{box-shadow:0 6px 20px var(--primary-glow),0 0 0 1px rgba(255,255,255,.15) inset}
     50%{box-shadow:0 8px 32px rgba(124,92,255,.65),0 0 18px rgba(34,211,238,.35),0 0 0 1px rgba(255,255,255,.2) inset}
   }
-  /* Shimmer sweep */
+  
   .brand-logo::before{
     content:'';position:absolute;inset:0;
     background:linear-gradient(110deg,transparent 20%,rgba(255,255,255,.35) 50%,transparent 80%);
@@ -181,7 +181,7 @@ if (!window.SUPABASE_CONFIG) {
     0%,40%{transform:translateX(-100%)}
     60%,100%{transform:translateX(120%)}
   }
-  /* Wallet SVG inner animations */
+  
   @keyframes walletWiggle{
     0%,100%{transform:rotate(0deg) scale(1)}
     15%{transform:rotate(-10deg) scale(1.05)}
@@ -202,7 +202,7 @@ if (!window.SUPABASE_CONFIG) {
   .chip:hover{color:var(--text);border-color:var(--border2)}
   .chip.active{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 4px 14px var(--primary-glow)}
 
-  /* Filter Dropdowns */
+  
   .fdd-wrap{position:relative}
   .fdd-trigger{
     display:inline-flex;align-items:center;gap:6px;
@@ -245,19 +245,19 @@ if (!window.SUPABASE_CONFIG) {
   .sortable{cursor:pointer;user-select:none}
   .sortable:hover{color:var(--text2)}
 
-  /* Pagination */
+  
   .page-btn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;font-size:12px;font-weight:700;font-family:var(--mono);cursor:pointer;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text2);transition:all .15s;}
   .page-btn:hover{background:rgba(255,255,255,.09);border-color:var(--border2);color:var(--text);}
   .page-btn.active{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 4px 14px var(--primary-glow);}
   .page-btn:disabled{opacity:.3;cursor:not-allowed;pointer-events:none;}
 
-  /* Type toggle in modal */
+  
   .type-toggle{display:flex;gap:6px;margin-bottom:16px}
   .type-btn{flex:1;padding:10px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text2);transition:all .18s;text-align:center;}
   .type-btn.active-thu{background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.4);color:#6ee7b7;}
   .type-btn.active-chi{background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.4);color:#fca5a5;}
 
-  /* Split Add Button */
+  
   .add-split-btn{
     display:flex;align-items:stretch;
     background:var(--grad);border-radius:12px;
@@ -278,7 +278,7 @@ if (!window.SUPABASE_CONFIG) {
     transition:background .15s;
   }
   .add-split-arrow:hover{background:rgba(255,255,255,.12)}
-  /* Dropdown menu */
+  
   .add-split-menu{
     position:absolute;top:calc(100% + 8px);right:0;
     background:linear-gradient(180deg,#1e2b52,#141e3a);
@@ -311,54 +311,52 @@ if (!window.SUPABASE_CONFIG) {
   .add-split-menu button:first-child span{color:#6ee7b7}
   .add-split-menu button:last-child span{color:#fca5a5}
 
-  /* Date filter selects */
+  
   .filter-select{padding:7px 12px;border-radius:999px;font-size:12.5px;font-weight:600;background:rgba(255,255,255,.04);color:var(--text2);border:1px solid var(--border);cursor:pointer;transition:all .18s;font-family:var(--font);appearance:none;-webkit-appearance:none;padding-right:28px;}
   .filter-select:focus{outline:none;border-color:var(--primary);color:var(--text);}
   .filter-select-wrap{position:relative}
   .filter-select-wrap::after{content:'▾';position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--text3);pointer-events:none;}
 
-  /* ═══════════════════════════════════════════
-     MOBILE CARD VIEW — replaces table on small screens
-  ═══════════════════════════════════════════ */
+  
   .mobile-cards{display:none}
 
   @media(max-width:767px){
-    /* Layout */
+    
     body{font-size:14px;}
-    .orb{display:none} /* save GPU on mobile */
+    .orb{display:none} 
 
-    /* Header */
+    
     header{margin-bottom:16px!important;gap:10px!important}
     header h1{font-size:1.15rem!important}
     header .flex.items-center.gap-2{gap:6px!important}
 
-    /* Role button — compact on mobile */
+    
     #btnRoleToggle{padding:8px 10px!important;font-size:11px!important}
     #btnRoleToggle span{display:none!important}
 
-    /* Stats grid: 2×2 */
+    
     section.grid{grid-template-columns:1fr 1fr!important;gap:10px!important;margin-bottom:14px!important}
     .stat{padding:14px 14px!important}
     .stat .text-2xl,.stat .text-3xl{font-size:1.2rem!important}
 
-    /* Filter section */
+    
     section.glass.p-4{padding:12px!important;margin-bottom:12px!important}
     section.glass.p-4 .flex{flex-wrap:wrap;gap:8px!important}
-    #searchInput{font-size:16px!important;} /* prevent iOS zoom */
-    .field{font-size:16px!important;} /* prevent iOS zoom on ALL inputs */
+    #searchInput{font-size:16px!important;} 
+    .field{font-size:16px!important;} 
     .fdd-trigger{font-size:12px!important;padding:7px 10px!important}
     .fdd-menu{min-width:160px!important}
 
-    /* Table section header */
+    
     .glass.overflow-hidden .flex.items-center.justify-between{padding:12px 14px!important}
 
-    /* Hide desktop table */
+    
     .overflow-x-auto{display:none!important}
 
-    /* Show mobile cards */
+    
     .mobile-cards{display:block}
 
-    /* Card styles */
+    
     .tx-card{
       border-bottom:1px solid rgba(34,43,74,.55);
       padding:15px 16px 15px 14px;
@@ -369,7 +367,7 @@ if (!window.SUPABASE_CONFIG) {
     .tx-card.row-chi{border-left:3px solid rgba(248,113,113,.5)}
     .tx-card:not(.row-chi){border-left:3px solid transparent}
 
-    /* Row 1: avatar + name + type badge | amount */
+    
     .tx-card-top{
       display:flex;align-items:center;justify-content:space-between;
       gap:10px;margin-bottom:10px;
@@ -385,7 +383,7 @@ if (!window.SUPABASE_CONFIG) {
       white-space:nowrap;flex-shrink:0;letter-spacing:-.01em;
     }
 
-    /* Row 2: date line */
+    
     .tx-card-dates{
       display:flex;align-items:center;gap:6px;
       font-size:12px;color:var(--text2);font-family:var(--mono);
@@ -393,7 +391,7 @@ if (!window.SUPABASE_CONFIG) {
     }
     .tx-card-dates .dot{opacity:.35;font-size:10px}
 
-    /* Row 3: badges row */
+    
     .tx-card-badges{
       display:flex;align-items:center;flex-wrap:wrap;gap:7px;
     }
@@ -406,11 +404,11 @@ if (!window.SUPABASE_CONFIG) {
     .tx-card-actions{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(34,43,74,.4)}
     .tx-card-actions .btn{padding:9px 14px!important;font-size:12.5px!important;flex:1;justify-content:center}
 
-    /* Pagination */
+    
     #paginationBar{padding:10px 14px!important}
     .page-btn{width:34px;height:34px;}
 
-    /* Modal full-screen on mobile */
+    
     .modal-backdrop{padding:0!important;align-items:flex-end!important}
     .modal{
       border-radius:20px 20px 0 0!important;
@@ -424,30 +422,30 @@ if (!window.SUPABASE_CONFIG) {
     .modal .px-6{padding-left:16px!important;padding-right:16px!important}
     .modal form.grid{grid-template-columns:1fr!important;gap:12px!important}
     .modal form .col-span-2{grid-column:span 1!important}
-    /* 2-col for date fields */
+    
     #wrapLate,#wrapPaid,#wrapMethod,.modal form>div:nth-child(5){grid-column:span 1}
 
-    /* Login modal also bottom sheet */
+    
     #loginModal .modal{border-radius:20px 20px 0 0!important;max-width:100%!important;width:100%!important}
 
-    /* Toast bottom safe area */
+    
     .toast{bottom:16px!important;right:12px!important;left:12px!important;font-size:13px!important}
 
-    /* Refresh button text hidden on very small */
+    
     #btnRefreshText{display:none}
 
-    /* Add split button compact */
+    
     .add-split-main{padding:10px 12px!important;font-size:13px!important}
     .add-split-menu{right:0;min-width:190px!important}
   }
 
-  /* Tiny screens */
+  
   @media(max-width:374px){
     .stat .text-2xl,.stat .text-3xl{font-size:1rem!important}
     header h1{font-size:1rem!important}
   }
 
-  /* Safe area for notched phones (Dynamic Island, Home Bar) */
+  
   @supports(padding-bottom:env(safe-area-inset-bottom)){
     body{
       padding-top:env(safe-area-inset-top);
@@ -468,7 +466,7 @@ if (!window.SUPABASE_CONFIG) {
 
 <div class="relative z-10 max-w-7xl mx-auto px-4 md:px-8 py-5 md:py-8">
 
-  <!-- Header -->
+  
   <header class="flex items-center justify-between mb-8 flex-wrap gap-4">
     <div class="flex items-center gap-3">
       <div class="brand-logo">
@@ -486,7 +484,7 @@ if (!window.SUPABASE_CONFIG) {
         <svg class="icon-refresh" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
         <span id="btnRefreshText">Làm mới</span>
       </button>
-      <!-- Split add button -->
+      
       <div class="admin-only add-split-wrap" style="display:none;position:relative">
         <div class="add-split-btn">
           <button class="add-split-main" onclick="openAddModal('thu')">
@@ -517,7 +515,7 @@ if (!window.SUPABASE_CONFIG) {
     </div>
   </header>
 
-  <!-- Stats: Tổng Thu | Đã Chi | Còn Lại | Giao dịch -->
+  
   <section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-7">
     <div class="glass stat stat-thu">
       <div class="text-[11px] font-mono uppercase tracking-wider text-[color:var(--text3)] font-bold mb-2">Tổng Quỹ</div>
@@ -541,15 +539,15 @@ if (!window.SUPABASE_CONFIG) {
     </div>
   </section>
 
-  <!-- Filters -->
+  
   <section class="glass p-4 mb-5" style="position:relative;z-index:20;overflow:visible">
     <div class="flex flex-wrap items-center gap-3">
-      <!-- Search -->
+      
       <div class="relative flex-1 min-w-[200px]">
         <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--text3)]" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input id="searchInput" class="field pl-9" placeholder="Tìm theo tên..." oninput="currentPage=1;render()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" readonly onfocus="this.removeAttribute('readonly')" name="search_fund_x">
       </div>
-      <!-- Month dropdown -->
+      
       <div class="fdd-wrap" id="fddMonth">
         <button class="fdd-trigger" onclick="toggleFdd('fddMonth',event)">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -560,7 +558,7 @@ if (!window.SUPABASE_CONFIG) {
           <button class="fdd-item active" data-value="" onclick="setFdd('fddMonth','month','','Tất cả tháng',this)"><span class="fdd-check">✓</span> Tất cả tháng</button>
         </div>
       </div>
-      <!-- Year dropdown -->
+      
       <div class="fdd-wrap" id="fddYear">
         <button class="fdd-trigger" onclick="toggleFdd('fddYear',event)">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -571,7 +569,7 @@ if (!window.SUPABASE_CONFIG) {
           <button class="fdd-item active" data-value="" onclick="setFdd('fddYear','year','','Tất cả năm',this)"><span class="fdd-check">✓</span> Tất cả năm</button>
         </div>
       </div>
-      <!-- Type dropdown -->
+      
       <div class="fdd-wrap" id="fddTxtype">
         <button class="fdd-trigger" onclick="toggleFdd('fddTxtype',event)">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 7 13 17 8 12 1 19"/><polyline points="17 7 23 7 23 13"/></svg>
@@ -592,7 +590,7 @@ if (!window.SUPABASE_CONFIG) {
           </button>
         </div>
       </div>
-      <!-- Method dropdown -->
+      
       <div class="fdd-wrap" id="fddMethod">
         <button class="fdd-trigger" onclick="toggleFdd('fddMethod',event)">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
@@ -605,7 +603,7 @@ if (!window.SUPABASE_CONFIG) {
           </button>
         </div>
       </div>
-      <!-- Status dropdown -->
+      
       <div class="fdd-wrap" id="fddStatus">
         <button class="fdd-trigger" onclick="toggleFdd('fddStatus',event)">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -621,7 +619,7 @@ if (!window.SUPABASE_CONFIG) {
     </div>
   </section>
 
-  <!-- Table -->
+  
   <section class="glass overflow-hidden">
     <div class="flex items-center justify-between px-5 py-4 border-b border-[color:var(--border)]">
       <div class="flex items-center gap-2">
@@ -649,7 +647,7 @@ if (!window.SUPABASE_CONFIG) {
         <tbody id="tbody"></tbody>
       </table>
     </div>
-    <!-- Mobile card list (shown only on small screens via CSS) -->
+    
     <div class="mobile-cards" id="mobileCards"></div>
 
     <div id="loadingState" class="empty" style="display:none"><span class="spinner"></span> <span class="ml-2">Đang tải...</span></div>
@@ -658,7 +656,7 @@ if (!window.SUPABASE_CONFIG) {
       <div class="font-bold text-lg mb-1">Chưa có giao dịch nào</div>
       <div class="text-sm text-[color:var(--text3)] mb-4">Bấm "Thu vào" hoặc "Chi ra" để bắt đầu</div>
     </div>
-    <!-- Pagination -->
+    
     <div id="paginationBar" class="flex items-center justify-between px-5 py-3 border-t border-[color:var(--border)]" style="display:none!important">
       <button class="btn btn-ghost btn-sm" id="btnPrev" onclick="goPage(-1)">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -677,7 +675,7 @@ if (!window.SUPABASE_CONFIG) {
   </footer>
 </div>
 
-<!-- Modal: Add / Edit Transaction -->
+
 <div class="modal-backdrop" id="modal">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="flex items-center justify-between px-6 py-4 border-b border-[color:var(--border)]">
@@ -685,7 +683,7 @@ if (!window.SUPABASE_CONFIG) {
       <button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button>
     </div>
     <div class="p-6">
-      <!-- Type toggle -->
+      
       <div class="type-toggle" id="typeToggle">
         <button type="button" class="type-btn active-thu" id="tbThu" onclick="setModalType('thu')">
           ↑ Thu vào
@@ -742,7 +740,7 @@ if (!window.SUPABASE_CONFIG) {
   </div>
 </div>
 
-<!-- Modal: Login / Role Gate -->
+
 <div class="modal-backdrop" id="loginModal">
   <div class="modal" style="max-width:440px" onclick="event.stopPropagation()">
     <div class="px-6 py-5 border-b border-[color:var(--border)] text-center">
@@ -781,7 +779,7 @@ const SUPABASE_ANON_KEY = window.SUPABASE_CONFIG['Fund_Tracking.html'].key;
 const isConfigured = SUPABASE_URL.startsWith('https://') && SUPABASE_ANON_KEY.length > 20;
 const sb = isConfigured ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-// ── State ──
+
 let rows = [];
 let filters = { method:'all', status:'all', txtype:'all', month:'', year:'' };
 let sort = { key:'late_date', dir:'desc' };
@@ -790,7 +788,7 @@ const PAGE_SIZE = 9;
 let currentRole = null;
 let modalTxType = 'thu';
 
-// ── Role / Auth ──
+
 function toggleAdminForm(show){
   document.getElementById('adminLoginForm').style.display = show ? 'block' : 'none';
   document.getElementById('roleChoice').style.display    = show ? 'none'  : 'block';
@@ -843,12 +841,12 @@ function applyRole(){
 }
 function handleRoleToggle(){ if(isAdmin()) logout(); else openLoginModal(); }
 
-// ── Add Menu ──
+
 function toggleAddMenu(e){ e.stopPropagation(); document.getElementById('addMenu').classList.toggle('open'); }
 function closeAddMenu(){ document.getElementById('addMenu').classList.remove('open'); }
 document.addEventListener('click', ()=>closeAddMenu());
 
-// ── Helpers ──
+
 const fmtMoney = n => (Number(n)||0).toLocaleString('vi-VN') + '₫';
 const fmtDate = d => { if(!d) return '—'; const [y,m,day]=d.split('-'); return `${day}/${m}/${y}`; };
 const colorFromName = (s='?') => {
@@ -860,7 +858,7 @@ const initials = (s='?') => s.trim().split(/\s+/).slice(-2).map(w=>w[0]?.toUpper
 const isChi = r => r.payment_method === 'chi ra' || r.type === 'chi';
 const dateOf = r => r.late_date || r.paid_date || '';
 
-// ── Toast ──
+
 function toast(msg, type='success'){
   const el=document.createElement('div');
   el.className=`toast toast-${type}`;
@@ -870,7 +868,7 @@ function toast(msg, type='success'){
   setTimeout(()=>el.remove(),2800);
 }
 
-// ── Load ──
+
 async function loadData(showSpin=false){
   if(!sb){ render(); return; }
   const btn=document.getElementById('btnRefresh');
