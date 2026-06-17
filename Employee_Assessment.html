@@ -20,8 +20,8 @@ if (!window.SUPABASE_CONFIG) {
       var SUPA_KEY = window.SUPABASE_CONFIG['Employee_Assessment.html'].key;
       var AS_URL   = SUPA_URL + '/functions/v1/auto-submit';
 
-      // sendBeacon text/plain = "simple request" = không cần CORS preflight
-      // → gửi được ngay cả khi tab đang đóng/browser đang tắt
+      
+      
       function sendAction(payload) {
         var bodyStr = JSON.stringify(payload);
         try { navigator.sendBeacon(AS_URL, new Blob([bodyStr], { type: 'text/plain' })); } catch(e) {}
@@ -35,13 +35,13 @@ if (!window.SUPABASE_CONFIG) {
         } catch(e) {}
       }
 
-      // ── Bước 1: Detect F5 vs navigate ──────────────────────────────────────
+      
       var navEntry = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
       var navType  = navEntry ? navEntry.type
                    : (performance.navigation && performance.navigation.type === 1 ? 'reload' : 'navigate');
       var isReload = (navType === 'reload');
 
-      // ── Bước 2: Restore session token nếu F5 ────────────────────────────────
+      
       var tokBackup = sessionStorage.getItem('_ac_tok_backup');
       var empBackup = sessionStorage.getItem('_ac_emp_backup');
       if (isReload) {
@@ -51,9 +51,9 @@ if (!window.SUPABASE_CONFIG) {
       sessionStorage.removeItem('_ac_tok_backup');
       sessionStorage.removeItem('_ac_emp_backup');
 
-      // ── Bước 3: Đọc snapshot + xử lý ──────────────────────────────────────
+      
       var raw = sessionStorage.getItem('_ac_snapshot');
-      sessionStorage.removeItem('_ac_snapshot'); // XÓA NGAY
+      sessionStorage.removeItem('_ac_snapshot'); 
 
       if (!raw) return;
       var snap;
@@ -61,42 +61,42 @@ if (!window.SUPABASE_CONFIG) {
       if (!snap || !snap.attemptId || !snap.empId || !(snap.ts > 0)) return;
 
       if (isReload) {
-        // F5: gửi cancel để Edge Function undo submit (PATCH in_progress)
+        
         sendAction({ action: 'cancel', attempt_id: snap.attemptId, employee_id: snap.empId, test_id: snap.testId || '', session_token: snap.sessionToken || '' });
-        // Ghi vi phạm F5 để exam.start() áp dụng
+        
         sessionStorage.setItem('_ac_f5_violation', JSON.stringify({
           violations: (snap.violations || 0) + 1,
           ts: snap.ts,
         }));
       }
-      // Đóng tab thật → không làm gì; beforeunload đã gửi action:"submit"
+      
 
     } catch(e) {}
   })();
   </script>
 
-  <!-- Supabase JS v2 -->
+  
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- bcryptjs: client-side password hashing -->
+  
   <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
-  <!-- Normalize bcryptjs CDN global: exposed as dcodeIO.bcrypt, alias to window.bcrypt -->
+  
   <script>window.bcrypt = (typeof dcodeIO !== 'undefined' && dcodeIO.bcrypt) ? dcodeIO.bcrypt : window.bcrypt;</script>
-  <!-- Chart.js: dashboard charts -->
+  
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <!-- SheetJS: Excel import/export -->
+  
   <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
-  <!-- SortableJS: drag-and-drop questions -->
+  
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
-    /* =====================================================
-       FONTS
-       ===================================================== */
+    
+
+
     @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@500;700&display=swap');
 
-    /* =====================================================
-       CSS VARIABLES - DARK LUXURY THEME
-       ===================================================== */
+    
+
+
     :root {
       --bg-primary: #0d0f1a;
       --bg-secondary: #12141f;
@@ -136,7 +136,7 @@ if (!window.SUPABASE_CONFIG) {
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; font-family: 'Sora', system-ui, sans-serif; background: var(--bg-primary); color: var(--text-primary); font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
-    /* Unified font override — Sora for entire app */
+    
     input, textarea, select, button, th, td, label, .badge, .btn, .nav-item, .toast-msg, .modal-title, .card-title { font-family: 'Sora', system-ui, sans-serif !important; }
 
     body {
@@ -172,13 +172,13 @@ if (!window.SUPABASE_CONFIG) {
       from { transform: translate(0,0) scale(1); }
       to   { transform: translate(50px,40px) scale(1.15); }
     }
-    /* Glass layers */
+    
     .sidebar { background: rgba(15,17,28,0.92) !important; backdrop-filter: blur(24px) !important; -webkit-backdrop-filter: blur(24px) !important; border-right: 1px solid rgba(255,255,255,0.06) !important; }
     .topbar  { background: rgba(13,15,26,0.85) !important; backdrop-filter: blur(20px) !important; -webkit-backdrop-filter: blur(20px) !important; border-bottom: 1px solid rgba(255,255,255,0.06) !important; }
     .card, .stat-card, .chart-card { background: rgba(20,23,38,0.88) !important; border-color: rgba(255,255,255,0.07) !important; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
     .modal { background: rgba(16,19,32,0.97) !important; backdrop-filter: blur(24px) !important; -webkit-backdrop-filter: blur(24px) !important; border-color: rgba(255,255,255,0.10) !important; }
 
-    /* ── RIPPLE ── */
+    
     .ripple-wave {
       position: fixed;
       border-radius: 50%;
@@ -197,15 +197,15 @@ if (!window.SUPABASE_CONFIG) {
     button { cursor: pointer; }
     ::selection { background: rgba(124,106,247,0.25); color: var(--text-primary); }
 
-    /* Scrollbar */
+    
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.10); border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
 
-    /* =====================================================
-       UTILITY
-       ===================================================== */
+    
+
+
     .hidden { display: none !important; }
     .flex { display: flex; }
     .flex-col { flex-direction: column; }
@@ -229,9 +229,9 @@ if (!window.SUPABASE_CONFIG) {
     .w-full { width: 100%; }
     .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    /* =====================================================
-       KEYFRAMES
-       ===================================================== */
+    
+
+
     @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     @keyframes slideOut { to { transform: translateX(120%); opacity: 0; } }
@@ -244,13 +244,13 @@ if (!window.SUPABASE_CONFIG) {
     @keyframes gradientShift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
     @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
 
-    /* =====================================================
-       SCREENS
-       ===================================================== */
+    
+
+
     .screen { display: none; width: 100%; min-height: 100vh; }
     .screen.active { display: flex; animation: fadeIn 0.35s ease; }
 
-    /* Loading screen */
+    
     #screen-loading { align-items: center; justify-content: center; flex-direction: column; gap: 20px; }
     .spinner {
       width: 52px; height: 52px;
@@ -262,7 +262,7 @@ if (!window.SUPABASE_CONFIG) {
     }
     #screen-loading .spinner-label { color: var(--text-muted); font-size: 13px; font-family: 'Sora', sans-serif; letter-spacing: 0.5px; }
 
-    /* Auth screen */
+    
     #screen-auth { align-items: center; justify-content: center; padding: 20px; position: relative; overflow: hidden; }
     #screen-auth::before {
       content: '';
@@ -314,9 +314,9 @@ if (!window.SUPABASE_CONFIG) {
     .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; color: var(--text-muted); border-radius: 9px; transition: all 0.25s; font-weight: 600; }
     .tab-btn.active { background: rgba(124,106,247,0.18); color: #a89df9; box-shadow: inset 0 1px 0 rgba(255,255,255,0.08); }
 
-    /* =====================================================
-       FORM ELEMENTS
-       ===================================================== */
+    
+
+
     .form-group { margin-bottom: 16px; }
     label { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.4px; text-transform: uppercase; }
     input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="date"], textarea, select {
@@ -334,9 +334,9 @@ if (!window.SUPABASE_CONFIG) {
     .input-group { display: flex; gap: 8px; }
     .input-group input { flex: 1; }
 
-    /* =====================================================
-       BUTTONS
-       ===================================================== */
+    
+
+
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 20px; border-radius: 10px; border: none; font-weight: 600; transition: all 0.22s; white-space: nowrap; position: relative; font-family: 'Sora', sans-serif; }
     .btn:active { transform: translateY(1px) scale(0.98); }
     .btn-primary {
@@ -360,9 +360,9 @@ if (!window.SUPABASE_CONFIG) {
     .btn-icon { padding: 8px; border-radius: 9px; }
     .btn:disabled { opacity: 0.40; cursor: not-allowed; transform: none; box-shadow: none; filter: none; }
 
-    /* =====================================================
-       ADMIN LAYOUT
-       ===================================================== */
+    
+
+
     #screen-admin { flex-direction: row; }
     .sidebar {
       width: var(--sidebar-w);
@@ -418,7 +418,7 @@ if (!window.SUPABASE_CONFIG) {
     .nav-item-recycle:hover { background: rgba(255,88,88,0.10) !important; color: var(--danger) !important; }
     .nav-item-recycle.active { background: rgba(255,88,88,0.15) !important; color: #ff8585 !important; border-color: rgba(255,88,88,0.25) !important; }
 
-    /* Recycle Bin view */
+    
     .recycle-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px; }
     .recycle-tabs { display:flex;gap:4px;background:rgba(255,255,255,0.04);border-radius:10px;padding:3px;border:1px solid rgba(255,255,255,0.07); }
     .recycle-tab { padding:7px 16px;border:none;background:transparent;color:var(--text-muted);border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;transition:all 0.2s;font-family:'Sora',sans-serif; }
@@ -465,7 +465,7 @@ if (!window.SUPABASE_CONFIG) {
     .topbar-actions { display: flex; align-items: center; gap: 10px; }
     .content-area { padding: 28px 30px; flex: 1; animation: fadeUp 0.4s ease; }
 
-    /* Employee layout */
+    
     #screen-employee { flex-direction: column; background: #0a0c16; }
     .emp-header {
       background: rgba(12,14,24,0.96);
@@ -484,7 +484,7 @@ if (!window.SUPABASE_CONFIG) {
     }
     .emp-content { padding: 48px 32px; flex: 1; max-width: 1000px; margin: 0 auto; width: 100%; animation: fadeUp 0.4s ease; }
 
-    /* ── EMPLOYEE TEST CARDS ── */
+    
     .emp-test-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
 
     .emp-test-card {
@@ -501,7 +501,7 @@ if (!window.SUPABASE_CONFIG) {
     }
     .emp-test-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.55); border-color: rgba(255,255,255,0.14); }
 
-    /* Urgent: has incomplete attempt */
+    
     .emp-test-card.card-urgent {
       border-color: rgba(255,210,0,0.30);
       background: rgba(30,28,18,0.97);
@@ -510,7 +510,7 @@ if (!window.SUPABASE_CONFIG) {
     .emp-test-card.card-urgent::before { background: linear-gradient(90deg, #ffd200, #f7971e); }
     .emp-test-card.card-urgent:hover { box-shadow: 0 16px 48px rgba(255,210,0,0.20), 0 0 0 1px rgba(255,210,0,0.25); }
 
-    /* Ready: can start */
+    
     .emp-test-card.card-ready {
       border-color: rgba(124,106,247,0.30);
       background: rgba(18,16,36,0.97);
@@ -519,9 +519,9 @@ if (!window.SUPABASE_CONFIG) {
     .emp-test-card.card-ready::before { background: var(--accent-grad); }
     .emp-test-card.card-ready:hover { box-shadow: 0 16px 48px rgba(124,106,247,0.25), 0 0 0 1px rgba(124,106,247,0.30); }
 
-    /* Done/pass */
+    
     .emp-test-card.card-pass::before { background: var(--accent-grad-2); }
-    /* Done/fail */
+    
     .emp-test-card.card-fail::before { background: var(--accent-grad-4); }
 
     .emp-test-card-glow {
@@ -553,9 +553,9 @@ if (!window.SUPABASE_CONFIG) {
       animation: pulse 1.4s ease-in-out infinite;
     }
 
-    /* =====================================================
-       CARDS
-       ===================================================== */
+    
+
+
     .card {
       background: rgba(20,23,38,0.88);
       border: 1px solid rgba(255,255,255,0.07);
@@ -593,9 +593,9 @@ if (!window.SUPABASE_CONFIG) {
     .stat-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 4px; }
     .stat-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
 
-    /* =====================================================
-       TABLE
-       ===================================================== */
+    
+
+
     .table-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
     .search-box { position: relative; }
     .search-box input { padding-left: 38px; width: 280px; }
@@ -646,11 +646,11 @@ if (!window.SUPABASE_CONFIG) {
     .page-btn:hover { background: rgba(255,255,255,0.08); color: var(--text-primary); border-color: rgba(255,255,255,0.14); }
     .page-btn.active { background: var(--accent-grad); color: #fff; border-color: transparent; box-shadow: 0 4px 14px rgba(124,106,247,0.35); }
 
-    /* =====================================================
-       BADGES
-       ===================================================== */
+    
+
+
     .badge { display: inline-flex; align-items: center; justify-content: center; padding: 3px 7px; min-width: 20px; height: 20px; border-radius: 100px; font-size: 11px; font-weight: 700; letter-spacing: 0.2px; }
-    /* Nav badge: pill nhỏ gọn hiển thị số đếm trong sidebar */
+    
     .nav-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 100px; font-size: 11px; font-weight: 700; line-height: 1; background: linear-gradient(135deg, #ff5858, #f857a6); color: #fff; box-shadow: 0 2px 8px rgba(255,88,88,0.40); margin-left: auto; flex-shrink: 0; }
     .badge-success { background: rgba(67,233,123,0.12); color: #43e97b; border: 1px solid rgba(67,233,123,0.20); }
     .badge-danger { background: rgba(255,88,88,0.12); color: #ff6b6b; border: 1px solid rgba(255,88,88,0.20); }
@@ -659,9 +659,9 @@ if (!window.SUPABASE_CONFIG) {
     .badge-muted { background: rgba(255,255,255,0.06); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.08); }
     .badge-accent { background: rgba(124,106,247,0.14); color: #a89df9; border: 1px solid rgba(124,106,247,0.22); }
 
-    /* =====================================================
-       MODAL
-       ===================================================== */
+    
+
+
     .modal-overlay {
       display: none; position: fixed; inset: 0;
       background: rgba(0,0,0,0.75);
@@ -703,9 +703,9 @@ if (!window.SUPABASE_CONFIG) {
       border-radius: 0 0 20px 20px;
     }
 
-    /* =====================================================
-       TOAST NOTIFICATIONS
-       ===================================================== */
+    
+
+
     #toast-container { position: fixed; bottom: 26px; right: 26px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
     .toast {
       display: flex; align-items: center; gap: 14px;
@@ -734,16 +734,16 @@ if (!window.SUPABASE_CONFIG) {
     .toast.info .toast-icon { background: rgba(79,172,254,0.12); }
     .toast-msg { flex: 1; font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
 
-    /* =====================================================
-       SKELETON LOADER
-       ===================================================== */
+    
+
+
     .skeleton { background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%); background-size: 200% 100%; animation: shimmer 1.8s infinite; border-radius: 6px; }
     .skeleton-line { height: 14px; margin-bottom: 8px; }
     .skeleton-card { height: 100px; border-radius: var(--radius); margin-bottom: 16px; }
 
-    /* =====================================================
-       CHARTS
-       ===================================================== */
+    
+
+
     .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 24px; }
     .chart-card {
       background: rgba(18,21,36,0.90);
@@ -753,9 +753,9 @@ if (!window.SUPABASE_CONFIG) {
     }
     .chart-card canvas { max-height: 280px; }
 
-    /* =====================================================
-       TABLE ACTION BUTTONS
-       ===================================================== */
+    
+
+
     .action-group { display: flex; align-items: center; gap: 5px; flex-wrap: nowrap; }
     .action-divider { width: 1px; height: 18px; background: rgba(255,255,255,0.07); flex-shrink: 0; margin: 0 2px; }
     .btn-action {
@@ -779,9 +779,9 @@ if (!window.SUPABASE_CONFIG) {
     .btn-icon-action:hover { background: rgba(255,255,255,0.09); color: var(--text-primary); border-color: rgba(255,255,255,0.14); }
     .btn-icon-action.btn-icon-danger:hover { background: rgba(255,88,88,0.14); color: #ff6b6b; border-color: rgba(255,88,88,0.25); }
 
-    /* =====================================================
-       QUESTION BUILDER
-       ===================================================== */
+    
+
+
     .question-item {
       background: rgba(18,21,36,0.92);
       border: 1px solid rgba(255,255,255,0.07);
@@ -834,7 +834,7 @@ if (!window.SUPABASE_CONFIG) {
     }
     .modal-question-footer-info { font-size: 12px; color: var(--text-muted); font-weight: 500; }
 
-    /* ── ADD QUESTION BAR (fixed to modal bottom, outside scroll) ── */
+    
     .modal-add-bar {
       display: flex; align-items: center; justify-content: space-between;
       gap: 8px; flex-wrap: wrap;
@@ -851,12 +851,12 @@ if (!window.SUPABASE_CONFIG) {
     .modal-add-bar-btns { display: flex; gap: 7px; flex-wrap: wrap; }
     #question-list-container { padding-bottom: 4px; }
 
-    /* =====================================================
-       EXAM / TEST TAKING
-       ===================================================== */
+    
+
+
     #screen-exam { flex-direction: column; background: #080a14; }
 
-    /* ── ANTI-CHEAT WARNING OVERLAY ── */
+    
     .anticheat-overlay {
       position: fixed; inset: 0; z-index: 99999;
       background: rgba(5,6,15,0.97);
@@ -901,7 +901,7 @@ if (!window.SUPABASE_CONFIG) {
       font-family: 'Sora', system-ui, sans-serif;
     }
 
-    /* ── EXAM HEADER ── */
+    
     .exam-header {
       background: rgba(8,10,20,0.98);
       backdrop-filter: blur(20px);
@@ -1005,9 +1005,9 @@ if (!window.SUPABASE_CONFIG) {
     .choice-option input[type="radio"], .choice-option input[type="checkbox"] { margin-top: 3px; flex-shrink: 0; accent-color: var(--accent); width: 18px; height: 18px; }
     .essay-input { width: 100%; min-height: 160px; font-size: 15px; line-height: 1.7; background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.10); }
 
-    /* =====================================================
-       PROGRESS BAR
-       ===================================================== */
+    
+
+
     .progress-bar { height: 6px; background: rgba(255,255,255,0.06); border-radius: 100px; overflow: hidden; }
     .progress-fill {
       height: 100%; background: var(--accent-grad);
@@ -1015,9 +1015,9 @@ if (!window.SUPABASE_CONFIG) {
       box-shadow: 0 0 10px rgba(124,106,247,0.50);
     }
 
-    /* =====================================================
-       GRADING
-       ===================================================== */
+    
+
+
     .grading-answer {
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.07);
@@ -1028,11 +1028,11 @@ if (!window.SUPABASE_CONFIG) {
     .grading-correct { color: #43e97b; font-size: 12px; margin-top: 6px; font-weight: 600; }
     .score-input { width: 90px; }
 
-    /* =====================================================
-       GRADING ENHANCEMENTS — REDESIGNED UI
-       ===================================================== */
+    
 
-    /* ── Candidate info header ── */
+
+
+    
     .grade-candidate-header {
       display: flex; align-items: center; gap: 16px;
       padding: 18px 22px;
@@ -1066,7 +1066,7 @@ if (!window.SUPABASE_CONFIG) {
     }
     .grade-meta-pill .pill-icon { opacity: 0.7; }
 
-    /* ── Question cards ── */
+    
     .grade-q-card {
       border-radius: 14px; margin-bottom: 14px; overflow: hidden;
       border: 1.5px solid rgba(255,255,255,0.07);
@@ -1106,7 +1106,7 @@ if (!window.SUPABASE_CONFIG) {
 
     .grade-q-body { padding: 16px 18px; }
 
-    /* Answer display */
+    
     .grade-answer-block { margin-bottom: 14px; }
     .grade-answer-label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-muted); margin-bottom: 6px; }
     .grade-answer-text {
@@ -1120,7 +1120,7 @@ if (!window.SUPABASE_CONFIG) {
     .grade-answer-text.no-answer { color: var(--text-muted); font-style: italic; }
     .grade-answer-text.essay-long { white-space: pre-wrap; word-break: break-word; }
 
-    /* Correct answer chip row */
+    
     .grade-correct-row {
       display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
       margin-bottom: 14px;
@@ -1143,7 +1143,7 @@ if (!window.SUPABASE_CONFIG) {
     .grade-result-chip.wrong    { background: rgba(255,88,88,0.14); color: #ff6b6b; border: 1px solid rgba(255,88,88,0.28); }
     .grade-result-chip.partial  { background: rgba(255,210,0,0.14); color: #ffd200; border: 1px solid rgba(255,210,0,0.28); }
 
-    /* Scoring row */
+    
     .grade-score-panel {
       display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
       padding: 11px 14px;
@@ -1178,7 +1178,7 @@ if (!window.SUPABASE_CONFIG) {
       white-space: nowrap; line-height: 1;
     }
 
-    /* Essay score input */
+    
     .essay-score-wrap {
       display: flex; align-items: center; gap: 10px;
       padding: 12px 14px;
@@ -1196,7 +1196,7 @@ if (!window.SUPABASE_CONFIG) {
     .essay-score-max { font-size: 14px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-weight: 700; white-space: nowrap; line-height: 1; }
     .essay-score-hint { font-size: 11px; color: var(--text-muted); margin-left: 8px; font-style: italic; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    /* ── Live score bar (footer) ── */
+    
     .grade-live-bar {
       display: flex; align-items: stretch; gap: 0;
       background: rgba(12,14,28,0.96);
@@ -1227,9 +1227,9 @@ if (!window.SUPABASE_CONFIG) {
     .grade-live-status.fail { background: rgba(255,88,88,0.12); color: #ff6b6b; }
 
 
-    /* =====================================================
-       REVIEW MODAL (Employee xem lại bài thi)
-       ===================================================== */
+    
+
+
     .review-header {
       display: flex; align-items: center; justify-content: space-between;
       gap: 16px; flex-wrap: wrap;
@@ -1255,7 +1255,7 @@ if (!window.SUPABASE_CONFIG) {
     .review-result-score.fail { color: var(--danger); }
     .review-result-score span { font-size: 13px; font-weight: 500; color: var(--text-muted); font-family: 'Sora', sans-serif; }
 
-    /* Question card */
+    
     .rv-q-card {
       border-radius: 14px; margin-bottom: 14px;
       border: 1.5px solid rgba(255,255,255,0.08);
@@ -1308,7 +1308,7 @@ if (!window.SUPABASE_CONFIG) {
 
     .rv-q-body { padding: 16px 18px; }
 
-    /* Essay answer box */
+    
     .rv-essay-box {
       padding: 12px 16px;
       background: rgba(124,106,247,0.05);
@@ -1320,7 +1320,7 @@ if (!window.SUPABASE_CONFIG) {
     .rv-essay-box.no-answer { color: var(--text-muted); font-style: italic; }
     .rv-essay-pending { display:flex;align-items:center;gap:6px;margin-top:8px;font-size:11.5px;color:var(--warning);font-weight:600; }
 
-    /* Options list */
+    
     .rv-options { display: flex; flex-direction: column; gap: 7px; margin-top: 10px; }
     .rv-option {
       display: flex; align-items: center; gap: 10px;
@@ -1353,9 +1353,9 @@ if (!window.SUPABASE_CONFIG) {
     .opt-correct-missed .rv-opt-badge { background: rgba(67,233,123,0.10); color: #43e97b; }
     .opt-wrong-picked   .rv-opt-badge { background: rgba(255,88,88,0.15);  color: #ff7878; }
 
-    /* =====================================================
-       CHECKBOX
-       ===================================================== */
+    
+
+
     .checkbox-group {
       max-height: 280px; overflow-y: auto;
       border: 1px solid rgba(255,255,255,0.07);
@@ -1365,14 +1365,14 @@ if (!window.SUPABASE_CONFIG) {
     .checkbox-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; cursor: pointer; transition: all 0.18s; border: 1.5px solid transparent; }
     .checkbox-item:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.08); }
     .checkbox-item input[type="checkbox"] { accent-color: var(--accent); width: 18px; height: 18px; flex-shrink: 0; cursor: pointer; }
-    /* Checked state — newly selected */
+    
     .checkbox-item:has(input:checked:not(:disabled)) {
       background: rgba(124,106,247,0.14);
       border-color: rgba(124,106,247,0.40);
       box-shadow: inset 0 0 0 1px rgba(124,106,247,0.18);
     }
     .checkbox-item:has(input:checked:not(:disabled)) span { color: #fff; font-weight: 600; }
-    /* Disabled (already assigned) state */
+    
     .checkbox-item:has(input:disabled) {
       background: rgba(67,233,123,0.10);
       border-color: rgba(67,233,123,0.35);
@@ -1381,16 +1381,16 @@ if (!window.SUPABASE_CONFIG) {
     }
     .checkbox-item:has(input:disabled) span { color: #43e97b; font-weight: 700; }
 
-    /* =====================================================
-       EMPTY STATE
-       ===================================================== */
+    
+
+
     .empty-state { text-align: center; padding: 70px 20px; color: var(--text-muted); }
     .empty-state svg { margin: 0 auto 16px; opacity: 0.30; }
     .empty-state p { font-size: 15px; font-weight: 500; color: var(--text-muted); }
 
-    /* =====================================================
-       RESULTS
-       ===================================================== */
+    
+
+
     #screen-results { flex-direction: column; }
     .results-header {
       background: rgba(12,14,24,0.95);
@@ -1401,9 +1401,9 @@ if (!window.SUPABASE_CONFIG) {
     }
     .results-content { padding: 30px; flex: 1; max-width: 1140px; margin: 0 auto; width: 100%; animation: fadeUp 0.4s ease; }
 
-    /* =====================================================
-       RESPONSIVE
-       ===================================================== */
+    
+
+
     @media (max-width: 900px) {
       :root { --sidebar-w: 0px; }
       .sidebar { transform: translateX(-280px); transition: transform 0.3s; width: 280px; }
@@ -1423,9 +1423,9 @@ if (!window.SUPABASE_CONFIG) {
       .auth-card { padding: 28px 22px; }
     }
 
-    /* =====================================================
-       MISC
-       ===================================================== */
+    
+
+
     .divider { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 16px 0; }
     .alert { padding: 14px 18px; border-radius: 12px; font-size: 13.5px; margin-bottom: 16px; font-weight: 500; border: 1px solid transparent; display: flex; align-items: center; gap: 10px; }
     .alert-info { background: rgba(79,172,254,0.10); color: #4facfe; border-color: rgba(79,172,254,0.20); }
@@ -1448,9 +1448,9 @@ if (!window.SUPABASE_CONFIG) {
 </head>
 <body>
 
-<!-- =====================================================
-     MOBILE WARNING OVERLAY
-     ===================================================== -->
+
+
+
 <div id="mobile-warning" style="
   display: none;
   position: fixed; inset: 0; z-index: 999999;
@@ -1501,36 +1501,36 @@ if (!window.SUPABASE_CONFIG) {
 })();
 </script>
 
-<!-- =====================================================
-     TOAST CONTAINER
-     ===================================================== -->
+
+
+
 <div id="toast-container"></div>
 
-<!-- =====================================================
-     SCREEN: LOADING
-     ===================================================== -->
+
+
+
 <div id="screen-loading" class="screen active">
   <div class="spinner"></div>
   <div class="spinner-label">Đang khởi động...</div>
 </div>
 
-<!-- =====================================================
-     SCREEN: AUTH (Login + First-time setup)
-     ===================================================== -->
+
+
+
 <div id="screen-auth" class="screen">
   <div class="auth-card">
     <div class="auth-logo">Employee Assessment</div>
     <div class="auth-subtitle">Hệ Thống Đánh Giá Nhân Viên</div>
 
-    <!-- Tab chọn Admin / Nhân viên -->
+    
     <div class="tab-group">
       <button class="tab-btn active" onclick="App.auth.switchTab('admin')">Quản trị viên</button>
       <button class="tab-btn" onclick="App.auth.switchTab('employee')">Nhân viên</button>
     </div>
 
-    <!-- === ADMIN LOGIN FORM === -->
+    
     <div id="auth-admin-form">
-      <!-- First-time setup alert -->
+      
       <div id="auth-setup-alert" class="alert alert-warning hidden">
         Chào mừng! Đây là lần đầu sử dụng. Vui lòng tạo mật khẩu quản trị.
       </div>
@@ -1548,10 +1548,10 @@ if (!window.SUPABASE_CONFIG) {
       <div id="auth-admin-error" class="mt-2 text-sm" style="color:var(--danger);"></div>
     </div>
 
-    <!-- === EMPLOYEE LOGIN FORM === -->
+    
     <div id="auth-employee-form" class="hidden">
 
-      <!-- STEP 1: Nhập email -->
+      
       <div id="emp-step-email">
         <div class="alert alert-info">Nhập tài khoản Heiway của bạn để xem bài thi.</div>
         <div class="form-group">
@@ -1561,7 +1561,7 @@ if (!window.SUPABASE_CONFIG) {
         <button class="btn btn-primary w-full" id="emp-login-btn" onclick="App.auth.employeeLogin()">Tiếp tục</button>
       </div>
 
-      <!-- STEP 2a: Tạo PIN mới -->
+      
       <div id="emp-step-create-pin" class="hidden">
         <div style="text-align:center;margin-bottom:20px;">
           <div style="width:52px;height:52px;border-radius:16px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:24px;">🔐</div>
@@ -1571,12 +1571,12 @@ if (!window.SUPABASE_CONFIG) {
         <div class="form-group">
           <label>Nhập mã PIN mới (6 chữ số)</label>
           <div style="position:relative;">
-            <!-- Hidden real input for capturing keystrokes -->
+            
             <input type="password" id="emp-pin-new" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="new-password"
               style="position:absolute;opacity:0;width:100%;height:100%;top:0;left:0;z-index:2;cursor:pointer;"
               oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6);App.auth._pinDots('emp-pin-new-dots',this.value.length)"
               onkeydown="if(event.key==='Enter')App.auth.confirmCreatePin()">
-            <!-- Visual PIN field: dots inside box -->
+            
             <div id="emp-pin-new-dots" onclick="document.getElementById('emp-pin-new').focus()"
               style="display:flex;gap:10px;justify-content:center;align-items:center;
                      padding:14px 48px 14px 14px;
@@ -1622,7 +1622,7 @@ if (!window.SUPABASE_CONFIG) {
         <button class="btn btn-ghost w-full mt-2" onclick="App.auth._backToEmail()">← Quay lại</button>
       </div>
 
-      <!-- STEP 2b: Nhập PIN đã có -->
+      
       <div id="emp-step-enter-pin" class="hidden">
         <div style="text-align:center;margin-bottom:20px;">
           <div style="width:52px;height:52px;border-radius:16px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:24px;">🔑</div>
@@ -1675,11 +1675,11 @@ if (!window.SUPABASE_CONFIG) {
   </div>
 </div>
 
-<!-- =====================================================
-     SCREEN: ADMIN
-     ===================================================== -->
+
+
+
 <div id="screen-admin" class="screen">
-  <!-- Sidebar -->
+  
   <aside class="sidebar" id="admin-sidebar">
     <div class="sidebar-brand">
       <div class="logo">Employee Assessment</div>
@@ -1741,7 +1741,7 @@ if (!window.SUPABASE_CONFIG) {
     </div>
   </aside>
 
-  <!-- Main content -->
+  
   <div class="main-content">
     <div class="topbar">
       <div class="flex items-center gap-4">
@@ -1762,14 +1762,14 @@ if (!window.SUPABASE_CONFIG) {
       </div>
     </div>
     <div class="content-area" id="admin-content">
-      <!-- Views injected by JS -->
+      
     </div>
   </div>
 </div>
 
-<!-- =====================================================
-     SCREEN: EMPLOYEE
-     ===================================================== -->
+
+
+
 <div id="screen-employee" class="screen">
   <div class="emp-header">
     <div class="logo">Employee Assessment</div>
@@ -1783,19 +1783,19 @@ if (!window.SUPABASE_CONFIG) {
     </div>
   </div>
   <div class="emp-content" id="emp-content">
-    <!-- Injected by JS -->
+    
   </div>
 </div>
 
-<!-- =====================================================
-     SCREEN: EXAM (Taking the test)
-     ===================================================== -->
-<!-- =====================================================
-     SCREEN: NỘI QUY THI
-     ===================================================== -->
+
+
+
+
+
+
 <div id="screen-rules" class="screen" style="flex-direction:column;align-items:center;justify-content:flex-start;background:#080a14;overflow-y:auto;padding:40px 16px 60px;height:100vh;">
   <div style="width:100%;max-width:680px;">
-    <!-- Header -->
+    
     <div style="text-align:center;margin-bottom:32px;">
       <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 6px 24px rgba(245,158,11,0.35);">
         <svg width="28" height="28" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -1804,10 +1804,10 @@ if (!window.SUPABASE_CONFIG) {
       <div style="font-size:13px;color:var(--text-muted);margin-top:6px;" id="rules-exam-subtitle">Vui lòng đọc kỹ trước khi bắt đầu</div>
     </div>
 
-    <!-- Rules box -->
+    
     <div style="background:rgba(20,23,38,0.95);border:1.5px solid rgba(255,255,255,0.1);border-radius:20px;padding:32px 36px;margin-bottom:24px;box-shadow:0 8px 40px rgba(0,0,0,0.5);">
 
-      <!-- Section: Thời gian -->
+      
       <div style="margin-bottom:24px;">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
           <div style="width:32px;height:32px;border-radius:8px;background:rgba(124,106,247,0.2);border:1px solid rgba(124,106,247,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -1823,7 +1823,7 @@ if (!window.SUPABASE_CONFIG) {
 
       <div style="height:1px;background:rgba(255,255,255,0.07);margin-bottom:24px;"></div>
 
-      <!-- Section: Cấm tải lại trang -->
+      
       <div style="margin-bottom:24px;">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
           <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,88,88,0.15);border:1px solid rgba(255,88,88,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -1843,7 +1843,7 @@ if (!window.SUPABASE_CONFIG) {
 
       <div style="height:1px;background:rgba(255,255,255,0.07);margin-bottom:24px;"></div>
 
-      <!-- Section: Cấm chuyển tab -->
+      
       <div style="margin-bottom:24px;">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
           <div style="width:32px;height:32px;border-radius:8px;background:rgba(251,167,106,0.15);border:1px solid rgba(251,167,106,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -1859,7 +1859,7 @@ if (!window.SUPABASE_CONFIG) {
 
       <div style="height:1px;background:rgba(255,255,255,0.07);margin-bottom:24px;"></div>
 
-      <!-- Section: Đóng tab / Đóng trình duyệt -->
+      
       <div style="margin-bottom:24px;">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
           <div style="width:32px;height:32px;border-radius:8px;background:rgba(248,87,166,0.15);border:1px solid rgba(248,87,166,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -1879,7 +1879,7 @@ if (!window.SUPABASE_CONFIG) {
 
       <div style="height:1px;background:rgba(255,255,255,0.07);margin-bottom:24px;"></div>
 
-      <!-- Section: Làm bài trung thực -->
+      
       <div>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
           <div style="width:32px;height:32px;border-radius:8px;background:rgba(104,211,145,0.15);border:1px solid rgba(104,211,145,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -1894,13 +1894,13 @@ if (!window.SUPABASE_CONFIG) {
       </div>
     </div>
 
-    <!-- Scroll indicator -->
+    
     <div id="rules-scroll-hint" style="text-align:center;margin-bottom:16px;font-size:12px;color:var(--text-muted);display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.3s;">
       <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
       Cuộn xuống để xem hết nội quy
     </div>
 
-    <!-- Confirm checkbox -->
+    
     <div id="rules-confirm-area" style="background:rgba(20,23,38,0.95);border:1.5px solid rgba(255,255,255,0.1);border-radius:16px;padding:24px 28px;margin-bottom:20px;opacity:0.4;transition:opacity 0.3s;pointer-events:none;" >
       <label style="display:flex;align-items:flex-start;gap:14px;cursor:pointer;user-select:none;">
         <div style="position:relative;flex-shrink:0;margin-top:1px;">
@@ -1913,7 +1913,7 @@ if (!window.SUPABASE_CONFIG) {
       </label>
     </div>
 
-    <!-- Start button -->
+    
     <button id="rules-start-btn" onclick="App.exam.rules.confirm()" disabled style="width:100%;padding:16px;border-radius:14px;border:none;background:linear-gradient(135deg,rgba(124,106,247,0.3),rgba(124,106,247,0.2));color:rgba(255,255,255,0.35);font-family:'Sora',sans-serif;font-size:15px;font-weight:700;cursor:not-allowed;transition:all 0.3s;letter-spacing:-0.2px;">
       Bắt đầu làm bài →
     </button>
@@ -1965,9 +1965,9 @@ if (!window.SUPABASE_CONFIG) {
   </div>
 </div>
 
-<!-- =====================================================
-     SCREEN: PUBLIC RESULTS
-     ===================================================== -->
+
+
+
 <div id="screen-results" class="screen" style="flex-direction:column;">
   <div class="results-header">
     <div style="display:flex;align-items:center;justify-content:space-between;">
@@ -1984,9 +1984,9 @@ if (!window.SUPABASE_CONFIG) {
     </div>
   </div>
   <div class="results-content">
-    <!-- Summary bar -->
+    
     <div id="results-summary-bar" style="display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap;"></div>
-    <!-- Toolbar -->
+    
     <div class="table-toolbar">
       <div class="search-box">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -2029,10 +2029,10 @@ if (!window.SUPABASE_CONFIG) {
   </div>
 </div>
 
-<!-- =====================================================
-     MODALS
-     ===================================================== -->
-<!-- Project Modal -->
+
+
+
+
 <div class="modal-overlay" id="modal-project">
   <div class="modal modal-md">
     <div class="modal-header">
@@ -2055,7 +2055,7 @@ if (!window.SUPABASE_CONFIG) {
   </div>
 </div>
 
-<!-- Test Modal -->
+
 <div class="modal-overlay" id="modal-test">
   <div class="modal modal-lg">
     <div class="modal-header">
@@ -2096,7 +2096,7 @@ if (!window.SUPABASE_CONFIG) {
   </div>
 </div>
 
-<!-- Question Modal -->
+
 <div class="modal-overlay" id="modal-question">
   <div class="modal modal-xl">
     <div class="modal-header">
@@ -2106,7 +2106,7 @@ if (!window.SUPABASE_CONFIG) {
     <div class="modal-body">
       <div id="modal-question-content"></div>
     </div>
-    <!-- Add-question bar always anchored at bottom of modal, outside scroll area -->
+    
     <div class="modal-add-bar" id="modal-question-add-bar">
       <span class="modal-add-bar-label">+ THÊM CÂU HỎI</span>
       <div class="modal-add-bar-btns">
@@ -2127,7 +2127,7 @@ if (!window.SUPABASE_CONFIG) {
   </div>
 </div>
 
-<!-- Assignment Modal -->
+
 <div class="modal-overlay" id="modal-assign">
   <div class="modal modal-lg">
     <div class="modal-header">
@@ -2156,7 +2156,7 @@ if (!window.SUPABASE_CONFIG) {
   </div>
 </div>
 
-<!-- Review Modal -->
+
 <div class="modal-overlay" id="modal-review">
   <div class="modal modal-lg">
     <div class="modal-header">
@@ -2170,7 +2170,7 @@ if (!window.SUPABASE_CONFIG) {
   </div>
 </div>
 
-<!-- Grading Modal -->
+
 <div class="modal-overlay" id="modal-grade">
   <div class="modal modal-xl">
     <div class="modal-header">
@@ -2179,7 +2179,7 @@ if (!window.SUPABASE_CONFIG) {
     </div>
     <div class="modal-body" id="modal-grade-body"></div>
     <div class="modal-footer" style="flex-direction:column;align-items:stretch;gap:12px;padding:16px 20px;">
-      <!-- Live score preview bar -->
+      
       <div class="grade-live-bar" id="grade-live-bar">
         <div class="grade-live-group">
           <div class="grade-live-label">Tổng điểm</div>
@@ -2199,7 +2199,7 @@ if (!window.SUPABASE_CONFIG) {
         </div>
         <div class="grade-live-status fail" id="grade-live-status">⏳ Hiện tại: FAIL ✗</div>
       </div>
-      <!-- Action buttons -->
+      
       <div style="display:flex;justify-content:flex-end;gap:10px;align-items:center;">
         <button class="btn btn-secondary" onclick="App.modal.close('modal-grade')">✕ Đóng</button>
         <button class="btn btn-danger" id="btn-reject" onclick="App.grading.finalize('fail')" style="min-width:140px;">
@@ -2215,7 +2215,7 @@ if (!window.SUPABASE_CONFIG) {
   </div>
 </div>
 
-<!-- Change Password Modal -->
+
 <div class="modal-overlay" id="modal-change-pw">
   <div class="modal modal-sm">
     <div class="modal-header">
@@ -2234,7 +2234,7 @@ if (!window.SUPABASE_CONFIG) {
   </div>
 </div>
 
-<!-- Confirm Modal -->
+
 <div class="modal-overlay" id="modal-confirm">
   <div class="modal modal-sm">
     <div class="modal-header">
@@ -2251,32 +2251,32 @@ if (!window.SUPABASE_CONFIG) {
   </div>
 </div>
 
-<!-- =====================================================
-     JAVASCRIPT
-     ===================================================== -->
+
+
+
 <script>
-/* =========================================================
-   CONFIG
-   ========================================================= */
+
+
+
 const SUPABASE_URL = window.SUPABASE_CONFIG['Employee_Assessment.html'].url;
 const SUPABASE_ANON_KEY = window.SUPABASE_CONFIG['Employee_Assessment.html'].key;
 const SESSION_KEY = 'Employee Assessment_session';
-const SESSION_DURATION_MS = 8 * 60 * 60 * 1000; // 8 hours
+const SESSION_DURATION_MS = 8 * 60 * 60 * 1000; 
 const BCRYPT_ROUNDS = 10;
 
-/* =========================================================
-   SUPABASE CLIENT
-   ========================================================= */
+
+
+
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* =========================================================
-   MAIN APP OBJECT
-   ========================================================= */
+
+
+
 const App = {
-  /* --- State --- */
+  
   state: {
-    session: null,        // admin session object
-    employee: null,       // logged-in employee object
+    session: null,        
+    employee: null,       
     isFirstSetup: false,
     currentView: 'dashboard',
     charts: {},
@@ -2288,7 +2288,7 @@ const App = {
       timerInterval: null,
       secondsLeft: 0,
     },
-    // Table state per view
+    
     tables: {
       projects: { data: [], filtered: [], page: 1, perPage: 10, sort: '', dir: 'asc', search: '' },
       tests: { data: [], filtered: [], page: 1, perPage: 10, sort: '', dir: 'asc', search: '' },
@@ -2297,34 +2297,34 @@ const App = {
       grading: { data: [], filtered: [], page: 1, perPage: 10, sort: '', dir: 'asc', search: '' },
       results: { data: [], filtered: [], page: 1, perPage: 10, sort: '', dir: 'asc', search: '' },
     },
-    gradeContext: null, // current grading context
-    empSessionToken: null,  // unique token for concurrent-login detection
-    empPresenceChannel: null, // realtime presence channel for employee (kept for compatibility)
-    empPingInterval: null,   // DB-based session ping interval
-    pendingLogin: null,  // { data, myToken } — waiting for PIN verification
+    gradeContext: null, 
+    empSessionToken: null,  
+    empPresenceChannel: null, 
+    empPingInterval: null,   
+    pendingLogin: null,  
   },
 
-  /* =========================================================
-     INIT
-     ========================================================= */
+  
+
+
   async init() {
     App.screen.show('loading');
 
-    // ── F5 DETECTION đã được xử lý bởi inline script đầu <head> ──
-    // Inline script chạy TRƯỚC khi CDN scripts nạp → cancel fetch tới Edge Function
-    // trong vài ms, không chờ đến đây. _ac_f5_pending_v đã được ghi sẵn để
-    // exam.start() đọc; _ac_pending_attempt/_ac_pending_emp đã bị xóa.
+    
+    
+    
+    
 
     try {
-      // Check if admin auth exists
+      
       const { data: authRows } = await db.from('exam_admin_auth').select('id').limit(1);
       App.state.isFirstSetup = !authRows || authRows.length === 0;
 
-      // Check session in sessionStorage
+      
       const savedSession = sessionStorage.getItem(SESSION_KEY);
       if (savedSession) {
         const sess = JSON.parse(savedSession);
-        // Verify session in DB
+        
         const { data: sessRow } = await db.from('exam_admin_sessions')
           .select('*').eq('session_token', sess.token).gt('expired_at', new Date().toISOString()).single();
         if (sessRow) {
@@ -2339,17 +2339,17 @@ const App = {
         }
       }
 
-      // Check employee session
+      
       const empSession = sessionStorage.getItem('Employee Assessment_employee');
       if (empSession) {
         App.state.employee = JSON.parse(empSession);
         const savedToken = sessionStorage.getItem('Employee Assessment_emp_token');
         if (savedToken && App.state.employee) {
           const myToken = savedToken;
-          const SESSION_TIMEOUT_MS = 90 * 1000; // đồng bộ với employeeLogin
+          const SESSION_TIMEOUT_MS = 90 * 1000; 
           const cutoff = new Date(Date.now() - SESSION_TIMEOUT_MS).toISOString();
 
-          // Kiểm tra session trong DB còn hợp lệ không
+          
           const { data: dbSession } = await db
             .from('exam_active_sessions')
             .select('session_token, last_ping')
@@ -2358,15 +2358,15 @@ const App = {
             .gt('last_ping', cutoff)
             .maybeSingle();
 
-          // FIX: nếu session không tìm thấy ngay (có thể Edge Function xóa trong
-          // khoảng thời gian F5 → App.init() chạy), retry không kèm session_token
-          // để bắt trường hợp session bị replace bởi token mới từ concurrent login guard.
-          // Cũng retry với cutoff rộng hơn (5 phút) để bắt edge case cold-start isolate
-          // khiến timer không fire đúng lúc nhưng session vẫn còn trong DB.
+          
+          
+          
+          
+          
           let resolvedSession = dbSession;
           if (!resolvedSession) {
-            // Retry: check xem session row có tồn tại không (bỏ qua cutoff last_ping)
-            // để phân biệt "session bị xóa hoàn toàn" vs "last_ping quá cũ vì F5 nhanh"
+            
+            
             const { data: retrySession } = await db
               .from('exam_active_sessions')
               .select('session_token, last_ping')
@@ -2374,13 +2374,13 @@ const App = {
               .eq('session_token', myToken)
               .maybeSingle();
             if (retrySession) {
-              // Session row vẫn còn, chỉ last_ping quá cũ (trang đang load F5) → ping ngay
+              
               resolvedSession = retrySession;
             }
           }
 
           if (resolvedSession) {
-            // Session hợp lệ → ping ngay và khởi động interval
+            
             await db.from('exam_active_sessions')
               .update({ last_ping: new Date().toISOString() })
               .eq('employee_id', App.state.employee.id)
@@ -2400,7 +2400,7 @@ const App = {
             App.employee.load();
             return;
           } else {
-            // Session hết hạn hoặc bị xoá → xoá local và yêu cầu login lại
+            
             sessionStorage.removeItem('Employee Assessment_employee');
             sessionStorage.removeItem('Employee Assessment_emp_token');
             App.state.employee = null;
@@ -2411,7 +2411,7 @@ const App = {
         }
       }
 
-      // Show auth
+      
       App.screen.show('auth');
       if (App.state.isFirstSetup) {
         document.getElementById('auth-setup-alert').classList.remove('hidden');
@@ -2424,24 +2424,24 @@ const App = {
     }
   },
 
-  /* =========================================================
-     SCREEN MANAGEMENT
-     ========================================================= */
+  
+
+
   screen: {
     show(name) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       const el = document.getElementById(`screen-${name}`);
       if (el) el.classList.add('active');
-      // Show sidebar toggle on mobile
+      
       if (name === 'admin' && window.innerWidth <= 900) {
         document.getElementById('sidebar-toggle').style.display = 'flex';
       }
     }
   },
 
-  /* =========================================================
-     SHOW RESULTS (public)
-     ========================================================= */
+  
+
+
   showResults() {
     App.screen.show('results');
     App.results.load();
@@ -2450,9 +2450,9 @@ const App = {
     App.screen.show('auth');
   },
 
-  /* =========================================================
-     MODAL MANAGEMENT
-     ========================================================= */
+  
+
+
   modal: {
     open(id) { document.getElementById(id).classList.add('open'); },
     close(id) { document.getElementById(id).classList.remove('open'); },
@@ -2469,9 +2469,9 @@ const App = {
     }
   },
 
-  /* =========================================================
-     TOAST
-     ========================================================= */
+  
+
+
   toast: {
     show(msg, type = 'info', duration = 3500) {
       const icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
@@ -2487,9 +2487,9 @@ const App = {
     }
   },
 
-  /* =========================================================
-     AUTH MODULE
-     ========================================================= */
+  
+
+
   auth: {
     switchTab(tab) {
       document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (tab==='admin'&&i===0)||(tab==='employee'&&i===1)));
@@ -2506,7 +2506,7 @@ const App = {
       if (!pw) { errEl.textContent = 'Vui lòng nhập mật khẩu.'; return; }
 
       if (App.state.isFirstSetup) {
-        // Create admin password
+        
         if (pw !== pwConfirm) { errEl.textContent = 'Mật khẩu xác nhận không khớp.'; return; }
         if (pw.length < 8) { errEl.textContent = 'Mật khẩu phải có ít nhất 8 ký tự.'; return; }
         try {
@@ -2520,7 +2520,7 @@ const App = {
           errEl.textContent = 'Lỗi tạo mật khẩu: ' + e.message;
         }
       } else {
-        // Verify password
+        
         try {
           const { data, error } = await db.from('exam_admin_auth').select('password_hash').single();
           if (error) throw error;
@@ -2540,7 +2540,7 @@ const App = {
       const sess = { token, expiredAt };
       App.state.session = sess;
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(sess));
-      // Schedule auto logout
+      
       setTimeout(() => App.auth.logout(), SESSION_DURATION_MS);
       App.screen.show('admin');
       App.admin.navigate('dashboard');
@@ -2556,7 +2556,7 @@ const App = {
       errEl.textContent = '';
       if (!email) { errEl.textContent = 'Vui lòng nhập email.'; return; }
 
-      // Loading state
+      
       btnEl.disabled = true;
       btnEl.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;margin-right:6px;"></span>Đang kiểm tra...</span>';
 
@@ -2568,8 +2568,8 @@ const App = {
           return;
         }
 
-        // Session hợp lệ = last_ping trong vòng 90 giây
-        // (Edge Function xóa session sau 5s, ping client mỗi 60s → 90s đủ dư)
+        
+        
         const SESSION_TIMEOUT_MS = 90 * 1000;
         const cutoff = new Date(Date.now() - SESSION_TIMEOUT_MS).toISOString();
 
@@ -2593,22 +2593,22 @@ const App = {
           return;
         }
 
-        // Không có session hợp lệ → tạo token mới
+        
         const myToken = crypto.randomUUID();
 
-        // Không có người khác → tiến đến bước PIN
+        
         App.state.pendingLogin = { data, myToken };
         btnEl.disabled = false; btnEl.textContent = 'Tiếp tục';
 
-        // Kiểm tra nhân viên đã có PIN chưa
+        
         const { data: pinRow } = await db.from('exam_employee_pins')
           .select('id').eq('employee_id', data.id).maybeSingle();
 
         if (pinRow) {
-          // Đã có PIN → bước nhập PIN
+          
           App.auth._showPinEnter(data);
         } else {
-          // Chưa có PIN → bước tạo PIN
+          
           App.auth._showPinCreate();
         }
       } catch(e) {
@@ -2617,20 +2617,20 @@ const App = {
       }
     },
 
-    // ── PIN UI HELPERS ──
+    
     _showPinCreate() {
       document.getElementById('emp-step-email').classList.add('hidden');
       document.getElementById('emp-step-enter-pin').classList.add('hidden');
       document.getElementById('emp-step-create-pin').classList.remove('hidden');
       document.getElementById('auth-emp-error').innerHTML = '';
-      // Reset fields
+      
       ['emp-pin-new','emp-pin-confirm'].forEach(id => {
         const el = document.getElementById(id);
         if (el) { el.value = ''; el._pinVisible = false; }
       });
       App.auth._pinDots('emp-pin-new-dots', 0);
       App.auth._pinDots('emp-pin-confirm-dots', 0);
-      // Attach focus/blur styling to dot boxes
+      
       App.auth._attachPinFocus('emp-pin-new', 'emp-pin-new-dots');
       App.auth._attachPinFocus('emp-pin-confirm', 'emp-pin-confirm-dots');
       setTimeout(() => document.getElementById('emp-pin-new')?.focus(), 100);
@@ -2657,7 +2657,7 @@ const App = {
       const input = document.getElementById(inputId);
       const box = document.getElementById(dotsId);
       if (!input || !box) return;
-      // Remove old listeners to prevent duplicates
+      
       if (input._focusHandler) { input.removeEventListener('focus', input._focusHandler); input.removeEventListener('blur', input._blurHandler); }
       input._focusHandler = () => { box.style.borderColor = 'var(--accent)'; box.style.boxShadow = 'var(--shadow-glow)'; box.style.background = 'rgba(124,106,247,0.06)'; };
       input._blurHandler = () => { box.style.borderColor = 'rgba(255,255,255,0.08)'; box.style.boxShadow = 'none'; box.style.background = 'rgba(255,255,255,0.05)'; };
@@ -2666,7 +2666,7 @@ const App = {
     },
 
     _backToEmail() {
-      // Huỷ pending login nếu có
+      
       App.state.pendingLogin = null;
       document.getElementById('emp-step-create-pin').classList.add('hidden');
       document.getElementById('emp-step-enter-pin').classList.add('hidden');
@@ -2680,7 +2680,7 @@ const App = {
       const container = document.getElementById(containerId);
       if (!container) return;
       const dots = container.querySelectorAll('[data-idx]');
-      // If showing text (toggle visible mode), skip dot coloring
+      
       if (container._showText) return;
       dots.forEach((dot, i) => {
         if (i < count) {
@@ -2705,23 +2705,23 @@ const App = {
       if (!el) return;
       const showing = el._pinVisible;
       if (!showing) {
-        // Show actual digits as text inside the dots box
+        
         el._pinVisible = true;
         btn.textContent = '🙈';
         if (dotsContainer) {
           dotsContainer._showText = true;
-          // Show digits directly in the box (replace dots with styled text)
+          
           const val = el.value || '';
           dotsContainer.innerHTML = `<span style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;letter-spacing:10px;color:var(--text-primary);padding-left:6px;">${val || '——————'}</span>`;
         }
       } else {
-        // Back to dot mode
+        
         el._pinVisible = false;
         btn.textContent = '👁';
         if (dotsContainer) {
           dotsContainer._showText = false;
           const count = el.value.length;
-          // Re-render dots
+          
           dotsContainer.innerHTML = Array.from({length:6}).map((_, i) => `<div data-idx="${i}" style="width:12px;height:12px;border-radius:50%;background:${i<count?'var(--accent)':'rgba(255,255,255,0.12)'};transition:all 0.15s;flex-shrink:0;${i<count?'transform:scale(1.25);box-shadow:0 0 8px rgba(124,106,247,0.6);':''}"></div>`).join('');
         }
       }
@@ -2729,7 +2729,7 @@ const App = {
 
     _pinFailCount: 0,
 
-    // ── TẠO PIN MỚI ──
+    
     async confirmCreatePin() {
       const pinNew = document.getElementById('emp-pin-new').value;
       const pinConfirm = document.getElementById('emp-pin-confirm').value;
@@ -2746,7 +2746,7 @@ const App = {
         document.getElementById('emp-pin-confirm').focus();
         return;
       }
-      // Các PIN quá đơn giản
+      
       const weak = ['000000','111111','222222','333333','444444','555555','666666','777777','888888','999999','123456','654321','012345'];
       if (weak.includes(pinNew)) { errEl.textContent = 'Mã PIN quá đơn giản, hãy chọn PIN khác.'; return; }
 
@@ -2763,7 +2763,7 @@ const App = {
         }, { onConflict: 'employee_id' });
         if (error) throw error;
 
-        // PIN tạo xong → đăng nhập luôn
+        
         App.auth._finalizeLogin(empData, myToken);
         App.toast.show('Mã PIN đã được tạo! Đăng nhập thành công.', 'success');
       } catch(e) {
@@ -2772,7 +2772,7 @@ const App = {
       }
     },
 
-    // ── XÁC THỰC PIN ──
+    
     async verifyPin() {
       const pinInput = document.getElementById('emp-pin-input');
       const pin = pinInput.value;
@@ -2804,13 +2804,13 @@ const App = {
           pinInput.value = '';
           App.auth._pinDots('emp-pin-enter-dots', 0);
           btnEl.disabled = false; btnEl.textContent = 'Đăng nhập';
-          // Hiệu ứng rung
+          
           pinInput.style.animation = 'none';
-          pinInput.offsetHeight; // reflow
+          pinInput.offsetHeight; 
           pinInput.style.animation = 'shake 0.4s ease';
           setTimeout(() => { pinInput.style.animation = ''; }, 400);
           if (remaining <= 0) {
-            // Quá 5 lần sai → huỷ phiên, về email
+            
             errEl.innerHTML = `<div style="padding:10px 12px;background:rgba(255,88,88,0.12);border:1px solid rgba(255,88,88,0.30);border-radius:8px;font-size:12px;color:#ff8585;font-weight:600;">🔒 Sai PIN quá nhiều lần. Vui lòng thử lại từ đầu.</div>`;
             setTimeout(() => App.auth._backToEmail(), 2000);
           } else {
@@ -2821,7 +2821,7 @@ const App = {
           return;
         }
 
-        // PIN đúng → đăng nhập
+        
         App.auth._finalizeLogin(empData, myToken);
         App.toast.show('Đăng nhập thành công!', 'success');
       } catch(e) {
@@ -2830,9 +2830,9 @@ const App = {
       }
     },
 
-    // ── HOÀN TẤT ĐĂNG NHẬP (sau khi PIN ok) ──
+    
     async _finalizeLogin(data, myToken) {
-      // Ghi session vào DB
+      
       await db.from('exam_active_sessions').upsert({
         employee_id: data.id,
         session_token: myToken,
@@ -2844,7 +2844,7 @@ const App = {
       App.state.empPresenceChannel = null;
       App.state.pendingLogin = null;
 
-      // Ping mỗi 60 giây để giữ session sống
+      
       if (App.state.empPingInterval) clearInterval(App.state.empPingInterval);
       App.state.empPingInterval = setInterval(async () => {
         if (!App.state.employee || !App.state.empSessionToken) return;
@@ -2856,7 +2856,7 @@ const App = {
 
       sessionStorage.setItem('Employee Assessment_employee', JSON.stringify(data));
       sessionStorage.setItem('Employee Assessment_emp_token', myToken);
-      // Reset UI về step email cho lần sau
+      
       document.getElementById('emp-step-create-pin').classList.add('hidden');
       document.getElementById('emp-step-enter-pin').classList.add('hidden');
       document.getElementById('emp-step-email').classList.remove('hidden');
@@ -2868,26 +2868,26 @@ const App = {
     _kickEmployee(message) {
       const wasExamActive = !!(App.state.examState?.attempt && App.state.examState?.timerInterval);
 
-      // Dừng timer nếu đang thi
+      
       if (App.state.examState && App.state.examState.timerInterval) {
         clearInterval(App.state.examState.timerInterval);
         App.state.examState.timerInterval = null;
       }
-      // Cleanup anti-cheat listeners để tránh memory leak
+      
       if (typeof App.exam?.antiCheat?.cleanup === 'function') {
         try { App.exam.antiCheat.cleanup(); } catch(e) {}
       }
-      // Xoá overlay anti-cheat nếu đang hiện
+      
       const acOverlay = document.getElementById('anticheat-overlay');
       if (acOverlay) acOverlay.remove();
 
-      // Dừng ping interval và xoá session DB
+      
       if (App.state.empPingInterval) { clearInterval(App.state.empPingInterval); App.state.empPingInterval = null; }
       if (App.state.employee) {
         db.from('exam_active_sessions').delete().eq('employee_id', App.state.employee.id).then(() => {});
       }
 
-      // Xoá presence channel (nếu còn)
+      
       if (App.state.empPresenceChannel) {
         try { db.removeChannel(App.state.empPresenceChannel); } catch(e) {}
         App.state.empPresenceChannel = null;
@@ -2901,7 +2901,7 @@ const App = {
       sessionStorage.removeItem('_ac_snapshot');
       sessionStorage.removeItem('_ac_f5_violation');
 
-      // Hiển thị thông báo bị kick trên màn hình auth
+      
       App.screen.show('auth');
       setTimeout(() => {
         const errEl = document.getElementById('auth-emp-error');
@@ -2926,7 +2926,7 @@ const App = {
       if (App.state.session) {
         await db.from('exam_admin_sessions').delete().eq('session_token', App.state.session.token);
       }
-      // Cleanup realtime channels and polling
+      
       App.realtime.channels.forEach(ch => { try { db.removeChannel(ch); } catch(e) {} });
       App.realtime.channels = [];
       if (App.realtime.pollInterval) { clearInterval(App.realtime.pollInterval); App.realtime.pollInterval = null; }
@@ -2937,7 +2937,7 @@ const App = {
     },
 
     employeeLogout() {
-      // Cleanup exam if active (timer, antiCheat listeners, overlays)
+      
       if (App.state.examState?.timerInterval) {
         clearInterval(App.state.examState.timerInterval);
         App.state.examState.timerInterval = null;
@@ -2947,14 +2947,14 @@ const App = {
       }
       const acOverlay = document.getElementById('anticheat-overlay');
       if (acOverlay) acOverlay.remove();
-      // Cleanup rules scroll handler if still attached
+      
       const rulesContainer = document.getElementById('screen-rules');
       if (rulesContainer?._rulesScrollHandler) {
         rulesContainer.removeEventListener('scroll', rulesContainer._rulesScrollHandler);
         rulesContainer._rulesScrollHandler = null;
       }
       App.state.examState = null;
-      // Dừng ping và xoá session DB
+      
       if (App.state.empPingInterval) { clearInterval(App.state.empPingInterval); App.state.empPingInterval = null; }
       if (App.state.employee) {
         db.from('exam_active_sessions').delete().eq('employee_id', App.state.employee.id).then(() => {});
@@ -2972,7 +2972,7 @@ const App = {
       sessionStorage.removeItem('_ac_emp_backup');
       sessionStorage.removeItem('_ac_snapshot');
       sessionStorage.removeItem('_ac_f5_violation');
-      // Reset auth UI về bước email, xóa sạch PIN fields
+      
       try {
         document.getElementById('emp-step-create-pin').classList.add('hidden');
         document.getElementById('emp-step-enter-pin').classList.add('hidden');
@@ -2989,9 +2989,9 @@ const App = {
     }
   },
 
-  /* =========================================================
-     ADMIN NAVIGATION
-     ========================================================= */
+  
+
+
   admin: {
     navigate(view) {
       App.state.currentView = view;
@@ -3004,11 +3004,11 @@ const App = {
     }
   },
 
-  /* =========================================================
-     VIEWS (render + load)
-     ========================================================= */
+  
+
+
   views: {
-    /* --- DASHBOARD --- */
+    
     dashboard: {
       render() {
         return `
@@ -3034,7 +3034,7 @@ const App = {
           const failed = allResults.filter(r => r.pass_fail === 'fail').length;
           const avgScore = allResults.length ? (allResults.reduce((a,b) => a + (b.total_score||0), 0) / allResults.length).toFixed(1) : 0;
 
-          // Employees count
+          
           const { count: empCount } = await db.from('hr_employees').select('id', { count: 'exact' });
 
           document.getElementById('dash-stats').innerHTML = `
@@ -3096,7 +3096,7 @@ const App = {
             </div>
           `;
 
-          // Charts
+          
           setTimeout(() => {
             const ctx1 = document.getElementById('chart-passfail');
             const ctx2 = document.getElementById('chart-scores');
@@ -3108,7 +3108,7 @@ const App = {
                 options: { plugins: { legend: { labels: { color: '#a0a8c4', font: { size: 12, weight: '600' } } } }, cutout: '68%' }
               });
             }
-            // Score by project
+            
             if (ctx2 && allResults.length) {
               const byProject = {};
               allResults.forEach(r => {
@@ -3129,7 +3129,7 @@ const App = {
       }
     },
 
-    /* --- PROJECTS --- */
+    
     projects: {
       render() {
         return `
@@ -3159,7 +3159,7 @@ const App = {
       }
     },
 
-    /* --- TESTS --- */
+    
     tests: {
       render() {
         return `
@@ -3202,20 +3202,20 @@ const App = {
         ]);
         const projMap = {};
         (projectsRes.data||[]).forEach(p => { projMap[p.id] = p.name; });
-        const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-        // Auto-close tests whose close_date has passed
+        const today = new Date().toISOString().slice(0, 10); 
+        
         const toClose = (testsRes.data||[]).filter(t => t.close_date && t.close_date <= today && t.status !== 'closed');
         if (toClose.length) {
           await Promise.all(toClose.map(t => db.from('exam_tests').update({ status: 'closed' }).eq('id', t.id)));
           toClose.forEach(t => { t.status = 'closed'; });
         }
         App.state.tables.tests.data = (testsRes.data || []).map(t => ({ ...t, project_name: projMap[t.project_id] || '' }));
-        // Populate project filter
+        
         const sel = document.getElementById('test-filter-project');
         if (sel) {
           sel.innerHTML = '<option value="">Tất cả dự án</option>' + (projectsRes.data||[]).map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
         }
-        // Populate test modal project select
+        
         const testProjSel = document.getElementById('test-project');
         if (testProjSel) {
           testProjSel.innerHTML = (projectsRes.data||[]).map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
@@ -3224,7 +3224,7 @@ const App = {
       }
     },
 
-    /* --- EMPLOYEES --- */
+    
     employees: {
       render() {
         return `
@@ -3250,7 +3250,7 @@ const App = {
       }
     },
 
-    /* --- ASSIGNMENTS --- */
+    
     assignments: {
       render() {
         return `
@@ -3295,7 +3295,7 @@ const App = {
       }
     },
 
-    /* --- GRADING --- */
+    
     grading: {
       render() {
         return `
@@ -3336,9 +3336,9 @@ const App = {
         }));
         const count = App.state.tables.grading.data.length;
         const fraudCount = App.state.tables.grading.data.filter(a => a.is_fraud).length;
-        // Update sidebar badge
+        
         App.grading.updateBadge(count, fraudCount);
-        // Render summary bar if on grading view
+        
         const summaryBar = document.getElementById('grading-summary-bar');
         if (summaryBar) {
           summaryBar.innerHTML = `
@@ -3358,7 +3358,7 @@ const App = {
       }
     },
 
-    /* --- RESULTS --- */
+    
     results: {
       render() {
         return `
@@ -3397,7 +3397,7 @@ const App = {
       }
     },
 
-    /* --- SETTINGS --- */
+    
     settings: {
       render() {
         return `
@@ -3422,9 +3422,9 @@ const App = {
     },
   },
 
-  /* =========================================================
-     PROJECTS CRUD
-     ========================================================= */
+  
+
+
   projects: {
     render_table() {
       const t = App.state.tables.projects;
@@ -3504,9 +3504,9 @@ const App = {
     }
   },
 
-  /* =========================================================
-     TESTS CRUD
-     ========================================================= */
+  
+
+
   tests: {
     render_table() {
       const t = App.state.tables.tests;
@@ -3559,7 +3559,7 @@ const App = {
       App.state.tables.tests.filtered = App.state.tables.tests.data.filter(t =>
         (!projId || t.project_id === projId) && (!status || t.status === status)
       );
-      // Override filtered for pagination
+      
       const t = App.state.tables.tests;
       let filtered = [...t.data];
       if (projId) filtered = filtered.filter(x => x.project_id === projId);
@@ -3577,7 +3577,7 @@ const App = {
       document.getElementById('test-open-date').value = '';
       document.getElementById('test-close-date').value = '';
       App.modal.open('modal-test');
-      App.views.tests.load(); // load projects into select
+      App.views.tests.load(); 
     },
     openEdit(id) {
       const t = App.state.tables.tests.data.find(x => x.id === id);
@@ -3619,7 +3619,7 @@ const App = {
       if (!t) return;
       const { data: newTest, error } = await db.from('exam_tests').insert({ ...t, id: undefined, name: t.name + ' (Copy)', status: 'draft', created_at: undefined, updated_at: undefined }).select().single();
       if (error) { App.toast.show('Lỗi: ' + error.message, 'error'); return; }
-      // Copy questions
+      
       const { data: questions } = await db.from('exam_questions').select('*').eq('test_id', id).is('deleted_at', null);
       if (questions?.length) {
         await db.from('exam_questions').insert(questions.map(q => ({ ...q, id: undefined, test_id: newTest.id, created_at: undefined, updated_at: undefined })));
@@ -3646,9 +3646,9 @@ const App = {
     }
   },
 
-  /* =========================================================
-     EMPLOYEES (read-only)
-     ========================================================= */
+  
+
+
   employees: {
     render_table() {
       const t = App.state.tables.employees;
@@ -3670,9 +3670,9 @@ const App = {
     search(val) { App.state.tables.employees.search = val.toLowerCase(); App.state.tables.employees.page = 1; App.employees.render_table(); },
   },
 
-  /* =========================================================
-     ASSIGNMENTS
-     ========================================================= */
+  
+
+
   assignments: {
     allEmployees: [],
     render_table() {
@@ -3705,10 +3705,10 @@ const App = {
     async openModal(testId, testName) {
       document.getElementById('assign-test-id').value = testId;
       document.getElementById('assign-test-name').textContent = testName;
-      // Load employees and projects for filter
+      
       const { data: empData } = await db.from('hr_employees').select('*').eq('is_active', true).order('name');
       App.assignments.allEmployees = empData || [];
-      // Get already assigned employees for this test
+      
       const { data: existing } = await db.from('exam_test_assignments').select('employee_id').eq('test_id', testId).is('deleted_at', null);
       const assignedIds = new Set((existing||[]).map(x=>x.employee_id));
       App.assignments._renderEmployeeList(App.assignments.allEmployees, assignedIds);
@@ -3775,9 +3775,9 @@ const App = {
     }
   },
 
-  /* =========================================================
-     QUESTIONS MANAGEMENT
-     ========================================================= */
+  
+
+
   questions: {
     currentTestId: null,
     questionList: [],
@@ -3802,7 +3802,7 @@ const App = {
       const totalScore = App.questions.questionList.reduce((s,q) => s + (q.score||0), 0);
       const hasQ = App.questions.questionList.length > 0;
 
-      // Build question list
+      
       const questionsHtml = App.questions.questionList.map((q,i) =>
         App.questions.renderQuestion(q,i)
       ).join('');
@@ -3823,7 +3823,7 @@ const App = {
         </div>
 
       `;
-      // Init Sortable
+      
       setTimeout(() => {
         const listEl = document.getElementById('question-list-container');
         if (listEl && typeof Sortable !== 'undefined') {
@@ -3886,7 +3886,7 @@ const App = {
       }).select().single();
       if (error) { App.toast.show('Lỗi: ' + error.message, 'error'); return; }
       await App.questions.load();
-      // Update question_count on test
+      
       await db.from('exam_tests').update({ question_count: App.questions.questionList.length }).eq('id', App.questions.currentTestId);
     },
 
@@ -3966,9 +3966,9 @@ const App = {
     }
   },
 
-  /* =========================================================
-     GRADING
-     ========================================================= */
+  
+
+
   grading: {
     async _preloadBadge() {
       try {
@@ -4045,7 +4045,6 @@ const App = {
       const empName = attempt.hr_employees?.name || '?';
       const empInitial = empName.trim().split(' ').pop()?.[0]?.toUpperCase() || '?';
       body.innerHTML = `
-        <!-- Candidate header -->
         <div class="grade-candidate-header">
           <div class="grade-avatar">${empInitial}</div>
           <div class="grade-candidate-info">
@@ -4068,7 +4067,6 @@ const App = {
           </div>
         </div>
 
-        <!-- Questions -->
         <div>
           ${(questions||[]).map((q,i) => {
             const ans = answerMap[q.id];
@@ -4084,15 +4082,15 @@ const App = {
               totalCorrect = correctSet.size;
               isCorrect = correctSet.size === userSet.size && [...correctSet].every(x=>userSet.has(x));
               if (isCorrect) { autoCalc = q.score||0; }
-              // Partial scoring for multiple-choice
-              // correctHits/totalCorrect * score (không penalty)
+              
+              
               if (q.type === 'multiple' && correctSet.size > 0) {
                 correctHits = [...userSet].filter(x => correctSet.has(x)).length;
                 partialCalc = parseFloat((correctHits / correctSet.size * (q.score||0)).toFixed(2));
               }
               autoScore += autoCalc;
             }
-            // card state class
+            
             const cardClass = q.type === 'essay' ? 'q-essay' : (isCorrect ? 'q-correct' : (partialCalc > 0 && partialCalc < (q.score||0) ? 'q-partial' : 'q-wrong'));
             const typeBadgeClass = q.type === 'single' ? 'qbadge-single' : q.type === 'multiple' ? 'qbadge-multiple' : 'qbadge-essay';
             const typeLabel = q.type === 'single' ? 'Một đáp án' : q.type === 'multiple' ? 'Nhiều đáp án' : 'Tự luận';
@@ -4101,23 +4099,19 @@ const App = {
               : null;
             return `
               <div class="grade-q-card ${cardClass}">
-                <!-- Head -->
                 <div class="grade-q-head">
                   <div class="grade-q-num">${i+1}</div>
                   <div class="grade-q-text">${q.question_text}</div>
                   <span class="grade-q-type-badge ${typeBadgeClass}">${typeLabel}</span>
                   <span class="grade-q-score-badge">⭐ ${q.score||0} điểm</span>
                 </div>
-                <!-- Body -->
                 <div class="grade-q-body">
-                  <!-- User answer -->
                   <div class="grade-answer-block">
                     <div class="grade-answer-label">Câu trả lời của thí sinh</div>
                     <div class="grade-answer-text ${userAnsDisplay ? (q.type==='essay' ? 'essay-long' : '') : 'no-answer'}">${userAnsDisplay || 'Không trả lời'}</div>
                   </div>
 
                   ${q.type !== 'essay' ? `
-                    <!-- Correct answer chips + result -->
                     <div class="grade-correct-row">
                       <span class="grade-correct-label">Đáp án đúng:</span>
                       ${(q.correct_answers||[]).map(a => `<span class="grade-answer-chip">${a}</span>`).join('')}
@@ -4127,7 +4121,6 @@ const App = {
                           ? `<span class="grade-result-chip partial">⚡ Đúng ${correctHits}/${totalCorrect}</span>`
                           : `<span class="grade-result-chip wrong">✗ Sai / Thiếu</span>`)}
                     </div>
-                    <!-- Score panel -->
                     <div class="grade-score-panel">
                       ${q.type === 'multiple' && !isCorrect && totalCorrect > 0 ? `
                         <span class="partial-score-info">Đúng ${correctHits}/${totalCorrect} ý → ${partialCalc} đ (partial)</span>
@@ -4143,7 +4136,6 @@ const App = {
                       </div>
                     </div>
                   ` : `
-                    <!-- Essay scoring -->
                     <div class="essay-score-wrap">
                       <label>Điểm tự luận</label>
                       <input type="number" class="score-input essay-score-input" data-qid="${q.id}" data-max="${q.score||0}" min="0" max="${q.score||0}" step="0.5" value="0" oninput="App.grading.recalcTotal()">
@@ -4162,12 +4154,12 @@ const App = {
           Điều chỉnh <em>Override</em> để ghi đè điểm thủ công. Tổng điểm cập nhật theo thời gian thực ở dưới.
         </div>
       `;
-      // Store for recalc
+      
       App.state.gradeContext.autoScore = autoScore;
       App.state.gradeContext.totalPossible = totalPossible;
       App.state.gradeContext.passPct = attempt.exam_tests?.pass_score || 70;
       App.modal.open('modal-grade');
-      // Populate static elements in live bar and run initial recalc
+      
       const elPossible = document.getElementById('grade-possible');
       const elThreshold = document.getElementById('grade-pass-threshold');
       if (elPossible) elPossible.textContent = totalPossible;
@@ -4177,13 +4169,13 @@ const App = {
 
     recalcTotal() {
       let total = 0;
-      // Sum all per-question override inputs (non-essay MC questions)
+      
       document.querySelectorAll('.grade-override-input').forEach(inp => {
         const max = parseFloat(inp.dataset.max) || 0;
         let val = Math.min(Math.max(parseFloat(inp.value) || 0, 0), max);
         total += val;
       });
-      // Sum all essay score inputs
+      
       document.querySelectorAll('.essay-score-input').forEach(inp => {
         const max = parseFloat(inp.dataset.max) || 0;
         let val = Math.min(Math.max(parseFloat(inp.value) || 0, 0), max);
@@ -4209,7 +4201,7 @@ const App = {
       }
     },
 
-    // Apply partial or all-or-nothing score to a question's override input
+    
     applyPartial(qid, partialScore, autoScore, usePartial) {
       const inp = document.getElementById('override-' + qid);
       if (!inp) return;
@@ -4230,11 +4222,11 @@ const App = {
         total += Math.min(Math.max(parseFloat(inp.value) || 0, 0), max);
       });
       const pct = ctx.totalPossible > 0 ? (total / ctx.totalPossible * 100) : 0;
-      const passFail = result; // 'pass' or 'fail'
+      const passFail = result; 
 
       const { data: proj } = await db.from('exam_projects').select('name').eq('id', ctx.attempt.exam_tests?.project_id).single();
 
-      // Insert / upsert result (upsert theo attempt_id để chấm lại không bị lỗi duplicate)
+      
       const resultPayload = {
         attempt_id: ctx.attempt.id,
         employee_id: ctx.attempt.employee_id,
@@ -4246,18 +4238,18 @@ const App = {
         total_score: total,
         score_percentage: pct.toFixed(1),
         pass_fail: passFail,
-        deleted_at: null,   // đảm bảo clear soft-delete nếu đây là chấm lại
+        deleted_at: null,   
       };
       const { error } = await db.from('exam_test_results')
         .upsert(resultPayload, { onConflict: 'attempt_id' });
       if (error) { App.toast.show('Lỗi lưu kết quả: ' + error.message, 'error'); return; }
 
-      // Update attempt status
+      
       await db.from('exam_exam_attempts').update({ status: 'graded' }).eq('id', ctx.attempt.id);
-      // Update assignment status
+      
       await db.from('exam_test_assignments').update({ status: 'completed' }).eq('test_id', ctx.attempt.test_id).eq('employee_id', ctx.attempt.employee_id);
 
-      // Send email via edge function
+      
       try {
         await db.functions.invoke('send-result-email', {
           body: {
@@ -4275,14 +4267,14 @@ const App = {
       App.toast.show(`Đã chấm xong. Kết quả: ${passFail.toUpperCase()}`, 'success');
       App.modal.close('modal-grade');
       App.views.grading.load();
-      // Nếu admin đang ở tab Kết quả thì reload luôn
+      
       if (App.state.currentView === 'results') App.views.results.load();
     }
   },
 
-  /* =========================================================
-     VIEW RESULTS (admin panel)
-     ========================================================= */
+  
+
+
   viewResults: {
     render_table() {
       const t = App.state.tables.results;
@@ -4311,7 +4303,7 @@ const App = {
       const f = document.getElementById('admin-results-filter')?.value;
       const base = App.state.tables.results.data;
       App.state.tables.results.filtered = f ? base.filter(r=>r.pass_fail===f) : base;
-      // override render
+      
       const t = App.state.tables.results;
       let filtered = [...t.data];
       if (f) filtered = filtered.filter(r=>r.pass_fail===f);
@@ -4319,9 +4311,9 @@ const App = {
     }
   },
 
-  /* =========================================================
-     PUBLIC RESULTS PAGE
-     ========================================================= */
+  
+
+
   results: {
     data: [],
     filtered: [],
@@ -4331,7 +4323,7 @@ const App = {
     sortDir: 'desc',
 
     async load() {
-      // Load graded results
+      
       const [resultsRes, attemptsRes, empRes, testsRes, projRes] = await Promise.all([
         db.from('exam_test_results').select('*').is('deleted_at', null),
         db.from('exam_exam_attempts').select('*').in('status', ['submitted','graded']).is('deleted_at', null),
@@ -4345,7 +4337,7 @@ const App = {
       const projMap = {}; (projRes.data||[]).forEach(p => { projMap[p.id] = p.name; });
       const resultByAttempt = {}; (resultsRes.data||[]).forEach(r => { resultByAttempt[r.attempt_id] = r; });
 
-      // Build unified row list: one row per attempt
+      
       const rows = (attemptsRes.data||[]).map(a => {
         const result = resultByAttempt[a.id];
         const emp = empMap[a.employee_id] || {};
@@ -4360,7 +4352,7 @@ const App = {
           test_id: a.test_id,
           test_name: test.name || result?.test_name || '—',
           project_name: projName || result?.project_name || '—',
-          // Graded info
+          
           total_score: result ? result.total_score : null,
           score_percentage: result ? result.score_percentage : null,
           pass_fail: result ? result.pass_fail : 'pending',
@@ -4372,12 +4364,12 @@ const App = {
         };
       });
 
-      // Sort newest first
+      
       rows.sort((a,b) => new Date(b.submitted_at) - new Date(a.submitted_at));
       App.results.data = rows;
       App.results.filtered = [...rows];
 
-      // Summary counts
+      
       const pending = rows.filter(r => r.pass_fail === 'pending').length;
       const passed = rows.filter(r => r.pass_fail === 'pass').length;
       const failed = rows.filter(r => r.pass_fail === 'fail').length;
@@ -4403,7 +4395,7 @@ const App = {
         `;
       }
 
-      // Populate project filter
+      
       const projects = [...new Set(rows.map(r=>r.project_name).filter(p=>p&&p!=='—'))];
       const sel = document.getElementById('results-filter-project');
       if (sel) sel.innerHTML = '<option value="">Tất cả dự án</option>' + projects.map(p=>`<option value="${p}">${p}</option>`).join('');
@@ -4455,21 +4447,21 @@ const App = {
         return;
       }
       tbody.innerHTML = page.map(r => {
-        // Score cell
+        
         const scoreCell = r.pass_fail === 'pending'
           ? `<td style="color:var(--text-muted);font-style:italic;">—</td>`
           : `<td><strong style="font-size:15px;">${r.total_score??0}</strong> <span style="color:var(--text-muted);font-size:12px;">(${r.score_percentage??0}%)</span></td>`;
 
-        // Result badge
+        
         let resultBadge = '';
         if (r.pass_fail === 'pass') resultBadge = '<span class="badge badge-success" style="font-size:12px;font-weight:700;">✓ Passed</span>';
         else if (r.pass_fail === 'fail') resultBadge = '<span class="badge badge-danger" style="font-size:12px;font-weight:700;">✗ Failed</span>';
         else resultBadge = '<span class="badge badge-warning" style="font-size:12px;font-weight:700;">⏳ Chờ đánh giá</span>';
 
-        // Date - show graded_at if graded, else submitted_at
+        
         const dateStr = r.graded_at ? App.util.formatDate(r.graded_at) : App.util.formatDate(r.submitted_at);
 
-        // Fraud cell
+        
         const fraudCell = r.is_fraud
           ? `<td><span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:rgba(255,60,60,0.15);border:1.5px solid rgba(255,60,60,0.45);border-radius:100px;font-size:11px;font-weight:700;color:#ff4444;" title="${r.fraud_notes||''}">🚨 Gian lận</span></td>`
           : `<td><span style="color:var(--text-muted);font-size:12px;">—</span></td>`;
@@ -4488,7 +4480,7 @@ const App = {
         </tr>`;
       }).join('');
 
-      // Pagination
+      
       const total = App.results.filtered.length;
       const totalPages = Math.ceil(total / App.results.perPage);
       const paginEl = document.getElementById('results-pagination');
@@ -4503,9 +4495,9 @@ const App = {
     goPage(p) { App.results.page = p; App.results.render_table(); }
   },
 
-  /* =========================================================
-     SETTINGS
-     ========================================================= */
+  
+
+
   settings: {
     async changePassword() {
       const current = document.getElementById('pw-current').value;
@@ -4530,9 +4522,9 @@ const App = {
     }
   },
 
-  /* =========================================================
-     EMPLOYEE MODULE
-     ========================================================= */
+  
+
+
   employee: {
     async load() {
       const emp = App.state.employee;
@@ -4540,7 +4532,7 @@ const App = {
       const content = document.getElementById('emp-content');
       content.innerHTML = `<div class="skeleton-card"></div><div class="skeleton-card"></div>`;
       try {
-        // Load assigned tests
+        
         const [assignRes, testsRes, projRes] = await Promise.all([
           db.from('exam_test_assignments').select('*').eq('employee_id', emp.id).is('deleted_at', null),
           db.from('exam_tests').select('*').is('deleted_at', null),
@@ -4550,7 +4542,7 @@ const App = {
         const testMap = {}; (testsRes.data||[]).forEach(t => { testMap[t.id] = t; });
         const projMap = {}; (projRes.data||[]).forEach(p => { projMap[p.id] = p.name; });
 
-        // Auto-close expired tests (runs for every user, not just admin)
+        
         const today = new Date().toISOString().slice(0, 10);
         const toClose = (testsRes.data||[]).filter(t => t.close_date && t.close_date <= today && t.status !== 'closed');
         if (toClose.length) {
@@ -4561,7 +4553,7 @@ const App = {
           content.innerHTML = `<div class="empty-state"><p>Bạn chưa được phân công bài thi nào.</p></div>`;
           return;
         }
-        // Check which ones are completed or in-progress
+        
         const testIds = assignments.map(a => a.test_id);
         const { data: attempts } = await db.from('exam_exam_attempts')
           .select('*').eq('employee_id', emp.id).in('test_id', testIds);
@@ -4663,25 +4655,25 @@ const App = {
     }
   },
 
-  /* =========================================================
-     EXAM MODULE
-     ========================================================= */
+  
+
+
   exam: {
     async start(testId, assignmentId) {
       const emp = App.state.employee;
-      // Security check: verify assignment in DB
+      
       const { data: assignment } = await db.from('exam_test_assignments')
         .select('*').eq('id', assignmentId).eq('employee_id', emp.id).eq('test_id', testId).is('deleted_at', null).single();
       if (!assignment) { App.toast.show('Bạn không có quyền làm bài này.', 'error'); return; }
 
-      // Check if already completed
+      
       const { data: existingResult } = await db.from('exam_test_results').select('id').eq('employee_id', emp.id).eq('test_id', testId).single();
       if (existingResult) { App.toast.show('Bạn đã hoàn thành bài thi này.', 'warning'); return; }
 
-      // Load test
+      
       const { data: test } = await db.from('exam_tests').select('*').eq('id', testId).single();
 
-      // Block if test is closed (by status or close_date)
+      
       const now = new Date();
       const closeDate = test?.close_date ? new Date(test.close_date + 'T23:59:59') : null;
       if (test?.status === 'closed' || (closeDate && closeDate < now)) {
@@ -4694,7 +4686,7 @@ const App = {
         const { data: proj } = await db.from('exam_projects').select('name').eq('id', test.project_id).single();
         testProjectName = proj?.name || '';
       }
-      // Load or create attempt
+      
       let attempt;
       const { data: existing } = await db.from('exam_exam_attempts')
         .select('*').eq('employee_id', emp.id).eq('test_id', testId).not('status', 'eq', 'submitted').not('status', 'eq', 'graded').is('deleted_at', null).single();
@@ -4709,11 +4701,11 @@ const App = {
         attempt = newAttempt;
       }
 
-      // Load questions — dùng exam_questions_public (không có correct_answers)
-      // Ngăn nhân viên đọc đáp án qua App.state.examState.questions trong DevTools
+      
+      
       const { data: questions } = await db.from('exam_questions_public')
         .select('*').eq('test_id', testId).is('deleted_at', null).order('order_no');
-      // Load saved answers
+      
       const { data: savedAnswers } = await db.from('exam_test_answers')
         .select('*').eq('attempt_id', attempt.id);
       const answers = {};
@@ -4721,26 +4713,26 @@ const App = {
 
       App.state.examState = { attempt, test, questions: questions||[], answers, timerInterval: null, secondsLeft: 0 };
 
-      // Calculate time left
+      
       const expiresAt = new Date(attempt.expires_at).getTime();
       App.state.examState.secondsLeft = Math.max(0, Math.floor((expiresAt - Date.now()) / 1000));
 
-      // Render exam UI
+      
       document.getElementById('exam-title').textContent = test.name;
       document.getElementById('exam-project').textContent = testProjectName;
       App.exam.renderQuestions();
 
-      // If resuming an existing attempt → skip rules screen, go straight to exam
+      
       if (existing) {
-        // ── Đọc _ac_f5_violation TRƯỚC khi gọi antiCheat.init() ─────────────
-        // antiCheat.init() gọi cleanup() bên trong → cleanup() xóa key này.
-        // Thiết kế mới: _ac_f5_violation = { violations, ts }
-        //   violations = tổng vi phạm tại lúc F5 (đã +1 bởi inline script)
-        //   Không cần tính toán lại — dùng trực tiếp.
+        
+        
+        
+        
+        
         let f5Violation = null;
         const f5Raw = sessionStorage.getItem('_ac_f5_violation');
         if (f5Raw) {
-          sessionStorage.removeItem('_ac_f5_violation'); // xóa TRƯỚC init()
+          sessionStorage.removeItem('_ac_f5_violation'); 
           try {
             const f5Data = JSON.parse(f5Raw);
             if (f5Data && f5Data.violations >= 1 && f5Data.ts > 0) {
@@ -4751,11 +4743,11 @@ const App = {
 
         App.screen.show('exam');
         App.exam.startTimer();
-        App.exam.antiCheat.init(); // cleanup() bên trong — key đã xóa rồi nên an toàn
+        App.exam.antiCheat.init(); 
 
-        // ── Áp vi phạm F5 SAU KHI init() đã chạy xong ──────────────────────
-        // init() set violationCount = 0 (hoặc resume từ snapshot đóng tab).
-        // Sau init(), override bằng giá trị F5 nếu có.
+        
+        
+        
         if (f5Violation) {
           const ac = App.exam.antiCheat;
           ac.violationCount = f5Violation.violations;
@@ -4766,7 +4758,7 @@ const App = {
           }
         }
       } else {
-        // New attempt → show rules screen first, timer starts only after confirmation
+        
         App.exam.rules.show(test.name);
       }
     },
@@ -4775,12 +4767,12 @@ const App = {
       const { questions, answers } = App.state.examState;
       const container = document.getElementById('exam-questions-list');
       const navGrid = document.getElementById('q-nav-grid');
-      // Show total possible score
+      
       const totalPossible = questions.reduce((sum, q) => sum + (parseFloat(q.score)||0), 0);
       const totalScoreLabel = document.getElementById('exam-total-score-label');
       if (totalScoreLabel) totalScoreLabel.textContent = `Tổng ${totalPossible} điểm · ${questions.length} câu`;
-      // C3 FIX: Loại bỏ correct_answers và các field nhạy cảm trước khi render vào DOM
-      // Ngăn nhân viên đọc đáp án đúng qua DevTools → inspect element
+      
+      
       const safeQuestions = questions.map(q => {
         const { correct_answers, correct_answer, answer_key, ...safeQ } = q;
         return safeQ;
@@ -4825,12 +4817,12 @@ const App = {
       if (type === 'essay') { val = input; }
       else if (type === 'single') { val = input.value; }
       else {
-        // multiple - collect all checked
+        
         const checks = document.querySelectorAll(`input[name="q_${qid}"]:checked`);
         val = [...checks].map(c => c.value);
       }
       App.state.examState.answers[qid] = val;
-      // Update nav button
+      
       const qidx = App.state.examState.questions.findIndex(q => q.id === qid);
       const navBtn = document.querySelectorAll('.q-nav-btn')[qidx];
       if (navBtn) {
@@ -4838,7 +4830,7 @@ const App = {
         navBtn.classList.toggle('answered', !!hasAnswer);
       }
       App.exam.updateProgress();
-      // Auto-save to Supabase
+      
       try {
         await db.from('exam_test_answers').upsert({
           attempt_id: App.state.examState.attempt.id,
@@ -4860,13 +4852,13 @@ const App = {
     },
 
     startTimer() {
-      // Clear any existing interval first to prevent double-running timers
+      
       if (App.state.examState?.timerInterval) {
         clearInterval(App.state.examState.timerInterval);
         App.state.examState.timerInterval = null;
       }
-      // C2 FIX: Tính thời gian còn lại từ expires_at server-side thay vì giảm dần client-side
-      // Ngăn chặn việc chỉnh App.state.examState.secondsLeft qua DevTools
+      
+      
       const getSecondsLeft = () => {
         const expiresAt = App.state.examState.attempt?.expires_at;
         if (!expiresAt) return 0;
@@ -4890,34 +4882,34 @@ const App = {
       App.state.examState.timerInterval = setInterval(update, 1000);
     },
 
-    /* ── ANTI-CHEAT ── */
-    // ── RULES SCREEN ────────────────────────────────────
+    
+    
     rules: {
       show(examName) {
         const subtitle = document.getElementById('rules-exam-subtitle');
         if (subtitle && examName) subtitle.textContent = `Bài thi: ${examName}`;
-        // Reset state
+        
         const checkbox = document.getElementById('rules-checkbox');
         if (checkbox) checkbox.checked = false;
         App.exam.rules._setChecked(false);
         App.exam.rules._setScrolled(false);
         App.screen.show('rules');
-        // Listen for scroll to unlock checkbox
+        
         const container = document.getElementById('screen-rules');
         if (container) {
-          // Remove old handler if exists (prevents leak when show() called multiple times)
+          
           if (container._rulesScrollHandler) {
             container.removeEventListener('scroll', container._rulesScrollHandler);
             container._rulesScrollHandler = null;
           }
           const checkScrolled = () => {
-            // Check if user has scrolled near the bottom of the rules container
+            
             const near = container.scrollTop + container.clientHeight >= container.scrollHeight - 80;
             if (near) App.exam.rules._setScrolled(true);
           };
           container._rulesScrollHandler = checkScrolled;
           container.addEventListener('scroll', container._rulesScrollHandler);
-          // Unlock immediately if all content fits without scrolling (short screens or zoom out)
+          
           setTimeout(() => {
             if (container.scrollHeight <= container.clientHeight + 80) {
               App.exam.rules._setScrolled(true);
@@ -4957,12 +4949,12 @@ const App = {
       },
       confirm() {
         if (!document.getElementById('rules-checkbox')?.checked) return;
-        // Cleanup scroll listener
+        
         const container = document.getElementById('screen-rules');
         if (container?._rulesScrollHandler) {
           container.removeEventListener('scroll', container._rulesScrollHandler);
         }
-        // Now show exam and START timer
+        
         App.screen.show('exam');
         App.exam.startTimer();
         App.exam.antiCheat.init();
@@ -4970,29 +4962,29 @@ const App = {
     },
 
     antiCheat: {
-      // ══════════════════════════════════════════════════════════════════════
-      // THIẾT KẾ MỚI — 1 nguồn sự thật duy nhất: _ac_snapshot
-      //
-      // beforeunload  → ghi _ac_snapshot = { violations, attemptId, empId, ts }
-      // inline script → (nếu F5) đọc snapshot, xóa ngay, ghi _ac_f5_violation,
-      //                 gửi cancel lên Edge Function
-      // antiCheat.init()  → đọc _ac_snapshot nếu còn (đóng tab → resume)
-      //                     KHÔNG đọc _ac_f5_violation (exam.start() xử lý)
-      // exam.start()  → đọc _ac_f5_violation sau init(), áp vi phạm
-      //
-      // Luồng F5:
-      //   beforeunload → ghi snapshot → inline script: xóa snapshot, ghi f5_violation,
-      //   gửi cancel → App.init() → employee screen → "Tiếp tục thi" → exam.start():
-      //     đọc f5_violation TRƯỚC init() → init() → áp violations SAU init()
-      //
-      // Luồng đóng tab:
-      //   beforeunload → ghi snapshot → (không reload) → lần sau mở lại: App.init()
-      //   → employee screen → "Tiếp tục thi" → exam.start() → init():
-      //     đọc snapshot còn nguyên → khôi phục violationCount im lặng
-      //
-      // Luồng thi mới:
-      //   exam.start() → init() → không có snapshot, không có f5_violation → count = 0
-      // ══════════════════════════════════════════════════════════════════════
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
 
       violationCount: 0,
       overlayEl: null,
@@ -5004,10 +4996,10 @@ const App = {
       _boundContextMenu: null,
       _boundBeforeUnload: null,
 
-      // ── TAB-AWAY 30s AUTO-SUBMIT ──────────────────────────────────────────
-      // Sau khi vi phạm được tính, bắt đầu đếm ngược 30 giây.
-      // Nếu user quay lại trước 30s → clear timer (đã tính vi phạm rồi, không nộp).
-      // Nếu vẫn ở ngoài sau 30s → auto-submit + ghi gian lận.
+      
+      
+      
+      
       _tabAwayTimer: null,
       _tabAwayStart: 0,
       _boundVisReturn: null,
@@ -5016,44 +5008,44 @@ const App = {
       init() {
         const ac = App.exam.antiCheat;
 
-        // ── Bước 1: cleanup listener cũ trước khi thêm mới ──────────────────
-        ac.cleanup(); // reset _active = false, remove listeners, clear debounce
+        
+        ac.cleanup(); 
 
         ac._active = true;
         ac.timerWasPaused = false;
-        // violationCount được set bởi exam.start() SAU KHI init() chạy xong
-        // (trường hợp F5). Với resume sau đóng tab: đọc từ snapshot bên dưới.
-        // Với thi mới: giữ nguyên 0.
+        
+        
+        
 
-        // ── Bước 2: Resume vi phạm sau đóng tab (navigate) ──────────────────
-        // Nếu là F5: inline script đã xóa _ac_snapshot → không còn gì để đọc.
-        // Nếu đóng tab → mở lại: _ac_snapshot còn nguyên → khôi phục im lặng.
-        // Nếu thi mới: không có snapshot → violations = 0.
+        
+        
+        
+        
         const snapRaw = sessionStorage.getItem('_ac_snapshot');
         if (snapRaw) {
-          sessionStorage.removeItem('_ac_snapshot'); // luôn xóa sau khi đọc
+          sessionStorage.removeItem('_ac_snapshot'); 
           try {
             const snap = JSON.parse(snapRaw);
             if (snap && snap.violations >= 0 && snap.ts > 0) {
-              ac.violationCount = snap.violations; // khôi phục im lặng
+              ac.violationCount = snap.violations; 
             }
           } catch(e) {}
         }
 
-        // ── Bước 3: Đăng ký beforeunload ────────────────────────────────────
-        // SUBMIT-ON-CLOSE v4: gửi POST đến Edge Function "auto-submit" ngay lập tức.
-        //
-        // Khi đóng tab/trình duyệt:
-        //   sendBeacon POST {action:"submit"} → Edge Function (service_role)
-        //   → PATCH attempt submitted + assignment completed → DB cập nhật ngay
-        //
-        // Khi F5:
-        //   beforeunload → sendBeacon POST {action:"submit"} (gửi đi)
-        //   → trang reload → inline script → sendBeacon POST {action:"cancel"} (undo)
-        //   → nhân viên tiếp tục thi bình thường, bị tính vi phạm F5
-        //
-        // sendBeacon text/plain = "simple request" = không cần CORS preflight
-        // → browser cho phép gửi ngay cả khi tab đang đóng
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         ac._boundBeforeUnload = function(e) {
           if (!ac._active || !App.state.examState?.attempt) return;
           e.preventDefault();
@@ -5064,14 +5056,14 @@ const App = {
           const testId     = App.state.examState.test?.id || '';
           if (!attemptId || !employeeId) return '';
 
-          // SESSION BACKUP: F5 → inline script restore; đóng tab → buộc login lại
+          
           const currentTok = sessionStorage.getItem('Employee Assessment_emp_token');
           const currentEmp = sessionStorage.getItem('Employee Assessment_employee');
           if (currentTok) sessionStorage.setItem('_ac_tok_backup', currentTok);
           sessionStorage.setItem('_ac_emp_backup', currentEmp || '');
           sessionStorage.removeItem('Employee Assessment_emp_token');
 
-          // SNAPSHOT: inline script F5 đọc để gửi cancel + ghi vi phạm
+          
           sessionStorage.setItem('_ac_snapshot', JSON.stringify({
             violations:    ac.violationCount,
             attemptId:     attemptId,
@@ -5081,7 +5073,7 @@ const App = {
             ts:            Date.now(),
           }));
 
-          // ── GỬI action:"submit" đến Edge Function ────────────────────────
+          
           const AS_URL  = SUPABASE_URL + '/functions/v1/auto-submit';
           const payload = JSON.stringify({
             action:      'submit',
@@ -5090,12 +5082,12 @@ const App = {
             test_id:     testId,
           });
 
-          // Channel 1: sendBeacon text/plain — hoạt động khi tab đang đóng
+          
           try {
             navigator.sendBeacon(AS_URL, new Blob([payload], { type: 'text/plain' }));
           } catch(_e) {}
 
-          // Channel 2: fetch keepalive — fallback cho trình duyệt cũ
+          
           try {
             fetch(AS_URL, {
               method:    'POST',
@@ -5112,12 +5104,12 @@ const App = {
         };
         window.addEventListener('beforeunload', ac._boundBeforeUnload);
 
-        // ── Bước 4: Đăng ký visibilitychange + blur (debounced) ─────────────
-        // visibilitychange và blur cùng fire khi chuyển tab → debounce 100ms
-        // đảm bảo chỉ 1 vi phạm được tính cho mỗi hành động của user.
+        
+        
+        
         ac._triggerViolation = function(type) {
           if (!ac._active || !App.state.examState?.attempt) return;
-          if (ac._violationDebounceTimer) return; // đang chờ — bỏ qua duplicate
+          if (ac._violationDebounceTimer) return; 
           ac._violationDebounceTimer = setTimeout(function() {
             ac._violationDebounceTimer = null;
             if (!ac._active || !App.state.examState?.attempt) return;
@@ -5136,7 +5128,7 @@ const App = {
         };
         window.addEventListener('blur', ac._boundBlur);
 
-        // Vô hiệu hóa chuột phải khi thi
+        
         ac._boundContextMenu = function(e) {
           if (ac._active && App.state.examState?.attempt) e.preventDefault();
         };
@@ -5157,15 +5149,15 @@ const App = {
         if (ac._boundBlur)        { window.removeEventListener('blur', ac._boundBlur); ac._boundBlur = null; }
         if (ac._boundContextMenu) { document.removeEventListener('contextmenu', ac._boundContextMenu); ac._boundContextMenu = null; }
 
-        // Cleanup tab-away timer + return listeners
+        
         ac._clearTabAwayTimer();
 
-        // Xóa toàn bộ các key cũ lẫn mới để không bao giờ sót state
+        
         sessionStorage.removeItem('_ac_snapshot');
         sessionStorage.removeItem('_ac_f5_violation');
         sessionStorage.removeItem('_ac_tok_backup');
         sessionStorage.removeItem('_ac_emp_backup');
-        // Xóa các key từ thiết kế cũ (backward compatibility)
+        
         sessionStorage.removeItem('_ac_saved_v');
         sessionStorage.removeItem('_ac_saved_ts');
         sessionStorage.removeItem('_ac_f5_count');
@@ -5177,12 +5169,12 @@ const App = {
 
       handleViolation(type) {
         const ac = App.exam.antiCheat;
-        // Re-check active state — could have been deactivated while debounce was pending
+        
         if (!ac._active || !App.state.examState?.attempt) return;
 
         ac.violationCount++;
 
-        // Pause timer while overlay is visible
+        
         if (App.state.examState?.timerInterval) {
           clearInterval(App.state.examState.timerInterval);
           App.state.examState.timerInterval = null;
@@ -5195,25 +5187,25 @@ const App = {
           ac.showOverlay(type);
         }
 
-        // ── TAB-AWAY 30s: bắt đầu đếm ngược khi user rời tab ────────────────
-        // Chỉ áp dụng cho 'tab' và 'focus' (không áp dụng cho 'reload' vì
-        // reload đã được xử lý riêng bởi beforeunload + inline script).
-        // Nếu vi phạm lần 3 thì showFinalOverlay đã submit rồi, không cần timer.
+        
+        
+        
+        
         if ((type === 'tab' || type === 'focus') && ac.violationCount < 3) {
           ac._startTabAwayTimer();
         }
       },
 
-      // ── Bắt đầu đếm 30 giây tab-away ──────────────────────────────────────
+      
       _startTabAwayTimer() {
         const ac = App.exam.antiCheat;
 
-        // Clear timer cũ nếu còn (trường hợp vi phạm liên tiếp nhanh)
+        
         ac._clearTabAwayTimer();
 
         ac._tabAwayStart = Date.now();
 
-        // Đăng ký listener "quay lại" — chỉ một lần, tự xóa khi fired
+        
         ac._boundVisReturn = function() {
           if (!document.hidden) {
             ac._clearTabAwayTimer();
@@ -5225,20 +5217,20 @@ const App = {
         document.addEventListener('visibilitychange', ac._boundVisReturn);
         window.addEventListener('focus', ac._boundFocusReturn);
 
-        // Đếm 30 giây — nếu vẫn ở ngoài thì auto-submit
+        
         ac._tabAwayTimer = setTimeout(function() {
           ac._tabAwayTimer = null;
-          // Kiểm tra lại: vẫn active, vẫn đang thi, vẫn đang ở ngoài tab
+          
           if (!ac._active || !App.state.examState?.attempt) return;
-          if (App.state.examState?._submitting) return; // đang submit rồi, bỏ qua
-          // Dọn listener return (không cần nữa)
+          if (App.state.examState?._submitting) return; 
+          
           ac._removeReturnListeners();
-          // Hiện overlay nộp bài vì ở ngoài quá 30 giây
+          
           ac._showTabAwayFinalOverlay();
         }, 30000);
       },
 
-      // ── Clear timer và listener quay lại ────────────────────────────────────
+      
       _clearTabAwayTimer() {
         const ac = App.exam.antiCheat;
         if (ac._tabAwayTimer) {
@@ -5260,7 +5252,7 @@ const App = {
         }
       },
 
-      // ── Overlay nộp bài do ở ngoài tab > 30 giây ───────────────────────────
+      
       _showTabAwayFinalOverlay() {
         const existing = document.getElementById('anticheat-overlay');
         if (existing) existing.remove();
@@ -5346,7 +5338,7 @@ const App = {
         const ac = App.exam.antiCheat;
         const overlay = document.getElementById('anticheat-overlay');
         if (overlay) overlay.remove();
-        // Resume timer
+        
         if (ac.timerWasPaused && App.state.examState?.attempt) {
           ac.timerWasPaused = false;
           App.exam.startTimer();
@@ -5359,7 +5351,7 @@ const App = {
     },
 
     async submit(auto, fraud) {
-      // Guard against double-submit (race: timer expiry + fraud overlay timeout)
+      
       if (App.state.examState?._submitting) return;
       if (App.state.examState) App.state.examState._submitting = true;
       if (App.state.examState?.timerInterval) clearInterval(App.state.examState.timerInterval);
@@ -5402,8 +5394,8 @@ const App = {
         const { data: result } = await db.from('exam_test_results')
           .select('*').eq('attempt_id', attemptId).single();
 
-        // Lấy correct_answers qua RPC — chỉ trả về nếu attempt đã submitted
-        // An toàn: server kiểm tra trạng thái, không leak khi đang làm bài
+        
+        
         let correctAnswersMap = {};
         if (attempt.status === 'submitted' || attempt.submitted_at) {
           const { data: caData } = await db.rpc('get_correct_answers_for_attempt', { p_attempt_id: attemptId });
@@ -5417,7 +5409,6 @@ const App = {
         const pf = result?.pass_fail;
 
         body.innerHTML = `
-          <!-- Header: test info + result -->
           <div class="review-header">
             <div>
               <div class="review-test-proj">${reviewProjName || '—'}</div>
@@ -5436,7 +5427,6 @@ const App = {
             </div>
           </div>
 
-          <!-- Question cards -->
           <div>
             ${(questions||[]).map((q, i) => {
               const userAns = answerMap[q.id];
@@ -5448,13 +5438,13 @@ const App = {
               const isCorrect = !isEssay && correctSet.size > 0 && correctSet.size === userSet.size && [...correctSet].every(x => userSet.has(x));
               const hasAnswer = userArr.length > 0;
 
-              // Card state
+              
               const state = isEssay ? 'rv-essay' : (isCorrect ? 'rv-correct' : (hasAnswer ? 'rv-wrong' : 'rv-skipped'));
               const statusIcon = isEssay ? '📝' : (isCorrect ? '✅' : (hasAnswer ? '❌' : '⬜'));
               const scoreEarned = isEssay ? '?' : (isCorrect ? (q.score||0) : 0);
               const scoreLabel = isEssay ? `? / ${q.score||0}` : `${scoreEarned} / ${q.score||0}`;
 
-              // Build options HTML
+              
               let optionsHtml = '';
               if (!isEssay) {
                 const letters = ['A','B','C','D'].filter(l => q['option_'+l.toLowerCase()]);
@@ -5500,36 +5490,36 @@ const App = {
     }
   },
 
-  /* =========================================================
-     RECYCLE BIN  — Supabase-backed (bảng: exam_recycle_bin)
-     Thay thế hoàn toàn localStorage cũ.
-     Schema bảng:
-       id          uuid PK
-       item_id     text  (ID gốc của record)
-       item_type   text  ('test'|'project'|'assignment'|'question')
-       item_name   text  (tên snapshot lúc xóa)
-       deleted_at  timestamptz
-       deleted_by  text  (tuỳ chọn)
-       meta        jsonb (tuỳ chọn)
+  
 
-  /* =========================================================
-     REALTIME
-     ========================================================= */
+
+
+
+
+
+
+
+
+
+
+
+
+
   realtime: {
     channels: [],
     pollInterval: null,
 
     subscribe() {
-      // M4 FIX: Dùng nhiều channel có tên cố định thay vì 1 channel với Date.now()
-      // Tránh trường hợp channel bị lỗi/quá tải làm mất toàn bộ thông báo
-      // Unsubscribe các channel cũ
+      
+      
+      
       App.realtime.channels.forEach(ch => { try { db.removeChannel(ch); } catch(e) {} });
       App.realtime.channels = [];
       if (App.realtime.pollInterval) { clearInterval(App.realtime.pollInterval); App.realtime.pollInterval = null; }
 
       let realtimeOk = false;
 
-      // Channel 1: theo dõi attempts (chấm điểm + dashboard)
+      
       const chAttempts = db.channel('admin-attempts-v1')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'exam_exam_attempts' }, () => {
           if (App.state.currentView === 'grading') App.views.grading.load();
@@ -5540,7 +5530,7 @@ const App = {
           if (err) console.warn('Realtime attempts error:', err);
         });
 
-      // Channel 2: theo dõi results
+      
       const chResults = db.channel('admin-results-v1')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'exam_test_results' }, () => {
           if (App.state.currentView === 'results') App.views.results.load();
@@ -5550,7 +5540,7 @@ const App = {
           if (err) console.warn('Realtime results error:', err);
         });
 
-      // Channel 3: theo dõi assignments
+      
       const chAssignments = db.channel('admin-assignments-v1')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'exam_test_assignments' }, () => {
           if (App.state.currentView === 'assignments') App.views.assignments.load();
@@ -5561,8 +5551,8 @@ const App = {
 
       App.realtime.channels.push(chAttempts, chResults, chAssignments);
 
-      // M4 FIX: Polling fallback mỗi 30s phòng khi Realtime Supabase lỗi/quá tải
-      // Đảm bảo admin không cần refresh tay để thấy bài mới nộp
+      
+      
       App.realtime.pollInterval = setInterval(() => {
         if (App.state.currentView === 'grading') App.views.grading.load();
         else if (App.state.currentView === 'dashboard') App.views.dashboard.load();
@@ -5571,9 +5561,9 @@ const App = {
     }
   },
 
-  /* =========================================================
-     UTILITIES
-     ========================================================= */
+  
+
+
   util: {
     formatDate(iso) {
       if (!iso) return '—';
@@ -5593,7 +5583,7 @@ const App = {
       container.innerHTML = html;
     },
     goPage(containerId, page, isPublic) {
-      // Determine which table to update
+      
       const map = {
         'projects-pagination': 'projects',
         'tests-pagination': 'tests',
@@ -5621,12 +5611,12 @@ const App = {
   }
 };
 
-/* =========================================================
-   BOOT
-   ========================================================= */
+
+
+
 window.addEventListener('DOMContentLoaded', () => App.init());
 
-/* Close modal on overlay click */
+
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
   overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
 });
@@ -5634,7 +5624,7 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
 </body>
 </html>
 <script>
-/* ── GLOBAL RIPPLE ON CLICK ── */
+
 (function() {
   const COLORS = [
     'rgba(124,106,247,0.28)',
