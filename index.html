@@ -11,31 +11,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<!-- PRE-AUTH: Chạy TRƯỚC CSS/render để ẩn gate ngay nếu đã đăng nhập (zero flash) -->
-<script>
-(function(){
-  try {
-    var raw = localStorage.getItem('itHub_sso_auth');
-    if (raw) {
-      var auth = JSON.parse(raw);
-      if (auth && auth.email && auth.exp && Date.now() < auth.exp) {
-        // Còn hạn → ẩn gate ngay bằng style inject trước khi CSS render
-        document.documentElement.style.setProperty('--gate-display', 'none');
-        // Tạo style tag ẩn gate ngay lập tức
-        var s = document.createElement('style');
-        s.id = 'pre-auth-style';
-        s.textContent = '#sso-gate{display:none!important}';
-        document.head.appendChild(s);
-      }
-    }
-  } catch(e) {}
-})();
-</script>
-<!-- Google Identity Services (SSO) -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
   :root {
-    /* Deep Navy × Glassmorphism × Champagne Gold */
+    
     --bg:          #0c1322;
     --bg-mesh:     #0f1a2e;
     --surface:     rgba(255,255,255,.08);
@@ -67,13 +45,13 @@
     overflow: hidden;
   }
 
-  /* Background canvas */
+  
   #bg-canvas {
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
     width: 100%; height: 100%;
   }
 
-  /* Fine grid overlay for depth */
+  
   body::after {
     content: '';
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
@@ -84,7 +62,7 @@
     mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, black 0%, transparent 100%);
   }
 
-  /* ══════════════ TOPBAR ══════════════ */
+  
   #topbar {
     position: fixed; top: 0; left: 0; right: 0;
     height: var(--topbar-h); z-index: 200;
@@ -122,7 +100,7 @@
     50%       { box-shadow: 0 0 28px rgba(245,210,120,.7), 0 2px 8px rgba(0,0,0,.4); }
   }
 
-  /* Sheen sweep on the logo icon */
+  
   .logo-icon::before {
     content: '';
     position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
@@ -135,7 +113,7 @@
     100% { left: 130%; }
   }
 
-  /* SVG bolt inside */
+  
   .logo-icon svg {
     width: 15px; height: 15px; position: relative; z-index: 1;
     filter: drop-shadow(0 1px 2px rgba(0,0,0,.35));
@@ -156,7 +134,7 @@
 
   .tab-sep { width: 1px; height: 18px; background: var(--border); margin: 0 6px; flex-shrink: 0; }
 
-  /* ── Active app chip on topbar ── */
+  
   #active-chip {
     display: none; align-items: center; gap: 6px;
     padding: 0 10px; height: var(--topbar-h);
@@ -174,7 +152,7 @@
 
   .chip-sep { width: 1px; height: 18px; background: var(--border); margin: 0 4px; flex-shrink: 0; }
 
-  /* ── Apps dropdown button ── */
+  
   #apps-btn {
     display: flex; align-items: center; gap: 6px;
     padding: 0 12px; height: var(--topbar-h);
@@ -200,7 +178,7 @@
   }
   #apps-btn.open .apps-btn-arrow { transform: rotate(180deg); }
 
-  /* ── Dropdown panel ── */
+  
   #apps-dropdown {
     position: fixed; top: calc(var(--topbar-h) + 6px); left: 0; right: 0;
     display: flex; justify-content: center;
@@ -307,7 +285,7 @@
   body.admin-mode .df-add-btn { display: flex; }
   .df-add-btn:hover { background: rgba(232,187,80,.16); }
 
-  /* hide old tabs */
+  
   #tabs { display: none; }
 
   .badge {
@@ -346,7 +324,7 @@
     box-shadow: 0 0 0 3px rgba(232,187,80,.1);
   }
 
-  /* Refresh button */
+  
   #refreshBtn svg {
     transition: transform .6s cubic-bezier(.17,.67,.35,1.3);
   }
@@ -364,7 +342,7 @@
     box-shadow: 0 0 0 3px rgba(104,211,145,.12);
   }
 
-  /* ══════════════ CONTENT ══════════════ */
+  
   #content {
     position: fixed; top: var(--topbar-h); left: 0; right: 0; bottom: 0; overflow: hidden; z-index: 1;
   }
@@ -376,7 +354,7 @@
   .pane.active { opacity: 1; pointer-events: auto; }
   .pane iframe { width: 100%; height: 100%; border: none; display: block; }
 
-  /* ══════════════ HOME ══════════════ */
+  
   #home {
     position: absolute; inset: 0;
     display: flex; flex-direction: column;
@@ -436,7 +414,7 @@
   @keyframes fadeDown { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
   @keyframes fadeUp   { from{opacity:0;transform:translateY(20px)}  to{opacity:1;transform:translateY(0)} }
 
-  /* ══════════════ CARDS ══════════════ */
+  
   .cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(288px, 1fr));
@@ -450,12 +428,12 @@
     border-radius: 20px; padding: 28px 24px 22px;
     overflow: hidden; text-align: left;
     transform-style: preserve-3d;
-    /* Glass surface */
+    
     background: rgba(255,255,255,.07);
     border: 1px solid rgba(255,255,255,.14);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    /* Strong visible shadow for depth */
+    
     box-shadow:
       0 4px 0 rgba(0,0,0,.5),
       0 8px 0 rgba(0,0,0,.3),
@@ -470,7 +448,7 @@
       background .25s ease;
   }
 
-  /* Shimmer sweep */
+  
   .card::before {
     content: '';
     position: absolute; top: 0; left: -120%; width: 65%; height: 100%;
@@ -479,7 +457,7 @@
     transition: left .55s ease; pointer-events: none; z-index: 3;
   }
 
-  /* Top glass reflection line */
+  
   .card::after {
     content: '';
     position: absolute; top: 0; left: 20px; right: 20px; height: 1px;
@@ -508,7 +486,7 @@
     transition: transform .1s, box-shadow .1s;
   }
 
-  /* Colored top stripe */
+  
   .card-stripe {
     position: absolute; top: 0; left: 0; right: 0; height: 3px;
     background: var(--card-stripe-bg, linear-gradient(90deg, var(--card-accent, var(--accent)), var(--card-accent2, var(--accent2))));
@@ -526,7 +504,7 @@
     overflow: hidden;
   }
 
-  /* Sheen sweep on card icons */
+  
   .card-icon::after {
     content: '';
     position: absolute; inset: 0;
@@ -582,7 +560,7 @@
     box-shadow: 0 4px 16px var(--card-glow, rgba(232,187,80,.4));
   }
 
-  /* Admin buttons */
+  
   .card-admin-bar { display: none; position: absolute; top: 12px; right: 12px; gap: 6px; z-index: 10; }
   body.admin-mode .card-admin-bar { display: flex; }
   .card-admin-btn {
@@ -599,7 +577,7 @@
   .card-toggle-btn.off { background: rgba(252,129,129,.12); color: var(--red); }
   .card-toggle-btn.off:hover { background: rgba(252,129,129,.25); transform: scale(1.1); }
 
-  /* Maintenance overlay */
+  
   .card-maintenance {
     position: absolute; inset: 0; border-radius: 18px; z-index: 5;
     background: rgba(10,12,20,.82);
@@ -621,7 +599,7 @@
     font-size: 11px; color: rgba(255,255,255,.3); font-family: var(--mono);
   }
 
-  /* Add card */
+  
   .card-add {
     display: none; background: rgba(255,255,255,.03);
     border: 1px dashed rgba(255,255,255,.15); border-radius: 20px;
@@ -644,7 +622,7 @@
     color: var(--text3); letter-spacing: .07em; text-align: center; position: relative; z-index: 2;
   }
 
-  /* ══════════════ LOADING ══════════════ */
+  
   .pane-loading {
     position: absolute; inset: 0;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -658,7 +636,7 @@
   @keyframes spin { to { transform: rotate(360deg); } }
   .load-text { font-size: 12px; color: var(--text2); font-family: var(--mono); letter-spacing: .08em; }
 
-  /* ══════════════ MODALS ══════════════ */
+  
   .modal-backdrop {
     position: fixed; inset: 0;
     background: rgba(5,10,20,.65); backdrop-filter: blur(12px);
@@ -710,7 +688,7 @@
   .modal-scroll::-webkit-scrollbar-track { background: transparent; }
   .modal-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 3px; }
 
-  /* Forms */
+  
   .form-group { margin-bottom: 18px; }
   .form-label {
     display: block; font-size: 11px; font-weight: 700;
@@ -733,7 +711,7 @@
   .form-textarea { resize: vertical; min-height: 80px; line-height: 1.55; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
-  /* ══════════════ COLOR PICKER ══════════════ */
+  
   .color-picker-tabs {
     display: flex; gap: 4px; margin-bottom: 10px;
   }
@@ -776,7 +754,7 @@
     border: 1px solid rgba(255,255,255,.15);
   }
 
-  /* Gradient swatches */
+  
   .gradient-swatches { display: flex; gap: 6px; flex-wrap: wrap; }
   .grad-swatch {
     width: 52px; height: 28px; border-radius: 8px; cursor: pointer;
@@ -797,7 +775,7 @@
     pointer-events: none;
   }
 
-  /* Swatches */
+  
   .color-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
   .swatch {
     width: 30px; height: 30px; border-radius: 9px; cursor: pointer;
@@ -807,7 +785,7 @@
   .swatch:hover { transform: scale(1.12); }
   .swatch.selected { border-color: #fff; transform: scale(1.2); box-shadow: 0 0 0 3px rgba(255,255,255,.25), 0 4px 12px rgba(0,0,0,.5); }
 
-  /* Emoji */
+  
   .emoji-grid {
     display: grid; grid-template-columns: repeat(7, 36px);
     gap: 6px; max-height: 180px; overflow-y: auto; padding-right: 2px;
@@ -824,7 +802,7 @@
   .emoji-btn:hover { background: rgba(255,255,255,.12); transform: scale(1.08); }
   .emoji-btn.selected { background: rgba(232,187,80,.15); border-color: rgba(232,187,80,.4); box-shadow: 0 0 12px rgba(232,187,80,.15); }
 
-  /* Source toggle */
+  
   .source-toggle { display: flex; gap: 8px; margin-bottom: 12px; }
   .source-btn {
     flex: 1; padding: 9px 12px; border-radius: 10px;
@@ -834,7 +812,7 @@
   }
   .source-btn.active { background: rgba(232,187,80,.12); border-color: rgba(232,187,80,.3); color: var(--accent2); }
 
-  /* Buttons */
+  
   .modal-actions { display: flex; gap: 10px; margin-top: 28px; }
   .btn {
     flex: 1; padding: 12px 20px; border-radius: 12px;
@@ -856,7 +834,7 @@
   .btn-danger { background: rgba(252,129,129,.1); color: var(--red); border: 1px solid rgba(252,129,129,.2); }
   .btn-danger:hover { background: rgba(252,129,129,.2); }
 
-  /* Login error */
+  
   .login-error {
     background: rgba(252,129,129,.08); border: 1px solid rgba(252,129,129,.22);
     border-radius: 10px; padding: 10px 14px; font-size: 13px; color: var(--red);
@@ -869,7 +847,7 @@
   }
   .delete-confirm-name { color: var(--text); font-weight: 800; }
 
-  /* Tab close */
+  
   .tab-close {
     display: none; width: 18px; height: 18px; border-radius: 5px;
     background: transparent; border: none; cursor: pointer;
@@ -879,7 +857,7 @@
   body.admin-mode .tab-close { display: flex; }
   .tab-close:hover { background: rgba(252,129,129,.2); color: var(--red); }
 
-  /* Responsive */
+  
   @media (max-width: 600px) {
     .tab { padding: 0 10px; font-size: 12px; }
     .logo-text { display: none; }
@@ -888,7 +866,7 @@
     .cards { grid-template-columns: 1fr; }
   }
 
-  /* Entry animations */
+  
   @keyframes cardIn {
     from { opacity: 0; transform: translateY(28px) scale(.95); }
     to   { opacity: 1; transform: translateY(0) scale(1); }
@@ -902,7 +880,7 @@
   @keyframes tabIn { from{opacity:0;transform:translateX(-6px)} to{opacity:1;transform:translateX(0)} }
   .tab-new { animation: tabIn .22s ease both; }
 
-  /* ══════════════ TOAST ══════════════ */
+  
   #toast-container {
     position: fixed; bottom: 28px; right: 28px;
     display: flex; flex-direction: column; gap: 10px;
@@ -947,7 +925,7 @@
     font-family: var(--mono); letter-spacing: .02em;
   }
 
-  /* Progress bar inside toast */
+  
   .toast-progress {
     position: absolute; bottom: 0; left: 0; height: 2px; border-radius: 0 0 14px 14px;
     background: linear-gradient(90deg, var(--accent3), var(--accent2));
@@ -960,7 +938,7 @@
     to   { width: 0%; }
   }
 
-  /* Spinning dots for loading toast */
+  
   .toast-dots {
     display: flex; gap: 4px; align-items: center; justify-content: center;
     width: 18px; height: 18px;
@@ -977,7 +955,7 @@
     40%          { transform: scale(1.1); opacity: 1; }
   }
 
-  /* ══════════════ REFRESH OVERLAY ══════════════ */
+  
   #refresh-overlay {
     position: fixed; inset: 0; z-index: 500;
     display: flex; flex-direction: column;
@@ -1027,252 +1005,12 @@
     letter-spacing: .05em; margin-top: -10px;
   }
 
-  /* ══════════════ SSO GATE ══════════════ */
-  #sso-gate {
-    position: fixed; inset: 0; z-index: 9999;
-    background: #080e1a;
-    display: none; align-items: center; justify-content: center;
-    flex-direction: column;
-    font-family: var(--font);
-    overflow: hidden;
-  }
-  /* Animated canvas background */
-  #sso-bg-canvas {
-    position: absolute; inset: 0; width: 100%; height: 100%;
-    pointer-events: none; z-index: 0;
-  }
-  /* Radial glow centre */
-  #sso-gate::after {
-    content: '';
-    position: absolute; z-index: 0; pointer-events: none;
-    width: 700px; height: 700px;
-    left: 50%; top: 50%;
-    transform: translate(-50%, -50%);
-    background: radial-gradient(ellipse at center,
-      rgba(232,187,80,.07) 0%,
-      rgba(100,140,255,.05) 40%,
-      transparent 70%);
-    animation: ssoPulseGlow 4s ease-in-out infinite alternate;
-  }
-  @keyframes ssoPulseGlow {
-    from { opacity: .6; transform: translate(-50%,-50%) scale(1); }
-    to   { opacity: 1;  transform: translate(-50%,-50%) scale(1.15); }
-  }
-  /* Fine grid */
-  #sso-grid {
-    position: absolute; inset: 0; z-index: 0; pointer-events: none;
-    background-image:
-      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-    background-size: 48px 48px;
-    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 0%, transparent 100%);
-    animation: ssoGridDrift 20s linear infinite;
-  }
-  @keyframes ssoGridDrift {
-    from { background-position: 0 0; }
-    to   { background-position: 48px 48px; }
-  }
-  .sso-card {
-    position: relative; z-index: 1;
-    background: rgba(255,255,255,.055);
-    border: 1px solid rgba(255,255,255,.13);
-    border-radius: 28px;
-    padding: 52px 48px 44px;
-    width: 100%; max-width: 420px; margin: 16px;
-    box-shadow:
-      0 0 0 1px rgba(232,187,80,.1),
-      0 32px 80px rgba(0,0,0,.6),
-      inset 0 1px 0 rgba(255,255,255,.1);
-    backdrop-filter: blur(32px) saturate(160%);
-    -webkit-backdrop-filter: blur(32px) saturate(160%);
-    text-align: center;
-    animation: ssoCardIn .6s cubic-bezier(.16,1,.3,1) both;
-  }
-  @keyframes ssoCardIn {
-    from { opacity:0; transform: translateY(24px) scale(.95); }
-    to   { opacity:1; transform: translateY(0) scale(1); }
-  }
-  /* Shimmer border on card */
-  .sso-card::before {
-    content: '';
-    position: absolute; inset: 0; border-radius: 28px; pointer-events: none;
-    background: linear-gradient(135deg,
-      rgba(232,187,80,.15) 0%,
-      transparent 40%,
-      rgba(100,140,255,.08) 100%);
-    opacity: 0;
-    animation: ssoShimmer 3s ease-in-out infinite alternate;
-  }
-  @keyframes ssoShimmer {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
-  .sso-logo-wrap {
-    width: 72px; height: 72px; margin: 0 auto 24px;
-    background: linear-gradient(145deg, #1e3060, #0a1020);
-    border-radius: 20px;
-    display: flex; align-items: center; justify-content: center;
-    border: 1px solid rgba(232,187,80,.25);
-    box-shadow:
-      0 0 0 4px rgba(232,187,80,.06),
-      0 8px 32px rgba(0,0,0,.5),
-      0 0 40px rgba(232,187,80,.15);
-    animation: ssoLogoPulse 3s ease-in-out infinite alternate;
-  }
-  @keyframes ssoLogoPulse {
-    from { box-shadow: 0 0 0 4px rgba(232,187,80,.06), 0 8px 32px rgba(0,0,0,.5), 0 0 30px rgba(232,187,80,.1); }
-    to   { box-shadow: 0 0 0 8px rgba(232,187,80,.1),  0 8px 40px rgba(0,0,0,.5), 0 0 60px rgba(232,187,80,.25); }
-  }
-  .sso-logo-wrap svg { width: 36px; height: 36px; }
-  .sso-title {
-    font-size: 22px; font-weight: 800; color: var(--text);
-    margin-bottom: 8px; letter-spacing: -.02em;
-    animation: ssoFadeUp .6s .15s cubic-bezier(.16,1,.3,1) both;
-  }
-  .sso-subtitle {
-    font-size: 13.5px; color: var(--text2); margin-bottom: 36px; line-height: 1.6;
-    animation: ssoFadeUp .6s .25s cubic-bezier(.16,1,.3,1) both;
-  }
-  @keyframes ssoFadeUp {
-    from { opacity:0; transform: translateY(10px); }
-    to   { opacity:1; transform: translateY(0); }
-  }
-  .sso-google-btn {
-    width: 100%; padding: 14px 20px;
-    background: #fff; color: #1f2937;
-    border: none; border-radius: 14px;
-    font-size: 14.5px; font-weight: 700;
-    font-family: var(--font);
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    transition: background .15s, box-shadow .2s, transform .15s;
-    box-shadow: 0 4px 20px rgba(0,0,0,.35), 0 1px 3px rgba(0,0,0,.2);
-    animation: ssoFadeUp .6s .35s cubic-bezier(.16,1,.3,1) both;
-    position: relative; overflow: hidden;
-  }
-  .sso-google-btn::after {
-    content: '';
-    position: absolute; inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,.4) 0%, transparent 60%);
-    opacity: 0; transition: opacity .2s;
-    pointer-events: none;
-  }
-  .sso-google-btn:hover {
-    background: #f8f9fa;
-    box-shadow: 0 8px 32px rgba(0,0,0,.45), 0 2px 8px rgba(0,0,0,.25);
-    transform: translateY(-2px);
-  }
-  .sso-google-btn:hover::after { opacity: 1; }
-  .sso-google-btn:active { transform: translateY(0); box-shadow: 0 2px 10px rgba(0,0,0,.3); }
-  .sso-google-btn svg { flex-shrink: 0; }
-  .sso-error {
-    margin-top: 16px; padding: 12px 16px;
-    background: rgba(252,129,129,.08); border: 1px solid rgba(252,129,129,.25);
-    border-radius: 12px; font-size: 13px; color: var(--red);
-    display: none; font-weight: 500; line-height: 1.5;
-    animation: ssoFadeUp .3s ease both;
-  }
-  .sso-footer {
-    margin-top: 24px; font-size: 11.5px; color: rgba(255,255,255,0.85); line-height: 1.6;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-    animation: ssoFadeUp .6s .45s cubic-bezier(.16,1,.3,1) both;
-  }
-  .sso-footer::before {
-    content: '';
-    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
-    background: var(--accent); opacity: .5;
-    animation: ssoDotBlink 2s ease-in-out infinite;
-  }
-  @keyframes ssoDotBlink {
-    0%,100% { opacity: .3; transform: scale(1); }
-    50%      { opacity: .8; transform: scale(1.3); }
-  }
-  /* User chip in topbar */
-  .sso-user-chip {
-    display: flex; align-items: center; gap: 7px;
-    padding: 3px 10px 3px 4px;
-    background: rgba(255,255,255,.06);
-    border: 1px solid rgba(255,255,255,.1);
-    border-radius: 20px; cursor: pointer;
-    transition: background .15s;
-    position: relative;
-  }
-  .sso-user-chip:hover { background: rgba(255,255,255,.1); }
-  .sso-user-avatar {
-    width: 26px; height: 26px; border-radius: 50%;
-    object-fit: cover; border: 1px solid rgba(232,187,80,.3);
-    flex-shrink: 0;
-  }
-  .sso-user-avatar-placeholder {
-    width: 26px; height: 26px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent3), var(--accent));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 700; color: #1a1200;
-    flex-shrink: 0;
-  }
-  .sso-user-name {
-    font-size: 12px; font-weight: 600; color: var(--text);
-    max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-  .sso-signout-dropdown {
-    position: absolute; top: calc(100% + 8px); right: 0;
-    background: rgba(15,26,46,.98);
-    border: 1px solid rgba(255,255,255,.12);
-    border-radius: 12px; padding: 6px;
-    min-width: 180px;
-    box-shadow: 0 16px 40px rgba(0,0,0,.5);
-    backdrop-filter: blur(20px);
-    display: none; z-index: 500;
-  }
-  .sso-signout-dropdown.open { display: block; animation: ssoFadeIn .15s ease; }
-  .sso-dropdown-email {
-    padding: 8px 10px 10px;
-    font-size: 11px; color: var(--text3);
-    border-bottom: 1px solid rgba(255,255,255,.07); margin-bottom: 4px;
-    word-break: break-all;
-  }
-  .sso-dropdown-btn {
-    width: 100%; padding: 8px 10px;
-    background: none; border: none; border-radius: 8px;
-    font-size: 13px; color: var(--red); font-family: var(--font);
-    cursor: pointer; text-align: left; display: flex; align-items: center; gap: 8px;
-    transition: background .12s;
-  }
-  .sso-dropdown-btn:hover { background: rgba(252,129,129,.08); }
-  @keyframes ssoSpin { to { transform: rotate(360deg); } }
-  .sso-google-btn:disabled { opacity: .75; cursor: not-allowed; transform: none !important; }
 </style>
 </head>
 <body>
 
-<!-- ══════ SSO GATE ══════ -->
-<div id="sso-gate">
-  <canvas id="sso-bg-canvas"></canvas>
-  <div id="sso-grid"></div>
-  <div class="sso-card">
-    <div class="sso-logo-wrap">
-      <img src="https://edsowiramriosgwfuewg.supabase.co/storage/v1/object/public/Video/L2.png" alt="L2 Logo" style="width:56px;height:56px;object-fit:contain;border-radius:12px;"/>
-    </div>
-    <div class="sso-title">Internal L2 Tools Hub</div>
-    <div class="sso-subtitle">Đăng nhập bằng tài khoản Google công ty<br>để tiếp tục</div>
-    <button class="sso-google-btn" onclick="ssoStartGoogleLogin()">
-      <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
-        <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
-        <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
-        <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-      </svg>
-      Đăng nhập với Google
-    </button>
-    <div class="sso-error" id="sso-error"></div>
-    <div class="sso-footer">Chỉ tài khoản nội bộ mới có thể truy cập</div>
-  </div>
-</div>
-
-<!-- ── Toast Container ── -->
 <div id="toast-container"></div>
 
-<!-- ── Refresh Overlay ── -->
 <div id="refresh-overlay">
   <div class="ro-ring-wrap">
     <div class="ro-ring"></div>
@@ -1284,7 +1022,6 @@
 </div>
 <canvas id="bg-canvas"></canvas>
 
-<!-- ── Top bar (fixed, never blocks content) ── -->
 <div id="topbar">
   <button class="logo" onclick="showHome()">
     <div class="logo-icon">
@@ -1299,14 +1036,14 @@
 
   <div class="tab-sep"></div>
 
-  <!-- Active app chip -->
+  
   <div id="active-chip">
     <span class="chip-dot" id="chip-dot"></span>
     <span id="chip-name"></span>
   </div>
   <div class="chip-sep" id="chip-sep" style="display:none"></div>
 
-  <!-- Apps dropdown trigger -->
+  
   <button id="apps-btn" onclick="toggleDropdown()">
     <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
       <rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity=".7"/>
@@ -1319,7 +1056,7 @@
     <span class="apps-btn-arrow">▼</span>
   </button>
 
-  <div id="tabs" style="display:none"><!-- dynamic, kept for JS compat --></div>
+  <div id="tabs" style="display:none"></div>
 
   <div class="topbar-right">
     <div class="admin-indicator" id="adminIndicator">
@@ -1333,23 +1070,10 @@
         <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
       </svg>
     </button>
-    <div class="sso-user-chip" id="sso-user-chip" style="display:none" onclick="ssoToggleDropdown(event)">
-      <div class="sso-user-avatar-placeholder" id="sso-avatar-placeholder"></div>
-      <img class="sso-user-avatar" id="sso-avatar-img" style="display:none" alt="avatar"/>
-      <span class="sso-user-name" id="sso-user-name"></span>
-      <div class="sso-signout-dropdown" id="sso-dropdown">
-        <div class="sso-dropdown-email" id="sso-dropdown-email"></div>
-        <button class="sso-dropdown-btn" onclick="ssoSignOut()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          Đăng xuất
-        </button>
-      </div>
-    </div>
     <button class="btn-icon" id="adminBtn" title="Admin panel" onclick="handleAdminBtn()">⚙️</button>
   </div>
 </div>
 
-<!-- ── Apps Dropdown ── -->
 <div id="apps-dropdown">
   <div class="dropdown-inner">
     <div class="dropdown-header">
@@ -1361,7 +1085,7 @@
         Trang chủ
       </button>
     </div>
-    <div class="dropdown-grid" id="dropdown-grid"><!-- dynamic --></div>
+    <div class="dropdown-grid" id="dropdown-grid"></div>
     <div class="dropdown-footer">
       <span class="df-count" id="df-count">0 APPS</span>
       <button class="df-add-btn" onclick="openAdd();closeDropdown()">＋ Thêm app</button>
@@ -1369,7 +1093,6 @@
   </div>
 </div>
 
-<!-- ── Content (offset by topbar height via CSS) ── -->
 <div id="content">
   <div id="home" class="pane active">
     <div class="home-inner">
@@ -1377,14 +1100,13 @@
       <h1 class="home-title"><span class="grad">Internal L2 Tools Hub</span></h1>
       <p class="home-sub">Trung tâm ứng dụng nội bộ — chọn công cụ bên dưới để bắt đầu.</p>
 
-      <div class="cards" id="cardsGrid"><!-- dynamic --></div>
-      <div class="home-footer" id="homeFooter"><!-- dynamic --></div>
+      <div class="cards" id="cardsGrid"></div>
+      <div class="home-footer" id="homeFooter"></div>
     </div>
   </div>
-  <div id="appPanes"><!-- dynamic --></div>
+  <div id="appPanes"></div>
 </div>
 
-<!-- ══════ MODAL: Login ══════ -->
 <div class="modal-backdrop" id="loginModal">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
@@ -1408,7 +1130,6 @@
   </div>
 </div>
 
-<!-- ══════ MODAL: Add / Edit App ══════ -->
 <div class="modal-backdrop" id="appModal">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('appModal')">✕</button>
@@ -1480,7 +1201,6 @@
   </div>
 </div>
 
-<!-- ══════ MODAL: Delete confirm ══════ -->
 <div class="modal-backdrop" id="deleteModal">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('deleteModal')">✕</button>
@@ -1508,335 +1228,11 @@ if (!window.SUPABASE_CONFIG) {
 }
 </script>
 <script>
-// ════════════════════════════════════════
-// SUPABASE
-// ════════════════════════════════════════
-// Các giá trị được mã hoá Base64 để bảo vệ khỏi scraping thô
+
 const _d = s => atob(s);
 const SUPABASE_URL      = window.SUPABASE_CONFIG['index.html'].url;
 const SUPABASE_ANON_KEY = window.SUPABASE_CONFIG['index.html'].key;
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// ════════════════════════════════════════
-// SSO_SESSIONS TABLE — tự động tạo nếu chưa có
-// Chạy SQL này 1 lần trong Supabase Dashboard > SQL Editor:
-/*
-  CREATE TABLE IF NOT EXISTS public.sso_sessions (
-    id            BIGSERIAL PRIMARY KEY,
-    email         TEXT NOT NULL,
-    session_token TEXT NOT NULL UNIQUE,
-    expires_at    TIMESTAMPTZ NOT NULL,
-    user_agent    TEXT,
-    last_seen     TIMESTAMPTZ DEFAULT now(),
-    created_at    TIMESTAMPTZ DEFAULT now()
-  );
-  CREATE INDEX IF NOT EXISTS idx_sso_sessions_email ON public.sso_sessions(email);
-  CREATE INDEX IF NOT EXISTS idx_sso_sessions_token ON public.sso_sessions(session_token);
-  ALTER TABLE public.sso_sessions ENABLE ROW LEVEL SECURITY;
-  CREATE POLICY "anon can upsert own session" ON public.sso_sessions
-    FOR ALL USING (true) WITH CHECK (true);
-*/
-// ════════════════════════════════════════
-
-// ════════════════════════════════════════
-// CONFIG
-// ════════════════════════════════════════
-// ════════════════════════════════════════
-// SSO CONFIG — ⚙️ Điền thông tin của bạn vào đây
-// ════════════════════════════════════════
-const SSO_CLIENT_ID      = _d('NTQ0MjE1ODE1MDY1LThpbjZwYjkyMnY1OGRqazVjbXFqNzRyNGpudjZkaGZ1LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29t');
-// Giới hạn domain email — ví dụ: 'company.com'
-// Để null để cho phép mọi tài khoản Google
-const SSO_ALLOWED_DOMAIN = null;
-const SSO_SESSION_KEY    = 'itHub_sso_token';
-const SSO_USER_KEY       = 'itHub_sso_user';
-
-// Supabase nhân sự (kiểm tra quyền truy cập)
-const HR_SUPABASE_URL      = window.SUPABASE_CONFIG['index.html'].hr.url;
-const HR_SUPABASE_ANON_KEY = window.SUPABASE_CONFIG['index.html'].hr.key;
-
-// ════════════════════════════════════════
-// SSO — GOOGLE OAUTH GATE
-// ════════════════════════════════════════
-
-// ─── SESSION KEY dài hạn (không phụ thuộc JWT exp 1h) ───
-const SSO_AUTH_KEY = 'itHub_sso_auth';   // {email, exp:ms} — hạn 7 ngày
-const SSO_SESSION_TTL = 7 * 24 * 60 * 60 * 1000; // 7 ngày (ms)
-
-function ssoParseJWT(token) {
-  try {
-    const base64 = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
-    return JSON.parse(atob(base64));
-  } catch(e) { return null; }
-}
-
-// Tạo session token ngẫu nhiên
-function ssoMakeToken() {
-  const arr = new Uint8Array(24);
-  crypto.getRandomValues(arr);
-  return Array.from(arr).map(b => b.toString(16).padStart(2,'0')).join('');
-}
-
-// Lưu auth entry dài hạn (7 ngày) + upsert lên Supabase sso_sessions
-async function ssoSaveSession(email, name, picture) {
-  const exp = Date.now() + SSO_SESSION_TTL;
-  const sessionToken = ssoMakeToken();
-
-  // 1. Lưu localStorage (instant, offline-safe)
-  localStorage.setItem(SSO_AUTH_KEY, JSON.stringify({ email, name, picture, exp, sessionToken }));
-  localStorage.setItem(SSO_USER_KEY, JSON.stringify({ email, name, picture }));
-
-  // 2. Upsert lên Supabase bảng sso_sessions (background, không block UI)
-  try {
-    const expISO = new Date(exp).toISOString();
-    const ua = navigator.userAgent.substring(0, 200);
-    await fetch(SUPABASE_URL + '/rest/v1/sso_sessions', {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates',
-      },
-      body: JSON.stringify({
-        email,
-        session_token: sessionToken,
-        expires_at: expISO,
-        user_agent: ua,
-        last_seen: new Date().toISOString(),
-      })
-    });
-  } catch(e) {
-    // Không block login nếu Supabase lỗi
-    console.warn('sso_sessions upsert failed:', e);
-  }
-}
-
-// Kiểm tra auth dài hạn — KHÔNG dùng JWT exp nữa
-function ssoIsSessionValid() {
-  try {
-    const raw = localStorage.getItem(SSO_AUTH_KEY);
-    if (!raw) return false;
-    const auth = JSON.parse(raw);
-    if (!auth || !auth.email || !auth.exp) return false;
-    if (Date.now() > auth.exp) {
-      // Hết 7 ngày → xóa hết
-      localStorage.removeItem(SSO_AUTH_KEY);
-      localStorage.removeItem(SSO_SESSION_KEY);
-      localStorage.removeItem(SSO_USER_KEY);
-      return false;
-    }
-    // Còn hạn → gia hạn thêm 7 ngày (rolling session)
-    auth.exp = Date.now() + SSO_SESSION_TTL;
-    localStorage.setItem(SSO_AUTH_KEY, JSON.stringify(auth));
-    return true;
-  } catch(e) { return false; }
-}
-
-function ssoShowGate() {
-  const gate = document.getElementById('sso-gate');
-  gate.style.display = 'flex';
-  // trigger reflow để animation chạy đúng
-  gate.offsetHeight;
-}
-
-function ssoHideGate() {
-  const gate = document.getElementById('sso-gate');
-  gate.style.opacity = '0';
-  gate.style.transition = 'opacity .3s ease';
-  setTimeout(() => { gate.style.display = 'none'; gate.style.opacity = ''; gate.style.transition = ''; }, 320);
-}
-
-function ssoRenderUserChip(user) {
-  const chip = document.getElementById('sso-user-chip');
-  const nameEl = document.getElementById('sso-user-name');
-  const avatarImg = document.getElementById('sso-avatar-img');
-  const avatarPh = document.getElementById('sso-avatar-placeholder');
-  const emailEl = document.getElementById('sso-dropdown-email');
-
-  // Lấy tên riêng (phần cuối) cho tiếng Việt, decode unicode nếu cần
-  function decodeName(str) {
-    try { return decodeURIComponent(escape(str)); } catch(e) { return str; }
-  }
-  const rawName = user.name || '';
-  const parts = rawName.trim().split(' ');
-  const displayName = parts.length > 1 ? parts[parts.length - 1] : (parts[0] || user.email.split('@')[0]);
-  nameEl.textContent = displayName;
-  emailEl.textContent = user.email;
-
-  if (user.picture) {
-    avatarImg.src = user.picture;
-    avatarImg.style.display = 'block';
-    avatarPh.style.display = 'none';
-  } else {
-    avatarPh.textContent = (user.name || user.email)[0].toUpperCase();
-    avatarPh.style.display = 'flex';
-    avatarImg.style.display = 'none';
-  }
-  chip.style.display = 'flex';
-}
-
-function ssoToggleDropdown(e) {
-  e.stopPropagation();
-  const dd = document.getElementById('sso-dropdown');
-  dd.classList.toggle('open');
-}
-
-// Đóng dropdown khi click ra ngoài
-document.addEventListener('click', function() {
-  const dd = document.getElementById('sso-dropdown');
-  if (dd) dd.classList.remove('open');
-});
-
-function ssoHandleCredential(response) {
-  const payload = ssoParseJWT(response.credential);
-  if (!payload || !payload.email) {
-    ssoShowError('Không thể xác thực token. Vui lòng thử lại.');
-    return;
-  }
-  // Hiện trạng thái đang kiểm tra
-  ssoShowChecking(payload.email);
-  // Kiểm tra email trong bảng nhan_su (Supabase HR)
-  ssoCheckNhanSu(payload.email).then(function(allowed) {
-    if (!allowed) {
-      ssoHideChecking();
-      ssoShowError('Tài khoản ' + payload.email + ' không có trong danh sách nhân sự L2 hoặc không còn Active / Probation. Vui lòng liên hệ quản trị viên.');
-      return;
-    }
-    // Được phép → lưu session dài hạn (7 ngày) & vào trang
-    // Vẫn lưu raw token để backup, nhưng session validity dùng SSO_AUTH_KEY
-    localStorage.setItem(SSO_SESSION_KEY, response.credential);
-    ssoSaveSession(payload.email, payload.name || '', payload.picture || '').then(() => {
-      ssoHideGate();
-      ssoRenderUserChip({ email: payload.email, name: payload.name, picture: payload.picture });
-    }).catch(() => {
-      // Vẫn cho vào dù Supabase ghi thất bại
-      ssoHideGate();
-      ssoRenderUserChip({ email: payload.email, name: payload.name, picture: payload.picture });
-    });
-  }).catch(function(err) {
-    ssoHideChecking();
-    ssoShowError('Không thể kết nối hệ thống xác thực. Vui lòng thử lại. (' + (err.message || err) + ')');
-  });
-}
-
-async function ssoCheckNhanSu(email) {
-  const url = HR_SUPABASE_URL + '/rest/v1/nhan_su?email=eq.' + encodeURIComponent(email) + '&bo_phan=eq.L2&trang_thai=in.(Active,Probation)&select=email,trang_thai&limit=1';
-  const res = await fetch(url, {
-    headers: {
-      'apikey': HR_SUPABASE_ANON_KEY,
-      'Authorization': 'Bearer ' + HR_SUPABASE_ANON_KEY,
-    }
-  });
-  if (!res.ok) throw new Error('HTTP ' + res.status);
-  const data = await res.json();
-  return Array.isArray(data) && data.length > 0;
-}
-
-function ssoShowChecking(email) {
-  const btn = document.querySelector('.sso-google-btn');
-  if (btn) {
-    btn.disabled = true;
-    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1f2937" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10" stroke-opacity=".2"/><path d="M12 2a10 10 0 0 1 10 10" style="animation:ssoSpin .8s linear infinite;transform-origin:center"/></svg> Đang kiểm tra quyền truy cập...';
-  }
-  const err = document.getElementById('sso-error');
-  if (err) err.style.display = 'none';
-}
-
-function ssoHideChecking() {
-  const btn = document.querySelector('.sso-google-btn');
-  if (btn) {
-    btn.disabled = false;
-    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg> Đăng nhập với Google';
-  }
-}
-
-function ssoShowError(msg) {
-  const el = document.getElementById('sso-error');
-  el.textContent = msg;
-  el.style.display = 'block';
-}
-
-function ssoStartGoogleLogin() {
-  // Dùng OAuth2 popup redirect — không phụ thuộc One Tap / FedCM
-  const params = new URLSearchParams({
-    client_id:     SSO_CLIENT_ID,
-    redirect_uri:  window.location.origin + window.location.pathname,
-    response_type: 'token id_token',
-    scope:         'openid email profile',
-    nonce:         Math.random().toString(36).slice(2),
-    prompt:        'select_account',
-  });
-  const w = 500, h = 600;
-  const left = Math.round((screen.width - w) / 2);
-  const top  = Math.round((screen.height - h) / 2);
-  const popup = window.open(
-    'https://accounts.google.com/o/oauth2/v2/auth?' + params.toString(),
-    'google_sso',
-    `width=${w},height=${h},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes`
-  );
-  if (!popup) {
-    ssoShowError('Trình duyệt đã chặn popup. Vui lòng cho phép popup cho trang này và thử lại.');
-    return;
-  }
-  // Lắng nghe kết quả từ popup (redirect về cùng origin)
-  const timer = setInterval(function() {
-    try {
-      if (!popup || popup.closed) {
-        clearInterval(timer);
-        return;
-      }
-      const url = popup.location.href;
-      if (url && url.indexOf(window.location.origin) === 0) {
-        clearInterval(timer);
-        popup.close();
-        // Parse fragment hash: #id_token=...&access_token=...
-        const hash = popup.location.hash || url.split('#')[1] || '';
-        const result = {};
-        hash.replace(/^#/, '').split('&').forEach(part => {
-          const [k, v] = part.split('=');
-          if (k) result[decodeURIComponent(k)] = decodeURIComponent(v || '');
-        });
-        if (result.id_token) {
-          ssoHandleCredential({ credential: result.id_token });
-        } else {
-          ssoShowError('Đăng nhập thất bại hoặc bị huỷ. Vui lòng thử lại.');
-        }
-      }
-    } catch(e) {
-      // cross-origin, chờ tiếp
-    }
-  }, 300);
-}
-
-function ssoInit() {
-  // Kiểm tra auth dài hạn (7 ngày) — không phụ thuộc JWT exp
-  if (ssoIsSessionValid()) {
-    try {
-      const user = JSON.parse(localStorage.getItem(SSO_USER_KEY) || '{}');
-      if (user.email) {
-        ssoRenderUserChip(user);
-        // Gate đã display:none theo CSS mặc định — không cần làm gì thêm
-        return;
-      }
-    } catch(e) {}
-  }
-  // Chưa login hoặc hết hạn → hiện gate
-  ssoShowGate();
-}
-
-function ssoSignOut() {
-  localStorage.removeItem(SSO_AUTH_KEY);
-  localStorage.removeItem(SSO_SESSION_KEY);
-  localStorage.removeItem(SSO_USER_KEY);
-  if (typeof google !== 'undefined' && google.accounts) {
-    google.accounts.id.disableAutoSelect();
-  }
-  location.reload();
-}
-
-// Chạy SSO ngay khi script load
-ssoInit();
 
 const ADMIN_PASSWORD_HASH = '8b85ce9a68ea550e7cd7417fc9c94fe9e53cb6e151bc094d0c3053bb2533e9e3';
 const STORAGE_KEY = 'itHub_apps_v2';
@@ -1863,25 +1259,25 @@ const COLORS = [
 ];
 
 const EMOJIS = [
-  // People & Teams
+  
   '👥','👤','🧑‍💼','👨‍💻','👩‍💻','🤝','🧑‍🤝‍🧑',
-  // Data & Charts
+  
   '📊','📈','📉','🗃️','🗄️','📐','🧮',
-  // Security & IT
+  
   '🛡️','🔒','🔑','🔐','🔏','🛠️','⚙️',
-  // Files & Docs
+  
   '📁','📂','🗂️','📄','📝','📋','📑','🗒️','📰','🧾',
-  // Tools & Actions
+  
   '🔧','🔨','⚒️','🪛','🔬','🧪','🧬',
-  // Business
+  
   '💼','🏢','🏦','💰','💳','📜','🏆','🎖️','🥇',
-  // Tech & Devices
+  
   '🖥️','💻','📱','⌨️','🖱️','🖨️','💾','📡','🌐',
-  // Communication
+  
   '💬','📧','📞','📢','🔔','📣','💌',
-  // Status & Priority
+  
   '✅','❌','⚠️','🚨','🔴','🟡','🟢',
-  // Misc & Fun
+  
   '🚀','⚡','💡','🎯','🧩','🔗','🔍','📦','📌','🗓️','⏰','🔄','📤','📥','🌟','🤖',
 ];
 
@@ -1910,11 +1306,6 @@ const DEFAULT_APPS = [
   { id:'app_2', name:'IT Incident Tracker', badge:'INC', desc:'Ghi nhận và theo dõi sự cố IT theo mức độ ưu tiên P1/P2, timeline và xuất báo cáo PowerPoint.', tags:'Incident · IT', src:'Incident_Tracking.html', emoji:'🛡️', color:'red' },
 ];
 
-// ════════════════════════════════════════
-// STATE
-// ════════════════════════════════════════
-// BUILD_TS: timestamp khi index.html được load — dùng làm cache-buster cho tất cả iframe
-// Mỗi lần user load/reload trang, giá trị này thay đổi → browser buộc tải lại file HTML con
 const BUILD_TS = Date.now();
 
 let apps = [];
@@ -1925,7 +1316,6 @@ let selectedColor = 'blue';
 let selectedEmoji = '📁';
 let srcMode = 'file';
 
-// Load all apps from Supabase, ordered by `position`
 async function loadApps() {
   try {
     const { data, error } = await sb
@@ -1934,7 +1324,7 @@ async function loadApps() {
       .order('position', { ascending: true });
     if (error) throw error;
     if (!data || data.length === 0) {
-      // First run: seed default apps into Supabase
+      
       const seed = DEFAULT_APPS.map((a, i) => ({ ...a, position: i }));
       const { data: inserted, error: insErr } = await sb.from('apps').insert(seed).select();
       if (insErr) throw insErr;
@@ -1947,13 +1337,11 @@ async function loadApps() {
   }
 }
 
-// Upsert one app row to Supabase
 async function upsertApp(app) {
   const { error } = await sb.from('apps').upsert(app, { onConflict: 'id' });
   if (error) { console.error('[Supabase] upsert failed:', error); alert('Lưu lên Supabase thất bại: ' + error.message); }
 }
 
-// Delete one app row from Supabase
 async function removeApp(id) {
   const { error } = await sb.from('apps').delete().eq('id', id);
   if (error) { console.error('[Supabase] delete failed:', error); alert('Xóa trên Supabase thất bại: ' + error.message); }
@@ -1961,9 +1349,6 @@ async function removeApp(id) {
 
 function genId() { return 'app_' + Date.now(); }
 
-// ════════════════════════════════════════
-// TOAST SYSTEM
-// ════════════════════════════════════════
 let _toastId = 0;
 
 function showToast({ title, sub = '', type = 'success', duration = 3000 }) {
@@ -2009,9 +1394,6 @@ function updateToast(id, opts) {
   setTimeout(() => showToast(opts), 80);
 }
 
-// ════════════════════════════════════════
-// HARD REFRESH ALL APP CARDS
-// ════════════════════════════════════════
 async function hardRefreshApps() {
   const btn = document.getElementById('refreshBtn');
   if (!btn || btn.classList.contains('spinning')) return;
@@ -2019,7 +1401,7 @@ async function hardRefreshApps() {
   btn.classList.remove('done');
   btn.classList.add('spinning');
 
-  // Show overlay + loading toast
+  
   const overlay = document.getElementById('refresh-overlay');
   overlay.classList.add('show');
   const toastId = showToast({ title: 'Đang làm mới…', sub: 'Xóa cache · Tải lại từ server', type: 'loading', duration: 0 });
@@ -2027,17 +1409,17 @@ async function hardRefreshApps() {
   try {
     const freshTs = Date.now();
 
-    // 1. Destroy tất cả iframe → xóa hoàn toàn khỏi DOM
+    
     document.querySelectorAll('#appPanes .pane').forEach(pane => {
       const iframe = pane.querySelector('iframe');
       if (iframe) iframe.remove();
     });
 
-    // 2. Reload danh sách app từ Supabase
+    
     apps = await loadApps();
     render();
 
-    // 3. Nếu đang mở một app, tạo lại iframe đó với timestamp mới
+    
     if (typeof current === 'number' && current < apps.length) {
       const app = apps[current];
       const pane = document.getElementById('pane-' + app.id);
@@ -2061,13 +1443,13 @@ async function hardRefreshApps() {
       }
     }
 
-    // Hide overlay
+    
     overlay.classList.remove('show');
     btn.classList.remove('spinning');
     btn.classList.add('done');
     setTimeout(() => btn.classList.remove('done'), 1800);
 
-    // Success toast
+    
     dismissToast(toastId);
     showToast({
       title: 'Làm mới thành công',
@@ -2093,9 +1475,6 @@ function loadSession() {
   try { const v = localStorage.getItem(SESSION_KEY); return v !== null ? JSON.parse(v) : 'home'; } catch { return 'home'; }
 }
 
-// ════════════════════════════════════════
-// RENDER
-// ════════════════════════════════════════
 function render() { renderDropdown(); renderCards(); renderFooter(); }
 
 function renderDropdown() {
@@ -2139,9 +1518,6 @@ function renderDropdown() {
   if (dfCount) dfCount.textContent = `${apps.length} APP${apps.length !== 1 ? 'S' : ''}`;
 }
 
-// ════════════════════════════════════════
-// DROPDOWN TOGGLE
-// ════════════════════════════════════════
 let dropdownOpen = false;
 
 function toggleDropdown() {
@@ -2160,7 +1536,6 @@ function closeDropdown() {
   document.getElementById('apps-dropdown').classList.remove('open');
 }
 
-// Close dropdown on outside click
 document.addEventListener('click', e => {
   if (dropdownOpen &&
       !e.target.closest('#apps-btn') &&
@@ -2169,9 +1544,6 @@ document.addEventListener('click', e => {
   }
 });
 
-// ════════════════════════════════════════
-// ACTIVE CHIP
-// ════════════════════════════════════════
 function updateChip(app) {
   const chip    = document.getElementById('active-chip');
   const chipDot = document.getElementById('chip-dot');
@@ -2196,7 +1568,7 @@ function renderCards() {
   grid.innerHTML = '';
   apps.forEach((app, i) => {
     const color = getColor(app.color);
-    const enabled = app.enabled !== false; // default true if not set
+    const enabled = app.enabled !== false; 
     const card = document.createElement('div');
     card.className = 'card card-new' + (enabled ? '' : ' disabled');
     card.id = 'card-' + app.id;
@@ -2233,7 +1605,7 @@ function renderCards() {
     grid.appendChild(card);
   });
 
-  // Add card (admin only)
+  
   const addCard = document.createElement('div');
   addCard.className = 'card card-add';
   addCard.onclick = openAdd;
@@ -2272,13 +1644,12 @@ function getColor(name) {
   return COLORS.find(c => c.name === name) || COLORS[0];
 }
 
-// ── SVG icon library ──────────────────────────────────────
 const SVG_ICONS = {
   '👥': `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- person left -->
+    
     <circle cx="8.5" cy="7" r="2.8" fill="currentColor" opacity=".9"/>
     <path d="M2.5 18c0-3.31 2.69-5.5 6-5.5s6 2.19 6 5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none" opacity=".9"/>
-    <!-- person right (offset) -->
+    
     <circle cx="15.5" cy="7" r="2.5" fill="currentColor" opacity=".6"/>
     <path d="M11.5 18c0-2.8 1.8-4.8 4-5.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none" opacity=".6"/>
   </svg>`,
@@ -2395,7 +1766,7 @@ function getAppIcon(emoji, colorHex) {
   if (SVG_ICONS[emoji]) {
     return `<span style="color:${colorHex};display:flex;align-items:center;justify-content:center;">${SVG_ICONS[emoji]}</span>`;
   }
-  // No SVG — render the emoji character directly as text
+  
   return `<span style="font-size:24px;line-height:1;display:flex;align-items:center;justify-content:center;">${emoji}</span>`;
 }
 
@@ -2403,9 +1774,6 @@ function esc(str) {
   return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ════════════════════════════════════════
-// NAVIGATION
-// ════════════════════════════════════════
 function showHome() {
   document.getElementById('home').classList.add('active');
   document.querySelectorAll('#appPanes .pane').forEach(p => p.classList.remove('active'));
@@ -2420,7 +1788,7 @@ function openApp(idx) {
   if (idx < 0 || idx >= apps.length) { showHome(); return; }
   const app = apps[idx];
 
-  // Block access if app is under maintenance (non-admin users)
+  
   if (app.enabled === false && !isAdmin) return;
 
   document.getElementById('home').classList.remove('active');
@@ -2439,7 +1807,7 @@ function openApp(idx) {
 
   if (!pane.querySelector('iframe')) {
     const frame = document.createElement('iframe');
-    // Always bust cache so GitHub Pages serves the latest version, not a cached one
+    
     const bust = app.src.includes('://') ? app.src : app.src + '?_v=' + BUILD_TS;
     frame.src = bust;
     frame.setAttribute('allow', 'clipboard-read; clipboard-write');
@@ -2456,9 +1824,6 @@ function openApp(idx) {
   renderDropdown();
 }
 
-// ════════════════════════════════════════
-// ADMIN AUTH
-// ════════════════════════════════════════
 function setAdminUI(on) {
   isAdmin = on;
   document.body.classList.toggle('admin-mode', on);
@@ -2497,9 +1862,6 @@ async function submitLogin() {
   }
 }
 
-// ════════════════════════════════════════
-// ADD / EDIT APP
-// ════════════════════════════════════════
 function openAdd() {
   editingId = null; selectedColor = 'blue'; selectedEmoji = '📁'; srcMode = 'file';
   document.getElementById('modalIcon').textContent = '➕';
@@ -2576,9 +1938,6 @@ function switchSource(mode) {
   document.getElementById('fSrc').placeholder = mode === 'file' ? 'VD: MyApp.html' : 'https://example.com/app';
 }
 
-// ════════════════════════════════════════
-// DELETE
-// ════════════════════════════════════════
 async function toggleApp(id) {
   const app = apps.find(a => a.id === id);
   if (!app) return;
@@ -2611,15 +1970,12 @@ function deleteApp(id) {
   removeApp(id);
 }
 
-// ════════════════════════════════════════
-// EMOJI & COLOR PICKERS
-// ════════════════════════════════════════
 function onIconUrlChange(url) {
   const preview = document.getElementById('iconUrlPreview');
   if (!preview) return;
   if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
     preview.innerHTML = `<img src="${url}" alt="preview" style="width:100%;height:100%;object-fit:contain;" onerror="this.parentElement.innerHTML='❌'"/>`;
-    // Deselect emoji buttons since URL takes priority
+    
     document.querySelectorAll('#emojiGrid .emoji-btn').forEach(b => b.classList.remove('selected'));
   } else {
     preview.innerHTML = '🖼️';
@@ -2637,7 +1993,7 @@ function buildEmojiGrid() {
       selectedEmoji = em;
       grid.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
-      // Clear the URL input when an emoji is chosen
+      
       const urlInput = document.getElementById('fIconUrl');
       if (urlInput) { urlInput.value = ''; onIconUrlChange(''); }
     };
@@ -2834,9 +2190,6 @@ function renderGradientPanel(wrap) {
   });
 }
 
-// ════════════════════════════════════════
-// MODAL HELPERS
-// ════════════════════════════════════════
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) {
   document.getElementById(id).classList.remove('open');
@@ -2854,15 +2207,12 @@ document.addEventListener('keydown', e => {
     document.querySelectorAll('.modal-backdrop.open').forEach(m => closeModal(m.id));
 });
 
-// ════════════════════════════════════════
-// BACKGROUND CANVAS ANIMATION
-// ════════════════════════════════════════
 (function initBgCanvas() {
   const canvas = document.getElementById('bg-canvas');
   const ctx = canvas.getContext('2d');
   let W, H, raf;
 
-  // ── Resize ──────────────────────────────
+  
   function resize() {
     W = canvas.width  = window.innerWidth;
     H = canvas.height = window.innerHeight;
@@ -2870,7 +2220,7 @@ document.addEventListener('keydown', e => {
   window.addEventListener('resize', resize);
   resize();
 
-  // ── Aurora orbs ─────────────────────────
+  
   const ORBS = [
     { x:.12, y:.22, rx:.55, ry:.42, r:0,   dr:.00018, r2:0,   dr2:.00011, color:[99,102,241],  a:.13 },
     { x:.88, y:.75, rx:.48, ry:.38, r:1.2, dr:.00014, r2:1.5, dr2:.00009, color:[168,85,247],  a:.10 },
@@ -2880,7 +2230,7 @@ document.addEventListener('keydown', e => {
     { x:.65, y:.35, rx:.38, ry:.28, r:4.2, dr:.00012, r2:4.0, dr2:.00008, color:[245,158,11],  a:.05 },
   ];
 
-  // ── Particles ───────────────────────────
+  
   const PARTICLE_COUNT = 55;
   const particles = [];
 
@@ -2897,7 +2247,7 @@ document.addEventListener('keydown', e => {
       vx: (Math.random() - .5) * .22,
       vy: -.08 - Math.random() * .18,
       alpha: .1 + Math.random() * .45,
-      life: Math.random(),          // 0-1 phase offset
+      life: Math.random(),          
       speed: .0006 + Math.random() * .0008,
       color: c,
       twinkle: .5 + Math.random() * .5,
@@ -2906,11 +2256,11 @@ document.addEventListener('keydown', e => {
 
   for (let i = 0; i < PARTICLE_COUNT; i++) {
     const p = mkParticle();
-    p.life = Math.random(); // stagger phases
+    p.life = Math.random(); 
     particles.push(p);
   }
 
-  // ── Shooting stars ───────────────────────
+  
   const shoots = [];
   function spawnShoot() {
     if (shoots.length >= 2) return;
@@ -2928,22 +2278,22 @@ document.addEventListener('keydown', e => {
     });
   }
 
-  // ── Draw ────────────────────────────────
+  
   let t = 0;
   function draw() {
     t++;
     ctx.clearRect(0, 0, W, H);
 
-    // Base deep navy
+    
     ctx.fillStyle = '#0c1322';
     ctx.fillRect(0, 0, W, H);
 
-    // Aurora orbs — slow breathing ellipses
+    
     ORBS.forEach(o => {
       o.r  += o.dr;
       o.r2 += o.dr2;
 
-      // Gently drift center using Lissajous
+      
       const cx = (o.x + Math.sin(o.r)  * .06) * W;
       const cy = (o.y + Math.cos(o.r2) * .05) * H;
       const rx = o.rx * W * (.85 + .15 * Math.sin(o.r * 1.3));
@@ -2965,13 +2315,13 @@ document.addEventListener('keydown', e => {
       ctx.restore();
     });
 
-    // Particles
+    
     particles.forEach(p => {
       p.life += p.speed;
       p.x += p.vx;
       p.y += p.vy;
 
-      // Wrap around
+      
       if (p.x < -4) p.x = W + 4;
       if (p.x > W + 4) p.x = -4;
       if (p.y < -4) { p.y = H + 4; p.x = Math.random() * W; }
@@ -2980,7 +2330,7 @@ document.addEventListener('keydown', e => {
       const a = p.alpha * (.4 + .6 * pulse) * p.twinkle;
       const [r, g2, b] = p.color;
 
-      // Glow halo
+      
       const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
       glow.addColorStop(0,   `rgba(${r},${g2},${b},${a * .6})`);
       glow.addColorStop(1,   `rgba(${r},${g2},${b},0)`);
@@ -2989,14 +2339,14 @@ document.addEventListener('keydown', e => {
       ctx.fillStyle = glow;
       ctx.fill();
 
-      // Core dot
+      
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r * (.6 + .4 * pulse), 0, Math.PI * 2);
       ctx.fillStyle = `rgba(${r},${g2},${b},${Math.min(1, a * 1.8)})`;
       ctx.fill();
     });
 
-    // Shooting stars
+    
     spawnShoot();
     for (let i = shoots.length - 1; i >= 0; i--) {
       const s = shoots[i];
@@ -3024,7 +2374,7 @@ document.addEventListener('keydown', e => {
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      // Head flash
+      
       const hg = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, 5);
       hg.addColorStop(0, `rgba(255,255,255,${s.life})`);
       hg.addColorStop(1, `rgba(255,255,255,0)`);
@@ -3040,7 +2390,7 @@ document.addEventListener('keydown', e => {
   draw();
 })();
 (async () => {
-  // Restore admin session if it was active before refresh
+  
   if (sessionStorage.getItem('itHub_admin') === '1') {
     setAdminUI(true);
   }
@@ -3055,9 +2405,7 @@ document.addEventListener('keydown', e => {
 </script>
 
 <script>
-// ════════════════════════════════════════
-// APPLE TOUCH ICON — tự tạo PNG 180x180 cho iOS Home Screen
-// ════════════════════════════════════════
+
 (function generateAppleTouchIcon() {
   try {
     const size = 180;
@@ -3065,7 +2413,7 @@ document.addEventListener('keydown', e => {
     canvas.width = size; canvas.height = size;
     const ctx = canvas.getContext('2d');
 
-    // Bo góc iOS (40px radius)
+    
     const radius = 40;
     ctx.beginPath();
     ctx.moveTo(radius, 0);
@@ -3080,25 +2428,25 @@ document.addEventListener('keydown', e => {
     ctx.closePath();
     ctx.clip();
 
-    // Nền gradient navy
+    
     const bg = ctx.createLinearGradient(0, 0, size, size);
     bg.addColorStop(0, '#1a2a4a');
     bg.addColorStop(1, '#0a1020');
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, size, size);
 
-    // Bolt vàng — căn giữa 180x180
-    // Bolt gốc nằm trong viewBox 32x32, dùng transform để scale + căn giữa
-    // Bolt points (từ SVG path): x: 9-23, y: 4-28 → width=14, height=24, center=(16,16)
+    
+    
+    
     const boltW = 14, boltH = 24;
-    const boltScale = Math.min(size * 0.55 / boltW, size * 0.55 / boltH); // ~4.1
-    const boltCX = size / 2;  // 90
-    const boltCY = size / 2;  // 90
-    // Hàm chuyển toạ độ bolt gốc → canvas (căn giữa)
+    const boltScale = Math.min(size * 0.55 / boltW, size * 0.55 / boltH); 
+    const boltCX = size / 2;  
+    const boltCY = size / 2;  
+    
     const bx = x => boltCX + (x - 16) * boltScale;
     const by = y => boltCY + (y - 16) * boltScale;
 
-    // Glow vàng phía sau bolt — căn đúng vào giữa bolt
+    
     const glow = ctx.createRadialGradient(boltCX, boltCY, 5, boltCX, boltCY, 80);
     glow.addColorStop(0, 'rgba(232,187,80,0.35)');
     glow.addColorStop(1, 'rgba(232,187,80,0)');
@@ -3118,7 +2466,7 @@ document.addEventListener('keydown', e => {
     ctx.closePath();
     ctx.fill();
 
-    // Gắn link vào <head>
+    
     const link = document.createElement('link');
     link.rel  = 'apple-touch-icon';
     link.href = canvas.toDataURL('image/png');
@@ -3129,127 +2477,5 @@ document.addEventListener('keydown', e => {
 })();
 </script>
 
-<script>
-// ════════════════════════════════════════
-// SSO BACKGROUND CANVAS ANIMATION
-// ════════════════════════════════════════
-(function() {
-  function initSSOCanvas() {
-    const canvas = document.getElementById('sso-bg-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    let W, H, particles, raf;
-
-    function resize() {
-      W = canvas.width  = window.innerWidth;
-      H = canvas.height = window.innerHeight;
-    }
-
-    // Particle types: orbs + sparkles
-    function mkParticle() {
-      const isOrb = Math.random() > 0.55;
-      return {
-        x: Math.random() * W,
-        y: Math.random() * H,
-        r: isOrb ? 120 + Math.random() * 200 : 1.5 + Math.random() * 2.5,
-        isOrb,
-        vx: (Math.random() - .5) * (isOrb ? .18 : .35),
-        vy: (Math.random() - .5) * (isOrb ? .18 : .35),
-        alpha: isOrb ? .04 + Math.random() * .06 : .3 + Math.random() * .5,
-        hue: Math.random() > .5
-          ? `232,187,80`   // gold
-          : Math.random() > .5
-            ? `100,140,255` // blue
-            : `80,200,180`, // teal
-        phase: Math.random() * Math.PI * 2,
-        speed: .003 + Math.random() * .005,
-      };
-    }
-
-    function init() {
-      resize();
-      particles = [];
-      // 6 large orbs
-      for (let i = 0; i < 6; i++) { const p = mkParticle(); p.isOrb = true; p.r = 150 + Math.random()*220; particles.push(p); }
-      // 55 sparkles
-      for (let i = 0; i < 55; i++) { const p = mkParticle(); p.isOrb = false; particles.push(p); }
-    }
-
-    function draw(t) {
-      ctx.clearRect(0, 0, W, H);
-
-      particles.forEach(p => {
-        p.phase += p.speed;
-        const pulse = Math.sin(p.phase) * .5 + .5;
-
-        if (p.isOrb) {
-          const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
-          grd.addColorStop(0,   `rgba(${p.hue},${p.alpha * (0.6 + pulse * .4)})`);
-          grd.addColorStop(0.5, `rgba(${p.hue},${p.alpha * .3})`);
-          grd.addColorStop(1,   `rgba(${p.hue},0)`);
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-          ctx.fillStyle = grd;
-          ctx.fill();
-        } else {
-          // Sparkle: cross / diamond shape
-          const a = p.alpha * (.5 + pulse * .5);
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate(p.phase * .5);
-          ctx.globalAlpha = a;
-          ctx.fillStyle = `rgba(${p.hue},1)`;
-          const s = p.r * (0.8 + pulse * .4);
-          // small cross
-          ctx.fillRect(-s*.15, -s, s*.3, s*2);
-          ctx.fillRect(-s, -s*.15, s*2, s*.3);
-          ctx.restore();
-        }
-
-        // Move
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.x < -p.r) p.x = W + p.r;
-        if (p.x > W + p.r) p.x = -p.r;
-        if (p.y < -p.r) p.y = H + p.r;
-        if (p.y > H + p.r) p.y = -p.r;
-      });
-
-      // Subtle scan line sweep
-      const scanY = (t * .04) % H;
-      const scanGrd = ctx.createLinearGradient(0, scanY - 60, 0, scanY + 60);
-      scanGrd.addColorStop(0,   'rgba(232,187,80,0)');
-      scanGrd.addColorStop(0.5, 'rgba(232,187,80,.018)');
-      scanGrd.addColorStop(1,   'rgba(232,187,80,0)');
-      ctx.fillStyle = scanGrd;
-      ctx.fillRect(0, scanY - 60, W, 120);
-
-      raf = requestAnimationFrame(draw);
-    }
-
-    // Only run while gate is visible
-    const observer = new MutationObserver(() => {
-      const gate = document.getElementById('sso-gate');
-      if (!gate) return;
-      const hidden = gate.style.display === 'none';
-      if (hidden && raf) { cancelAnimationFrame(raf); raf = null; }
-      else if (!hidden && !raf) { raf = requestAnimationFrame(draw); }
-    });
-
-    const gate = document.getElementById('sso-gate');
-    if (gate) observer.observe(gate, { attributes: true, attributeFilter: ['style'] });
-
-    window.addEventListener('resize', () => { resize(); });
-    init();
-    raf = requestAnimationFrame(draw);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initSSOCanvas);
-  } else {
-    initSSOCanvas();
-  }
-})();
-</script>
 </body>
 </html>
