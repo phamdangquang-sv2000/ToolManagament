@@ -24,7 +24,7 @@ if (!window.SUPABASE_CONFIG) {
   @keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
   .drop-active{border-color:#6366f1!important;background:#eef2ff!important;transform:scale(1.01)}
 
-  /* ===== Dropzone idle animations ===== */
+  
   #dropzone{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(238,242,255,.55),rgba(252,231,243,.45),rgba(224,242,254,.55));background-size:200% 200%;animation:dz-bg 8s ease infinite;transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease}
   #dropzone:hover{transform:translateY(-2px);box-shadow:0 18px 40px -20px rgba(99,102,241,.35);border-color:#a5b4fc!important}
   #dropzone::before{content:"";position:absolute;inset:-2px;border-radius:18px;padding:2px;background:conic-gradient(from 0deg,#6366f1,#ec4899,#22d3ee,#6366f1);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .3s;animation:dz-spin 6s linear infinite;pointer-events:none}
@@ -43,7 +43,7 @@ if (!window.SUPABASE_CONFIG) {
   @keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
   ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:8px}
 
-  /* ============ Gamification ============ */
+  
   @keyframes gm-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
   @keyframes gm-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px) rotate(-2deg)}75%{transform:translateX(4px) rotate(2deg)}}
   @keyframes gm-pop{0%{transform:scale(.5);opacity:0}60%{transform:scale(1.15);opacity:1}100%{transform:scale(1);opacity:1}}
@@ -75,7 +75,6 @@ if (!window.SUPABASE_CONFIG) {
 </head>
 <body class="text-slate-800">
 
-<!-- Mobile block -->
 <div id="mobileBlock" class="hidden fixed inset-0 z-[9999] bg-white flex-col items-center justify-center p-8 text-center">
   <div class="text-6xl mb-4">🖥️</div>
   <h1 class="text-2xl font-bold mb-2">Vui lòng sử dụng Desktop / Laptop</h1>
@@ -84,12 +83,10 @@ if (!window.SUPABASE_CONFIG) {
 
 <div id="app"></div>
 
-<!-- Toast -->
 <div id="toast" class="fixed top-5 right-5 z-50 space-y-2"></div>
 
 <script>
-/* ====================== CONFIG ====================== */
-// Runtime config — không chứa credentials dạng plain text
+
 window.__cfg = { u: window.SUPABASE_CONFIG['CAT_Tracking.html'].url, k: window.SUPABASE_CONFIG['CAT_Tracking.html'].key };
 const SUPABASE_URL = window.__cfg.u;
 const SUPABASE_ANON_KEY = window.__cfg.k;
@@ -124,8 +121,6 @@ try {
   if (e.message !== 'not_configured') showSetup('Lỗi khởi tạo Supabase: ' + e.message);
 }
 
-/* ====================== STATE ====================== */
-// Local-time YYYY-MM-DD (tránh lệch ngày do UTC sau 00:00 giờ VN)
 function _localDateStr(d){
   const x = new Date(d);
   const y = x.getFullYear();
@@ -158,7 +153,6 @@ function setKpiPreset(p){
   state.role==='admin'?drawAdmin():drawEmployee();
 }
 
-/* ====================== UTILS ====================== */
 const $ = s => document.querySelector(s);
 const fmt = d => new Date(d).toLocaleString('vi-VN');
 function toast(msg, type='info'){
@@ -173,16 +167,11 @@ async function sha256(file){
   const hash=await crypto.subtle.digest('SHA-256',buf);
   return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-/* ============ CONTENT-AWARE HASH ============
-   Với .eml: dedup theo Message-ID (header chuẩn của email).
-   → Dù nhân viên đổi tên file + sửa 1 byte (whitespace, metadata),
-     Message-ID vẫn giữ nguyên ⇒ hash giống ⇒ DB chặn trùng ngay.
-   Với các loại khác: fallback SHA-256 nội dung file.
-============================================ */
+
 async function contentHash(file){
   try{
     if(/\.eml$/i.test(file.name)){
-      // đọc tối đa 64KB đầu (đủ chứa toàn bộ header)
+      
       const head = await file.slice(0, 64*1024).text();
       const m = head.match(/^\s*Message-ID\s*:\s*<([^>\r\n]+)>/im);
       if(m && m[1]){
@@ -203,32 +192,31 @@ function parseName(filename){
   const m=base.match(/^(.+?)_CAT$/i) || base.match(/^([^_]+)_/);
   if(!m) return null;
   const raw=m[1].trim();
-  // tìm employee có tên (không dấu, không khoảng trắng) khớp với raw
+  
   const key=normalizeName(raw);
   const emp=(state.employees||[]).find(e=>normalizeName(e.name)===key);
-  // WHITELIST: chỉ chấp nhận employee đã có trong danh sách. Không tự tạo mới.
+  
   return emp ? emp.name : null;
 }
 function evidenceKey(filename){
   const leaf=(filename||'').split('/').pop();
-  // Bỏ phần mở rộng cuối, lặp lại nếu là đuôi quen thuộc (xử lý "....eml.eml")
+  
   let base=leaf;
   const KNOWN=/\.(eml|msg|pdf|png|jpe?g|gif|bmp|webp|html?|txt|zip|rar|7z|docx?|xlsx?|pptx?)$/i;
   while(KNOWN.test(base)) base=base.replace(KNOWN,'');
-  // Nếu có @heineken.com → chỉ giữ phần local-part trước @ (chuẩn hoá mạnh hơn)
+  
   const atIdx=base.toLowerCase().indexOf('@heineken.com');
   if(atIdx>=0) base=base.slice(0,atIdx);
-  // strip các hậu tố "gian lận" thường dùng để né dedup: _copy, _v2, _new, _final, -bak,…
-  // KHÔNG strip số thuần (dong1, dong2, dong3) vì đó là nhân viên trùng họ tên hợp lệ
-  // Bắt buộc có dấu phân cách trước keyword để không nhầm email thật (phamvan.dongcopy@)
+  
+  
+  
   const DEDUP_SUFFIX=/[\s._\-]+\(?\s*(v\d+|copy|new|final|bak|backup|dup)\s*\)?$/i;
   base=base.replace(DEDUP_SUFFIX,'');
-  // chạy thêm 1 vòng để xử lý chuỗi như "abc_v2_copy"
+  
   base=base.replace(DEDUP_SUFFIX,'');
   return normalizeName(base).replace(/[^a-z0-9]/g,'');
 }
 
-/* ====================== AUTH ====================== */
 async function checkAuth(){
   if(!sb) return;
   const { data:{ session } } = await sb.auth.getSession();
@@ -238,21 +226,20 @@ async function checkAuth(){
 if(sb) sb.auth.onAuthStateChange((_e,s)=>{
   if(s){
     state.user=s.user;
-    // Chỉ render admin nếu KHÔNG đang ở chế độ nhân viên (tránh bị đá về admin khi xem với tư cách nhân viên)
+    
     if(state.role !== 'employee'){
       state.role='admin';
       renderAdmin();
     }
-    // Nếu đang ở employee mode → giữ nguyên, không làm gì
+    
   } else {
-    // Session hết → về landing (renderLanding() sẽ tự reset state.role)
+    
     renderLanding();
   }
 });
 
-/* ====================== RENDER ====================== */
 function renderLanding(){
-  // Reset role khi về landing (dù từ Thoát nhân viên hay logout admin)
+  
   state.role = null;
   state.employeeName = '';
   try{ stopFireworksLoop(); }catch(e){}
@@ -280,7 +267,7 @@ async function login(){
 }
 async function logout(){
   document.getElementById('suspicious-modal')?.remove();
-  // Reset role về null TRƯỚC khi signOut để onAuthStateChange không nhầm
+  
   state.role = null;
   state.user = null;
   state.employeeName = '';
@@ -291,7 +278,6 @@ function enterEmployee(){
   renderEmployee();
 }
 
-/* ====================== DATA ====================== */
 async function loadAll(){
   const [emps, files, settings, daily, suspChecked] = await Promise.all([
     sb.from('employees').select('*').order('name'),
@@ -305,34 +291,33 @@ async function loadAll(){
   if(settings.data) state.kpiTarget=settings.data.daily_target;
   state.dailyTargets={};
   (daily.data||[]).forEach(r=>{ state.dailyTargets[r.date]=r.target; });
-  // Map base_email → {checked_at, checked_by}
+  
   state.suspiciousChecked={};
   (suspChecked.data||[]).forEach(r=>{ state.suspiciousChecked[r.base_email]=r; });
-  // Tính dung lượng thực tế từ Supabase Storage API (không dùng size trong DB)
-  state.storageUsed=null; // hiện "Đang tải..." trước
-  _fetchRealStorageSize(); // load async, tự update card sau
+  
+  state.storageUsed=null; 
+  _fetchRealStorageSize(); 
 }
 
-/* Gọi Storage API để lấy size thật của từng file trong bucket */
 async function _fetchRealStorageSize(){
   try{
-    // Lấy danh sách folder prefix từ storage_path đang có trong DB
+    
     const paths = (state.files||[]).map(f=>f.storage_path).filter(Boolean);
-    // Lấy unique folder (phần trước dấu / cuối cùng)
+    
     const folders = [...new Set(paths.map(p=>{
       const parts = p.split('/');
-      parts.pop(); // bỏ filename
+      parts.pop(); 
       return parts.join('/');
     }))].filter(Boolean);
 
     let totalBytes = 0;
 
     if(folders.length === 0){
-      // Không có folder nào → thử list root
+      
       const {data} = await sb.storage.from(BUCKET).list('', {limit:1000});
       if(data) totalBytes = data.reduce((s,f)=>s+(f.metadata?.size||0),0);
     } else {
-      // List từng folder, cộng size thật
+      
       const results = await Promise.all(
         folders.map(folder =>
           sb.storage.from(BUCKET).list(folder, {limit:1000})
@@ -344,21 +329,20 @@ async function _fetchRealStorageSize(){
     }
 
     state.storageUsed = totalBytes;
-    // Chỉ patch đúng card storage, KHÔNG gọi drawAdmin() để tránh re-render toàn trang gây nhảy UI
+    
     _patchStorageCard();
   } catch(e){
     console.warn('Storage API error:', e);
-    // Fallback về size trong DB nếu API lỗi
+    
     const totalBytes=(state.files||[]).reduce((sum,f)=>sum+(f.size||0),0);
     state.storageUsed=totalBytes;
     _patchStorageCard();
   }
 }
 
-/* Cập nhật card Storage tại chỗ mà không redraw toàn trang */
 function _patchStorageCard(){
   const wrap = document.getElementById('storage-card-wrap');
-  if(!wrap) return; // admin chưa render xong hoặc không ở trang admin → bỏ qua
+  if(!wrap) return; 
   const tmp = document.createElement('div');
   tmp.innerHTML = storageCard();
   const newCard = tmp.firstElementChild;
@@ -384,10 +368,7 @@ function computeStatsRange(from,to){
   });
 }
 
-
-
-/* ====================== GAMIFICATION ====================== */
-const GM_DEADLINE_HOUR = 17; // giờ deadline coi là "đúng giờ"
+const GM_DEADLINE_HOUR = 17; 
 const _gm = { lastUploadTs: 0, comboCount: 0, comboTimer: null };
 
 function _gmDateStr(d){
@@ -399,14 +380,13 @@ function _gmDateStr(d){
 }
 function _gmDaysAgo(n){ const d=new Date(); d.setDate(d.getDate()-n); return _gmDateStr(d); }
 
-// Streak: số ngày liên tiếp tính lùi từ hôm nay (bỏ qua hôm nay nếu chưa đạt) mà NV upload ≥ target và file cuối ≤ deadline
 function computeStreak(empName){
   if(!empName) return 0;
   const files = state.files.filter(f=>f.employee_name===empName);
   let streak = 0;
   const today = new Date(); today.setHours(0,0,0,0);
   let cur = new Date(today);
-  // nếu hôm nay chưa đạt thì bắt đầu từ hôm qua
+  
   const todayStr = _gmDateStr(today);
   const todayFiles = files.filter(f=>_localDateStr(f.uploaded_at)===todayStr);
   const todayTarget = getTargetFor(todayStr);
@@ -425,10 +405,9 @@ function computeStreak(empName){
   return streak;
 }
 
-// Badge tier dựa trên streak hoặc số ngày đạt KPI trong 90 ngày gần nhất
 function computeBadge(empName){
   const streak = computeStreak(empName);
-  // đếm ngày đạt KPI trong 90 ngày gần nhất
+  
   let achieved = 0;
   const files = state.files.filter(f=>f.employee_name===empName);
   for(let i=0;i<90;i++){
@@ -458,7 +437,6 @@ function renderBadgeOnly(empName){
   return b ? `<span class="gm-badge" data-tier="${b.tier}" title="${b.label}">${b.icon}</span>` : '';
 }
 
-// Top 3 sớm nhất theo ngày (theo file đầu tiên trong ngày)
 function computeLeaderboardForDate(dateStr){
   const map = {};
   state.files.forEach(f=>{
@@ -511,7 +489,7 @@ function renderLeaderboardCard(){
 
   let body;
   if(dates.length === 0){
-    // Fallback: dùng hôm nay nếu range không hợp lệ
+    
     body = renderRows(computeLeaderboardForDate(_gmDateStr(new Date())));
   } else if(isSingle){
     body = renderRows(computeLeaderboardForDate(dates[0]));
@@ -534,7 +512,6 @@ function renderLeaderboardCard(){
   </div>`;
 }
 
-// Confetti
 function fireConfetti(){
   if(typeof confetti !== 'function') return;
   confetti({particleCount: 120, spread: 80, origin: {y: 0.6}});
@@ -542,7 +519,6 @@ function fireConfetti(){
   setTimeout(()=>confetti({particleCount: 80, spread: 100, angle: 120, origin: {x:1,y:.7}}), 400);
 }
 
-/* ===== Fireworks burst (chạy ~6s khi cả team Completed, tự dừng) ===== */
 let _fwTimer = null;
 let _fwStopAt = 0;
 const FW_DURATION_MS = 6000;
@@ -560,7 +536,7 @@ function stopFireworksLoop(){
   _fwStopAt = 0;
 }
 function startFireworksBurst(){
-  if(_fwTimer) return; // đang chạy
+  if(_fwTimer) return; 
   _fwBurst();
   _fwStopAt = Date.now() + FW_DURATION_MS;
   _fwTimer = setInterval(()=>{
@@ -574,7 +550,7 @@ function isTeamAllDone(){
   const stats = computeStats(today);
   return stats.length>0 && stats.every(s=>s.status==='Completed');
 }
-// Chỉ bắn lại khi trạng thái CHUYỂN từ "chưa xong" → "xong"
+
 let _fwLastAllDone = false;
 function evaluateFireworks(){
   if(state.role !== 'employee'){ stopFireworksLoop(); _fwLastAllDone = false; return; }
@@ -582,13 +558,12 @@ function evaluateFireworks(){
   if(allDone && !_fwLastAllDone){
     startFireworksBurst();
   } else if(!allDone){
-    // ai đó quay về Pending → dừng ngay & cho phép bắn lại lần sau
+    
     stopFireworksLoop();
   }
   _fwLastAllDone = allDone;
 }
 
-// Combo
 function triggerCombo(){
   const now = Date.now();
   if(now - _gm.lastUploadTs < 5000){
@@ -610,8 +585,7 @@ function showComboPopup(n){
   setTimeout(()=>el.remove(), 1400);
 }
 
-// Team complete (dùng chung trợ lý kpi-assistant đã có sẵn)
-function renderMascot(){ /* no-op: dùng #kpi-assistant có sẵn */ }
+function renderMascot(){  }
 function checkTeamComplete(){
   if(!state.employees || !state.employees.length) return;
   const today = _gmDateStr(new Date());
@@ -620,7 +594,7 @@ function checkTeamComplete(){
   const key = 'gm_team_celebrated_'+today;
   if(allDone && !localStorage.getItem(key)){
     localStorage.setItem(key,'1');
-    // làm trợ lý có sẵn nhảy + đổi màu cầu vồng
+    
     const wrap = document.getElementById('kpi-assistant');
     if(wrap){
       wrap.classList.add('mood-happy-jump','gm-celebrate');
@@ -644,8 +618,6 @@ function checkPersonalComplete(empName){
   }
 }
 
-/* ====================== SUSPICIOUS FILES DETECTION ====================== */
-// Lấy base email (bỏ số cuối): "phamvan.dong1" → "phamvan.dong", "phamvan.dong" → "phamvan.dong"
 function emailBase(filename){
   const leaf = (filename||'').split('/').pop();
   const KNOWN = /\.(eml|msg|pdf|png|jpe?g|gif|bmp|webp|html?|txt|zip|rar|7z|docx?|xlsx?|pptx?)$/i;
@@ -653,13 +625,13 @@ function emailBase(filename){
   while(KNOWN.test(base)) base = base.replace(KNOWN,'');
   const atIdx = base.toLowerCase().indexOf('@heineken.com');
   if(atIdx >= 0) base = base.slice(0, atIdx);
-  // bỏ số ở cuối để lấy base: dong1 → dong, dong2 → dong
+  
   return normalizeName(base).replace(/[^a-z0-9]/g,'').replace(/\d+$/, '');
 }
 
 function detectSuspiciousGroups(){
   const files = state.files || [];
-  // Group files by emailBase
+  
   const baseMap = {};
   for(const f of files){
     const b = emailBase(f.filename);
@@ -667,11 +639,11 @@ function detectSuspiciousGroups(){
     if(!baseMap[b]) baseMap[b] = [];
     baseMap[b].push(f);
   }
-  // Suspicious = cùng base nhưng có ít nhất 2 local-part khác nhau
-  // ví dụ: phamvandong + phamvandong1 → base "phamvandong" → nghi ngờ
+  
+  
   const groups = [];
   for(const [base, arr] of Object.entries(baseMap)){
-    // lấy distinct local-parts (trước khi bỏ số)
+    
     const KNOWN = /\.(eml|msg|pdf|png|jpe?g|gif|bmp|webp|html?|txt|zip|rar|7z|docx?|xlsx?|pptx?)$/i;
     const localParts = arr.map(f => {
       let b = (f.filename||'').split('/').pop();
@@ -682,138 +654,13 @@ function detectSuspiciousGroups(){
     });
     const distinctLocals = [...new Set(localParts)];
     if(distinctLocals.length >= 2){
-      // có ít nhất 2 local-part khác nhau cùng base → nghi ngờ
+      
       groups.push({ base, files: arr, distinctLocals });
     }
   }
   return groups;
 }
 
-// Supabase helpers cho trạng thái đã check nghi ngờ
-async function markSuspiciousGroup(base, done){
-  if(done){
-    const {error} = await sb.from('kpi_suspicious_checked').upsert({
-      base_email: base,
-      checked_at: new Date().toISOString(),
-      checked_by: state.user?.email || ''
-    }, {onConflict: 'base_email'});
-    if(error) return toast(error.message, 'error');
-    state.suspiciousChecked[base] = { base_email: base, checked_at: new Date().toISOString(), checked_by: state.user?.email||'' };
-  } else {
-    const {error} = await sb.from('kpi_suspicious_checked').delete().eq('base_email', base);
-    if(error) return toast(error.message, 'error');
-    delete state.suspiciousChecked[base];
-  }
-  // re-render modal in place
-  const modal = document.getElementById('suspicious-modal');
-  if(modal){ modal.remove(); openSuspiciousModal(); }
-  // update nav icon badge
-  const btn = document.getElementById('suspicious-icon-btn');
-  if(btn){ btn.outerHTML = buildSuspiciousIconHTML(); }
-}
-
-function buildSuspiciousIconHTML(){
-  const groups = detectSuspiciousGroups();
-  if(!groups.length) return '';
-  const checked = state.suspiciousChecked || {};
-  const pending = groups.filter(g => !checked[g.base]).length;
-  const allDone = pending === 0;
-  const badge = allDone
-    ? `<span class="absolute -top-1.5 -right-1.5 bg-emerald-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center leading-none">✓</span>`
-    : `<span class="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center leading-none">${pending}</span>`;
-  const bg = allDone ? 'bg-emerald-100 hover:bg-emerald-200 border-emerald-300 text-emerald-800' : 'bg-amber-100 hover:bg-amber-200 border-amber-300 text-amber-800';
-  const label = allDone ? `✅ 0 nghi ngờ` : `⚠️ ${pending} chờ check`;
-  return `<button id="suspicious-icon-btn" onclick="toggleSuspiciousModal()" title="Nhóm file nghi ngờ cần kiểm tra"
-    class="relative flex items-center gap-1.5 ${bg} border px-3 py-1.5 rounded-lg text-sm font-medium transition">
-    <span>${label}</span>${badge}
-  </button>`;
-}
-
-function renderSuspiciousIcon(){
-  return buildSuspiciousIconHTML();
-}
-
-function openSuspiciousModal(){
-  const groups = detectSuspiciousGroups();
-  const checked = state.suspiciousChecked || {};
-  const pending = groups.filter(g => !checked[g.base]).length;
-
-  // Sắp xếp: chờ check (pending) lên đầu, đã done xuống dưới
-  const sortedGroups = [...groups].sort((a, b) => {
-    const aDone = !!checked[a.base];
-    const bDone = !!checked[b.base];
-    if (aDone === bDone) return 0;
-    return aDone ? 1 : -1;
-  });
-
-  const rows = sortedGroups.map(g => {
-    const isDone = !!checked[g.base];
-    const rec = checked[g.base];
-    const sorted = [...g.files].sort((a,b) => a.filename.localeCompare(b.filename));
-    const fileRows = sorted.map(f =>
-      `<tr class="border-b last:border-0 ${isDone ? 'opacity-50' : 'hover:bg-amber-50'}">
-        <td class="py-1.5 px-2 font-mono text-xs ${isDone ? 'text-slate-400 line-through' : 'text-amber-900'}">${f.filename}</td>
-        <td class="py-1.5 px-2 text-xs ${isDone ? 'text-slate-400' : ''}">${f.employee_name}</td>
-        <td class="py-1.5 px-2 text-xs text-slate-400">${fmt(f.uploaded_at)}</td>
-      </tr>`
-    ).join('');
-
-    const doneAt = rec ? new Date(rec.checked_at).toLocaleString('vi-VN') : null;
-    const doneBy = rec?.checked_by || '';
-
-    return `<div class="mb-3 last:mb-0 rounded-xl border ${isDone ? 'border-emerald-200 bg-emerald-50/40' : 'border-amber-200 bg-white'} overflow-hidden">
-      <div class="flex items-center gap-2 px-3 py-2 ${isDone ? 'bg-emerald-50' : 'bg-amber-50'}">
-        <span class="text-xs font-semibold ${isDone ? 'text-emerald-700' : 'text-amber-800'} flex-1">
-          📧 <code class="px-1.5 py-0.5 rounded font-mono ${isDone ? 'bg-emerald-100' : 'bg-amber-100'}">${g.base}</code>
-          <span class="font-normal ml-1">→ ${g.distinctLocals.join(', ')}</span>
-        </span>
-        ${isDone
-          ? `<span class="text-xs text-emerald-600 mr-2" title="Bởi ${doneBy}">✓ ${doneAt}${doneBy ? ' · ' + doneBy : ''}</span>
-             <button onclick="markSuspiciousGroup('${g.base}', false)"
-               class="text-xs text-slate-400 hover:text-rose-500 border border-slate-200 rounded px-2 py-0.5 bg-white">Bỏ đánh dấu</button>`
-          : `<button onclick="markSuspiciousGroup('${g.base}', true)"
-               class="text-xs font-medium text-white bg-emerald-500 hover:bg-emerald-600 rounded px-3 py-1 shrink-0">✓ Đánh dấu done</button>`
-        }
-      </div>
-      <table class="w-full text-sm">
-        <thead><tr class="text-xs border-b ${isDone ? 'text-slate-400' : 'text-amber-700'}">
-          <th class="py-1.5 px-3 text-left font-semibold">Tên file</th>
-          <th class="py-1.5 px-3 text-left font-semibold">Nhân viên</th>
-          <th class="py-1.5 px-3 text-left font-semibold">Thời gian</th>
-        </tr></thead>
-        <tbody>${fileRows}</tbody>
-      </table>
-    </div>`;
-  }).join('');
-
-  const modal = document.createElement('div');
-  modal.id = 'suspicious-modal';
-  modal.className = 'fixed inset-0 z-50 flex items-start justify-end p-4 pt-16 pointer-events-none';
-  modal.innerHTML = `
-    <div class="pointer-events-auto w-full max-w-2xl max-h-[80vh] overflow-y-auto bg-white rounded-2xl shadow-2xl border border-amber-200">
-      <div class="sticky top-0 bg-amber-50 border-b border-amber-200 px-5 py-3 flex items-center gap-2 rounded-t-2xl">
-        <span class="text-lg">⚠️</span>
-        <span class="font-bold text-amber-800">${groups.length} nhóm nghi ngờ — còn ${pending} chờ check</span>
-        <button onclick="document.getElementById('suspicious-modal').remove()" class="ml-auto text-slate-400 hover:text-slate-700 text-xl leading-none">×</button>
-      </div>
-      <div class="px-5 py-3 text-sm text-slate-600 bg-amber-50/50 border-b border-amber-100">
-        Các file có <b>email gần giống nhau</b> (khác số cuối). Có thể là 2 nhân viên trùng họ tên hợp lệ hoặc 1 người upload lại. Admin check xong thì bấm <b>✓ Đánh dấu done</b>.
-      </div>
-      <div class="p-4">${rows}</div>
-    </div>`;
-  document.body.appendChild(modal);
-  modal.addEventListener('click', e => { if(e.target === modal) modal.remove(); });
-}
-
-function toggleSuspiciousModal(){
-  const existing = document.getElementById('suspicious-modal');
-  if(existing){ existing.remove(); return; }
-  openSuspiciousModal();
-}
-
-function renderSuspiciousPanel(){ return ''; } // kept for compat, no longer used
-
-/* ====================== ADMIN ====================== */
 async function renderAdmin(){
   $('#app').innerHTML=`<div class="p-8"><div class="skeleton h-32 rounded-2xl mb-4"></div><div class="skeleton h-96 rounded-2xl"></div></div>`;
   await loadAll();
@@ -840,8 +687,6 @@ function drawAdmin(){
         <input type="date" value="${state.date}" onchange="state.date=this.value;drawAdmin()" class="border rounded-lg px-3 py-2"/>
         <label class="text-sm">KPI ngày này: <input id="kpiT" type="number" value="${todayTarget}" class="w-16 border rounded px-2 py-1 ml-1"/></label>
         <button onclick="saveKPI()" class="bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm" title="Lưu KPI riêng cho ngày ${state.date}">Lưu</button>
-        ${renderSuspiciousIcon()}
-        <button onclick="exportExcel()" class="bg-emerald-500 text-white px-3 py-2 rounded-lg text-sm">Excel</button>
         <button onclick="logout()" class="text-slate-500 hover:text-slate-800 text-sm">Đăng xuất</button>
       </div>
     </nav>
@@ -855,7 +700,6 @@ function drawAdmin(){
     </div>
 
     <div class="px-8 mb-2">${renderLeaderboardCard()}</div>
-    ${renderSuspiciousPanel()}
 
     <div class="px-8 grid grid-cols-3 gap-6">
       <div class="col-span-2 glass rounded-2xl p-6 shadow">
@@ -873,9 +717,6 @@ function drawAdmin(){
             <input placeholder="Tìm nhân viên..." oninput="filterRows(this.value)" class="border rounded-lg px-3 py-1.5 text-sm"/>
           </div>
         </div>
-         <div class="flex justify-end mb-2">
-          <button onclick="remindAllPending()" class="bg-rose-500 hover:bg-rose-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium">📧 Nhắc tất cả Pending</button>
-         </div>
          <table class="w-full text-sm"><thead class="text-left text-slate-500 border-b">
           <tr><th class="py-2">Nhân viên</th><th>File</th><th>Trạng thái</th><th>Upload cuối</th><th>Hành động</th></tr></thead>
           <tbody id="rows">${stats.map(s=>`
@@ -924,8 +765,6 @@ function drawAdmin(){
             <input type="date" value="${state.fromDate}" onchange="setRange('fromDate',this.value)" class="border rounded-lg px-2 py-1"/>
             <span class="text-slate-500">đến</span>
            <input type="date" value="${state.toDate}" onchange="setRange('toDate',this.value)" class="border rounded-lg px-2 py-1"/>
-            <button onclick="downloadAllFiles()" class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium">⬇ Tải tất cả</button>
-            <button onclick="exportUploadsExcel()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium ml-2">Excel</button>
           </div>
         </div>
         <table class="w-full text-sm"><thead class="text-left text-slate-500 border-b">
@@ -944,7 +783,7 @@ function drawAdmin(){
 function card(label,val,grad){return `<div class="glass rounded-2xl p-5 shadow"><div class="text-sm text-slate-500">${label}</div><div class="text-3xl font-bold mt-1 bg-gradient-to-r ${grad} bg-clip-text text-transparent">${val}</div></div>`}
 function storageCard(){
   const used=state.storageUsed;
-  const limitMB=1024; // 1 GB free tier
+  const limitMB=1024; 
   if(used===null) return `<div id="storage-card-wrap" class="glass rounded-2xl p-5 shadow"><div class="text-sm text-slate-500">Dung lượng Storage</div><div class="text-lg font-bold mt-1 text-slate-400">Đang tải...</div></div>`;
   const usedMB=(used/1024/1024);
   const pct=Math.min(100,(usedMB/limitMB*100));
@@ -1016,18 +855,6 @@ function remindEmp(name,count,target){
   window.open(url,'_blank');
   if(!to) toast(`Chưa có email cho ${name} — hãy nhập thủ công trong cửa sổ mail.`,'info');
 }
-function remindAllPending(){
-  const stats=computeStatsRange(state.fromDate,state.toDate).filter(s=>s.status==='Pending');
-  if(!stats.length) return toast('Không có nhân viên Pending nào!','success');
-  if(!confirm(`Gửi mail nhắc cho ${stats.length} nhân viên Pending?`)) return;
-  const tos=stats.map(s=>(state.employees.find(e=>e.name===s.name)?.email)).filter(Boolean);
-  const names=stats.map(s=>`• ${s.name} (${s.count}/${s.target} file)`).join('\n');
-  const subject=`[Nhắc nhở KPI] ${stats.length} nhân viên chưa hoàn thành KPI ${_rangeLabel()}`;
-  const body=`Xin chào,\n\nDanh sách nhân viên chưa hoàn thành KPI ${_rangeLabel()} (${state.fromDate} → ${state.toDate}):\n\n${names}\n\nVui lòng hoàn tất phần còn lại sớm nhất có thể.\nLink Tracking: https://phamdangquang-sv2000.github.io/tracking-kpi-l2/\n\nTrân trọng,\nKPI Admin`;
-  const cc='TangHien.Phat@heineken.com';
-  const url=`mailto:${encodeURIComponent(tos.join(','))}?cc=${encodeURIComponent(cc)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  window.open(url,'_blank');
-}
 async function downloadFile(path,name){
   const {data,error}=await sb.storage.from(BUCKET).download(path);
   if(error) return toast(error.message,'error');
@@ -1035,63 +862,6 @@ async function downloadFile(path,name){
   const a=document.createElement('a');a.href=url;a.download=name;a.click();
 }
 
-function exportExcel(){
-  const stats=computeStatsRange(state.fromDate,state.toDate);
-  const target=sumTargetRange(state.fromDate,state.toDate);
-  const same=state.fromDate===state.toDate;
-  const label=same?state.fromDate:`${state.fromDate}_den_${state.toDate}`;
-  const ws=XLSX.utils.json_to_sheet(stats.map(s=>({'Nhân viên':s.name,'Số file':s.count,'KPI':target,'Trạng thái':s.status,'Upload cuối':s.last?fmt(s.last):'-'})));
-  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'KPI');
-  XLSX.writeFile(wb,`KPI_${label}.xlsx`);
-}
-
-async function downloadAllFiles(){
-  const list=state.files.filter(inRange).sort((a,b)=>new Date(b.uploaded_at)-new Date(a.uploaded_at));
-  if(!list.length) return toast('Không có file trong khoảng này','error');
-
-  const same=state.fromDate===state.toDate;
-  const label=same?state.fromDate:`${state.fromDate}_den_${state.toDate}`;
-  const zipName=`Uploads_${label}.zip`;
-
-  toast(`Đang tải ${list.length} file, vui lòng chờ...`,'success');
-
-  // Gom tất cả file vào zip phẳng (không folder con)
-  const zip=new JSZip();
-  let done=0, errors=0;
-  for(const f of list){
-    try{
-      const {data,error}=await sb.storage.from(BUCKET).download(f.storage_path);
-      if(error){errors++;toast(`Lỗi tải ${f.filename}: ${error.message}`,'error');continue;}
-      zip.file(f.filename, data);
-      done++;
-      toast(`Đang xử lý... ${done}/${list.length}`, 'success');
-    }catch(e){errors++;toast(`Lỗi tải ${f.filename}`,'error');}
-  }
-
-  if(!done) return toast('Không tải được file nào!','error');
-  toast('Đang nén file, vui lòng chờ...','success');
-
-  const blob=await zip.generateAsync({type:'blob'}, meta=>{
-    // meta.percent từ 0-100
-  });
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download=zipName;a.click();
-  URL.revokeObjectURL(url);
-  toast(`Đã tải xong! ${done} file${errors?` (${errors} lỗi)`:''}  →  ${zipName}`,'success');
-}
-
-function exportUploadsExcel(){
-  const list=state.files.filter(inRange).sort((a,b)=>new Date(b.uploaded_at)-new Date(a.uploaded_at));
-  if(!list.length) return toast('Không có file trong khoảng này','error');
-  const same=state.fromDate===state.toDate;
-  const label=same?state.fromDate:`${state.fromDate}_den_${state.toDate}`;
-  const ws=XLSX.utils.json_to_sheet(list.map(f=>({'Tên file':f.filename.replace(/(\@[^@]+\.com)\.[^.]+$/i,'$1'),'Nhân viên':f.employee_name,'Thời gian':fmt(f.uploaded_at),'Hash':f.file_hash})));
-  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Uploads');
-  XLSX.writeFile(wb,`Uploads_${label}.xlsx`);
-}
-
-
-/* ====================== EMPLOYEE ====================== */
 async function renderEmployee(){
   $('#app').innerHTML=`<div class="p-8"><div class="skeleton h-32 rounded-2xl mb-4"></div><div class="skeleton h-96 rounded-2xl"></div></div>`;
   await loadAll();
@@ -1212,7 +982,7 @@ async function handleFiles(files){
 async function uploadZip(zipFile){
   const empName=parseName(zipFile.name);
   if(!empName){
-    // Phân biệt 2 trường hợp: sai format vs không có trong whitelist
+    
     const base=zipFile.name.replace(/\.[^.]+$/,'');
     const m=base.match(/^(.+?)_CAT$/i) || base.match(/^([^_]+)_/);
     if(!m) return toast(`Sai format zip: ${zipFile.name} (cần HoTen_CAT.zip)`,'error');
@@ -1223,7 +993,7 @@ async function uploadZip(zipFile){
   let zip;
   try{ zip=await JSZip.loadAsync(zipFile);}catch(e){return toast(`Không đọc được zip: ${zipFile.name}`,'error');}
   let entries=Object.values(zip.files).filter(f=>!f.dir);
-  // Bỏ qua file hệ thống
+  
   entries=entries.filter(f=>{
     const n=f.name.split('/').pop()||'';
     if(f.name.startsWith('__MACOSX/')) return false;
@@ -1232,7 +1002,7 @@ async function uploadZip(zipFile){
   });
   if(!entries.length) return toast(`Zip rỗng: ${zipFile.name}`,'error');
 
-  // Chặn zip có folder lồng bên trong (vd: PhamDangQuang_CAT/abc.png)
+  
   const nested = entries.find(e=>e.name.includes('/'));
   if(nested){
     const topDir = nested.name.split('/')[0];
@@ -1241,7 +1011,7 @@ async function uploadZip(zipFile){
     return;
   }
 
-  // Validate: mỗi file phải có dạng ...@heineken.com.<ext>
+  
   const validRe=/@heineken\.com\.[^.]+$/i;
   const invalid=entries.map(e=>e.name.split('/').pop()).filter(n=>!validRe.test(n));
   if(invalid.length){
@@ -1264,7 +1034,7 @@ async function uploadFile(file, displayName, _f, forcedEmp){
   if(!forcedEmp && state.role==='employee' && state.employeeName && empName!==state.employeeName)
     return toast(`Tên file (${empName}) không khớp với bạn`,'error');
 
-  // Hash theo nội dung "ý nghĩa": .eml dùng Message-ID; còn lại SHA-256 nội dung
+  
   const hash=await contentHash(file);
   const {data:dupHash}=await sb.from('kpi_files').select('id,filename,employee_name').eq('file_hash',hash).limit(1);
   if(dupHash&&dupHash.length) return toast(`File "${file.name}" trùng nội dung (cùng Message-ID/SHA-256) với "${dupHash[0].filename}" của ${dupHash[0].employee_name}. Không thể upload lại dù đã đổi tên hay sửa metadata.`,'error');
@@ -1288,7 +1058,7 @@ async function uploadFile(file, displayName, _f, forcedEmp){
   const {error:e2}=await sb.from('kpi_files').insert({filename:file.name,employee_name:empName,storage_path:path,file_hash:hash,size:file.size});
   bar.style.width='100%';
   if(e2){
-    // Race condition: người khác vừa upload file giống hệt → DB unique chặn lại. Dọn file vừa upload lên storage.
+    
     try{ await sb.storage.from(BUCKET).remove([path]); }catch(_){}
     prog.remove();
     if((e2.code==='23505')||/duplicate|unique/i.test(e2.message||''))
@@ -1300,7 +1070,6 @@ async function uploadFile(file, displayName, _f, forcedEmp){
   try{ triggerCombo(); checkPersonalComplete(empName); checkTeamComplete(); }catch(e){console.warn('gm',e);}
 }
 
-/* ====================== REALTIME ====================== */
 let channel=null;
 let _reloadTimer=null, _reloading=false, _reloadPending=false;
 function isUserBusy(){
@@ -1315,7 +1084,7 @@ async function safeReload(){
   try{
     await loadAll();
     if(isUserBusy()){
-      // Người dùng đang gõ — hoãn vẽ lại để không mất focus/giá trị nhập dở
+      
       setTimeout(safeReload, 1500);
     } else {
       state.role==='admin'?drawAdmin():drawEmployee();
@@ -1329,7 +1098,7 @@ async function safeReload(){
 }
 function scheduleReload(){
   clearTimeout(_reloadTimer);
-  // Gộp burst realtime events trong 800ms để tránh redraw liên tục khi nhiều người upload cùng lúc
+  
   _reloadTimer=setTimeout(safeReload, 800);
 }
 function subscribeRealtime(){
@@ -1343,7 +1112,6 @@ function subscribeRealtime(){
 }
 window.addEventListener('beforeunload',()=>{ if(channel) sb.removeChannel(channel); });
 
-/* ====================== INIT ====================== */
 function checkSize(){
   const small=window.innerWidth<1024;
   $('#mobileBlock').classList.toggle('hidden',!small);
@@ -1354,7 +1122,6 @@ checkSize();
 checkAuth();
 </script>
 
-<!-- Hướng dẫn nén & upload zip -->
 <div id="guideModal" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onclick="if(event.target===this)closeGuide()">
   <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
     <div class="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center rounded-t-2xl">
@@ -1363,7 +1130,7 @@ checkAuth();
     </div>
     <div class="p-6 space-y-5 text-sm text-slate-700">
 
-      <!-- VIDEO HƯỚNG DẪN -->
+      
       <section>
         <div style="border-radius:12px;overflow:hidden;background:#000;box-shadow:0 4px 20px rgba(0,0,0,0.15);">
           <video controls style="width:100%;display:block;max-height:340px;background:#000;" preload="metadata">
@@ -1444,7 +1211,6 @@ checkAuth();
   document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeGuide(); });
 </script>
 
-<!-- ========== ASSISTANT CHARACTER ========== -->
 <style>
   #kpi-assistant {
     position: fixed;
@@ -1457,7 +1223,7 @@ checkAuth();
     pointer-events: none;
     transition: top 0.6s cubic-bezier(.4,0,.2,1);
     user-select: none;
-    /* never overflow viewport */
+    
     max-top: calc(100vh - 180px);
   }
   #kpi-assistant.hidden-assistant { display: none !important; }
@@ -1594,12 +1360,12 @@ checkAuth();
       <ellipse cx="47" cy="89" rx="8" ry="4" fill="#3730a3"/>
       <circle cx="49" cy="53" r="6" fill="#f59e0b"/>
       <text x="49" y="56.5" text-anchor="middle" font-size="7" font-weight="700" fill="white">&#9733;</text>
-      <!-- sweat drop – hidden by default -->
+      
       <g id="asst-sweat" opacity="0" style="transition:opacity .5s">
         <ellipse cx="60" cy="16" rx="3.5" ry="5" fill="#93c5fd" opacity=".9"/>
         <ellipse cx="60" cy="20" rx="2" ry="1.5" fill="#93c5fd" opacity=".6"/>
       </g>
-      <!-- eyebrow shapes for worry -->
+      
       <path id="asst-brow-l" d="M20 20 Q26 18 32 20" fill="none" stroke="#1e1b4b" stroke-width="2" stroke-linecap="round" opacity="0" style="transition:opacity .4s"/>
       <path id="asst-brow-r" d="M40 20 Q46 18 52 20" fill="none" stroke="#1e1b4b" stroke-width="2" stroke-linecap="round" opacity="0" style="transition:opacity .4s"/>
     </svg>
@@ -1609,7 +1375,7 @@ checkAuth();
 
 <script>
 (function(){
-  /* ---- Guards: only employee + desktop ---- */
+  
   var ASST_ACTIVE = false;
   var _moveTimer, _notifTimer, _hideTimer, _countdownTimer;
   var _dismissed = false;
@@ -1623,10 +1389,10 @@ checkAuth();
     );
   }
 
-  /* ---- DOM refs ---- */
+  
   function el(id){ return document.getElementById(id); }
 
-  /* ---- Show/hide assistant shell ---- */
+  
   function asstMount(){
     if(!shouldShow()) return;
     ASST_ACTIVE = true;
@@ -1635,7 +1401,7 @@ checkAuth();
     scheduleNotification();
     setTimeout(refreshMood, 500);
     setTimeout(hookEscapeListener, 300);
-    // Chờ state load xong rồi khởi động hệ thống cảnh báo nghi ngờ độc lập
+    
     setTimeout(function(){
       syncSuspiciousBanner();
       startSuspiciousSystem();
@@ -1664,7 +1430,7 @@ checkAuth();
     else { showQuickStatus(); }
   };
 
-  /* ---- Safe position bounds (always visible on screen) ---- */
+  
   function getSafeBounds(){
     var wrap = el('kpi-assistant');
     var wrapH = wrap ? wrap.offsetHeight : 160;
@@ -1673,20 +1439,20 @@ checkAuth();
     return { minY: minY, maxY: maxY };
   }
 
-  /* ---- Vertical drift along right edge ---- */
+  
   function scheduleMove(){
     _moveTimer = setTimeout(function(){
       if(!ASST_ACTIVE) return;
       var b = getSafeBounds();
       var newTop = Math.floor(Math.random()*(b.maxY - b.minY) + b.minY);
       el('kpi-assistant').style.top = newTop + 'px';
-      // Cập nhật vị trí banner theo con trợ lý sau transition
+      
       setTimeout(_updateBannerPos, 650);
       scheduleMove();
     }, 8000 + Math.random()*7000);
   }
 
-  /* ---- Escape logic: run away when mouse nears close button ---- */
+  
   var _escapeCooldown = false;
   function escapeFromMouse(){
     if(!ASST_ACTIVE || _escapeCooldown) return;
@@ -1695,7 +1461,7 @@ checkAuth();
     var wrap = el('kpi-assistant');
     var rect = wrap.getBoundingClientRect();
 
-    // Pick a new position far from current, within safe bounds
+    
     var b = getSafeBounds();
     var minY = b.minY, maxY = b.maxY;
     var candidates = [];
@@ -1704,12 +1470,12 @@ checkAuth();
       var dist = Math.abs(cy - rect.top);
       candidates.push({y: cy, d: dist});
     }
-    // pick the one farthest from current position
+    
     candidates.sort(function(a,b){ return b.d - a.d; });
     var newTop = candidates[0].y;
     wrap.style.top = newTop + 'px';
 
-    // Show "chạy trốn" bubble without clearing scheduled notifications
+    
     var b = el('asst-bubble');
     var escaped = [
       '🏃 Ahihi, đố anh chị bắt được em!',
@@ -1730,7 +1496,7 @@ checkAuth();
     ];
     el('asst-text').innerHTML = pickRandom('escape', escaped);
     b.classList.add('show');
-    // Hide escape bubble after 2.5s then restore previous bubble state naturally
+    
     clearTimeout(_escapeBubbleTimer);
     _escapeBubbleTimer = setTimeout(function(){
       b.classList.remove('show');
@@ -1741,7 +1507,7 @@ checkAuth();
 
   var _escapeBubbleTimer;
 
-  // Attach mousemove listener to close button to detect approach
+  
   function hookEscapeListener(){
     var closeBtn = el('asst-close-btn');
     if(!closeBtn || closeBtn.__escapeHooked) return;
@@ -1751,9 +1517,9 @@ checkAuth();
     });
   }
 
-  /* ---- Countdown helpers ---- */
+  
   function getDeadlineMs(){
-    // deadline = today 17:00 local
+    
     var now = new Date();
     var dead = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 17, 0, 0, 0);
     return dead - now;
@@ -1768,7 +1534,7 @@ checkAuth();
     return s + ' giây nữa';
   }
 
-  /* ---- Check if current employee has suspicious files pending admin review ---- */
+  
   function getMyPendingSuspicious(){
     try{
       if(typeof state === 'undefined' || !state.employeeName || state.role !== 'employee') return false;
@@ -1783,7 +1549,7 @@ checkAuth();
     } catch(e){ return false; }
   }
 
-  /* ---- Get pending employee names ---- */
+  
   function getPendingInfo(){
     try{
       if(!state.employees || !state.files) return null;
@@ -1799,7 +1565,7 @@ checkAuth();
     } catch(ex){ return null; }
   }
 
-  /* ---- No-repeat random picker ---- */
+  
   var _lastPicked = {};
   function pickRandom(key, arr){
     var last = _lastPicked[key];
@@ -1809,7 +1575,7 @@ checkAuth();
     return picked;
   }
 
-  /* ---- Build full status bubble (always shows countdown + names) ---- */
+  
   function buildStatusHtml(){
     var pendingNames = getPendingInfo();
     var ms = getDeadlineMs();
@@ -1819,7 +1585,7 @@ checkAuth();
     var allDone = pendingNames !== null && pendingNames.length === 0;
 
     if(allDone){
-      // Cả team đã xong: chỉ nói tin vui, không cảnh báo "hết giờ"
+      
       if(ms > 0){
         lines.push('🎉 <b style="color:#059669">Cả team hoàn thành rồi!</b>');
         lines.push('⏱ Vẫn còn <b style="color:#4f46e5">'+cntStr+'</b> trước deadline — quá xịn!');
@@ -1830,7 +1596,7 @@ checkAuth();
       return lines.join('<br>');
     }
 
-    // Còn người pending → giữ logic cũ
+    
     if(ms > 0){
       lines.push('⏱ Còn <b style="color:#4f46e5">'+cntStr+'</b> để upload hôm nay');
     } else {
@@ -1847,7 +1613,7 @@ checkAuth();
     return lines.join('<br>');
   }
 
-  /* ---- Mood-aware periodic messages ---- */
+  
   var _periodicMsgs = {
     happy: [
       '🎉 Cả team xong hết rồi, tuyệt vời quá! Em tự hào lắm 😄',
@@ -1917,14 +1683,12 @@ checkAuth();
     av.classList.add('pulse');
     setTimeout(function(){ av.classList.remove('pulse'); }, 4500);
     if(duration){
-      clearTimeout(_hideTimer); // chỉ clear timer ẩn bubble, KHÔNG đụng _notifTimer
+      clearTimeout(_hideTimer); 
       _hideTimer = setTimeout(function(){ b.classList.remove('show'); }, duration);
     }
   }
 
-  /* =====================================================
-     SUSPICIOUS WARNING SYSTEM — hoàn toàn độc lập với KPI
-     ===================================================== */
+  
   var _suspiciousWarningMsgs = [
     '⚠️ <b>Lưu ý nhỏ:</b> Có file của bạn đang chờ Admin xác nhận — bạn cứ bình tĩnh, không cần làm gì thêm nha!',
     '🔍 <b>Admin đang kiểm tra một file của bạn.</b> Vui lòng chờ xác nhận, em sẽ thông báo khi xong~',
@@ -1932,9 +1696,9 @@ checkAuth();
     '🛎️ Nhắc nhỏ: file của bạn đang <b>chờ Admin duyệt</b>, không cần upload lại đâu ạ!',
     '🤝 Em đã báo Admin rồi nha! Bạn chờ chút, sẽ có kết quả sớm thôi~'
   ];
-  var _suspBubbleTimer = null; // timer riêng, KHÔNG dùng _bubbleTimer của KPI
+  var _suspBubbleTimer = null; 
 
-  /* -- Banner cố định bên cạnh con trợ lý -- */
+  
   function _suspBannerPos(){
     var wrap = document.getElementById('kpi-assistant');
     if(!wrap) return null;
@@ -1980,21 +1744,21 @@ checkAuth();
     else hideSuspiciousBanner();
   }
 
-  /* -- Bubble cảnh báo dùng timer riêng, không đụng _bubbleTimer KPI -- */
+  
   function _showSuspBubble(){
-    // Chỉ hiện nếu bubble KPI đang không show (nhường nhau lịch sự)
+    
     var kpiBubble = document.getElementById('asst-bubble');
     var kpiShowing = kpiBubble && kpiBubble.classList.contains('show');
     var msg = pickRandom('susp_bubble', _suspiciousWarningMsgs);
     if(kpiShowing){
-      // KPI đang nói → đợi nó xong (tối đa 13s) rồi mới chen vào
+      
       _suspBubbleTimer = setTimeout(_showSuspBubble, 13000);
       return;
     }
     showBubble(msg, 10000);
   }
 
-  /* -- Lịch cảnh báo nghi ngờ: mỗi ~90-120s kiểm tra 1 lần, độc lập hoàn toàn -- */
+  
   var _suspScheduleTimer = null;
   function _scheduleSuspCheck(){
     _suspScheduleTimer = setTimeout(function(){
@@ -2005,7 +1769,7 @@ checkAuth();
     }, 90000 + Math.random()*30000);
   }
 
-  /* -- Khởi động hệ thống cảnh báo nghi ngờ -- */
+  
   function startSuspiciousSystem(){
     clearTimeout(_suspScheduleTimer);
     clearTimeout(_suspBubbleTimer);
@@ -2025,14 +1789,8 @@ checkAuth();
     showBubble(intro + '<br><br>' + statusHtml, 12000);
   }
 
-  /* ---- Mood engine ---- */
-  /*
-    4 moods based on KPI state:
-    happy  – team all done (😄 big smile, green head, pink cheeks, jump)
-    normal – default / enough time left (😊 smile, purple head)
-    worry  – <2h left OR >half team pending (😟 flat mouth, orange head, eyebrows, no cheeks)
-    panic  – deadline passed OR everyone pending (😰 frown, red head, sweat drop, shake)
-  */
+  
+  
   var _lastMood = null;
 
   function calcMood(){
@@ -2041,7 +1799,7 @@ checkAuth();
     var total = (state.employees||[]).length || 1;
     var pendingCount = pendingNames ? pendingNames.length : 0;
 
-    // Cả team xong → luôn happy, kể cả khi đã quá 17h
+    
     if(pendingNames !== null && pendingCount === 0) return 'happy';
     if(ms <= 0) return 'panic';
     var twoHours = 2 * 3600 * 1000;
@@ -2067,28 +1825,28 @@ checkAuth();
 
     if(!head) return;
 
-    // reset animation classes
+    
     wrap.classList.remove('mood-panic','mood-happy-jump');
 
     if(mood === 'happy'){
-      head.setAttribute('fill','#6ee7b7');       // mint green
+      head.setAttribute('fill','#6ee7b7');       
       antenna.setAttribute('fill','#f59e0b');
-      mouth.setAttribute('d','M24 40 Q36 54 48 40'); // big W smile
+      mouth.setAttribute('d','M24 40 Q36 54 48 40'); 
       cheekL.setAttribute('fill','#f9a8d4'); cheekL.setAttribute('opacity','.8');
       cheekR.setAttribute('fill','#f9a8d4'); cheekR.setAttribute('opacity','.8');
       sweat.setAttribute('opacity','0');
       browL.setAttribute('opacity','0'); browR.setAttribute('opacity','0');
       eyeL.setAttribute('ry','7'); eyeR.setAttribute('ry','7');
       eyeL.setAttribute('fill','#1e1b4b'); eyeR.setAttribute('fill','#1e1b4b');
-      // trigger jump
+      
       void wrap.offsetWidth;
       wrap.classList.add('mood-happy-jump');
       setTimeout(function(){ wrap.classList.remove('mood-happy-jump'); }, 1100);
     }
     else if(mood === 'normal'){
-      head.setAttribute('fill','#818cf8');        // default purple
+      head.setAttribute('fill','#818cf8');        
       antenna.setAttribute('fill','#f59e0b');
-      mouth.setAttribute('d','M28 42 Q36 50 44 42'); // normal smile
+      mouth.setAttribute('d','M28 42 Q36 50 44 42'); 
       cheekL.setAttribute('fill','#f9a8d4'); cheekL.setAttribute('opacity','.55');
       cheekR.setAttribute('fill','#f9a8d4'); cheekR.setAttribute('opacity','.55');
       sweat.setAttribute('opacity','0');
@@ -2097,28 +1855,28 @@ checkAuth();
       eyeL.setAttribute('fill','#1e1b4b'); eyeR.setAttribute('fill','#1e1b4b');
     }
     else if(mood === 'worry'){
-      head.setAttribute('fill','#fbbf24');        // amber/orange
+      head.setAttribute('fill','#fbbf24');        
       antenna.setAttribute('fill','#ef4444');
-      mouth.setAttribute('d','M28 46 Q36 46 44 46'); // flat line
+      mouth.setAttribute('d','M28 46 Q36 46 44 46'); 
       cheekL.setAttribute('opacity','0');
       cheekR.setAttribute('opacity','0');
       sweat.setAttribute('opacity','0');
-      browL.setAttribute('opacity','1'); browR.setAttribute('opacity','1'); // furrowed brows
-      // squint slightly
+      browL.setAttribute('opacity','1'); browR.setAttribute('opacity','1'); 
+      
       eyeL.setAttribute('ry','5'); eyeR.setAttribute('ry','5');
       eyeL.setAttribute('fill','#1e1b4b'); eyeR.setAttribute('fill','#1e1b4b');
     }
     else if(mood === 'panic'){
-      head.setAttribute('fill','#f87171');        // red
+      head.setAttribute('fill','#f87171');        
       antenna.setAttribute('fill','#dc2626');
-      mouth.setAttribute('d','M28 48 Q36 43 44 48'); // upside-down frown
+      mouth.setAttribute('d','M28 48 Q36 43 44 48'); 
       cheekL.setAttribute('opacity','0');
       cheekR.setAttribute('opacity','0');
       sweat.setAttribute('opacity','1');
       browL.setAttribute('opacity','1'); browR.setAttribute('opacity','1');
       eyeL.setAttribute('ry','5'); eyeR.setAttribute('ry','5');
       eyeL.setAttribute('fill','#7f1d1d'); eyeR.setAttribute('fill','#7f1d1d');
-      // trigger shake
+      
       void wrap.offsetWidth;
       wrap.classList.add('mood-panic');
       setTimeout(function(){ wrap.classList.remove('mood-panic'); }, 1100);
@@ -2130,13 +1888,13 @@ checkAuth();
     try{ applyMood(calcMood()); } catch(e){}
   }
 
-  /* ---- Periodic notifications ---- */
+  
   function scheduleNotification(){
-    // Show immediately after 3s on mount
+    
     _notifTimer = setTimeout(function(){
       if(!ASST_ACTIVE) return;
       showQuickStatus();
-      // then every ~1-2 min
+      
       function repeat(){
         _notifTimer = setTimeout(function(){
           if(!ASST_ACTIVE) return;
@@ -2148,8 +1906,8 @@ checkAuth();
     }, 3000);
   }
 
-  /* ---- Upload success hook ---- */
-  // Wrap the global toast function to detect success uploads
+  
+  
   var _origToast = typeof toast === 'function' ? toast : null;
   function hookToast(){
     if(typeof toast !== 'function') return;
@@ -2178,7 +1936,7 @@ checkAuth();
         ];
         showBubble(pickRandom('upload_success', cheers), 8000);
         setTimeout(refreshMood, 1500);
-        // Sau khi bubble chúc mừng tắt (~9s), kiểm tra nghi ngờ và hiện bubble + banner
+        
         setTimeout(function(){
           syncSuspiciousBanner();
           if(getMyPendingSuspicious()) _showSuspBubble();
@@ -2188,7 +1946,7 @@ checkAuth();
     window.toast.__asstHooked = true;
   }
 
-  /* ---- Observe state changes via polling ---- */
+  
   var _lastRole = null;
   function checkState(){
     if(_dismissed) return;
@@ -2206,7 +1964,7 @@ checkAuth();
   setInterval(checkState, 800);
   window.addEventListener('resize', checkState);
 
-  // Live-refresh the open bubble every 30s + sync mood
+  
   setInterval(function(){
     if(!ASST_ACTIVE) return;
     refreshMood();
@@ -2217,20 +1975,18 @@ checkAuth();
     el('asst-text').innerHTML = buildStatusHtml();
   }, 30000);
 
-  // initial check after a short delay (state may not be set yet)
+  
   setTimeout(checkState, 1200);
 })();
 </script>
-<!-- ========== END ASSISTANT CHARACTER ========== -->
-
 
 <script>
-/* ============ L2 TEAM INTRO LOADER — CSS-only, no canvas ============ */
+
 (function(){
   const INTRO_TEXT     = 'L2 Team';
-  const INTRO_DURATION = 3200;   // ms tổng (ngắn hơn ~38%)
+  const INTRO_DURATION = 3200;   
 
-  /* ── CSS ── */
+  
   const css = `
   .l2-ov{
     position:fixed;inset:0;z-index:99999;
@@ -2240,7 +1996,6 @@ checkAuth();
     opacity:1;transition:opacity .55s ease;
   }
 
-  /* Orbs nổi — GPU transform only, không repaint */
   .l2-orb{
     position:absolute;border-radius:50%;filter:blur(60px);
     will-change:transform;pointer-events:none;
@@ -2268,7 +2023,6 @@ checkAuth();
   @keyframes l2float2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-20px,-16px) scale(1.08)}}
   @keyframes l2float3{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-46%,-54%) scale(1.05)}}
 
-  /* Text shine */
   .l2-title{
     position:relative;z-index:2;
     font-family:'Inter',system-ui,sans-serif;
@@ -2286,7 +2040,6 @@ checkAuth();
   @keyframes l2titleIn{to{opacity:1;transform:translateY(0) scale(1)}}
   @keyframes l2shine{0%{background-position:200% center}100%{background-position:-100% center}}
 
-  /* Sub text */
   .l2-sub{
     position:relative;z-index:2;
     margin-top:16px;
@@ -2297,7 +2050,6 @@ checkAuth();
   }
   @keyframes l2subIn{to{opacity:1}}
 
-  /* Progress bar */
   .l2-bar-wrap{
     position:relative;z-index:2;margin-top:28px;
     width:min(220px,52vw);height:2px;
@@ -2310,7 +2062,6 @@ checkAuth();
   }
   @keyframes l2barFill{to{width:100%}}
 
-  /* Dots decoratifs */
   .l2-dots{position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden}
   .l2-dot{
     position:absolute;border-radius:50%;opacity:0;
@@ -2335,7 +2086,7 @@ checkAuth();
     return !window.__l2IntroPlayed;
   }
 
-  /* Tạo dots ngẫu nhiên — chỉ DOM nhỏ, không canvas */
+  
   function makeDots(container){
     const colors = ['#6366f1','#818cf8','#8b5cf6','#a855f7','#06b6d4','#0ea5e9'];
     const N = 18;
@@ -2366,32 +2117,32 @@ checkAuth();
       ov.className = 'l2-ov';
       ov.style.setProperty('--dur', INTRO_DURATION + 'ms');
 
-      /* Orbs */
+      
       [1,2,3].forEach(n=>{
         const o = document.createElement('div');
         o.className = `l2-orb l2-orb${n}`;
         ov.appendChild(o);
       });
 
-      /* Floating dots */
+      
       const dotsWrap = document.createElement('div');
       dotsWrap.className = 'l2-dots';
       makeDots(dotsWrap);
       ov.appendChild(dotsWrap);
 
-      /* Title */
+      
       const title = document.createElement('div');
       title.className = 'l2-title';
       title.textContent = INTRO_TEXT;
       ov.appendChild(title);
 
-      /* Sub */
+      
       const sub = document.createElement('div');
       sub.className = 'l2-sub';
       sub.textContent = 'Đang tải dữ liệu…';
       ov.appendChild(sub);
 
-      /* Bar */
+      
       const barWrap = document.createElement('div');
       barWrap.className = 'l2-bar-wrap';
       const barFill = document.createElement('div');
@@ -2401,7 +2152,7 @@ checkAuth();
 
       document.body.appendChild(ov);
 
-      /* Dismiss sau INTRO_DURATION */
+      
       setTimeout(()=>{
         ov.style.opacity = '0';
         setTimeout(()=>{ ov.remove(); __playing = false; resolve(); }, 580);
@@ -2409,7 +2160,7 @@ checkAuth();
     });
   }
 
-  /* Patch renderEmployee / renderAdmin / renderLanding */
+  
   function patch(){
     if(typeof renderEmployee === 'function' && !renderEmployee.__l2Patched){
       const orig = renderEmployee;
@@ -2445,7 +2196,6 @@ checkAuth();
   setTimeout(patch, 500);
 })();
 </script>
-
 
 </body>
 </html>
