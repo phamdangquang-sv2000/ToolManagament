@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" class="light">
 <head>
-<script src="./auth-guard.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3500,10 +3499,10 @@ function renderWarn() {
           ${w.resolve_date ? `<div class="mob-row-card-field"><span class="mob-row-card-label">Ngày gỡ</span><span class="mob-row-card-val">${fmtD(w.resolve_date)}</span></div>` : ''}
         </div>
         ${w.reason ? `<div class="mob-row-card-reason">${w.reason}</div>` : ''}
-        ${(w.attachments||[[]).length ? `<div style="padding:.3rem .75rem .5rem;display:flex;flex-wrap:wrap;gap:.35rem">
-          ${(w.attachments||[[]).map(a => {
+        ${(w.attachments||[]).length ? `<div style="padding:.3rem .75rem .5rem;display:flex;flex-wrap:wrap;gap:.35rem">
+          ${(w.attachments||[]).map(a => {
             const ext = (a.name||'').split('.').pop().toLowerCase();
-            const isImg = [['jpg','jpeg','png','gif','webp','svg'].includes(ext);
+            const isImg = ['jpg','jpeg','png','gif','webp','svg'].includes(ext);
             const icon = warnFileIcon(a.name||'');
             const action = a.url ? (isImg
               ? `onclick="warnPreviewImage('${a.url}','${a.name}')"`
