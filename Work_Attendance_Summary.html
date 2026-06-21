@@ -2026,7 +2026,6 @@ const S = {
   selectedLeaveYear: _initLeaveYear,
   
   scheduleData: {},
-  scheduleRules: {},
   scheduleLoading: false,
   scheduleSortOrder: 'name-asc',
 };
@@ -4075,32 +4074,6 @@ async function loadScheduleData(year, month) {
 }
 
 
-function getDefaultRules() {
-  return {
-    max_wfh_per_month:      { value: '1',     description: 'Số lần WFH tối đa mỗi tháng' },
-    wfh_blocked_days:       { value: '2,3',   description: 'Ngày không được WFH (2=T2, 3=T3...)' },
-    allow_employee_edit:    { value: 'false', description: 'Nhân viên tự đăng ký lịch' },
-    require_reason_for_off: { value: 'false', description: 'Yêu cầu lý do khi đăng ký nghỉ' },
-    default_weekday_status: { value: 'x',     description: 'Trạng thái mặc định ngày thường' },
-    advance_days_required:  { value: '0',     description: 'Số ngày cần đăng ký trước (0 = không giới hạn)' },
-  };
-}
-
-async function loadScheduleRules() {
-  try {
-    const { data, error } = await db.from('hr_schedule_rules').select('rule_key, rule_value, description');
-    if (error || !data || !data.length) {
-      return getDefaultRules();
-    }
-    const rules = {};
-    data.forEach(r => { rules[r.rule_key] = { value: r.rule_value, description: r.description }; });
-    return rules;
-  } catch(e) {
-    return getDefaultRules();
-  }
-}
-
-
 function schGetVal(empId, year, month, day) {
   const dateStr = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
   const key = `${empId}|${dateStr}`;
@@ -4141,31 +4114,19 @@ function countWfhInMonth(empId, year, month) {
 }
 
 
-function checkSchRules(empId, year, month, day, newVal) {
-  const rules = S.scheduleRules;
-  const warnings = [];
-  const dow = new Date(year, month-1, day).getDay();
+// Quy tắc WFH — hardcode, không lấy từ Supabase
+const MAX_WFH_PER_MONTH = 1;
 
+function checkSchRules(empId, year, month, day, newVal) {
+  const warnings = [];
   if (newVal === 'w' || newVal === 'wo') {
-    const maxWfh = parseInt(rules.max_wfh_per_month?.value || '1');
     const curWfh = countWfhInMonth(empId, year, month);
     const existingVal = schGetVal(empId, year, month, day);
     const isAlreadyWfh = existingVal === 'w' || existingVal === 'wo';
-    if (!isAlreadyWfh && curWfh >= maxWfh) {
-      warnings.push(`⚠️ Đã đạt giới hạn WFH (${maxWfh} lần/tháng). Hiện tại: ${curWfh} lần.`);
+    if (!isAlreadyWfh && curWfh >= MAX_WFH_PER_MONTH) {
+      warnings.push(`⚠️ Đã đạt giới hạn WFH (${MAX_WFH_PER_MONTH} lần/tháng). Hiện tại: ${curWfh} lần.`);
     }
   }
-
-  if (newVal === 'w' || newVal === 'wo') {
-    const blocked = (rules.wfh_blocked_days?.value || '2,3').split(',').map(Number);
-    const jsDowToRuleDow = { 0:1, 1:2, 2:3, 3:4, 4:5, 5:6, 6:7 };
-    const ruleDow = jsDowToRuleDow[dow];
-    if (blocked.includes(ruleDow)) {
-      const dayNames = { 2:'Thứ 2',3:'Thứ 3',4:'Thứ 4',5:'Thứ 5',6:'Thứ 6',7:'Thứ 7',1:'Chủ nhật' };
-      warnings.push(`⚠️ WFH không được phép vào ${dayNames[ruleDow] || 'ngày này'} theo quy tắc.`);
-    }
-  }
-
   return warnings;
 }
 
@@ -4183,7 +4144,7 @@ async function initializeMonth() {
 
   try {
     const rows = [];
-    const defaultStatus = S.scheduleRules.default_weekday_status?.value || 'x';
+    const defaultStatus = 'x';
     employees.forEach(emp => {
       for (let d = 1; d <= daysInMonth; d++) {
         const dow = new Date(y, m-1, d).getDay();
@@ -4230,12 +4191,8 @@ async function initCal() {
   const m = parseInt(document.getElementById('sch-month').value);
   const y = parseInt(document.getElementById('sch-year').value);
 
-  const [schData, rules] = await Promise.all([
-    loadScheduleData(y, m),
-    loadScheduleRules(),
-  ]);
+  const schData = await loadScheduleData(y, m);
   S.scheduleData = schData;
-  S.scheduleRules = rules;
 
   renderSchedule(y, m);
 
@@ -4281,13 +4238,9 @@ function renderSchedule(year, month) {
     days.push({ d, dow, isWeekend, isToday });
   }
 
-  const maxWfh = parseInt(S.scheduleRules.max_wfh_per_month?.value || '1');
-
-  const wfhBlockedDays = (S.scheduleRules.wfh_blocked_days?.value || '2,3').split(',').map(Number);
-  const blockedNames = wfhBlockedDays.map(n => ({ 2:'T2',3:'T3',4:'T4',5:'T5',6:'T6',7:'T7',1:'CN' }[n] || n)).join(', ');
   const note = document.getElementById('sch-info-note');
   if (note) {
-    note.innerHTML = `⚡ WFH tối đa <strong>${maxWfh} lần/tháng</strong> (không WFH: ${blockedNames}) &nbsp;·&nbsp; ${S.isAdmin ? 'Click ô để chỉnh (Admin)' : 'Chế độ xem — chỉ Admin mới edit được'}`;
+    note.innerHTML = `⚡ WFH tối đa <strong>${MAX_WFH_PER_MONTH} lần/tháng</strong> &nbsp;·&nbsp; ${S.isAdmin ? 'Click ô để chỉnh (Admin)' : 'Chế độ xem — chỉ Admin mới edit được'}`;
   }
 
   let html = `<table class="sch-table">`;
@@ -4311,7 +4264,7 @@ function renderSchedule(year, month) {
   } else {
     employees.forEach((emp) => {
       const empWfh = countWfhInMonth(emp.id, y, m);
-      const wfhOverLimit = empWfh > maxWfh;
+      const wfhOverLimit = empWfh > MAX_WFH_PER_MONTH;
       html += `<tr>`;
       html += `<td class="sch-name-td" title="${escAttr(emp.name)}">
         ${escAttr(emp.name)}
