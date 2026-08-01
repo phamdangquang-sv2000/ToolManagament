@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JSON → CSV Converter</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --bg-grad1:#eef2ff; --bg-grad2:#f7fafc;
+    --panel:#ffffff; --panel2:#f6f8fc; --border:#e2e6ef;
+    --text:#1c2230; --muted:#6b7385; --accent:#3b6ff0; --accent-soft:#eaf0ff;
+    --accent2:#0fa968; --accent2-soft:#e6f8f0;
+    --danger:#e0344c; --danger-soft:#fdeaee; --warn:#e08a1f;
+    --shadow:0 1px 2px rgba(20,25,45,.04), 0 8px 24px -12px rgba(20,25,45,.12);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(160deg,var(--bg-grad1) 0%, var(--bg) 45%, var(--bg-grad2) 100%);
+    background-attachment:fixed;
+    color:var(--text); min-height:100vh;
+  }
+  header{
+    padding:28px 32px 16px; border-bottom:1px solid var(--border);
+    background:rgba(255,255,255,.6); backdrop-filter:blur(6px);
+  }
+  header h1{margin:0 0 6px; font-size:22px; font-weight:700; letter-spacing:-.01em;}
+  header p{margin:0; color:var(--muted); font-size:13.5px; line-height:1.5;}
+  .container{padding:24px 32px 40px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:20px; max-width:1400px; margin:0 auto;}
+  @media (max-width:900px){.container{grid-template-columns:minmax(0,1fr); padding:18px;}}
+  .panel{
+    background:var(--panel); border:1px solid var(--border); border-radius:14px;
+    padding:18px; display:flex; flex-direction:column; gap:12px;
+    box-shadow:var(--shadow); min-width:0; max-width:100%;
+  }
+  .panel h2{margin:0; font-size:13px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.06em;}
+  textarea{
+    width:100%; min-height:260px; background:var(--panel2); color:var(--text);
+    border:1px solid var(--border); border-radius:10px; padding:12px; font-family:"SF Mono",Consolas,Menlo,monospace;
+    font-size:13px; resize:vertical; line-height:1.55;
+  }
+  textarea::placeholder{color:#a4abbb;}
+  textarea:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft);}
+  .dropzone{
+    border:2px dashed #c7cfe6; border-radius:10px; padding:20px; text-align:center;
+    color:var(--muted); cursor:pointer; transition:.15s; font-size:13px; background:var(--accent-soft);
+  }
+  .dropzone:hover{border-color:var(--accent); color:var(--text);}
+  .dropzone.drag{border-color:var(--accent); background:#dfe8ff; color:var(--text);}
+  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+  button{
+    background:var(--accent); color:#fff; border:none; border-radius:9px; padding:10px 16px;
+    font-size:13px; font-weight:600; cursor:pointer; transition:.15s; box-shadow:0 2px 6px -2px rgba(59,111,240,.5);
+  }
+  button:hover{filter:brightness(1.07); transform:translateY(-1px);}
+  button:active{transform:scale(.98);}
+  button.secondary{background:#fff; color:var(--text); border:1px solid var(--border); box-shadow:none;}
+  button.secondary:hover{background:var(--panel2); border-color:#c7cfe6;}
+  button.success{background:var(--accent2); color:#fff; box-shadow:0 2px 6px -2px rgba(15,169,104,.5);}
+  button:disabled{opacity:.45; cursor:not-allowed; transform:none; filter:none;}
+  label.opt{display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--muted); cursor:pointer; user-select:none;}
+  input[type=checkbox]{accent-color:var(--accent);}
+  input[type=text]{
+    background:#fff; color:var(--text); border:1px solid var(--border);
+    border-radius:6px; padding:6px 8px; font-size:12px; width:50px; text-align:center;
+  }
+  .status{font-size:12.5px; padding:9px 12px; border-radius:8px; display:none; font-weight:500;}
+  .status.show{display:block;}
+  .status.ok{background:var(--accent2-soft); color:#0a7d4d; border:1px solid #b9ecd6;}
+  .status.err{background:var(--danger-soft); color:#c22540; border:1px solid #f6c3cd;}
+  .status.info{background:var(--accent-soft); color:#2a55c4; border:1px solid #c9d8ff;}
+  .stats{display:flex; gap:16px; font-size:12.5px; color:var(--muted); flex-wrap:wrap;}
+  .stats b{color:var(--text);}
+  .full{grid-column:1 / -1;}
+  pre.preview{
+    background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:12px;
+    max-height:340px; overflow:auto; font-size:12px; font-family:"SF Mono",Consolas,Menlo,monospace; margin:0;
+    white-space:pre;
+  }
+  table.preview-table{border-collapse:separate; border-spacing:0; width:100%; font-size:12.5px; table-layout:fixed;}
+  table.preview-table th, table.preview-table td{
+    border:0; border-bottom:1px solid var(--border); border-right:1px solid var(--border);
+    padding:7px 10px; text-align:left; white-space:nowrap;
+    overflow:hidden; text-overflow:ellipsis; position:relative; background:var(--panel);
+  }
+  table.preview-table tr > *:first-child{border-left:1px solid var(--border);}
+  table.preview-table thead th{border-top:1px solid var(--border);}
+  table.preview-table th{background:var(--panel2); position:sticky; top:0; z-index:3; color:var(--accent); font-weight:700; user-select:none;}
+  table.preview-table th .th-label{display:block; overflow:hidden; text-overflow:ellipsis; padding-right:8px;}
+  table.preview-table tbody tr:nth-child(even) td{background:#fafbfe;}
+  table.preview-table tbody tr:hover td{background:var(--accent-soft);}
+  .col-resizer{
+    position:absolute; top:0; right:0; width:8px; height:100%; cursor:col-resize; z-index:4;
+  }
+  .col-resizer:hover, .col-resizer.resizing{background:var(--accent); opacity:.5;}
+  .tablewrap{max-height:340px; overflow:auto; border:1px solid var(--border); border-radius:10px; min-width:0; width:100%;}
+  .footer-note{color:var(--muted); font-size:11.5px; margin-top:4px;}
+  .badge{font-size:10.5px; background:var(--accent-soft); border:1px solid #c9d8ff; padding:3px 9px; border-radius:20px; color:#2a55c4; font-weight:600;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔄 JSON → CSV Converter</h1>
+  <p>Dán JSON hoặc kéo-thả file. Tự động phát hiện cấu trúc (mảng đối tượng, object lồng nhau, object đơn) và chuyển thành CSV chuẩn.</p>
+</header>
+
+<div class="container">
+  <div class="panel">
+    <h2>1. Nhập JSON</h2>
+    <div class="dropzone" id="dropzone">📂 Kéo-thả file .json vào đây, hoặc bấm để chọn file</div>
+    <input type="file" id="fileInput" accept=".json,application/json" style="display:none">
+    <textarea id="jsonInput" placeholder='Dán JSON vào đây, ví dụ:
+[
+  {"id":1,"name":"An","address":{"city":"HCM","zip":"70000"}},
+  {"id":2,"name":"Bình","address":{"city":"HN","zip":"10000"}}
+]'></textarea>
+    <div class="row">
+      <button id="btnConvert">⚡ Convert sang CSV</button>
+      <button class="secondary" id="btnClear">Xóa</button>
+    </div>
+
+    <div class="row" style="margin-top:4px;">
+      <label class="opt"><input type="checkbox" id="optFlatten" checked> Làm phẳng object lồng nhau (key.child)</label>
+      <label class="opt"><input type="checkbox" id="optExpandArrays" checked> Tách mảng chứa object thành cột riêng (key.1.field, key.2.field...)</label>
+    </div>
+    <div class="row">
+      <label class="opt"><input type="checkbox" id="optArrayJoin" checked> Gộp mảng giá trị đơn giản thành chuỗi (phân tách bởi <input type="text" id="arraySep" value="; "> )</label>
+    </div>
+    <div class="row">
+      <label class="opt"><input type="checkbox" id="optBom" checked> Thêm BOM (mở tốt trong Excel)</label>
+      <label class="opt">Ký tự phân tách:
+        <select id="delimSelect" style="background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:4px 6px;">
+          <option value=",">, (phẩy)</option>
+          <option value=";">; (chấm phẩy)</option>
+          <option value="\t">Tab</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="panel">
+    <h2>2. Kết quả CSV <span class="badge" id="rowsBadge"></span></h2>
+    <div class="stats" id="stats"></div>
+    <div class="tablewrap"><table class="preview-table" id="previewTable"></table></div>
+    <div class="row">
+      <button class="success" id="btnDownload" disabled>⬇️ Tải file CSV</button>
+      <button class="secondary" id="btnCopy" disabled>📋 Copy CSV</button>
+    </div>
+    <p class="footer-note">Xử lý hoàn toàn trên trình duyệt của bạn — không upload dữ liệu lên bất kỳ máy chủ nào.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  const jsonInput = document.getElementById('jsonInput');
+  const fileInput = document.getElementById('fileInput');
+  const dropzone = document.getElementById('dropzone');
+  const statusEl = document.getElementById('status');
+  const previewTable = document.getElementById('previewTable');
+  const statsEl = document.getElementById('stats');
+  const rowsBadge = document.getElementById('rowsBadge');
+  const btnDownload = document.getElementById('btnDownload');
+  const btnCopy = document.getElementById('btnCopy');
+
+  let csvResult = "";
+  let lastRowCount = 0, lastColCount = 0;
+  let lastRows = [], lastColumns = [];
+
+  function showStatus(msg, type){
+    statusEl.textContent = msg;
+    statusEl.className = 'status show ' + type;
+  }
+  function clearStatus(){
+    statusEl.className = 'status';
+  }
+
+  // ---------- File handling ----------
+  dropzone.addEventListener('click', () => fileInput.click());
+  dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag'); });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag'));
+  dropzone.addEventListener('drop', e => {
+    e.preventDefault(); dropzone.classList.remove('drag');
+    const f = e.dataTransfer.files[0];
+    if(f) readFile(f);
+  });
+  fileInput.addEventListener('change', e => {
+    const f = e.target.files[0];
+    if(f) readFile(f);
+  });
+  function readFile(f){
+    const reader = new FileReader();
+    reader.onload = ev => {
+      jsonInput.value = ev.target.result;
+      showStatus('Đã tải file: ' + f.name, 'info');
+    };
+    reader.onerror = () => showStatus('Không đọc được file.', 'err');
+    reader.readAsText(f, 'UTF-8');
+  }
+
+  document.getElementById('btnClear').addEventListener('click', () => {
+    jsonInput.value = '';
+    csvResult = '';
+    lastRows = [];
+    lastColumns = [];
+    previewTable.innerHTML = '';
+    statsEl.innerHTML = '';
+    rowsBadge.textContent = '';
+    btnDownload.disabled = true;
+    btnCopy.disabled = true;
+    clearStatus();
+  });
+
+  // ---------- Core: detect & normalize JSON into array of flat rows ----------
+
+  function detectAndNormalize(data){
+    // 1. Determine base array of records
+    let records;
+    if(Array.isArray(data)){
+      records = data;
+    } else if(typeof data === 'object' && data !== null){
+      // Try to find the first property that is an array of objects (common API wrapper e.g. {data:[...]})
+      const arrayProp = Object.keys(data).find(k => Array.isArray(data[k]) && data[k].length && typeof data[k][0] === 'object');
+      if(arrayProp && Object.keys(data).length <= 5){
+        records = data[arrayProp];
+      } else {
+        // Single object -> treat as one row
+        records = [data];
+      }
+    } else {
+      throw new Error('JSON gốc phải là object hoặc mảng.');
+    }
+
+    // 2. Ensure each record is an object; wrap primitives
+    records = records.map(r => {
+      if(r === null || typeof r !== 'object') return { value: r };
+      return r;
+    });
+
+    return records;
+  }
+
+  function readableValue(v){
+    if(v === null || v === undefined) return '';
+    if(Array.isArray(v)) return v.map(readableValue).join('; ');
+    if(typeof v === 'object') return Object.keys(v).map(k => k + ': ' + readableValue(v[k])).join(', ');
+    return String(v);
+  }
+
+  function isPlainObject(v){
+    return v !== null && typeof v === 'object' && !Array.isArray(v);
+  }
+
+  function flattenObject(obj, prefix, flatten, arrayJoin, expandArrays, sep, out){
+    for(const key in obj){
+      if(!Object.prototype.hasOwnProperty.call(obj, key)) continue;
+      const val = obj[key];
+      const newKey = prefix ? prefix + '.' + key : key;
+
+      if(val === null || val === undefined){
+        out[newKey] = '';
+      } else if(Array.isArray(val)){
+        const hasObjectElements = val.some(v => isPlainObject(v));
+        if(hasObjectElements && flatten && expandArrays){
+          // Tách từng phần tử object trong mảng thành các cột riêng: key.1.field, key.2.field...
+          val.forEach((v, idx) => {
+            const idxKey = newKey + '.' + (idx + 1);
+            if(isPlainObject(v)){
+              flattenObject(v, idxKey, flatten, arrayJoin, expandArrays, sep, out);
+            } else if(Array.isArray(v)){
+              out[idxKey] = JSON.stringify(v);
+            } else {
+              out[idxKey] = v;
+            }
+          });
+        } else if(arrayJoin){
+          out[newKey] = val.map(v => isPlainObject(v) ? readableValue(v) : String(v)).join(sep);
+        } else {
+          out[newKey] = JSON.stringify(val);
+        }
+      } else if(typeof val === 'object'){
+        if(flatten){
+          flattenObject(val, newKey, flatten, arrayJoin, expandArrays, sep, out);
+        } else {
+          out[newKey] = JSON.stringify(val);
+        }
+      } else {
+        out[newKey] = val;
+      }
+    }
+    return out;
+  }
+
+  function buildRows(records, flatten, arrayJoin, expandArrays, sep){
+    const rows = records.map(r => flattenObject(r, '', flatten, arrayJoin, expandArrays, sep, {}));
+    // Union of all keys, preserving first-seen order
+    const keySet = [];
+    const seen = new Set();
+    rows.forEach(row => {
+      Object.keys(row).forEach(k => {
+        if(!seen.has(k)){ seen.add(k); keySet.push(k); }
+      });
+    });
+    return { rows, columns: keySet };
+  }
+
+  function csvEscape(value, delim){
+    if(value === undefined || value === null) return '';
+    let s = String(value);
+    const needsQuote = s.includes('"') || s.includes(delim) || s.includes('\n') || s.includes('\r');
+    if(s.includes('"')) s = s.replace(/"/g, '""');
+    return needsQuote ? '"' + s + '"' : s;
+  }
+
+  function toCSV(rows, columns, delim){
+    const lines = [];
+    lines.push(columns.map(c => csvEscape(c, delim)).join(delim));
+    rows.forEach(row => {
+      lines.push(columns.map(c => csvEscape(row[c], delim)).join(delim));
+    });
+    return lines.join('\r\n');
+  }
+
+  function renderPreview(rows, columns){
+    const maxRows = 50;
+    let html = '<thead><tr>' + columns.map(c => `<th style="width:160px;"><span class="th-label">${escapeHtml(c)}</span><span class="col-resizer"></span></th>`).join('') + '</tr></thead><tbody>';
+    rows.slice(0, maxRows).forEach(row => {
+      html += '<tr>' + columns.map(c => `<td title="${escapeHtml(String(row[c] ?? ''))}">${escapeHtml(String(row[c] ?? ''))}</td>`).join('') + '</tr>';
+    });
+    html += '</tbody>';
+    previewTable.innerHTML = html;
+    if(rows.length > maxRows){
+      statsEl.innerHTML += `<span>(chỉ hiển thị ${maxRows}/${rows.length} dòng đầu trong bản xem trước — file tải về có đủ)</span>`;
+    }
+    attachColumnResize();
+  }
+
+  // ---------- Kéo giãn độ rộng cột trong bảng xem trước ----------
+  function attachColumnResize(){
+    const ths = previewTable.querySelectorAll('th');
+    ths.forEach((th, colIndex) => {
+      const resizer = th.querySelector('.col-resizer');
+      if(!resizer) return;
+      let startX = 0, startWidth = 0;
+
+      function onMouseMove(e){
+        const delta = e.pageX - startX;
+        const newWidth = Math.max(50, startWidth + delta);
+        th.style.width = newWidth + 'px';
+      }
+      function onMouseUp(){
+        resizer.classList.remove('resizing');
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+      }
+      resizer.addEventListener('mousedown', e => {
+        e.preventDefault();
+        startX = e.pageX;
+        startWidth = th.offsetWidth;
+        resizer.classList.add('resizing');
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+      });
+    });
+  }
+
+  function escapeHtml(s){
+    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // ---------- Convert action ----------
+  document.getElementById('btnConvert').addEventListener('click', () => {
+    clearStatus();
+    const raw = jsonInput.value.trim();
+    if(!raw){
+      showStatus('Vui lòng nhập hoặc tải JSON trước.', 'err');
+      return;
+    }
+
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch(e){
+      showStatus('❌ JSON không hợp lệ: ' + e.message, 'err');
+      return;
+    }
+
+    try {
+      const flatten = document.getElementById('optFlatten').checked;
+      const arrayJoin = document.getElementById('optArrayJoin').checked;
+      const expandArrays = document.getElementById('optExpandArrays').checked;
+      const sep = document.getElementById('arraySep').value || ', ';
+      const delimRaw = document.getElementById('delimSelect').value;
+      const delim = delimRaw === '\\t' ? '\t' : delimRaw;
+
+      const records = detectAndNormalize(data);
+      if(records.length === 0){
+        showStatus('⚠️ JSON hợp lệ nhưng không có dữ liệu để chuyển đổi.', 'err');
+        return;
+      }
+
+      const { rows, columns } = buildRows(records, flatten, arrayJoin, expandArrays, sep);
+      csvResult = toCSV(rows, columns, delim === '\t' ? ',' : delim); // CSV internal delim distinct from display; use selected delim directly below
+      csvResult = toCSV(rows, columns, delim);
+
+      lastRowCount = rows.length;
+      lastColCount = columns.length;
+      lastRows = rows;
+      lastColumns = columns;
+
+      renderPreview(rows, columns);
+      statsEl.innerHTML = `<span><b>${rows.length}</b> dòng</span><span><b>${columns.length}</b> cột</span><span><b>${(csvResult.length/1024).toFixed(1)}</b> KB</span>`;
+      rowsBadge.textContent = `${rows.length} rows × ${columns.length} cols`;
+
+      btnDownload.disabled = false;
+      btnCopy.disabled = false;
+
+      showStatus(`✅ Convert thành công: ${rows.length} dòng, ${columns.length} cột.`, 'ok');
+    } catch(e){
+      showStatus('❌ Lỗi xử lý: ' + e.message, 'err');
+    }
+  });
+
+  // ---------- Download ----------
+  btnDownload.addEventListener('click', () => {
+    if(!csvResult) return;
+    const bom = document.getElementById('optBom').checked ? '\uFEFF' : '';
+    const blob = new Blob([bom + csvResult], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'converted_' + Date.now() + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  // ---------- Copy ----------
+  // Lưu ý: khi copy văn bản rồi dán trực tiếp vào Excel, Excel chỉ tự tách cột
+  // nếu dữ liệu clipboard phân tách bằng TAB — dùng dấu phẩy/chấm phẩy thường
+  // bị dán dồn vào 1 cột duy nhất (đặc biệt với máy đặt locale có List separator khác dấu phẩy).
+  // Vì vậy nút Copy luôn tạo bản TSV (tab-delimited) riêng, độc lập với dấu phân tách
+  // đã chọn để TẢI FILE .csv (delimSelect) — đảm bảo dữ liệu tải file và dữ liệu copy đều
+  // đúng, chính xác, khớp 1-1 với dữ liệu gốc.
+  btnCopy.addEventListener('click', async () => {
+    if(!csvResult || !lastColumns.length) return;
+    try {
+      const tsv = toCSV(lastRows, lastColumns, '\t');
+      await navigator.clipboard.writeText(tsv);
+      showStatus('📋 Đã copy dữ liệu (dạng TAB) — dán trực tiếp vào Excel sẽ tự tách đúng từng cột.', 'ok');
+    } catch(e){
+      showStatus('Không thể copy tự động, vui lòng chọn thủ công.', 'err');
+    }
+  });
+
+})();
+</script>
+
+</body>
+</html>
